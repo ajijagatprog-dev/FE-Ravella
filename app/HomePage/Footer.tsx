@@ -10,7 +10,7 @@ import {
 
 export default function Footer() {
   const companyLinks = [
-    { name: "Tentang Kami", href: "/about" },
+    { name: "About", href: "/about" },
     { name: "FAQ", href: "/faq" },
   ];
 
