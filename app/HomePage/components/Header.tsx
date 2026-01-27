@@ -89,11 +89,11 @@ export default function Header({
               <div
                 className="hidden sm:flex items-center gap-2 rounded-full 
                 bg-gray-100 px-4 py-2 w-56
-                focus-within:ring-1 focus-within:ring-black transition"
+                focus-within:ring-1 focus-within:ring-white transition"
               >
                 <input
                   type="text"
-                  placeholder="Search collection..."
+                  placeholder="Search product..."
                   onChange={(e) => onSearch(e.target.value)}
                   className="w-full bg-transparent border-none text-sm 
                   text-gray-800 placeholder:text-gray-500 focus:ring-0"

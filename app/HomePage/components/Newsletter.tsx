@@ -1,28 +1,214 @@
-export default function Newsletter() {
-  return (
-    <section className="px-4 md:px-10 lg:px-40 py-16">
-      <div className="max-w-[1280px] mx-auto bg-primary rounded-[2rem] p-10 md:p-20 text-center relative overflow-hidden">
-        <div className="relative z-10">
-          <h2 className="text-white text-3xl md:text-4xl font-bold mb-4">
-            Join the Collective
-          </h2>
-          <p className="text-blue-100 mb-10 max-w-lg mx-auto">
-            Be the first to receive early access to new collections and
-            exclusive invitations.
-          </p>
+"use client";
 
-          <form className="flex flex-col md:flex-row gap-4 max-w-md mx-auto">
-            <input
-              className="flex-1 bg-white/10 border border-white/20 text-white placeholder:text-blue-100/70 rounded-xl px-6 py-4 focus:ring-1 focus:ring-white/50"
-              placeholder="Enter your email"
-              type="email"
-            />
-            <button className="bg-white text-primary px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition">
-              Subscribe
-            </button>
-          </form>
+import { Mail, Send, Shield, Sparkles, ArrowRight } from "lucide-react";
+import { useState } from "react";
+
+export default function Newsletter() {
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!email || !email.includes("@")) {
+      alert("Mohon masukkan email yang valid");
+      return;
+    }
+
+    setIsSubmitting(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    alert(`Terima kasih! Email ${email} telah terdaftar.`);
+    setEmail("");
+    setIsSubmitting(false);
+  };
+
+  const articles = [
+    {
+      title: "5 Kebiasaan yang Membuat Rice Cooker Cepat Rusak",
+      date: "10 Des 2025",
+      image:
+        "https://asset-2.tstatic.net/shopping/foto/bank/images/ilustrasi-rice-cooker-mini-untuk-kemudahan-menanak-nasi-di-dapur-mungil.jpg",
+      category: "Tips & Trik",
+    },
+    {
+      title: "Fungsi Tersembunyi Rice Cooker di Rumah Anda",
+      date: "8 Des 2025",
+      image:
+        "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=800",
+      category: "Tutorial",
+    },
+    {
+      title: "Kesalahan Umum Menggunakan Juicer",
+      date: "5 Des 2025",
+      image:
+        "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?q=80&w=800",
+      category: "Panduan",
+    },
+  ];
+
+  return (
+    <section className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-gray-50 to-white">
+      <div className="max-w-[1600px] mx-auto relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl">
+        {/* Decorative ambient lights */}
+        <div className="absolute -top-32 -right-32 w-72 sm:w-96 h-72 sm:h-96 bg-orange-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-32 -left-32 w-72 sm:w-96 h-72 sm:h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+
+        <div className="relative z-10 p-6 sm:p-10 md:p-16 lg:p-20">
+          {/* Header Section */}
+          <div className="text-center mb-12 sm:mb-16">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 mb-4 sm:mb-6 px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-orange-500/20 to-pink-500/20 backdrop-blur-xl border border-orange-400/30 rounded-full shadow-lg">
+              <Sparkles className="w-4 h-4 text-orange-400" />
+              <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-orange-400">
+                Ravella Insight
+              </span>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 sm:mb-6 leading-tight">
+              Insight & Tips Dapur{" "}
+              <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                dari Ravella
+              </span>
+            </h2>
+
+            {/* Description */}
+            <p className="text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed mb-8 sm:mb-12">
+              Dapatkan tips, tutorial, dan insight terbaru seputar peralatan
+              dapur Ravella. Dari cara penggunaan hingga perawatan agar alat
+              dapur lebih awet.
+            </p>
+          </div>
+
+          {/* Articles Preview Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-12">
+            {articles.map((item, i) => (
+              <a
+                key={i}
+                href="/news"
+                className="group relative rounded-2xl overflow-hidden bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+              >
+                {/* Image */}
+                <div className="relative h-40 sm:h-48 overflow-hidden">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                    style={{ backgroundImage: `url(${item.image})` }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+                  {/* Category Badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 bg-orange-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-full">
+                      {item.category}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-4 sm:p-5">
+                  <p className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                    {item.date}
+                  </p>
+                  <h3 className="text-sm sm:text-base font-bold text-white leading-snug group-hover:text-orange-400 transition-colors line-clamp-2">
+                    {item.title}
+                  </h3>
+                </div>
+
+                {/* Hover Arrow */}
+                <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                  <ArrowRight className="w-5 h-5 text-orange-400" />
+                </div>
+              </a>
+            ))}
+          </div>
+
+          {/* View All Link */}
+          <div className="text-center mb-10 sm:mb-14">
+            <a
+              href="/news"
+              className="inline-flex items-center gap-2 text-orange-400 font-bold text-sm sm:text-base hover:text-orange-300 transition-colors group"
+            >
+              <span>Lihat Semua Artikel & Tips Dapur</span>
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
+
+          {/* Divider */}
+          <div className="max-w-4xl mx-auto mb-10 sm:mb-12">
+            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+          </div>
+
+          {/* Subscribe Section */}
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                Subscribe Newsletter
+              </h3>
+            </div>
+
+            <p className="text-gray-400 text-sm sm:text-base mb-6 sm:mb-8">
+              Dapatkan tips, promo eksklusif, dan update produk terbaru langsung
+              ke email Anda
+            </p>
+
+            {/* Subscribe Input */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+              <div className="flex-1 relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                  placeholder="Masukkan email Anda"
+                  className="w-full rounded-xl pl-12 pr-6 py-3 sm:py-4 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-4 focus:ring-orange-500/40 shadow-lg font-medium transition-all"
+                />
+              </div>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 px-6 sm:px-8 py-3 sm:py-4 font-bold text-white hover:shadow-2xl hover:shadow-orange-500/40 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span className="hidden sm:inline">Mengirim...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Subscribe</span>
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-green-400" />
+                <span>Privasi Aman</span>
+              </div>
+              <div className="w-1 h-1 rounded-full bg-gray-600"></div>
+              <div className="flex items-center gap-2">
+                <span>Tanpa Spam</span>
+              </div>
+              <div className="w-1 h-1 rounded-full bg-gray-600"></div>
+              <div className="flex items-center gap-2">
+                <span>Unsubscribe Kapan Saja</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+      `}</style>
     </section>
   );
 }
