@@ -419,6 +419,7 @@ function NewsContent() {
           </article>
         ))}
       </div>
+      <Footer />
     </div>
   );
 }
