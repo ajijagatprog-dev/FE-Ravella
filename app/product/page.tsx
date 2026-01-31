@@ -795,15 +795,17 @@ export default function ProductPage() {
                     Fitur Utama
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {selectedProduct.features.map((feature, idx) => (
-                      <span
-                        key={idx}
-                        className="px-4 py-2 bg-white text-orange-700 text-sm font-semibold rounded-xl border-2 border-orange-100"
-                      >
-                        <Check className="w-4 h-4 inline mr-1" />
-                        {feature}
-                      </span>
-                    ))}
+                    {selectedProduct.features.map(
+                      (feature: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className="px-4 py-2 bg-white text-orange-700 text-sm font-semibold rounded-xl border-2 border-orange-100"
+                        >
+                          <Check className="w-4 h-4 inline mr-1" />
+                          {feature}
+                        </span>
+                      ),
+                    )}
                   </div>
                 </div>
 
@@ -813,21 +815,19 @@ export default function ProductPage() {
                     Spesifikasi
                   </h3>
                   <div className="space-y-2">
-                    {Object.entries(selectedProduct.specifications).map(
-                      ([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex justify-between py-2 border-b border-gray-100"
-                        >
-                          <span className="text-gray-600 font-medium">
-                            {key}
-                          </span>
-                          <span className="text-gray-900 font-semibold">
-                            {value}
-                          </span>
-                        </div>
-                      ),
-                    )}
+                    {Object.entries(
+                      selectedProduct.specifications as Record<string, string>,
+                    ).map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex justify-between py-2 border-b border-gray-100"
+                      >
+                        <span className="text-gray-600 font-medium">{key}</span>
+                        <span className="text-gray-900 font-semibold">
+                          {value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
