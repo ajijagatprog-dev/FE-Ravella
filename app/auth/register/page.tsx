@@ -347,15 +347,34 @@ export default function RegisterPage() {
 /* =============================
    REUSABLE INPUT COMPONENT
 ============================= */
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onFocus" | "onBlur" | "onKeyPress"
+> {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   error?: string;
   touched?: boolean;
   focused?: string;
-  onFocus: (name: string) => void;
-  onBlur: (name: string) => void;
-  onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+
+  onInputFocus?: (name: string) => void;
+  onInputBlur?: (name: string) => void;
+  onInputKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+}
+
+interface InputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onFocus" | "onBlur" | "onKeyPress"
+> {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  error?: string;
+  touched?: boolean;
+  focused?: string;
+
+  onInputFocus?: (name: string) => void;
+  onInputBlur?: (name: string) => void;
+  onInputKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 function Input(props: InputProps) {
@@ -366,23 +385,25 @@ function Input(props: InputProps) {
     error,
     touched,
     focused,
-    onFocus,
-    onBlur,
-    onKeyPress,
+    onInputFocus,
+    onInputBlur,
+    onInputKeyPress,
     ...rest
   } = props;
 
   return (
     <div>
       <label className="text-[#0d121b] text-sm font-semibold">{label}</label>
+
       <div className="relative mt-2">
         <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 text-gray-400" />
+
         <input
           {...rest}
           name={name}
-          onFocus={() => onFocus(name)}
-          onBlur={() => onBlur(name)}
-          onKeyPress={onKeyPress}
+          onFocus={() => onInputFocus?.(name!)}
+          onBlur={() => onInputBlur?.(name!)}
+          onKeyPress={(e) => onInputKeyPress?.(e)}
           className={`w-full h-12 rounded-lg pl-10 pr-10
             border bg-[#f9fafb]
             text-[#0d121b]
@@ -401,6 +422,7 @@ function Input(props: InputProps) {
         {touched && !error && rest.value && (
           <Check className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 w-5 h-5" />
         )}
+
         {touched && error && (
           <X className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 w-5 h-5" />
         )}
