@@ -4,7 +4,7 @@ import Header from "./HomePage/components/Header";
 import HeroSection from "./HomePage/components/HeroSectoin";
 import NewProducts from "./HomePage/components/NewProducts";
 import Newsletter from "./HomePage/components/Newsletter";
-import Footer from "./HomePage/Footer";
+import Footer from "./HomePage/components/Footer";
 
 export default function Home() {
   return (

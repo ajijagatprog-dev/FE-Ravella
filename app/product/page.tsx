@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import Header from "../HomePage/components/Header";
-import Footer from "../HomePage/Footer";
+import Footer from "../HomePage/components/Footer";
 
 export default function ProductPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -77,7 +77,7 @@ export default function ProductPage() {
       price: 1399900,
       originalPrice: 1799900,
       image:
-        "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=500&q=80",
+        "https://www.ravelle.co.id/data/product_cover/224-20250520175323.png",
       category: "homeliving",
       rating: 4.9,
       reviews: 89,
@@ -97,11 +97,11 @@ export default function ProductPage() {
     },
     {
       id: 3,
-      name: "Ravelle NOVA Digital Dehumidifier 1L",
-      price: 559900,
-      originalPrice: 699900,
+      name: "Ravelle High Speed Hair Dryer-grey",
+      price: 799900,
+      originalPrice: 899900,
       image:
-        "https://images.unsplash.com/photo-1572635196243-4dd75fbdbd7f?w=500&q=80",
+        "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
       category: "homeliving",
       rating: 4.7,
       reviews: 156,
@@ -125,7 +125,7 @@ export default function ProductPage() {
       price: 1199900,
       originalPrice: 1499900,
       image:
-        "https://images.unsplash.com/photo-1583425423320-2386622cd2e4?w=500&q=80",
+        "https://www.ravelle.co.id/data/product_cover/223-20250520175032.png",
       category: "homeliving",
       rating: 4.9,
       reviews: 203,
@@ -145,11 +145,11 @@ export default function ProductPage() {
     },
     {
       id: 5,
-      name: "Ravelle Airy Air Purifier HEPA13 + Aromatherapy",
+      name: "Ravelle Ezy Squeenze Citrus Juicer- Cream",
       price: 559900,
       originalPrice: 749900,
       image:
-        "https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?w=500&q=80",
+        "https://www.ravelle.co.id/data/product_cover/218-20250520162617.png",
       category: "homeliving",
       rating: 4.6,
       reviews: 98,

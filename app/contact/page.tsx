@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import Header from "../HomePage/components/Header";
-import Footer from "../HomePage/Footer";
+import Footer from "../HomePage/components/Footer";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -36,7 +36,9 @@ export default function ContactPage() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -104,28 +106,56 @@ export default function ContactPage() {
   ];
 
   const socialMedia = [
-    { icon: Instagram, name: "Instagram", handle: "@ravella.id", color: "hover:bg-pink-600", url: "#" },
-    { icon: Facebook, name: "Facebook", handle: "Ravella Indonesia", color: "hover:bg-blue-600", url: "#" },
-    { icon: Twitter, name: "Twitter", handle: "@ravella_id", color: "hover:bg-sky-500", url: "#" },
-    { icon: Youtube, name: "Youtube", handle: "Ravella Official", color: "hover:bg-red-600", url: "#" },
+    {
+      icon: Instagram,
+      name: "Instagram",
+      handle: "@ravella.id",
+      color: "hover:bg-pink-600",
+      url: "#",
+    },
+    {
+      icon: Facebook,
+      name: "Facebook",
+      handle: "Ravella Indonesia",
+      color: "hover:bg-blue-600",
+      url: "#",
+    },
+    {
+      icon: Twitter,
+      name: "Twitter",
+      handle: "@ravella_id",
+      color: "hover:bg-sky-500",
+      url: "#",
+    },
+    {
+      icon: Youtube,
+      name: "Youtube",
+      handle: "Ravella Official",
+      color: "hover:bg-red-600",
+      url: "#",
+    },
   ];
 
   const faqs = [
     {
       question: "Berapa lama pengiriman produk?",
-      answer: "Pengiriman reguler memakan waktu 2-3 hari kerja. Untuk same-day delivery tersedia di area Jakarta dan sekitarnya.",
+      answer:
+        "Pengiriman reguler memakan waktu 2-3 hari kerja. Untuk same-day delivery tersedia di area Jakarta dan sekitarnya.",
     },
     {
       question: "Apakah produk memiliki garansi?",
-      answer: "Ya, semua produk Ravella dilengkapi dengan garansi resmi 1 tahun. Garansi mencakup kerusakan manufaktur dan dapat diklaim di service center kami.",
+      answer:
+        "Ya, semua produk Ravella dilengkapi dengan garansi resmi 1 tahun. Garansi mencakup kerusakan manufaktur dan dapat diklaim di service center kami.",
     },
     {
       question: "Bagaimana cara melakukan retur produk?",
-      answer: "Retur dapat dilakukan dalam 7 hari setelah produk diterima. Hubungi customer service kami untuk proses retur dan pengembalian dana.",
+      answer:
+        "Retur dapat dilakukan dalam 7 hari setelah produk diterima. Hubungi customer service kami untuk proses retur dan pengembalian dana.",
     },
     {
       question: "Apakah tersedia pembayaran cicilan?",
-      answer: "Ya, kami menyediakan berbagai opsi pembayaran cicilan melalui kartu kredit dan platform payment partner kami dengan tenor 3, 6, atau 12 bulan.",
+      answer:
+        "Ya, kami menyediakan berbagai opsi pembayaran cicilan melalui kartu kredit dan platform payment partner kami dengan tenor 3, 6, atau 12 bulan.",
     },
   ];
 
@@ -379,7 +409,10 @@ export default function ContactPage() {
             {/* Map & Additional Info */}
             <div className="space-y-8">
               {/* Map */}
-              <div className="relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-100" id="map">
+              <div
+                className="relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-100"
+                id="map"
+              >
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.521260322283!2d106.8195613!3d-6.1944491!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d2e764b12d%3A0x3d2ad6e1e0e9bcc8!2sJl.%20Jend.%20Sudirman%2C%20Jakarta!5e0!3m2!1sen!2sid!4v1234567890"
                   width="100%"
@@ -396,7 +429,9 @@ export default function ContactPage() {
                       <MapPin className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="font-bold text-gray-900">Visit Our Office</p>
+                      <p className="font-bold text-gray-900">
+                        Visit Our Office
+                      </p>
                       <p className="text-sm text-gray-600">Jakarta Pusat</p>
                     </div>
                   </div>

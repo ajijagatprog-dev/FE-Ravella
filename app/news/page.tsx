@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import Header from "../HomePage/components/Header";
-import Footer from "../HomePage/Footer";
+import Footer from "../HomePage/components/Footer";
 
 export default function News() {
   const [searchQuery, setSearchQuery] = useState("");
