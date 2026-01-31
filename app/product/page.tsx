@@ -34,6 +34,8 @@ export default function ProductPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const categories = [
     { id: "all", name: "ALL PRODUCTS", icon: Package, count: 48 },
@@ -60,6 +62,14 @@ export default function ProductPage() {
       features: ["HEPA Filter", "Cordless", "2h Battery"],
       inStock: true,
       isNew: false,
+      description:
+        "Vacuum cleaner cordless dengan teknologi HEPA filter untuk pembersihan maksimal. Dilengkapi baterai tahan lama hingga 2 jam.",
+      specifications: {
+        Power: "120W",
+        Battery: "2000mAh",
+        Weight: "2.5kg",
+        Warranty: "1 Year",
+      },
     },
     {
       id: 2,
@@ -76,6 +86,14 @@ export default function ProductPage() {
       features: ["2-in-1", "Smart Sensor", "Ultra Quiet"],
       inStock: true,
       isNew: true,
+      description:
+        "Dehumidifier dan air purifier 2 in 1 dengan smart sensor otomatis. Operasi ultra quiet cocok untuk kamar tidur.",
+      specifications: {
+        Capacity: "2L",
+        Coverage: "30m²",
+        "Noise Level": "35dB",
+        Warranty: "1 Year",
+      },
     },
     {
       id: 3,
@@ -92,6 +110,14 @@ export default function ProductPage() {
       features: ["Digital Display", "Auto Shutoff", "Portable"],
       inStock: true,
       isNew: false,
+      description:
+        "Dehumidifier digital portabel dengan auto shutoff untuk keamanan maksimal. Display digital menampilkan kelembaban real-time.",
+      specifications: {
+        Capacity: "1L",
+        Coverage: "20m²",
+        Weight: "1.8kg",
+        Warranty: "1 Year",
+      },
     },
     {
       id: 4,
@@ -108,6 +134,14 @@ export default function ProductPage() {
       features: ["HEPA13", "Anti-Allergen", "Smart Mode"],
       inStock: true,
       isNew: false,
+      description:
+        "Air purifier premium dengan HEPA13 filter yang mampu menyaring 99.97% partikel allergen. Dilengkapi smart mode untuk efisiensi energi.",
+      specifications: {
+        Filter: "HEPA13",
+        Coverage: "50m²",
+        CADR: "300m³/h",
+        Warranty: "1 Year",
+      },
     },
     {
       id: 5,
@@ -124,6 +158,14 @@ export default function ProductPage() {
       features: ["Aromatherapy", "Night Light", "Compact"],
       inStock: true,
       isNew: true,
+      description:
+        "Air purifier compact dengan fitur aromatherapy dan night light. Sempurna untuk kamar tidur dengan desain modern.",
+      specifications: {
+        Filter: "HEPA13",
+        Coverage: "25m²",
+        Features: "Aromatherapy, LED Light",
+        Warranty: "1 Year",
+      },
     },
     {
       id: 6,
@@ -131,7 +173,7 @@ export default function ProductPage() {
       price: 899900,
       originalPrice: 1199900,
       image:
-        "https://images.unsplash.com/photo-1556910109-76e43ce4d3f4?w=500&q=80",
+        "https://cdn.ruparupa.io/fit-in/850x850/filters:format(webp)/filters:watermark(content.ruparupa.io,products/wm/rr.png,0,-0,0,100,100)/ruparupa-com/image/upload/Products/10632435_1.jpg",
       category: "appliance",
       rating: 4.8,
       reviews: 234,
@@ -140,6 +182,14 @@ export default function ProductPage() {
       features: ["Smart Cook", "Keep Warm", "Non-stick"],
       inStock: true,
       isNew: false,
+      description:
+        "Rice cooker pintar dengan teknologi smart cook untuk hasil nasi sempurna. Fitur keep warm hingga 12 jam.",
+      specifications: {
+        Capacity: "1.8L",
+        Power: "600W",
+        Material: "Non-stick coating",
+        Warranty: "1 Year",
+      },
     },
     {
       id: 7,
@@ -156,6 +206,14 @@ export default function ProductPage() {
       features: ["800W Motor", "Glass Jar", "6 Speeds"],
       inStock: true,
       isNew: false,
+      description:
+        "Blender premium dengan motor 800W untuk hasil blending sempurna. Jar kaca tahan panas dan 6 speed settings.",
+      specifications: {
+        Power: "800W",
+        Capacity: "2L",
+        Material: "Glass Jar",
+        Warranty: "1 Year",
+      },
     },
     {
       id: 8,
@@ -172,6 +230,14 @@ export default function ProductPage() {
       features: ["German Steel", "Ergonomic", "Block Included"],
       inStock: true,
       isNew: true,
+      description:
+        "Set pisau profesional 8 pieces dengan material German steel berkualitas tinggi. Dilengkapi knife block kayu premium.",
+      specifications: {
+        Material: "German Stainless Steel",
+        Pieces: "8pcs",
+        Includes: "Wooden Block",
+        Warranty: "1 Year",
+      },
     },
   ];
 
@@ -179,20 +245,18 @@ export default function ProductPage() {
     let filtered = products;
 
     if (activeCategory !== "ALL PRODUCTS") {
-      const categoryId = categories.find(
-        (c) => c.name === activeCategory
-      )?.id;
+      const categoryId = categories.find((c) => c.name === activeCategory)?.id;
       filtered = filtered.filter((p) => p.category === categoryId);
     }
 
     if (searchQuery) {
       filtered = filtered.filter((p) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase())
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
     filtered = filtered.filter(
-      (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
+      (p) => p.price >= priceRange[0] && p.price <= priceRange[1],
     );
 
     switch (sortBy) {
@@ -227,8 +291,18 @@ export default function ProductPage() {
     setFavorites((prev) =>
       prev.includes(productId)
         ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
+        : [...prev, productId],
     );
+  };
+
+  const openQuickView = (product: any) => {
+    setSelectedProduct(product);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setTimeout(() => setSelectedProduct(null), 300);
   };
 
   return (
@@ -437,9 +511,7 @@ export default function ProductPage() {
                 onMouseEnter={() => setHoveredProduct(product.id)}
                 onMouseLeave={() => setHoveredProduct(null)}
                 className={`group relative bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-orange-200 hover:shadow-2xl transition-all duration-300 ${
-                  viewMode === "grid"
-                    ? "hover:-translate-y-2"
-                    : "flex flex-row"
+                  viewMode === "grid" ? "hover:-translate-y-2" : "flex flex-row"
                 }`}
               >
                 {/* Image Section */}
@@ -492,7 +564,10 @@ export default function ProductPage() {
                         }`}
                       />
                     </button>
-                    <button className="w-10 h-10 bg-white/90 backdrop-blur-xl rounded-xl flex items-center justify-center hover:bg-white hover:scale-110 transition-all shadow-lg">
+                    <button
+                      onClick={() => openQuickView(product)}
+                      className="w-10 h-10 bg-white/90 backdrop-blur-xl rounded-xl flex items-center justify-center hover:bg-white hover:scale-110 transition-all shadow-lg"
+                    >
                       <Eye className="w-5 h-5 text-gray-700" />
                     </button>
                   </div>
@@ -584,7 +659,10 @@ export default function ProductPage() {
                     <button className="px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-2xl transition-all">
                       Add to Cart
                     </button>
-                    <button className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 hover:border-orange-300 transition-all">
+                    <button
+                      onClick={() => openQuickView(product)}
+                      className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 hover:border-orange-300 transition-all"
+                    >
                       Details
                     </button>
                   </div>
@@ -603,6 +681,196 @@ export default function ProductPage() {
           </div>
         )}
       </div>
+
+      {/* Quick View Modal */}
+      {showModal && selectedProduct && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-6 right-6 w-12 h-12 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all shadow-lg z-10"
+            >
+              <X className="w-6 h-6 text-gray-700" />
+            </button>
+
+            <div className="grid md:grid-cols-2 gap-8 p-8">
+              {/* Product Image */}
+              <div className="relative">
+                <div className="sticky top-0">
+                  <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50">
+                    <img
+                      src={selectedProduct.image}
+                      alt={selectedProduct.name}
+                      className="w-full h-full object-cover"
+                    />
+
+                    {/* Badges */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
+                      {selectedProduct.isNew && (
+                        <span className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold rounded-lg shadow-lg">
+                          NEW
+                        </span>
+                      )}
+                      {selectedProduct.discount > 0 && (
+                        <span className="px-3 py-1.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold rounded-lg shadow-lg">
+                          -{selectedProduct.discount}%
+                        </span>
+                      )}
+                      {selectedProduct.badge && (
+                        <span className="px-3 py-1.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold rounded-lg shadow-lg">
+                          {selectedProduct.badge}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Details */}
+              <div className="flex flex-col">
+                {/* Rating */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 ${
+                          i < Math.floor(selectedProduct.rating)
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-bold text-gray-900">
+                    {selectedProduct.rating}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    ({selectedProduct.reviews} reviews)
+                  </span>
+                </div>
+
+                {/* Product Name */}
+                <h2 className="text-3xl font-black text-gray-900 mb-4 leading-tight">
+                  {selectedProduct.name}
+                </h2>
+
+                {/* Description */}
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  {selectedProduct.description}
+                </p>
+
+                {/* Price */}
+                <div className="mb-6 p-6 bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl border-2 border-orange-100">
+                  <div className="flex items-baseline gap-3 mb-2">
+                    <span className="text-4xl font-black bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
+                      {formatPrice(selectedProduct.price)}
+                    </span>
+                    {selectedProduct.originalPrice > selectedProduct.price && (
+                      <span className="text-lg text-gray-400 line-through font-medium">
+                        {formatPrice(selectedProduct.originalPrice)}
+                      </span>
+                    )}
+                  </div>
+                  {selectedProduct.originalPrice > selectedProduct.price && (
+                    <p className="text-sm text-emerald-600 font-bold">
+                      Hemat{" "}
+                      {formatPrice(
+                        selectedProduct.originalPrice - selectedProduct.price,
+                      )}
+                    </p>
+                  )}
+                </div>
+
+                {/* Features */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">
+                    Fitur Utama
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProduct.features.map((feature, idx) => (
+                      <span
+                        key={idx}
+                        className="px-4 py-2 bg-white text-orange-700 text-sm font-semibold rounded-xl border-2 border-orange-100"
+                      >
+                        <Check className="w-4 h-4 inline mr-1" />
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Specifications */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">
+                    Spesifikasi
+                  </h3>
+                  <div className="space-y-2">
+                    {Object.entries(selectedProduct.specifications).map(
+                      ([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex justify-between py-2 border-b border-gray-100"
+                        >
+                          <span className="text-gray-600 font-medium">
+                            {key}
+                          </span>
+                          <span className="text-gray-900 font-semibold">
+                            {value}
+                          </span>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 mt-auto">
+                  <button
+                    onClick={() => toggleFavorite(selectedProduct.id)}
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-lg ${
+                      favorites.includes(selectedProduct.id)
+                        ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white scale-105"
+                        : "bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-orange-300"
+                    }`}
+                  >
+                    <Heart
+                      className={`w-6 h-6 ${
+                        favorites.includes(selectedProduct.id)
+                          ? "fill-current"
+                          : ""
+                      }`}
+                    />
+                  </button>
+                  <button className="flex-1 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3">
+                    <ShoppingCart className="w-5 h-5" />
+                    <span>Add to Cart</span>
+                  </button>
+                </div>
+
+                {/* Stock Status */}
+                <div className="mt-4 flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full ${selectedProduct.inStock ? "bg-emerald-500 animate-pulse" : "bg-red-500"}`}
+                  />
+                  <span
+                    className={`text-sm font-semibold ${selectedProduct.inStock ? "text-emerald-600" : "text-red-600"}`}
+                  >
+                    {selectedProduct.inStock ? "In Stock" : "Out of Stock"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Features Section */}
       <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-16 sm:py-20 relative overflow-hidden">
@@ -665,6 +933,45 @@ export default function ProductPage() {
         </div>
       </section>
       <Footer />
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+
+        .animate-scaleIn {
+          animation: scaleIn 0.3s ease-out;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }
