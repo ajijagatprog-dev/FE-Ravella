@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import Header from "../HomePage/components/Header";
-import Footer from "../HomePage/Footer";
+import Footer from "../HomePage/components/Footer";
 
 export default function Company() {
   const [activeTimeline, setActiveTimeline] = useState(0);
@@ -46,7 +46,10 @@ export default function Company() {
 
         {/* Animated Background Elements */}
         <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "700ms" }} />
+        <div
+          className="absolute bottom-20 right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "700ms" }}
+        />
 
         <div className="relative z-10 h-full flex items-center justify-center px-4">
           <div className="text-center max-w-4xl">
@@ -261,7 +264,10 @@ export default function Company() {
           <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl p-8 sm:p-12 md:p-16 relative overflow-hidden shadow-2xl">
             {/* Animated Background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1000ms" }} />
+            <div
+              className="absolute bottom-0 left-0 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl animate-pulse"
+              style={{ animationDelay: "1000ms" }}
+            />
 
             <div className="relative z-10">
               <div className="text-center mb-12">
