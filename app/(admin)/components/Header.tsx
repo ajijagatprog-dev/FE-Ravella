@@ -43,7 +43,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           {/* Right Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
             {/* Store Status - Hidden on mobile & tablet */}
-            <div className="hidden xl:flex items-center gap-2.5 px-4 py-2 rounded-xl bg-green-50 border border-green-200">
+            {/* <div className="hidden xl:flex items-center gap-2.5 px-4 py-2 rounded-xl bg-green-50 border border-green-200">
               <div className="relative">
                 <span className="w-2.5 h-2.5 rounded-full bg-green-500 block" />
                 <span className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-green-500 animate-ping" />
@@ -52,10 +52,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 <span className="text-gray-600 font-medium">Status:</span>
                 <span className="font-semibold text-green-700">Online</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Notifications */}
-            <button className="relative p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-all group">
+            {/* <button className="relative p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-all group">
               <Bell
                 className="text-gray-600 group-hover:text-primary transition-colors"
                 size={18}
@@ -65,7 +65,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                   {notifications > 9 ? "9+" : notifications}
                 </span>
               )}
-            </button>
+            </button> */}
 
             {/* Settings - Hidden on small mobile */}
             <button className="hidden sm:block p-2 sm:p-2.5 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-all group">
@@ -80,7 +80,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
             {/* User Profile */}
             <button className="flex items-center gap-2 sm:gap-2.5 lg:gap-3 px-1.5 sm:px-2 lg:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-all group">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-md shrink-0">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-gray-800 font-semibold text-xs sm:text-sm shadow-md shrink-0">
                 A
               </div>
               <div className="hidden md:block text-left min-w-0">

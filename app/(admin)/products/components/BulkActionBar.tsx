@@ -32,7 +32,7 @@ export default function BulkActionBar({
             onClick={onChangeCategory}
             className="text-xs font-bold hover:underline transition-all"
           >
-            Change Category
+            Ubah Kategori
           </button>
           <button
             onClick={onMarkInactive}
@@ -44,7 +44,7 @@ export default function BulkActionBar({
             onClick={onBulkDelete}
             className="bg-white text-gray-900 px-4 py-2 rounded-lg text-xs font-black hover:bg-gray-100 transition-colors"
           >
-            Bulk Delete
+            Hapus Pemilihan
           </button>
         </div>
       </div>
