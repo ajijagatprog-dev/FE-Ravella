@@ -10,6 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import Link from "next/link";
+import { link } from "fs";
 
 const HERO_IMAGES = [
   "/Hero/banner1.png",
@@ -25,6 +27,7 @@ const HERO_DATA = [
     description:
       "Temukan peralatan dapur berkualitas tinggi dengan harga terjangkau. Sempurnakan setiap masakan Anda.",
     cta: "Belanja Sekarang",
+    link: "/products",
   },
   {
     badge: "✨ KOLEKSI TERBARU",
@@ -33,6 +36,7 @@ const HERO_DATA = [
     description:
       "Hadirkan inovasi terbaru ke dapur Anda. Desain modern, fungsi maksimal, kualitas terjamin.",
     cta: "Lihat Koleksi",
+    link: "/products/new",
   },
   {
     badge: "💎 KUALITAS PREMIUM",
@@ -41,6 +45,7 @@ const HERO_DATA = [
     description:
       "Produk original dengan garansi resmi. Layanan purna jual terpercaya untuk kepuasan Anda.",
     cta: "Jelajahi Sekarang",
+    link: "/products",
   },
 ];
 
@@ -295,13 +300,20 @@ function HeroContent({
           <div
             className={`flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 transform transition-all duration-700 delay-300 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
-            <button className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold text-sm sm:text-base hover:shadow-2xl hover:shadow-orange-500/50 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2">
+            <Link
+              href="/product"
+              className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold text-sm sm:text-base hover:shadow-2xl hover:shadow-orange-500/50 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2"
+            >
               <span>{data.cta}</span>
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl border-2 border-white/60 text-white backdrop-blur-xl bg-white/5 hover:bg-white/10 hover:border-white/80 transition-all duration-300 font-semibold text-sm sm:text-base hover:scale-[1.02]">
+            </Link>
+
+            <Link
+              href="/promo"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl border-2 border-white/60 text-white backdrop-blur-xl bg-white/5 hover:bg-white/10 hover:border-white/80 transition-all duration-300 font-semibold text-sm sm:text-base hover:scale-[1.02]"
+            >
               Lihat Semua Promo
-            </button>
+            </Link>
           </div>
 
           {/* Rating & Trust Indicators */}
