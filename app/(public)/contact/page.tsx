@@ -20,8 +20,8 @@ import {
   HeadphonesIcon,
 } from "lucide-react";
 import { useState } from "react";
-import Header from "../HomePage/components/Header";
-import Footer from "../HomePage/components/Footer";
+import Header from "../../HomePage/components/Header";
+import Footer from "../../HomePage/components/Footer";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({

@@ -22,8 +22,8 @@ import {
   Check,
 } from "lucide-react";
 import { useState, useMemo } from "react";
-import Header from "../HomePage/components/Header";
-import Footer from "../HomePage/components/Footer";
+import Header from "../../HomePage/components/Header";
+import Footer from "../../HomePage/components/Footer";
 
 export default function ProductPage() {
   const [searchQuery, setSearchQuery] = useState("");
