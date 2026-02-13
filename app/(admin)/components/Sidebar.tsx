@@ -19,8 +19,9 @@ const menuItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Product Management", href: "/products", icon: Package },
   { label: "Order Management", href: "/order", icon: ShoppingCart },
-  { label: "Customer Management", href: "/customers", icon: Users },
-  { label: "B2B Management", href: "/b2b", icon: Building2 },
+  { label: "User Management", href: "/users_management", icon: Users },
+  // { label: "Customer Management", href: "/customers", icon: Users },
+  // { label: "B2B Management", href: "/b2b", icon: Building2 },
   { label: "Loyalty System", href: "/loyalty", icon: Award },
   { label: "Reporting", href: "/reports", icon: BarChart3 },
 ];

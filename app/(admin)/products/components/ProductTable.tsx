@@ -19,12 +19,16 @@ interface Product {
 interface ProductTableProps {
   products: Product[];
   onSelectProduct?: (id: number) => void;
+  onDeleteProduct?: (id: number) => void;
+  onEditProduct?: (product: Product) => void;
   selectedProducts?: number[];
 }
 
 export default function ProductTable({
   products,
   onSelectProduct,
+  onDeleteProduct,
+  onEditProduct,
   selectedProducts = [],
 }: ProductTableProps) {
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
@@ -61,16 +65,10 @@ export default function ProductTable({
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-4 py-3 text-left">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
+                <input type="checkbox" />
               </th>
               <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Product Name
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                SKU
               </th>
               <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Stock
@@ -86,6 +84,7 @@ export default function ProductTable({
               </th>
             </tr>
           </thead>
+
           <tbody className="divide-y divide-gray-100">
             {products.map((product) => (
               <tr
@@ -99,9 +98,9 @@ export default function ProductTable({
                     type="checkbox"
                     checked={selectedProducts.includes(product.id)}
                     onChange={() => onSelectProduct?.(product.id)}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                 </td>
+
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 relative">
@@ -122,34 +121,42 @@ export default function ProductTable({
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-4">
-                  <span className="text-sm font-mono text-gray-600">
-                    {product.sku}
-                  </span>
-                </td>
+
                 <td className="px-4 py-4 text-center">
                   {getStockBadge(product.stock, product.stockStatus)}
                 </td>
-                <td className="px-4 py-4">
-                  <span className="text-sm font-semibold text-gray-900">
-                    ${product.retailPrice.toFixed(2)}
-                  </span>
+
+                <td className="px-4 py-4 text-gray-500">
+                  Rp. {product.retailPrice.toFixed(2)}
                 </td>
-                <td className="px-4 py-4">
-                  <span className="text-sm font-semibold text-gray-900">
-                    ${product.b2bPrice.toFixed(2)}
-                  </span>
+
+                <td className="px-4 py-4 text-gray-500">
+                  Rp. {product.b2bPrice.toFixed(2)}
                 </td>
+
                 <td className="px-4 py-4">
                   <div
                     className={`flex items-center justify-end gap-2 transition-opacity ${
                       hoveredRow === product.id ? "opacity-100" : "opacity-0"
                     }`}
                   >
-                    <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditProduct?.(product);
+                      }}
+                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
                       <Edit size={16} />
                     </button>
-                    <button className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteProduct?.(product.id);
+                      }}
+                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -158,32 +165,6 @@ export default function ProductTable({
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-200">
-        <p className="text-sm text-gray-600">Showing 1 to 5 of 142 products</p>
-        <div className="flex items-center gap-1">
-          <button className="px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50">
-            ‹
-          </button>
-          <button className="px-3 py-1.5 text-sm font-bold bg-blue-600 text-white rounded-lg">
-            1
-          </button>
-          <button className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">
-            2
-          </button>
-          <button className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">
-            3
-          </button>
-          <span className="px-2 text-gray-400">...</span>
-          <button className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">
-            28
-          </button>
-          <button className="px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-200 rounded-lg transition-colors">
-            ›
-          </button>
-        </div>
       </div>
     </div>
   );
