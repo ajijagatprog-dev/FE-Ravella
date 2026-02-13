@@ -570,8 +570,7 @@ export default function OrdersPage() {
     setSearchQuery(query);
     setCurrentPage(1);
   };
-
-  // Calculate counts for each tab
+  
   const counts = useMemo(() => {
     return {
       all: allOrders.length,
