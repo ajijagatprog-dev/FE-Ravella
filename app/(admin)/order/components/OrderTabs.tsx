@@ -1,19 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-
-interface OrderTabsProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-  onSearch: (query: string) => void;
-  searchQuery: string;
-  counts: {
-    all: number;
-    pending: number;
-    success: number;
-    failed: number;
-  };
-}
+import { OrderTabsProps } from "../types";
 
 export default function OrderTabs({
   activeTab,
@@ -38,25 +26,13 @@ export default function OrderTabs({
             onClick={() => onTabChange(tab.id)}
             className={`relative px-5 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
               activeTab === tab.id
-                ? "bg-white text-gray-900 shadow-md shadow-gray-300/50"
+                ? "bg-white text-gray-900 shadow-md"
                 : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
             }`}
           >
-            <span className="relative z-10">{tab.label}</span>
+            {tab.label}
             {tab.count > 0 && (
-              <span
-                className={`ml-2 px-2 py-0.5 text-xs font-bold rounded-full ${
-                  activeTab === tab.id
-                    ? tab.id === "pending"
-                      ? "bg-amber-100 text-amber-700"
-                      : tab.id === "success"
-                        ? "bg-green-100 text-green-700"
-                        : tab.id === "failed"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-blue-100 text-blue-700"
-                    : "bg-gray-200 text-gray-600"
-                }`}
-              >
+              <span className="ml-2 px-2 py-0.5 text-xs font-bold rounded-full bg-gray-200 text-gray-700">
                 {tab.count}
               </span>
             )}
@@ -74,7 +50,7 @@ export default function OrderTabs({
           placeholder="Search ID, customer..."
           value={searchQuery}
           onChange={(e) => onSearch(e.target.value)}
-          className="pl-10 pr-4 py-2.5 border-2 border-gray-200 bg-white rounded-xl text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 hover:border-gray-300 w-72"
+          className="pl-10 pr-4 py-2.5 border-2 border-gray-200 bg-white rounded-xl text-sm font-medium text-gray-900 focus:outline-none focus:border-blue-500 w-72"
         />
       </div>
     </div>

@@ -1,12 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Plus,
   Search,
-  Filter,
   Download,
-  SlidersHorizontal,
 } from "lucide-react";
 
 import ProductTable from "./components/ProductTable";
@@ -66,11 +64,10 @@ const initialProducts: Product[] = [
   },
   {
     id: 4,
-    name: "Ravelle High Speed Hair Dryer-grey",
+    name: "Product 4",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-JKT-115",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-004",
     stock: 24,
     stockStatus: "medium",
     retailPrice: 899900,
@@ -78,11 +75,10 @@ const initialProducts: Product[] = [
   },
   {
     id: 5,
-    name: "Ravelle High Speed Hair Dryer-grey",
+    name: "Product 5",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-JKT-115",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-005",
     stock: 24,
     stockStatus: "medium",
     retailPrice: 899900,
@@ -90,11 +86,65 @@ const initialProducts: Product[] = [
   },
   {
     id: 6,
-    name: "Ravelle High Speed Hair Dryer-grey",
+    name: "Product 6",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-JKT-115",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-006",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 7,
+    name: "Product 7",
+    category: "homeliving",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-007",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 8,
+    name: "Product 8",
+    category: "homeliving",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-008",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 9,
+    name: "Product 9",
+    category: "homeliving",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-009",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 10,
+    name: "Product 10",
+    category: "homeliving",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-010",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 11,
+    name: "Product 11",
+    category: "homeliving",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-011",
     stock: 24,
     stockStatus: "medium",
     retailPrice: 899900,
@@ -102,27 +152,25 @@ const initialProducts: Product[] = [
   },
 ];
 
-// ===============================
-// Page Component
-// ===============================
-
 export default function ProductManagementPage() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("latest");
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // Modal State
   const [deleteTargetIds, setDeleteTargetIds] = useState<number[]>([]);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // ===============================
-  // Handlers
-  // ===============================
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy]);
 
   const handleSelectProduct = (id: number) => {
     setSelectedProducts((prev) =>
@@ -186,75 +234,180 @@ export default function ProductManagementPage() {
     return result;
   }, [products, searchQuery, sortBy]);
 
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
+  // Pagination pages with ellipsis
+  const getPageNumbers = () => {
+    const pages: (number | "...")[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("...");
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+        pages.push(i);
+      }
+      if (currentPage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
   return (
     <div className="space-y-6 px-4 sm:px-0">
-      {/* Header */}
+
+      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900">
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
             Product Management
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-slate-500 mt-0.5">
             Organize inventory and manage SKU logistics.
+            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 ring-1 ring-slate-200">
+              {products.length} products
+            </span>
           </p>
         </div>
 
         <button
           onClick={() => setOpenAddModal(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-600/30 transition-all"
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-colors"
         >
-          <Plus size={18} />
+          <Plus size={16} />
           Add New Product
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-xl border border-gray-200">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      {/* ── Filters ── */}
+      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+
           {/* Search */}
           <div className="relative flex-1 max-w-md">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={16}
             />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search product..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Search by product name..."
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
 
-          {/* Sort */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Sort */}
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400 font-semibold px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
-              <option value="latest">Latest</option>
+              <option value="latest">Sort: Latest</option>
               <option value="stock-low">Stock: Low to High</option>
               <option value="price-high">Price: High to Low</option>
             </select>
 
-            <button className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50">
-              <Download size={18} className="text-gray-600" />
+            {/* Export */}
+            <button className="inline-flex items-center gap-1.5 px-3 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 text-sm font-medium transition-colors">
+              <Download size={15} />
+              <span className="hidden sm:inline">Export</span>
             </button>
           </div>
         </div>
+
+        {/* Active search hint */}
+        {searchQuery && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
+            <span>
+              Showing <span className="font-semibold text-slate-700">{filteredProducts.length}</span> result{filteredProducts.length !== 1 ? "s" : ""} for
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium ring-1 ring-blue-200">
+              "{searchQuery}"
+              <button
+                onClick={() => setSearchQuery("")}
+                className="ml-0.5 hover:text-blue-900"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Table */}
+      {/* ── Table ── */}
       <ProductTable
-        products={filteredProducts}
+        products={paginatedProducts}
         selectedProducts={selectedProducts}
         onSelectProduct={handleSelectProduct}
         onDeleteProduct={handleSingleDelete}
         onEditProduct={handleEditClick}
       />
 
-      {/* Bulk Action */}
+      {/* ── Pagination ── */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-slate-500">
+            Page <span className="font-semibold text-slate-700">{currentPage}</span> of{" "}
+            <span className="font-semibold text-slate-700">{totalPages}</span>
+            <span className="ml-2 text-slate-400">
+              ({filteredProducts.length} total)
+            </span>
+          </p>
+
+          <div className="flex items-center gap-1">
+            {/* Prev */}
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
+            >
+              ‹
+            </button>
+
+            {getPageNumbers().map((page, i) =>
+              page === "..." ? (
+                <span
+                  key={`ellipsis-${i}`}
+                  className="w-8 h-8 flex items-center justify-center text-slate-400 text-sm"
+                >
+                  …
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page as number)}
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === page
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
+
+            {/* Next */}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Bulk Action Bar ── */}
       <BulkActionBar
         selectedCount={selectedProducts.length}
         onBulkDelete={handleBulkDelete}
@@ -262,7 +415,7 @@ export default function ProductManagementPage() {
         onMarkInactive={() => {}}
       />
 
-      {/* Add Modal */}
+      {/* ── Modals ── */}
       <ModalTambah
         open={openAddModal}
         onClose={() => setOpenAddModal(false)}
@@ -276,7 +429,6 @@ export default function ProductManagementPage() {
         onUpdateProduct={handleUpdateProduct}
       />
 
-      {/* Delete Modal */}
       <ModalDelete
         open={openDeleteModal}
         onClose={() => setOpenDeleteModal(false)}
@@ -286,7 +438,7 @@ export default function ProductManagementPage() {
             ? `Delete ${deleteTargetIds.length} Products`
             : "Hapus Produk"
         }
-        description="Apakah anda yakin ingin menghapus produk ini ?"
+        description="Apakah anda yakin ingin menghapus produk ini?"
       />
     </div>
   );

@@ -7,7 +7,8 @@ type Product = {
   id: number;
   name: string;
   sku: string;
-  price: number;
+  retail_price: number;
+  b2b_price: number;
   stock: number;
 };
 
