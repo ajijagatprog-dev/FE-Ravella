@@ -22,6 +22,8 @@ import {
   Check,
 } from "lucide-react";
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 
@@ -36,6 +38,12 @@ export default function ProductPage() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
+  // Toast notification state
+  const [toast, setToast] = useState<{ visible: boolean; productName: string }>({
+    visible: false,
+    productName: "",
+  });
+  const router = useRouter();
 
   const categories = [
     { id: "all", name: "ALL PRODUCTS", icon: Package, count: 48 },
@@ -241,6 +249,33 @@ export default function ProductPage() {
     },
   ];
 
+  // ─── UPDATED handleAddToCart ─────────────────────────────────────────────────
+  // Saves the product data to localStorage before navigating to cart,
+  // so cart/page.tsx can pick it up and display the correct image & name.
+  const handleAddToCart = (product: (typeof products)[number]) => {
+    // Store pending product data so the cart page can read it
+    localStorage.setItem(
+      "ravelle_pending_product",
+      JSON.stringify({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.image,
+        badge: product.badge,
+        discount: product.discount,
+        category: product.category,
+      }),
+    );
+
+    // Show toast notification
+    setToast({ visible: true, productName: product.name });
+    setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
+
+    router.push(`/cart?add=${product.id}`);
+  };
+  // ─────────────────────────────────────────────────────────────────────────────
+
   const filteredProducts = useMemo(() => {
     let filtered = products;
 
@@ -309,6 +344,31 @@ export default function ProductPage() {
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       <Header />
 
+      {/* ── Toast Notification ────────────────────────────────────────────── */}
+      <div
+        className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${
+          toast.visible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-4 pointer-events-none"
+        }`}
+      >
+        <div className="flex items-center gap-3 bg-white border-2 border-green-200 rounded-2xl shadow-2xl px-5 py-4 min-w-[280px] max-w-sm">
+          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <ShoppingCart className="w-5 h-5 text-green-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-gray-900 text-sm">
+              Ditambahkan ke Keranjang!
+            </p>
+            <p className="text-xs text-gray-500 truncate mt-0.5">
+              {toast.productName}
+            </p>
+          </div>
+          <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+        </div>
+      </div>
+      {/* ──────────────────────────────────────────────────────────────────── */}
+
       {/* Hero Section */}
       <section className="relative h-[400px] sm:h-[450px] overflow-hidden">
         <div
@@ -338,7 +398,7 @@ export default function ProductPage() {
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight">
               Find Your{" "}
-              <span className="block mt-2 bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="block mt-2 bg-gradient-to-r text-white font-mono bg-clip-text text-transparent">
                 Perfect Product
               </span>
             </h1>
@@ -551,20 +611,6 @@ export default function ProductPage() {
                   {/* Action Buttons */}
                   <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                     <button
-                      onClick={() => toggleFavorite(product.id)}
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-xl shadow-lg transition-all ${
-                        favorites.includes(product.id)
-                          ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white scale-110"
-                          : "bg-white/90 text-gray-700 hover:bg-white hover:scale-110"
-                      }`}
-                    >
-                      <Heart
-                        className={`w-5 h-5 ${
-                          favorites.includes(product.id) ? "fill-current" : ""
-                        }`}
-                      />
-                    </button>
-                    <button
                       onClick={() => openQuickView(product)}
                       className="w-10 h-10 bg-white/90 backdrop-blur-xl rounded-xl flex items-center justify-center hover:bg-white hover:scale-110 transition-all shadow-lg"
                     >
@@ -572,9 +618,12 @@ export default function ProductPage() {
                     </button>
                   </div>
 
-                  {/* Quick Add to Cart */}
+                  {/* Quick Add to Cart — now passes full product object */}
                   <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all">
-                    <button className="w-full py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-orange-500/50 transition-all flex items-center justify-center gap-2 hover:scale-105">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      className="w-full py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-orange-500/50 transition-all flex items-center justify-center gap-2 hover:scale-105"
+                    >
                       <ShoppingCart className="w-5 h-5" />
                       <span>Add to Cart</span>
                     </button>
@@ -656,7 +705,10 @@ export default function ProductPage() {
                 {/* List View CTA */}
                 {viewMode === "list" && (
                   <div className="flex items-center gap-3 p-6 border-l-2 border-gray-100">
-                    <button className="px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-2xl transition-all">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      className="px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-2xl transition-all"
+                    >
                       Add to Cart
                     </button>
                     <button
@@ -849,7 +901,13 @@ export default function ProductPage() {
                       }`}
                     />
                   </button>
-                  <button className="flex-1 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3">
+                  <button
+                    onClick={() => {
+                      closeModal();
+                      handleAddToCart(selectedProduct);
+                    }}
+                    className="flex-1 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+                  >
                     <ShoppingCart className="w-5 h-5" />
                     <span>Add to Cart</span>
                   </button>
