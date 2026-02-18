@@ -61,14 +61,14 @@ export default function CategoryGrid() {
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16 md:mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-pink-100 rounded-full mb-4">
-            <Package className="w-4 h-4 text-orange-600" />
-            <span className="text-orange-600 font-bold text-xs sm:text-sm uppercase tracking-wide">
+            <Package className="w-4 h-4 text-gray-600" />
+            <span className="text-gray-600 font-bold text-xs sm:text-sm uppercase tracking-wide">
               Kategori Produk
             </span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-gray-900 mb-3 sm:mb-4">
             Shop by{" "}
-            <span className="bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r bg-black bg-clip-text text-transparent">
               Category
             </span>
           </h2>
@@ -87,7 +87,7 @@ export default function CategoryGrid() {
 
         {/* View All CTA */}
         <div className="text-center mt-12 sm:mt-16">
-          <button className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-2xl hover:shadow-orange-500/40 transition-all duration-300 hover:scale-105">
+          <button className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r bg-gray-900 text-white font-bold rounded-xl hover:shadow-2xl hover:shadow-orange-500/40 transition-all duration-300 hover:scale-105">
             <span className="text-sm sm:text-base">Lihat Semua Kategori</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>

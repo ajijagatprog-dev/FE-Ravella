@@ -73,7 +73,7 @@ export default function Header({
                     />
                   </svg>
                 </div>
-                <h2 className="text-xl font-black tracking-[0.15em] bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
+                <h2 className="text-xl font-black tracking-[0.15em] bg-gradient-to-r bg-black bg-clip-text text-transparent">
                   RAVELLE
                 </h2>
               </Link>
@@ -87,7 +87,7 @@ export default function Header({
                     className="relative text-sm font-semibold text-gray-700 hover:text-orange-600 transition-colors group"
                   >
                     {menu.label}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-orange-500 to-pink-500 group-hover:w-full transition-all duration-300" />
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r bg-black group-hover:w-full transition-all duration-300" />
                   </Link>
                 ))}
               </nav>
@@ -151,7 +151,7 @@ export default function Header({
               {/* LOGIN BUTTON - Desktop */}
               <Link
                 href="/auth/login"
-                className="hidden md:inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold text-sm hover:shadow-xl hover:scale-105 transition-all group"
+                className="hidden md:inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r bg-black text-white font-bold text-sm hover:shadow-xl hover:scale-105 transition-all group"
               >
                 <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
                 <span>Login</span>
