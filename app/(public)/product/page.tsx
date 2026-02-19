@@ -2,7 +2,6 @@
 
 import {
   Search,
-  Filter,
   ShoppingCart,
   Heart,
   Eye,
@@ -10,9 +9,7 @@ import {
   ChevronDown,
   Grid,
   List,
-  SlidersHorizontal,
   TrendingUp,
-  Sparkles,
   ArrowRight,
   Package,
   Zap,
@@ -20,12 +17,16 @@ import {
   Award,
   X,
   Check,
+  Filter,
+  Sparkles,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
+
+const JOST = "'Jost', system-ui, sans-serif";
+const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ProductPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,12 +34,10 @@ export default function ProductPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState("featured");
   const [priceRange, setPriceRange] = useState([0, 5000000]);
-  const [showFilters, setShowFilters] = useState(false);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
-  // Toast notification state
   const [toast, setToast] = useState<{ visible: boolean; productName: string }>({
     visible: false,
     productName: "",
@@ -55,424 +54,173 @@ export default function ProductPage() {
   ];
 
   const products = [
-    {
-      id: 1,
-      name: "Ravelle Airflex Vacuum Cleaner",
-      price: 598900,
-      originalPrice: 798900,
-      image:
-        "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
-      category: "homeliving",
-      rating: 4.8,
-      reviews: 124,
-      badge: "Best Seller",
-      discount: 25,
-      features: ["HEPA Filter", "Cordless", "2h Battery"],
-      inStock: true,
-      isNew: false,
-      description:
-        "Vacuum cleaner cordless dengan teknologi HEPA filter untuk pembersihan maksimal. Dilengkapi baterai tahan lama hingga 2 jam.",
-      specifications: {
-        Power: "120W",
-        Battery: "2000mAh",
-        Weight: "2.5kg",
-        Warranty: "1 Year",
-      },
-    },
-    {
-      id: 2,
-      name: "Ravelle SOLIS Dehumidifier & Air Purifier 2in1 2L",
-      price: 1399900,
-      originalPrice: 1799900,
-      image:
-        "https://www.ravelle.co.id/data/product_cover/224-20250520175323.png",
-      category: "homeliving",
-      rating: 4.9,
-      reviews: 89,
-      badge: "Premium",
-      discount: 22,
-      features: ["2-in-1", "Smart Sensor", "Ultra Quiet"],
-      inStock: true,
-      isNew: true,
-      description:
-        "Dehumidifier dan air purifier 2 in 1 dengan smart sensor otomatis. Operasi ultra quiet cocok untuk kamar tidur.",
-      specifications: {
-        Capacity: "2L",
-        Coverage: "30m²",
-        "Noise Level": "35dB",
-        Warranty: "1 Year",
-      },
-    },
-    {
-      id: 3,
-      name: "Ravelle High Speed Hair Dryer-grey",
-      price: 799900,
-      originalPrice: 899900,
-      image:
-        "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-      category: "homeliving",
-      rating: 4.7,
-      reviews: 156,
-      badge: "Popular",
-      discount: 20,
-      features: ["Digital Display", "Auto Shutoff", "Portable"],
-      inStock: true,
-      isNew: false,
-      description:
-        "Dehumidifier digital portabel dengan auto shutoff untuk keamanan maksimal. Display digital menampilkan kelembaban real-time.",
-      specifications: {
-        Capacity: "1L",
-        Coverage: "20m²",
-        Weight: "1.8kg",
-        Warranty: "1 Year",
-      },
-    },
-    {
-      id: 4,
-      name: "Ravelle Luxe Air Purifier HEPA13 + Anti-Allergen",
-      price: 1199900,
-      originalPrice: 1499900,
-      image:
-        "https://www.ravelle.co.id/data/product_cover/223-20250520175032.png",
-      category: "homeliving",
-      rating: 4.9,
-      reviews: 203,
-      badge: "Premium",
-      discount: 20,
-      features: ["HEPA13", "Anti-Allergen", "Smart Mode"],
-      inStock: true,
-      isNew: false,
-      description:
-        "Air purifier premium dengan HEPA13 filter yang mampu menyaring 99.97% partikel allergen. Dilengkapi smart mode untuk efisiensi energi.",
-      specifications: {
-        Filter: "HEPA13",
-        Coverage: "50m²",
-        CADR: "300m³/h",
-        Warranty: "1 Year",
-      },
-    },
-    {
-      id: 5,
-      name: "Ravelle Ezy Squeenze Citrus Juicer- Cream",
-      price: 559900,
-      originalPrice: 749900,
-      image:
-        "https://www.ravelle.co.id/data/product_cover/218-20250520162617.png",
-      category: "homeliving",
-      rating: 4.6,
-      reviews: 98,
-      badge: "New",
-      discount: 25,
-      features: ["Aromatherapy", "Night Light", "Compact"],
-      inStock: true,
-      isNew: true,
-      description:
-        "Air purifier compact dengan fitur aromatherapy dan night light. Sempurna untuk kamar tidur dengan desain modern.",
-      specifications: {
-        Filter: "HEPA13",
-        Coverage: "25m²",
-        Features: "Aromatherapy, LED Light",
-        Warranty: "1 Year",
-      },
-    },
-    {
-      id: 6,
-      name: "Ravelle Smart Rice Cooker 1.8L",
-      price: 899900,
-      originalPrice: 1199900,
-      image:
-        "https://cdn.ruparupa.io/fit-in/850x850/filters:format(webp)/filters:watermark(content.ruparupa.io,products/wm/rr.png,0,-0,0,100,100)/ruparupa-com/image/upload/Products/10632435_1.jpg",
-      category: "appliance",
-      rating: 4.8,
-      reviews: 234,
-      badge: "Best Seller",
-      discount: 25,
-      features: ["Smart Cook", "Keep Warm", "Non-stick"],
-      inStock: true,
-      isNew: false,
-      description:
-        "Rice cooker pintar dengan teknologi smart cook untuk hasil nasi sempurna. Fitur keep warm hingga 12 jam.",
-      specifications: {
-        Capacity: "1.8L",
-        Power: "600W",
-        Material: "Non-stick coating",
-        Warranty: "1 Year",
-      },
-    },
-    {
-      id: 7,
-      name: "Ravelle Premium Blender 2L",
-      price: 699900,
-      originalPrice: 899900,
-      image:
-        "https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=500&q=80",
-      category: "appliance",
-      rating: 4.7,
-      reviews: 167,
-      badge: "Popular",
-      discount: 22,
-      features: ["800W Motor", "Glass Jar", "6 Speeds"],
-      inStock: true,
-      isNew: false,
-      description:
-        "Blender premium dengan motor 800W untuk hasil blending sempurna. Jar kaca tahan panas dan 6 speed settings.",
-      specifications: {
-        Power: "800W",
-        Capacity: "2L",
-        Material: "Glass Jar",
-        Warranty: "1 Year",
-      },
-    },
-    {
-      id: 8,
-      name: "Ravelle Professional Knife Set 8pcs",
-      price: 1299900,
-      originalPrice: 1799900,
-      image:
-        "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=500&q=80",
-      category: "knife",
-      rating: 4.9,
-      reviews: 145,
-      badge: "Premium",
-      discount: 28,
-      features: ["German Steel", "Ergonomic", "Block Included"],
-      inStock: true,
-      isNew: true,
-      description:
-        "Set pisau profesional 8 pieces dengan material German steel berkualitas tinggi. Dilengkapi knife block kayu premium.",
-      specifications: {
-        Material: "German Stainless Steel",
-        Pieces: "8pcs",
-        Includes: "Wooden Block",
-        Warranty: "1 Year",
-      },
-    },
+    { id: 1, name: "Ravelle Airflex Vacuum Cleaner", price: 598900, originalPrice: 798900, image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80", category: "homeliving", rating: 4.8, reviews: 124, badge: "Best Seller", discount: 25, features: ["HEPA Filter", "Cordless", "2h Battery"], inStock: true, isNew: false, description: "Vacuum cleaner cordless dengan teknologi HEPA filter untuk pembersihan maksimal. Dilengkapi baterai tahan lama hingga 2 jam.", specifications: { Power: "120W", Battery: "2000mAh", Weight: "2.5kg", Warranty: "1 Year" } },
+    { id: 2, name: "Ravelle SOLIS Dehumidifier & Air Purifier 2in1 2L", price: 1399900, originalPrice: 1799900, image: "https://www.ravelle.co.id/data/product_cover/224-20250520175323.png", category: "homeliving", rating: 4.9, reviews: 89, badge: "Premium", discount: 22, features: ["2-in-1", "Smart Sensor", "Ultra Quiet"], inStock: true, isNew: true, description: "Dehumidifier dan air purifier 2 in 1 dengan smart sensor otomatis.", specifications: { Capacity: "2L", Coverage: "30m²", "Noise Level": "35dB", Warranty: "1 Year" } },
+    { id: 3, name: "Ravelle High Speed Hair Dryer-grey", price: 799900, originalPrice: 899900, image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png", category: "homeliving", rating: 4.7, reviews: 156, badge: "Popular", discount: 20, features: ["Digital Display", "Auto Shutoff", "Portable"], inStock: true, isNew: false, description: "Hair dryer berkecepatan tinggi dengan teknologi digital untuk hasil terbaik.", specifications: { Capacity: "1L", Coverage: "20m²", Weight: "1.8kg", Warranty: "1 Year" } },
+    { id: 4, name: "Ravelle Luxe Air Purifier HEPA13 + Anti-Allergen", price: 1199900, originalPrice: 1499900, image: "https://www.ravelle.co.id/data/product_cover/223-20250520175032.png", category: "homeliving", rating: 4.9, reviews: 203, badge: "Premium", discount: 20, features: ["HEPA13", "Anti-Allergen", "Smart Mode"], inStock: true, isNew: false, description: "Air purifier premium dengan HEPA13 filter yang mampu menyaring 99.97% partikel allergen.", specifications: { Filter: "HEPA13", Coverage: "50m²", CADR: "300m³/h", Warranty: "1 Year" } },
+    { id: 5, name: "Ravelle Ezy Squeenze Citrus Juicer- Cream", price: 559900, originalPrice: 749900, image: "https://www.ravelle.co.id/data/product_cover/218-20250520162617.png", category: "homeliving", rating: 4.6, reviews: 98, badge: "New", discount: 25, features: ["Aromatherapy", "Night Light", "Compact"], inStock: true, isNew: true, description: "Juicer compact dengan fitur aromatherapy dan night light.", specifications: { Filter: "HEPA13", Coverage: "25m²", Features: "Aromatherapy, LED Light", Warranty: "1 Year" } },
+    { id: 6, name: "Ravelle Smart Rice Cooker 1.8L", price: 899900, originalPrice: 1199900, image: "https://cdn.ruparupa.io/fit-in/850x850/filters:format(webp)/filters:watermark(content.ruparupa.io,products/wm/rr.png,0,-0,0,100,100)/ruparupa-com/image/upload/Products/10632435_1.jpg", category: "appliance", rating: 4.8, reviews: 234, badge: "Best Seller", discount: 25, features: ["Smart Cook", "Keep Warm", "Non-stick"], inStock: true, isNew: false, description: "Rice cooker pintar dengan teknologi smart cook untuk hasil nasi sempurna.", specifications: { Capacity: "1.8L", Power: "600W", Material: "Non-stick coating", Warranty: "1 Year" } },
+    { id: 7, name: "Ravelle Premium Blender 2L", price: 699900, originalPrice: 899900, image: "https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=500&q=80", category: "appliance", rating: 4.7, reviews: 167, badge: "Popular", discount: 22, features: ["800W Motor", "Glass Jar", "6 Speeds"], inStock: true, isNew: false, description: "Blender premium dengan motor 800W untuk hasil blending sempurna.", specifications: { Power: "800W", Capacity: "2L", Material: "Glass Jar", Warranty: "1 Year" } },
+    { id: 8, name: "Ravelle Professional Knife Set 8pcs", price: 1299900, originalPrice: 1799900, image: "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=500&q=80", category: "knife", rating: 4.9, reviews: 145, badge: "Premium", discount: 28, features: ["German Steel", "Ergonomic", "Block Included"], inStock: true, isNew: true, description: "Set pisau profesional 8 pieces dengan material German steel berkualitas tinggi.", specifications: { Material: "German Stainless Steel", Pieces: "8pcs", Includes: "Wooden Block", Warranty: "1 Year" } },
   ];
 
-  // ─── UPDATED handleAddToCart ─────────────────────────────────────────────────
-  // Saves the product data to localStorage before navigating to cart,
-  // so cart/page.tsx can pick it up and display the correct image & name.
   const handleAddToCart = (product: (typeof products)[number]) => {
-    // Store pending product data so the cart page can read it
-    localStorage.setItem(
-      "ravelle_pending_product",
-      JSON.stringify({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        originalPrice: product.originalPrice,
-        image: product.image,
-        badge: product.badge,
-        discount: product.discount,
-        category: product.category,
-      }),
-    );
-
-    // Show toast notification
+    localStorage.setItem("ravelle_pending_product", JSON.stringify({
+      id: product.id, name: product.name, price: product.price,
+      originalPrice: product.originalPrice, image: product.image,
+      badge: product.badge, discount: product.discount, category: product.category,
+    }));
     setToast({ visible: true, productName: product.name });
     setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
-
     router.push(`/cart?add=${product.id}`);
   };
-  // ─────────────────────────────────────────────────────────────────────────────
 
   const filteredProducts = useMemo(() => {
     let filtered = products;
-
     if (activeCategory !== "ALL PRODUCTS") {
       const categoryId = categories.find((c) => c.name === activeCategory)?.id;
       filtered = filtered.filter((p) => p.category === categoryId);
     }
-
-    if (searchQuery) {
-      filtered = filtered.filter((p) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-    }
-
-    filtered = filtered.filter(
-      (p) => p.price >= priceRange[0] && p.price <= priceRange[1],
-    );
-
+    if (searchQuery) filtered = filtered.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    filtered = filtered.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
     switch (sortBy) {
-      case "price-low":
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case "price-high":
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case "rating":
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case "newest":
-        filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-        break;
-      default:
-        filtered.sort((a, b) => b.reviews - a.reviews);
+      case "price-low": filtered.sort((a, b) => a.price - b.price); break;
+      case "price-high": filtered.sort((a, b) => b.price - a.price); break;
+      case "rating": filtered.sort((a, b) => b.rating - a.rating); break;
+      case "newest": filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)); break;
+      default: filtered.sort((a, b) => b.reviews - a.reviews);
     }
-
     return filtered;
-  }, [activeCategory, searchQuery, sortBy, priceRange, products, categories]);
+  }, [activeCategory, searchQuery, sortBy, priceRange]);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(price);
 
-  const toggleFavorite = (productId: number) => {
-    setFavorites((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId],
-    );
-  };
+  const toggleFavorite = (id: number) =>
+    setFavorites((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
-  const openQuickView = (product: any) => {
-    setSelectedProduct(product);
-    setShowModal(true);
-  };
+  const openQuickView = (product: any) => { setSelectedProduct(product); setShowModal(true); };
+  const closeModal = () => { setShowModal(false); setTimeout(() => setSelectedProduct(null), 300); };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setTimeout(() => setSelectedProduct(null), 300);
+  const badgeStyle: Record<string, string> = {
+    "Best Seller": "bg-neutral-900 text-white",
+    "Premium": "bg-neutral-700 text-white",
+    "Popular": "bg-neutral-100 text-neutral-700 border border-neutral-200",
+    "New": "bg-white text-neutral-900 border border-neutral-200",
+    "Sale": "bg-neutral-100 text-neutral-700 border border-neutral-200",
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+    <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
       <Header />
 
-      {/* ── Toast Notification ────────────────────────────────────────────── */}
-      <div
-        className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${
-          toast.visible
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-4 pointer-events-none"
-        }`}
-      >
-        <div className="flex items-center gap-3 bg-white border-2 border-green-200 rounded-2xl shadow-2xl px-5 py-4 min-w-[280px] max-w-sm">
-          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <ShoppingCart className="w-5 h-5 text-green-600" />
-          </div>
+      {/* ── Toast ── */}
+      <div className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${toast.visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}`}>
+        <div className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm" style={{ fontFamily: JOST }}>
+          <ShoppingCart className="w-4 h-4 text-neutral-600 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-gray-900 text-sm">
-              Ditambahkan ke Keranjang!
-            </p>
-            <p className="text-xs text-gray-500 truncate mt-0.5">
-              {toast.productName}
-            </p>
+            <p className="font-medium text-neutral-900 text-sm">Ditambahkan ke Keranjang</p>
+            <p className="text-xs text-neutral-400 truncate mt-0.5">{toast.productName}</p>
           </div>
-          <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+          <Check className="w-4 h-4 text-neutral-500 flex-shrink-0" />
         </div>
       </div>
-      {/* ──────────────────────────────────────────────────────────────────── */}
 
-      {/* Hero Section */}
-      <section className="relative h-[400px] sm:h-[450px] overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
+      {/* ── HERO ── */}
+      <section className="relative h-[380px] sm:h-[440px] overflow-hidden">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)" }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
-        {/* Animated Background Elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
-        <div
-          className="absolute bottom-20 right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "700ms" }}
-        />
+        <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
+          <div className="max-w-2xl">
 
-        <div className="relative z-10 h-full flex items-center justify-center px-4">
-          <div className="text-center max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full mb-6 hover:bg-white/20 transition-all">
-              <Sparkles className="w-4 h-4 text-orange-400" />
-              <span className="text-white font-bold text-sm uppercase tracking-wide">
-                SHOP RAVELLE
+            <div className="inline-flex items-center gap-2.5 mb-5">
+              <div className="w-5 h-[1px] bg-white/50" />
+              <span className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]" style={{ fontFamily: JOST }}>
+                Shop Ravelle
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-4 leading-[1.05]" style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}>
               Find Your{" "}
-              <span className="block mt-2 bg-gradient-to-r text-white font-mono bg-clip-text text-transparent">
+              <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
                 Perfect Product
-              </span>
+              </em>
             </h1>
 
-            <p className="text-gray-200 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8">
-              Temukan peralatan rumah tangga berkualitas premium untuk kebutuhan
-              Anda
-            </p>
+            <div className="w-10 h-[1px] bg-white/30 mb-5" />
 
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto">
-              <div className="relative group">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Cari produk yang Anda inginkan..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-14 pr-5 py-4 rounded-2xl bg-white border-2 border-gray-200 focus:border-orange-500 focus:outline-none shadow-lg text-gray-900 placeholder:text-gray-400 transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm font-semibold transition-colors"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            </div>
+            <p className="text-white/70 text-sm sm:text-base font-light leading-relaxed max-w-lg" style={{ fontFamily: JOST }}>
+              Temukan peralatan rumah tangga berkualitas premium untuk kebutuhan Anda.
+            </p>
           </div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-            <div className="w-1.5 h-3 bg-white/50 rounded-full animate-pulse" />
+          <div className="w-5 h-8 border border-white/30 flex items-start justify-center pt-1.5">
+            <div className="w-1 h-2 bg-white/40 rounded-full" />
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
+      {/* ── MAIN ── */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16">
+
+        {/* Search Bar — pill style, centered */}
+        <div className="flex justify-center mb-10">
+          <div
+            className="flex items-center gap-3 w-full max-w-lg px-5 py-3.5 rounded-full border border-neutral-200 bg-white shadow-sm hover:border-neutral-300 transition-colors"
+            style={{ fontFamily: JOST }}
+          >
+            <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="Cari produk, tips, atau tutorial..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-transparent text-sm text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
+              style={{ fontFamily: JOST }}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="text-neutral-400 hover:text-neutral-700 transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Category Tabs */}
         <div className="mb-10">
-          <div className="flex items-center gap-2 mb-6">
-            <Filter className="w-5 h-5 text-gray-500" />
-            <h2 className="text-xl font-bold text-gray-900">Categories</h2>
+          <div className="flex items-center gap-2.5 mb-5">
+            <div className="w-4 h-[1px] bg-neutral-400" />
+            <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.22em]" style={{ fontFamily: JOST }}>
+              Categories
+            </span>
           </div>
           <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-            <div className="flex gap-3 pb-4 min-w-max">
+            <div className="flex gap-2 pb-2 min-w-max">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 return (
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.name)}
-                    className={`group flex items-center gap-2.5 px-5 py-3 rounded-full font-semibold text-sm transition-all whitespace-nowrap ${
-                      activeCategory === cat.name
-                        ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg scale-105"
-                        : "bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 hover:border-orange-300"
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2.5 text-[11px] tracking-[0.15em] uppercase font-medium transition-all whitespace-nowrap ${activeCategory === cat.name
+                        ? "bg-neutral-900 text-white"
+                        : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-400 hover:text-neutral-900"
+                      }`}
+                    style={{ fontFamily: JOST }}
                   >
-                    <Icon className="w-4.5 h-4.5" />
+                    <Icon className="w-3.5 h-3.5" />
                     <span>{cat.name}</span>
                     {cat.count > 0 && (
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                          activeCategory === cat.name
-                            ? "bg-white/20 text-white"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {cat.count}
+                      <span className={`text-[10px] ${activeCategory === cat.name ? "text-white/60" : "text-neutral-400"}`}>
+                        ({cat.count})
                       </span>
                     )}
                   </button>
@@ -483,238 +231,187 @@ export default function ProductPage() {
         </div>
 
         {/* Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-5 bg-white rounded-2xl border-2 border-gray-100 shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="text-gray-900 text-base font-bold">
-              {filteredProducts.length}
-            </span>
-            <span className="text-gray-600 text-sm">Products Found</span>
-          </div>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 py-4 border-y border-neutral-100">
+          <span className="text-sm text-neutral-500 font-light" style={{ fontFamily: JOST }}>
+            <span className="font-medium text-neutral-900">{filteredProducts.length}</span> produk ditemukan
+          </span>
 
           <div className="flex items-center gap-3">
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+            {/* View Toggle */}
+            <div className="flex items-center border border-neutral-200">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2.5 rounded-lg transition-all ${
-                  viewMode === "grid"
-                    ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`p-2 transition-colors ${viewMode === "grid" ? "bg-neutral-900 text-white" : "text-neutral-400 hover:text-neutral-700"}`}
               >
-                <Grid className="w-4.5 h-4.5" />
+                <Grid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2.5 rounded-lg transition-all ${
-                  viewMode === "list"
-                    ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`p-2 transition-colors ${viewMode === "list" ? "bg-neutral-900 text-white" : "text-neutral-400 hover:text-neutral-700"}`}
               >
-                <List className="w-4.5 h-4.5" />
+                <List className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Sort Dropdown */}
+            {/* Sort */}
             <div className="relative">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none pl-4 pr-10 py-2.5 bg-white border-2 border-gray-200 rounded-xl font-semibold text-sm text-gray-700 hover:border-orange-300 focus:border-orange-500 focus:outline-none cursor-pointer transition-all"
+                className="appearance-none pl-4 pr-9 py-2 border border-neutral-200 text-[11px] tracking-[0.12em] uppercase text-neutral-700 hover:border-neutral-400 focus:outline-none cursor-pointer bg-white"
+                style={{ fontFamily: JOST }}
               >
                 <option value="featured">Featured</option>
                 <option value="newest">Newest</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
+                <option value="price-low">Price: Low → High</option>
+                <option value="price-high">Price: High → Low</option>
                 <option value="rating">Top Rated</option>
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400 pointer-events-none" />
             </div>
           </div>
         </div>
 
-        {/* Products Grid */}
+        {/* Products */}
         {filteredProducts.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
-              <Package className="w-12 h-12 text-orange-500" />
-            </div>
-            <h3 className="text-3xl font-black text-gray-900 mb-3">
+          <div className="text-center py-24">
+            <Package className="w-12 h-12 text-neutral-300 mx-auto mb-5" />
+            <h3 className="text-4xl font-light text-neutral-900 mb-3" style={{ fontFamily: CORMORANT }}>
               No Products Found
             </h3>
-            <p className="text-gray-600 text-lg mb-8">
+            <p className="text-neutral-500 text-sm font-light mb-8" style={{ fontFamily: JOST }}>
               Try adjusting your filters or search query
             </p>
             <button
-              onClick={() => {
-                setSearchQuery("");
-                setActiveCategory("ALL PRODUCTS");
-                setPriceRange([0, 5000000]);
-              }}
-              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full font-bold hover:shadow-2xl hover:scale-105 transition-all"
+              onClick={() => { setSearchQuery(""); setActiveCategory("ALL PRODUCTS"); setPriceRange([0, 5000000]); }}
+              className="px-8 py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-900 hover:text-white transition-colors"
+              style={{ fontFamily: JOST }}
             >
-              Reset All Filters
+              Reset Filters
             </button>
           </div>
         ) : (
-          <div
-            className={
-              viewMode === "grid"
-                ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8"
-                : "flex flex-col gap-6"
-            }
-          >
+          <div className={viewMode === "grid" ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "flex flex-col gap-4"}>
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
                 onMouseEnter={() => setHoveredProduct(product.id)}
                 onMouseLeave={() => setHoveredProduct(null)}
-                className={`group relative bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-orange-200 hover:shadow-2xl transition-all duration-300 ${
-                  viewMode === "grid" ? "hover:-translate-y-2" : "flex flex-row"
-                }`}
+                className={`group relative bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-300 ${viewMode === "list" ? "flex flex-row" : ""}`}
               >
-                {/* Image Section */}
-                <div
-                  className={`relative overflow-hidden bg-gray-50 ${
-                    viewMode === "grid" ? "h-72" : "w-72 h-72 flex-shrink-0"
-                  }`}
-                >
+                {/* Image */}
+                <div className={`relative overflow-hidden bg-neutral-50 ${viewMode === "grid" ? "aspect-[3/4]" : "w-56 sm:w-72 flex-shrink-0 aspect-square"}`}>
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   {/* Badges */}
-                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5">
                     {product.isNew && (
-                      <span className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold rounded-lg shadow-lg">
-                        NEW
+                      <span className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] font-medium tracking-[0.12em] uppercase border border-neutral-200" style={{ fontFamily: JOST }}>
+                        New
                       </span>
                     )}
                     {product.discount > 0 && (
-                      <span className="px-3 py-1.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold rounded-lg shadow-lg">
+                      <span className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] font-medium tracking-[0.12em] uppercase" style={{ fontFamily: JOST }}>
                         -{product.discount}%
                       </span>
                     )}
-                    {product.badge && (
-                      <span className="px-3 py-1.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold rounded-lg shadow-lg">
-                        {product.badge}
-                      </span>
-                    )}
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                    <button
-                      onClick={() => openQuickView(product)}
-                      className="w-10 h-10 bg-white/90 backdrop-blur-xl rounded-xl flex items-center justify-center hover:bg-white hover:scale-110 transition-all shadow-lg"
-                    >
-                      <Eye className="w-5 h-5 text-gray-700" />
-                    </button>
-                  </div>
+                  {/* Quick view */}
+                  <button
+                    onClick={() => openQuickView(product)}
+                    className="absolute top-3 right-3 w-8 h-8 bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 hover:bg-neutral-100"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-neutral-700" />
+                  </button>
 
-                  {/* Quick Add to Cart — now passes full product object */}
-                  <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all">
+                  {/* Quick Add */}
+                  <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="w-full py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-orange-500/50 transition-all flex items-center justify-center gap-2 hover:scale-105"
+                      className="w-full py-3 bg-neutral-900 text-white text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-black transition-colors flex items-center justify-center gap-2"
+                      style={{ fontFamily: JOST }}
                     >
-                      <ShoppingCart className="w-5 h-5" />
-                      <span>Add to Cart</span>
+                      <ShoppingCart className="w-3.5 h-3.5" />
+                      Add to Cart
                     </button>
                   </div>
 
-                  {/* Stock Badge */}
+                  {/* Out of Stock */}
                   {!product.inStock && (
-                    <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center">
-                      <span className="px-8 py-4 bg-gray-900 text-white font-bold rounded-2xl shadow-2xl">
+                    <div className="absolute inset-0 bg-white/90 flex items-center justify-center">
+                      <span className="px-5 py-2.5 bg-neutral-900 text-white text-[11px] tracking-[0.2em] uppercase font-medium" style={{ fontFamily: JOST }}>
                         Out of Stock
                       </span>
                     </div>
                   )}
                 </div>
 
-                {/* Content Section */}
-                <div
-                  className={`p-6 ${viewMode === "list" ? "flex-1 flex flex-col justify-center" : ""}`}
-                >
+                {/* Info */}
+                <div className={`p-4 sm:p-5 ${viewMode === "list" ? "flex-1 flex flex-col justify-center" : ""}`}>
                   {/* Rating */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4.5 h-4.5 fill-amber-400 text-amber-400" />
-                      <span className="text-sm font-bold text-gray-900">
-                        {product.rating}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      ({product.reviews} reviews)
-                    </span>
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                    <span className="text-xs font-medium text-neutral-800" style={{ fontFamily: JOST }}>{product.rating}</span>
+                    <span className="text-[11px] text-neutral-400" style={{ fontFamily: JOST }}>({product.reviews})</span>
                   </div>
 
-                  {/* Product Name */}
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-orange-600 transition-colors leading-snug">
+                  {/* Name */}
+                  <h3 className="text-lg sm:text-xl font-light text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-600 transition-colors leading-snug" style={{ fontFamily: CORMORANT }}>
                     {product.name}
                   </h3>
 
                   {/* Features */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {product.features.map((feature, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 bg-gradient-to-br from-orange-50 to-pink-50 text-orange-700 text-xs font-semibold rounded-lg border border-orange-100"
-                      >
-                        {feature}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {product.features.map((f, i) => (
+                      <span key={i} className="px-2 py-0.5 border border-neutral-200 text-neutral-500 text-[10px] tracking-[0.1em] uppercase font-medium" style={{ fontFamily: JOST }}>
+                        {f}
                       </span>
                     ))}
                   </div>
 
                   {/* Price */}
-                  <div className="space-y-1 mb-5">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-black bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
-                        {formatPrice(product.price)}
-                      </span>
-                      {product.originalPrice > product.price && (
-                        <span className="text-sm text-gray-400 line-through font-medium">
-                          {formatPrice(product.originalPrice)}
-                        </span>
-                      )}
-                    </div>
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="text-base sm:text-lg font-medium text-neutral-900" style={{ fontFamily: JOST }}>
+                      {formatPrice(product.price)}
+                    </span>
                     {product.originalPrice > product.price && (
-                      <p className="text-xs text-emerald-600 font-bold">
-                        Save{" "}
-                        {formatPrice(product.originalPrice - product.price)}
-                      </p>
+                      <span className="text-xs text-neutral-400 line-through" style={{ fontFamily: JOST }}>
+                        {formatPrice(product.originalPrice)}
+                      </span>
                     )}
                   </div>
+                  {product.originalPrice > product.price && (
+                    <p className="text-[11px] text-neutral-500 font-medium mb-3" style={{ fontFamily: JOST }}>
+                      Hemat {formatPrice(product.originalPrice - product.price)}
+                    </p>
+                  )}
 
-                  {/* CTA Button */}
+                  {/* View Details — grid only */}
                   {viewMode === "grid" && (
-                    <button className="w-full py-3 bg-white text-orange-600 font-bold rounded-xl hover:bg-gradient-to-r hover:from-orange-50 hover:to-pink-50 transition-all border-2 border-orange-200 hover:border-orange-300 flex items-center justify-center gap-2 group/btn">
-                      <span>View Details</span>
-                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    <button
+                      onClick={() => openQuickView(product)}
+                      className="w-full py-2.5 border border-neutral-200 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all flex items-center justify-center gap-2 group/btn mt-1"
+                      style={{ fontFamily: JOST }}
+                    >
+                      View Details
+                      <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                   )}
                 </div>
 
-                {/* List View CTA */}
+                {/* List CTA */}
                 {viewMode === "list" && (
-                  <div className="flex items-center gap-3 p-6 border-l-2 border-gray-100">
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-2xl transition-all"
-                    >
+                  <div className="flex items-center gap-2 p-4 border-l border-neutral-100">
+                    <button onClick={() => handleAddToCart(product)} className="px-5 py-2.5 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors" style={{ fontFamily: JOST }}>
                       Add to Cart
                     </button>
-                    <button
-                      onClick={() => openQuickView(product)}
-                      className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 hover:border-orange-300 transition-all"
-                    >
+                    <button onClick={() => openQuickView(product)} className="px-5 py-2.5 border border-neutral-200 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium hover:border-neutral-800 transition-colors" style={{ fontFamily: JOST }}>
                       Details
                     </button>
                   </div>
@@ -726,201 +423,121 @@ export default function ProductPage() {
 
         {/* Load More */}
         {filteredProducts.length > 0 && (
-          <div className="mt-16 text-center">
-            <button className="px-10 py-4 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-full hover:bg-gray-50 hover:border-orange-300 hover:shadow-lg transition-all">
+          <div className="mt-14 text-center">
+            <button className="px-10 py-3.5 border border-neutral-300 text-neutral-700 text-[11px] tracking-[0.2em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all" style={{ fontFamily: JOST }}>
               Load More Products
             </button>
           </div>
         )}
       </div>
 
-      {/* Quick View Modal */}
+      {/* ── QUICK VIEW MODAL ── */}
       {showModal && selectedProduct && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
-          onClick={closeModal}
-        >
-          <div
-            className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button
-              onClick={closeModal}
-              className="absolute top-6 right-6 w-12 h-12 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all shadow-lg z-10"
-            >
-              <X className="w-6 h-6 text-gray-700" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={closeModal} style={{ fontFamily: JOST }}>
+          <div className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
+
+            {/* Close */}
+            <button onClick={closeModal} className="absolute top-5 right-5 w-9 h-9 bg-white border border-neutral-200 flex items-center justify-center hover:bg-neutral-900 hover:text-white hover:border-neutral-900 transition-all z-10">
+              <X className="w-4 h-4" />
             </button>
 
-            <div className="grid md:grid-cols-2 gap-8 p-8">
-              {/* Product Image */}
-              <div className="relative">
-                <div className="sticky top-0">
-                  <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50">
-                    <img
-                      src={selectedProduct.image}
-                      alt={selectedProduct.name}
-                      className="w-full h-full object-cover"
-                    />
-
-                    {/* Badges */}
-                    <div className="absolute top-4 left-4 flex flex-col gap-2">
-                      {selectedProduct.isNew && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold rounded-lg shadow-lg">
-                          NEW
-                        </span>
-                      )}
-                      {selectedProduct.discount > 0 && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold rounded-lg shadow-lg">
-                          -{selectedProduct.discount}%
-                        </span>
-                      )}
-                      {selectedProduct.badge && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold rounded-lg shadow-lg">
-                          {selectedProduct.badge}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+            <div className="grid md:grid-cols-2">
+              {/* Image */}
+              <div className="relative aspect-square bg-neutral-50 overflow-hidden">
+                <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
+                <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+                  {selectedProduct.isNew && <span className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase border border-neutral-200" style={{ fontFamily: JOST }}>New</span>}
+                  {selectedProduct.discount > 0 && <span className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase" style={{ fontFamily: JOST }}>-{selectedProduct.discount}%</span>}
                 </div>
               </div>
 
-              {/* Product Details */}
-              <div className="flex flex-col">
+              {/* Details */}
+              <div className="p-7 sm:p-8 flex flex-col">
                 {/* Rating */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-5 h-5 ${
-                          i < Math.floor(selectedProduct.rating)
-                            ? "fill-amber-400 text-amber-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm font-bold text-gray-900">
-                    {selectedProduct.rating}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    ({selectedProduct.reviews} reviews)
-                  </span>
+                <div className="flex items-center gap-1.5 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`w-4 h-4 ${i < Math.floor(selectedProduct.rating) ? "fill-yellow-400 text-yellow-400" : "text-neutral-200"}`} />
+                  ))}
+                  <span className="text-xs text-neutral-500 ml-1" style={{ fontFamily: JOST }}>{selectedProduct.rating} ({selectedProduct.reviews} reviews)</span>
                 </div>
 
-                {/* Product Name */}
-                <h2 className="text-3xl font-black text-gray-900 mb-4 leading-tight">
+                {/* Name */}
+                <h2 className="text-2xl sm:text-3xl font-light text-neutral-900 mb-2 leading-tight" style={{ fontFamily: CORMORANT }}>
                   {selectedProduct.name}
                 </h2>
+                <div className="w-8 h-[1px] bg-neutral-200 mb-4" />
 
                 {/* Description */}
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <p className="text-neutral-500 text-sm font-light leading-relaxed mb-5" style={{ fontFamily: JOST }}>
                   {selectedProduct.description}
                 </p>
 
                 {/* Price */}
-                <div className="mb-6 p-6 bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl border-2 border-orange-100">
-                  <div className="flex items-baseline gap-3 mb-2">
-                    <span className="text-4xl font-black bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
+                <div className="border border-neutral-100 bg-neutral-50 p-4 mb-5">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-2xl font-medium text-neutral-900" style={{ fontFamily: JOST }}>
                       {formatPrice(selectedProduct.price)}
                     </span>
                     {selectedProduct.originalPrice > selectedProduct.price && (
-                      <span className="text-lg text-gray-400 line-through font-medium">
+                      <span className="text-sm text-neutral-400 line-through" style={{ fontFamily: JOST }}>
                         {formatPrice(selectedProduct.originalPrice)}
                       </span>
                     )}
                   </div>
                   {selectedProduct.originalPrice > selectedProduct.price && (
-                    <p className="text-sm text-emerald-600 font-bold">
-                      Hemat{" "}
-                      {formatPrice(
-                        selectedProduct.originalPrice - selectedProduct.price,
-                      )}
+                    <p className="text-[11px] text-neutral-500 mt-1 tracking-wide" style={{ fontFamily: JOST }}>
+                      Hemat {formatPrice(selectedProduct.originalPrice - selectedProduct.price)}
                     </p>
                   )}
                 </div>
 
                 {/* Features */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">
-                    Fitur Utama
-                  </h3>
+                <div className="mb-4">
+                  <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-2.5" style={{ fontFamily: JOST }}>Fitur Utama</p>
                   <div className="flex flex-wrap gap-2">
-                    {selectedProduct.features.map(
-                      (feature: string, idx: number) => (
-                        <span
-                          key={idx}
-                          className="px-4 py-2 bg-white text-orange-700 text-sm font-semibold rounded-xl border-2 border-orange-100"
-                        >
-                          <Check className="w-4 h-4 inline mr-1" />
-                          {feature}
-                        </span>
-                      ),
-                    )}
+                    {selectedProduct.features.map((f: string, i: number) => (
+                      <span key={i} className="flex items-center gap-1.5 px-3 py-1.5 border border-neutral-200 text-neutral-600 text-[11px] tracking-[0.1em] uppercase font-medium" style={{ fontFamily: JOST }}>
+                        <Check className="w-3 h-3" />{f}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
                 {/* Specifications */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">
-                    Spesifikasi
-                  </h3>
-                  <div className="space-y-2">
-                    {Object.entries(
-                      selectedProduct.specifications as Record<string, string>,
-                    ).map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="flex justify-between py-2 border-b border-gray-100"
-                      >
-                        <span className="text-gray-600 font-medium">{key}</span>
-                        <span className="text-gray-900 font-semibold">
-                          {value}
-                        </span>
+                <div className="mb-6">
+                  <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-2.5" style={{ fontFamily: JOST }}>Spesifikasi</p>
+                  <div className="space-y-1.5">
+                    {Object.entries(selectedProduct.specifications as Record<string, string>).map(([k, v]) => (
+                      <div key={k} className="flex justify-between py-1.5 border-b border-neutral-100 text-sm" style={{ fontFamily: JOST }}>
+                        <span className="text-neutral-400 font-light">{k}</span>
+                        <span className="text-neutral-800 font-medium">{v}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3 mt-auto">
+                {/* Actions */}
+                <div className="flex gap-2 mt-auto">
                   <button
                     onClick={() => toggleFavorite(selectedProduct.id)}
-                    className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-lg ${
-                      favorites.includes(selectedProduct.id)
-                        ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white scale-105"
-                        : "bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-orange-300"
-                    }`}
+                    className={`w-11 h-11 flex items-center justify-center border transition-all ${favorites.includes(selectedProduct.id) ? "bg-neutral-900 border-neutral-900 text-white" : "border-neutral-200 text-neutral-500 hover:border-neutral-800"}`}
                   >
-                    <Heart
-                      className={`w-6 h-6 ${
-                        favorites.includes(selectedProduct.id)
-                          ? "fill-current"
-                          : ""
-                      }`}
-                    />
+                    <Heart className={`w-4 h-4 ${favorites.includes(selectedProduct.id) ? "fill-current" : ""}`} />
                   </button>
                   <button
-                    onClick={() => {
-                      closeModal();
-                      handleAddToCart(selectedProduct);
-                    }}
-                    className="flex-1 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+                    onClick={() => { closeModal(); handleAddToCart(selectedProduct); }}
+                    className="flex-1 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-black transition-colors flex items-center justify-center gap-2"
+                    style={{ fontFamily: JOST }}
                   >
-                    <ShoppingCart className="w-5 h-5" />
-                    <span>Add to Cart</span>
+                    <ShoppingCart className="w-4 h-4" />
+                    Add to Cart
                   </button>
                 </div>
 
-                {/* Stock Status */}
-                <div className="mt-4 flex items-center gap-2">
-                  <div
-                    className={`w-3 h-3 rounded-full ${selectedProduct.inStock ? "bg-emerald-500 animate-pulse" : "bg-red-500"}`}
-                  />
-                  <span
-                    className={`text-sm font-semibold ${selectedProduct.inStock ? "text-emerald-600" : "text-red-600"}`}
-                  >
+                {/* Stock */}
+                <div className="mt-3 flex items-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${selectedProduct.inStock ? "bg-green-500" : "bg-red-400"}`} />
+                  <span className="text-[11px] text-neutral-400 tracking-wide" style={{ fontFamily: JOST }}>
                     {selectedProduct.inStock ? "In Stock" : "Out of Stock"}
                   </span>
                 </div>
@@ -930,59 +547,27 @@ export default function ProductPage() {
         </div>
       )}
 
-      {/* Features Section */}
-      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-16 sm:py-20 relative overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
-        <div
-          className="absolute bottom-0 left-0 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "1000ms" }}
-        />
-
-        <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+      {/* ── FEATURES STRIP ── */}
+      <section className="bg-neutral-900 py-12 sm:py-14">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
             {[
-              {
-                icon: Shield,
-                title: "Official Warranty",
-                desc: "1 Year Warranty",
-                gradient: "from-orange-500 to-pink-500",
-              },
-              {
-                icon: Zap,
-                title: "Fast Delivery",
-                desc: "Same Day Delivery",
-                gradient: "from-pink-500 to-purple-500",
-              },
-              {
-                icon: Award,
-                title: "Premium Quality",
-                desc: "Certified Products",
-                gradient: "from-purple-500 to-blue-500",
-              },
-              {
-                icon: TrendingUp,
-                title: "Best Price",
-                desc: "Guaranteed Lowest",
-                gradient: "from-blue-500 to-cyan-500",
-              },
-            ].map((feature, idx) => {
-              const Icon = feature.icon;
+              { icon: Shield, title: "Official Warranty", desc: "1 Year Warranty" },
+              { icon: Zap, title: "Fast Delivery", desc: "Same Day Delivery" },
+              { icon: Award, title: "Premium Quality", desc: "Certified Products" },
+              { icon: TrendingUp, title: "Best Price", desc: "Guaranteed Lowest" },
+            ].map((f, i) => {
+              const Icon = f.icon;
               return (
-                <div
-                  key={idx}
-                  className="flex items-center gap-4 p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 hover:bg-white/20 hover:scale-105 transition-all group"
-                >
-                  <div
-                    className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg`}
-                  >
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
+                <div key={i} className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-neutral-900 hover:bg-neutral-800 transition-colors group">
+                  <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0" />
                   <div>
-                    <h4 className="font-bold text-white mb-1">
-                      {feature.title}
-                    </h4>
-                    <p className="text-sm text-gray-300">{feature.desc}</p>
+                    <p className="text-[11px] tracking-[0.18em] uppercase text-white font-medium mb-0.5" style={{ fontFamily: JOST }}>
+                      {f.title}
+                    </p>
+                    <p className="text-[11px] text-white/40 font-light tracking-wide" style={{ fontFamily: JOST }}>
+                      {f.desc}
+                    </p>
                   </div>
                 </div>
               );
@@ -990,45 +575,12 @@ export default function ProductPage() {
           </div>
         </div>
       </section>
+
       <Footer />
 
       <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
-        }
-
-        .animate-scaleIn {
-          animation: scaleIn 0.3s ease-out;
-        }
-
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </div>
   );
