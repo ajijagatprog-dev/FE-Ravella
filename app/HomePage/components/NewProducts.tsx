@@ -3,8 +3,16 @@
 import Link from "next/link";
 import { ArrowRight, ShoppingBag, Sparkles } from "lucide-react";
 
+interface Product {
+  title: string;
+  category: string;
+  price: string;
+  image: string;
+  badge: string;
+}
+
 export default function NewProducts() {
-  const products = [
+  const products: Product[] = [
     {
       title: "Panci Set Premium",
       category: "Peralatan Masak",
@@ -61,7 +69,7 @@ export default function NewProducts() {
 
           <Link
             href="/product"
-            className="group flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 hover:scale-105"
+            className="group flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r bg-gray-900 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 hover:scale-105"
           >
             <span className="text-sm sm:text-base">Lihat Semua</span>
             <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
@@ -106,7 +114,7 @@ export default function NewProducts() {
   );
 }
 
-function ProductCard({ product, index }: { product: any; index: number }) {
+function ProductCard({ product, index }: { product: Product; index: number }) {
   return (
     <div className="min-w-[280px] sm:min-w-[320px] lg:min-w-0 snap-start group">
       {/* Product Image */}
@@ -153,7 +161,7 @@ function ProductCard({ product, index }: { product: any; index: number }) {
           {product.title}
         </h3>
         <div className="flex items-center justify-between">
-          <p className="font-black text-lg sm:text-xl bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
+          <p className="font-black text-lg sm:text-xl bg-gradient-to-r bg-black bg-clip-text text-transparent">
             {product.price}
           </p>
           <div className="flex items-center gap-1 text-yellow-400">

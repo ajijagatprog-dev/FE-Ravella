@@ -8,114 +8,206 @@ import {
   Package,
   ShoppingCart,
   Users,
-  Building2,
   Award,
   BarChart3,
-  Menu,
   X,
+  ChevronRight,
+  LogOut,
+  Building2,
 } from "lucide-react";
+
+// ── Menu Config ───────────────────────────────────────────────────────────────
 
 const menuItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Product Management", href: "/products", icon: Package },
   { label: "Order Management", href: "/order", icon: ShoppingCart },
-  { label: "Customer Management", href: "/customers", icon: Users },
-  { label: "B2B Management", href: "/b2b", icon: Building2 },
+  { label: "User Management", href: "/users_management", icon: Users },
   { label: "Loyalty System", href: "/loyalty", icon: Award },
   { label: "Reporting", href: "/reports", icon: BarChart3 },
 ];
 
-export default function Sidebar() {
+// ── Badge helper (optional per-menu badge) ────────────────────────────────────
+
+const menuBadges: Record<string, { count: number; color: string }> = {
+  "/order": { count: 12, color: "bg-blue-500" },
+  "/products": { count: 3, color: "bg-amber-500" },
+};
+
+// ── Props ─────────────────────────────────────────────────────────────────────
+
+interface SidebarProps {
+  isMobileOpen: boolean;
+  onMobileClose: () => void;
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
+export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <button
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-lg"
-      >
-        {isMobileMenuOpen ? (
-          <X size={20} className="text-gray-600" />
-        ) : (
-          <Menu size={20} className="text-gray-600" />
-        )}
-      </button>
-
-      {/* Overlay Mobile */}
-      {isMobileMenuOpen && (
+      {/* ── Mobile Overlay ─────────────────────────────────── */}
+      {isMobileOpen && (
         <div
-          onClick={() => setIsMobileMenuOpen(false)}
-          className="lg:hidden fixed inset-0 bg-black/50 z-30"
+          onClick={onMobileClose}
+          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-30 transition-opacity"
         />
       )}
 
-      {/* Sidebar */}
+      {/* ── Sidebar ────────────────────────────────────────── */}
       <aside
         className={`
           fixed lg:sticky top-0
-          w-64 h-screen
-          bg-white border-r border-gray-200
-          px-4 py-6
-          z-40
-          transition-transform duration-300
-          ${
-            isMobileMenuOpen
-              ? "translate-x-0"
-              : "-translate-x-full lg:translate-x-0"
-          }
-          flex flex-col
+          h-screen bg-white border-r border-gray-200
+          flex flex-col z-40
+          transition-all duration-300 ease-in-out
+          ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          ${collapsed ? "lg:w-[72px]" : "w-64"}
         `}
       >
-        {/* Logo */}
-        <div className="flex items-center gap-2 mb-8 px-2">
-          <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
-            R
+        {/* ── Logo ─────────────────────────────────────────── */}
+        <div className="flex items-center justify-between px-4 py-5 border-b border-gray-100 shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-blue-200 shrink-0">
+              R
+            </div>
+            {!collapsed && (
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-gray-900 truncate">Ravelle Fashion</p>
+                <p className="text-[11px] text-gray-400 truncate">Admin Panel</p>
+              </div>
+            )}
           </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-800">
-              Ravelle Fashion
-            </p>
-            <p className="text-xs text-gray-500">Admin Panel</p>
-          </div>
+
+          {/* Close on mobile / collapse toggle on desktop */}
+          <button
+            onClick={() => {
+              if (window.innerWidth < 1024) {
+                onMobileClose();
+              } else {
+                setCollapsed((v) => !v);
+              }
+            }}
+            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+          >
+            {/* Mobile: X, Desktop: chevron */}
+            <X size={16} className="lg:hidden" />
+            <ChevronRight
+              size={16}
+              className={`hidden lg:block transition-transform duration-300 ${collapsed ? "" : "rotate-180"}`}
+            />
+          </button>
         </div>
 
-        {/* Menu */}
-        <nav className="space-y-1 flex-1 overflow-y-auto pr-1">
+        {/* ── Navigation ───────────────────────────────────── */}
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
+          {!collapsed && (
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-3 pb-2">
+              Menu Utama
+            </p>
+          )}
+
           {menuItems.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive =
+              pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
+            const badge = menuBadges[item.href];
 
             return (
               <Link
                 key={item.label}
                 href={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
+                onClick={onMobileClose}
+                title={collapsed ? item.label : undefined}
+                className={`
+                  relative flex items-center gap-3 rounded-xl text-sm font-medium
+                  transition-all duration-150 group
+                  ${collapsed ? "justify-center px-0 py-3" : "px-3 py-2.5"}
                   ${
                     isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-200"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                  }`}
+                  }
+                `}
               >
-                <Icon size={18} />
-                {item.label}
+                {/* Active indicator bar */}
+                {isActive && !collapsed && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-white/50 rounded-r-full" />
+                )}
+
+                <Icon
+                  size={18}
+                  className={`shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-white" : ""}`}
+                />
+
+                {!collapsed && (
+                  <span className="flex-1 truncate">{item.label}</span>
+                )}
+
+                {/* Badge */}
+                {!collapsed && badge && (
+                  <span
+                    className={`min-w-[20px] h-5 flex items-center justify-center px-1.5 text-[10px] font-bold text-white rounded-full ${
+                      isActive ? "bg-white/30" : badge.color
+                    }`}
+                  >
+                    {badge.count}
+                  </span>
+                )}
+
+                {/* Collapsed tooltip */}
+                {collapsed && (
+                  <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-xl transition-opacity">
+                    {item.label}
+                    {badge && (
+                      <span className={`ml-1.5 px-1.5 py-0.5 text-[9px] font-bold rounded-full ${badge.color}`}>
+                        {badge.count}
+                      </span>
+                    )}
+                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900" />
+                  </div>
+                )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="pt-4 border-t border-gray-200">
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
-              AR
+        {/* ── Footer: User Profile ─────────────────────────── */}
+        <div className="shrink-0 border-t border-gray-100 p-3">
+          <div
+            className={`flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group ${
+              collapsed ? "justify-center" : ""
+            }`}
+            title={collapsed ? "Alex Rivera — Store Manager" : undefined}
+          >
+            {/* Avatar */}
+            <div className="relative shrink-0">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-xs font-bold shadow">
+                AR
+              </div>
+              {/* Online dot */}
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-800">Alex Rivera</p>
-              <p className="text-xs text-gray-500">Store Manager</p>
-            </div>
+
+            {!collapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-800 truncate">
+                    Alex Rivera
+                  </p>
+                  <p className="text-[11px] text-gray-400 truncate">Store Manager</p>
+                </div>
+                <button
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all"
+                  title="Keluar"
+                >
+                  <LogOut size={14} />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </aside>

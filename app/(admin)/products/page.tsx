@@ -1,18 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Plus,
-  Search,
-  Filter,
-  Download,
-  SlidersHorizontal,
-} from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
+import { Plus, Search, Download } from "lucide-react";
+
 import ProductTable from "./components/ProductTable";
 import BulkActionBar from "./components/BulkActionBar";
+import ModalDelete from "./components/ModalDelete";
+import ModalTambah from "./components/ModalTambah";
+import ModalEdit from "./components/ModalEdit";
 
-// Sample data
-const productsData = [
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  image: string;
+  sku: string;
+  stock: number;
+  stockStatus: "high" | "medium" | "low";
+  retailPrice: number;
+  b2bPrice: number;
+}
+
+const initialProducts: Product[] = [
   {
     id: 1,
     name: "Ravelle Airflex Vacuum Cleaner",
@@ -21,7 +30,7 @@ const productsData = [
       "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
     sku: "RV-TSH-001",
     stock: 142,
-    stockStatus: "high" as const,
+    stockStatus: "high",
     retailPrice: 798900,
     b2bPrice: 598900,
   },
@@ -33,7 +42,7 @@ const productsData = [
       "https://www.ravelle.co.id/data/product_cover/224-20250520175323.png",
     sku: "RV-JNS-402",
     stock: 8,
-    stockStatus: "low" as const,
+    stockStatus: "low",
     retailPrice: 1799900,
     b2bPrice: 850000,
   },
@@ -45,41 +54,127 @@ const productsData = [
       "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-JKT-115",
     stock: 24,
-    stockStatus: "medium" as const,
+    stockStatus: "medium",
     retailPrice: 899900,
     b2bPrice: 799900,
   },
   {
     id: 4,
-    name: "Ravelle Luxe Air Purifier HEPA13 + Anti-Allergen",
-    category: "Tops / Hoodies",
+    name: "Product 4",
+    category: "homeliving",
     image:
-      "https://www.ravelle.co.id/data/product_cover/223-20250520175032.png",
-    sku: "RV-HOD-881",
-    stock: 64,
-    stockStatus: "high" as const,
-    retailPrice: 75.0,
-    b2bPrice: 40.0,
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-004",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
   },
   {
     id: 5,
-    name: "Ravelle Ezy Squeenze Citrus Juicer- Cream",
+    name: "Product 5",
     category: "homeliving",
     image:
-      "https://www.ravelle.co.id/data/product_cover/218-20250520162617.png",
-    sku: "RV-SHR-303",
-    stock: 210,
-    stockStatus: "high" as const,
-    retailPrice: 559900,
-    b2bPrice: 749900,
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-005",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 6,
+    name: "Product 6",
+    category: "homeliving",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-006",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 7,
+    name: "Product 7",
+    category: "homeliving",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-007",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 8,
+    name: "Product 8",
+    category: "homeliving",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-008",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 9,
+    name: "Product 9",
+    category: "homeliving",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-009",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 10,
+    name: "Product 10",
+    category: "homeliving",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-010",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
+  },
+  {
+    id: 11,
+    name: "Product 11",
+    category: "homeliving",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    sku: "RV-011",
+    stock: 24,
+    stockStatus: "medium",
+    retailPrice: 899900,
+    b2bPrice: 799900,
   },
 ];
 
 export default function ProductManagementPage() {
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("latest");
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  const [deleteTargetIds, setDeleteTargetIds] = useState<number[]>([]);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy]);
 
   const handleSelectProduct = (id: number) => {
     setSelectedProducts((prev) =>
@@ -87,156 +182,275 @@ export default function ProductManagementPage() {
     );
   };
 
+  const handleAddProduct = (product: Product) => {
+    setProducts((prev) => [product, ...prev]);
+  };
+
+  const handleEditClick = (product: Product) => {
+    setSelectedProduct(product);
+    setOpenEditModal(true);
+  };
+
+  const handleUpdateProduct = (updatedProduct: Product) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)),
+    );
+  };
+
+  const handleSingleDelete = (id: number) => {
+    setDeleteTargetIds([id]);
+    setOpenDeleteModal(true);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedProducts.length === 0) return;
+    setDeleteTargetIds(selectedProducts);
+    setOpenDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    setProducts((prev) =>
+      prev.filter((product) => !deleteTargetIds.includes(product.id)),
+    );
+
+    setSelectedProducts([]);
+    setDeleteTargetIds([]);
+    setOpenDeleteModal(false);
+  };
+
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    if (searchQuery) {
+      result = result.filter((product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    if (sortBy === "stock-low") {
+      result.sort((a, b) => a.stock - b.stock);
+    }
+
+    if (sortBy === "price-high") {
+      result.sort((a, b) => b.retailPrice - a.retailPrice);
+    }
+
+    return result;
+  }, [products, searchQuery, sortBy]);
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
+  // Pagination pages with ellipsis
+  const getPageNumbers = () => {
+    const pages: (number | "...")[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("...");
+      for (
+        let i = Math.max(2, currentPage - 1);
+        i <= Math.min(totalPages - 1, currentPage + 1);
+        i++
+      ) {
+        pages.push(i);
+      }
+      if (currentPage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
   return (
-    <div className="space-y-4 sm:space-y-6 px-4 sm:px-0">
-      {/* Breadcrumbs & Header */}
-      <div className="space-y-3 sm:space-y-4">
-        {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-500">
-          <span className="font-medium">DASHBOARD</span>
-          <span>›</span>
-          <span className="text-gray-900 font-semibold">PRODUCTS</span>
+    <div className="space-y-6 px-4 sm:px-0">
+      {/* ── Header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+            Product Management
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Organize inventory and manage SKU logistics.
+            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 ring-1 ring-slate-200">
+              {products.length} products
+            </span>
+          </p>
         </div>
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-1 truncate">
-              Product Management
-            </h1>
-            <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
-              Organize inventory, modify pricing, and manage SKU logistics.
-            </p>
-          </div>
-
-          <button className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold text-sm shadow-lg shadow-blue-600/30 transition-all hover:shadow-xl hover:shadow-blue-600/40 shrink-0 w-full sm:w-auto">
-            <Plus size={18} />
-            <span>Add New Product</span>
-          </button>
-        </div>
+        <button
+          onClick={() => setOpenAddModal(true)}
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-colors"
+        >
+          <Plus size={16} />
+          Add New Product
+        </button>
       </div>
 
-      {/* Filters & Search */}
-      <div className="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-200">
-        {/* Mobile: Search + Filter Toggle Button */}
-        <div className="lg:hidden space-y-3">
+      {/* ── Filters ── */}
+      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          {/* Search */}
+          <div className="relative flex-1 max-w-md">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={16}
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by product name..."
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+
           <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={16}
-              />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <button
-              onClick={() => setShowMobileFilters(!showMobileFilters)}
-              className="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors shrink-0"
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
-              <SlidersHorizontal size={18} />
+              <option value="latest">Sort: Latest</option>
+              <option value="stock-low">Stock: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+
+            {/* Export */}
+            <button className="inline-flex items-center gap-1.5 px-3 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 text-sm font-medium transition-colors">
+              <Download size={15} />
+              <span className="hidden sm:inline">Export</span>
             </button>
           </div>
-
-          {/* Mobile Filters Dropdown */}
-          {showMobileFilters && (
-            <div className="space-y-3 pt-3 border-t border-gray-200 animate-slide-down">
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors flex-1">
-                  <Filter size={16} />
-                  <span>Category</span>
-                </button>
-                <button className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  <Download size={16} className="text-gray-600" />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-gray-500 uppercase shrink-0">
-                  Sort:
-                </span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="flex-1 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="latest">Latest Created</option>
-                  <option value="stock-low">Stock: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                </select>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Desktop: All Filters in One Row */}
-        <div className="hidden lg:flex items-center justify-between gap-4">
-          {/* Search & Filter */}
-          <div className="flex items-center gap-3 flex-1">
-            <div className="relative flex-1 max-w-md">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={18}
-              />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Filter by Name or Product"
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-gray-800 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
-
-            <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-800 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors whitespace-nowrap">
-              <Filter size={18} />
-              <span>Category</span>
-            </button>
-          </div>
-
-          {/* Sort & Export */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <p className="text-xs font-bold text-gray-800 uppercase whitespace-nowrap">
-                Sort By:
-              </p>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-gray-50 border border-gray-200 text-gray-800 rounded-lg text-sm font-semibold px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[160px]"
+        {/* Active search hint */}
+        {searchQuery && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
+            <span>
+              Showing{" "}
+              <span className="font-semibold text-slate-700">
+                {filteredProducts.length}
+              </span>{" "}
+              result{filteredProducts.length !== 1 ? "s" : ""} for
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium ring-1 ring-blue-200">
+              "{searchQuery}"
+              <button
+                onClick={() => setSearchQuery("")}
+                className="ml-0.5 hover:text-blue-900"
               >
-                <option value="latest">Latest Created</option>
-                <option value="stock-low">Stock: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-              </select>
-            </div>
-
-            <button className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <Download size={18} className="text-gray-600" />
-            </button>
+                ×
+              </button>
+            </span>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Product Table */}
+      {/* ── Table ── */}
       <ProductTable
-        products={productsData}
-        onSelectProduct={handleSelectProduct}
+        products={paginatedProducts}
         selectedProducts={selectedProducts}
+        onSelectProduct={handleSelectProduct}
+        onDeleteProduct={handleSingleDelete}
+        onEditProduct={handleEditClick}
       />
 
-      {/* Bulk Action Bar */}
+      {/* ── Pagination ── */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-slate-500">
+            Page{" "}
+            <span className="font-semibold text-slate-700">{currentPage}</span>{" "}
+            of{" "}
+            <span className="font-semibold text-slate-700">{totalPages}</span>
+            <span className="ml-2 text-slate-400">
+              ({filteredProducts.length} total)
+            </span>
+          </p>
+
+          <div className="flex items-center gap-1">
+            {/* Prev */}
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
+            >
+              ‹
+            </button>
+
+            {getPageNumbers().map((page, i) =>
+              page === "..." ? (
+                <span
+                  key={`ellipsis-${i}`}
+                  className="w-8 h-8 flex items-center justify-center text-slate-400 text-sm"
+                >
+                  …
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page as number)}
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === page
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              ),
+            )}
+
+            {/* Next */}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Bulk Action Bar ── */}
       <BulkActionBar
         selectedCount={selectedProducts.length}
-        onChangeCategory={() => console.log("Change category")}
-        onMarkInactive={() => console.log("Mark inactive")}
-        onBulkDelete={() => {
-          console.log("Bulk delete");
-          setSelectedProducts([]);
-        }}
+        onBulkDelete={handleBulkDelete}
+        onChangeCategory={() => {}}
+        onMarkInactive={() => {}}
+      />
+
+      {/* ── Modals ── */}
+      <ModalTambah
+        open={openAddModal}
+        onClose={() => setOpenAddModal(false)}
+        onAddProduct={handleAddProduct}
+      />
+
+      <ModalEdit
+        open={openEditModal}
+        product={selectedProduct}
+        onClose={() => setOpenEditModal(false)}
+        onUpdateProduct={handleUpdateProduct}
+      />
+
+      <ModalDelete
+        open={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title={
+          deleteTargetIds.length > 1
+            ? `Delete ${deleteTargetIds.length} Products`
+            : "Hapus Produk"
+        }
+        description="Apakah anda yakin ingin menghapus produk ini?"
       />
     </div>
   );
