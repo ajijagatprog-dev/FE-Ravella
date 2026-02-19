@@ -5,18 +5,13 @@ import {
   Users,
   Globe,
   TrendingUp,
-  Heart,
   Shield,
   Sparkles,
   Target,
   Zap,
-  Star,
   CheckCircle,
   ArrowRight,
-  Quote,
-  MapPin,
-  Mail,
-  Phone,
+  Star,
   Package,
   Palette,
   MessageCircle,
@@ -26,14 +21,17 @@ import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 
+const JOST = "'Jost', system-ui, sans-serif";
+const CORMORANT = "'Cormorant Garamond', Georgia, serif";
+
 export default function Company() {
   const [activeTimeline, setActiveTimeline] = useState(0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+    <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
       <Header />
 
-      {/* Hero Section */}
+      {/* ── HERO ── */}
       <section className="relative h-[400px] sm:h-[500px] md:h-[600px] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -42,282 +40,303 @@ export default function Company() {
               "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
-        {/* Animated Background Elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
-        <div
-          className="absolute bottom-20 right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "700ms" }}
-        />
+        <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
+          <div className="max-w-2xl">
 
-        <div className="relative z-10 h-full flex items-center justify-center px-4">
-          <div className="text-center max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full mb-6 hover:bg-white/20 transition-all">
-              <Sparkles className="w-4 h-4 text-orange-400" />
-              <span className="text-white font-bold text-sm uppercase tracking-wide">
-                About Ravella
+            {/* Eyebrow */}
+            <div className="inline-flex items-center gap-2.5 mb-5">
+              <div className="w-5 h-[1px] bg-white/50" />
+              <span
+                className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]"
+                style={{ fontFamily: JOST }}
+              >
+                About Ravelle
               </span>
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight">
-              Kitchen Innovation{" "}
-              <span className="block mt-2 bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-                Since 2020
-              </span>
+
+            {/* Heading */}
+            <h1
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-5 leading-[1.05]"
+              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+            >
+              Kitchen{" "}
+              <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
+                Innovation
+              </em>
+              <span className="block mt-1">Since 2020</span>
             </h1>
-            <p className="text-gray-200 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8">
+
+            <div className="w-10 h-[1px] bg-white/30 mb-5" />
+
+            <p
+              className="text-white/75 text-sm sm:text-base font-light leading-relaxed mb-8 max-w-lg"
+              style={{ fontFamily: JOST }}
+            >
               Providing premium quality kitchen appliances with modern and
-              innovative designs to make your cooking activities easier
+              innovative designs to make your cooking activities easier.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <button className="px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full font-bold hover:shadow-2xl hover:scale-105 transition-all">
+
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="/contact"
+                className="px-8 py-3.5 bg-white text-neutral-900 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-100 transition-colors"
+                style={{ fontFamily: JOST }}
+              >
                 Contact Us
-              </button>
-              <button className="px-8 py-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-full font-bold hover:bg-white/20 transition-all">
+              </a>
+              <a
+                href="/product"
+                className="px-8 py-3.5 border border-white/50 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-white/10 transition-colors"
+                style={{ fontFamily: JOST }}
+              >
                 View Products
-              </button>
+              </a>
             </div>
           </div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-            <div className="w-1.5 h-3 bg-white/50 rounded-full animate-pulse" />
+          <div className="w-5 h-8 border border-white/30 flex items-start justify-center pt-1.5">
+            <div className="w-1 h-2 bg-white/50 rounded-full" />
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
+      {/* ── MAIN CONTENT ── */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-        {/* Company Story */}
+
+        {/* ── COMPANY STORY ── */}
         <section className="py-16 sm:py-20 md:py-24">
-          <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-start">
-            {/* Left Side - Images */}
-            <div className="relative space-y-6">
-              {/* Main Kitchen Image */}
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl group">
+          <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-20 items-start">
+
+            {/* Images */}
+            <div className="relative space-y-4">
+              <div className="relative overflow-hidden group">
                 <img
                   src="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80"
-                  alt="Ravella Kitchen Setup"
+                  alt="Ravelle Kitchen Setup"
                   className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
               </div>
 
-              {/* Product Image */}
-              <div className="relative rounded-3xl overflow-hidden shadow-xl h-64 sm:h-80 lg:h-72 group">
+              <div className="relative overflow-hidden h-60 sm:h-72 group">
                 <img
                   src="https://cdn.shopify.com/s/files/1/0931/2382/files/Products_A2_480x480.gif?v=1718387274"
-                  alt="Ravella Products"
+                  alt="Ravelle Products"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               </div>
 
-              {/* Floating Rating Badge */}
-              <div className="absolute top-6 right-6 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100 backdrop-blur-sm">
+              {/* Floating rating badge */}
+              <div className="absolute top-4 right-4 bg-white border border-neutral-100 px-4 py-3 shadow-lg">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                    <Star className="w-6 h-6 text-white fill-white" />
-                  </div>
+                  <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
                   <div>
-                    <div className="text-2xl font-black text-gray-900">4.8</div>
-                    <div className="text-xs text-gray-600">Rating</div>
+                    <div
+                      className="text-2xl font-light text-neutral-900"
+                      style={{ fontFamily: CORMORANT }}
+                    >
+                      4.8
+                    </div>
+                    <div
+                      className="text-[10px] tracking-[0.15em] uppercase text-neutral-400 font-medium"
+                      style={{ fontFamily: JOST }}
+                    >
+                      Rating
+                    </div>
                   </div>
                 </div>
               </div>
-
-              {/* Decorative Element */}
-              <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-gradient-to-br from-orange-200 to-pink-200 rounded-full blur-3xl opacity-50 -z-10" />
             </div>
 
-            {/* Right Side - Content */}
+            {/* Content */}
             <div className="space-y-6 lg:space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border border-orange-100 rounded-full">
-                <Quote className="w-4 h-4 text-orange-600" />
-                <span className="text-orange-600 font-bold text-sm">
+
+              {/* Eyebrow */}
+              <div className="inline-flex items-center gap-2.5">
+                <div className="w-5 h-[1px] bg-neutral-400" />
+                <span
+                  className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
+                  style={{ fontFamily: JOST }}
+                >
                   Our Story
                 </span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.1]">
+              <h2
+                className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900 leading-[1.05]"
+                style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              >
                 Improve the{" "}
-                <span className="bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
+                <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
                   Living Quality
-                </span>
+                </em>
               </h2>
 
-              <div className="space-y-6">
-                <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                  Since its debut in{" "}
-                  <span className="font-bold text-orange-600">2020</span>,
-                  RAVELLE has continued to improve the living quality of
-                  Indonesian families especially during the pandemic time by
-                  consistently carrying these values in all of its products:
-                </p>
+              <div className="w-10 h-[1px] bg-neutral-200" />
 
-                {/* Core Values List */}
-                <div className="bg-gradient-to-br from-orange-50 via-pink-50/80 to-purple-50/60 rounded-2xl p-6 sm:p-8 border-2 border-orange-100/50 shadow-sm">
-                  <ul className="space-y-3">
-                    {[
-                      "Quality everyday life",
-                      "Joyful experience",
-                      "Inner strength and independency",
-                      "Honesty and communicative",
-                      "Clarity and transparency",
-                    ].map((value, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-3 text-gray-800"
+              <p
+                className="text-base text-neutral-600 font-light leading-relaxed"
+                style={{ fontFamily: JOST }}
+              >
+                Since its debut in{" "}
+                <span className="font-medium text-neutral-900">2020</span>,
+                RAVELLE has continued to improve the living quality of Indonesian
+                families especially during the pandemic time by consistently
+                carrying these values in all of its products:
+              </p>
+
+              {/* Core Values */}
+              <div className="border border-neutral-100 p-6 sm:p-8 bg-neutral-50">
+                <ul className="space-y-3.5">
+                  {[
+                    "Quality everyday life",
+                    "Joyful experience",
+                    "Inner strength and independency",
+                    "Honesty and communicative",
+                    "Clarity and transparency",
+                  ].map((value, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <div className="w-4 h-[1px] bg-neutral-400 flex-shrink-0 mt-[10px]" />
+                      <span
+                        className="text-sm sm:text-base font-light text-neutral-700 tracking-wide"
+                        style={{ fontFamily: JOST }}
                       >
-                        <div className="w-1.5 h-1.5 rounded-full bg-orange-600 flex-shrink-0 mt-2.5" />
-                        <span className="text-base sm:text-lg font-medium">
-                          {value}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                        {value}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Product Excellence Section */}
-        <section className="py-16 sm:py-20 bg-white">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-4">
-              Ravelle{" "}
-              <span className="bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
-                Product
+        {/* ── PRODUCT EXCELLENCE ── */}
+        <section className="py-16 sm:py-20 border-t border-neutral-100">
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-flex items-center gap-2.5 mb-4">
+              <div className="w-5 h-[1px] bg-neutral-400" />
+              <span
+                className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
+                style={{ fontFamily: JOST }}
+              >
+                Excellence
               </span>
+              <div className="w-5 h-[1px] bg-neutral-400" />
+            </div>
+            <h2
+              className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900 mb-4"
+              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+            >
+              Ravelle{" "}
+              <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
+                Product
+              </em>
             </h2>
-            <p className="text-gray-600 text-base sm:text-lg max-w-3xl mx-auto">
-              These values are consistently translated into all RAVELLE products
-              through:
+            <p
+              className="text-neutral-500 text-sm sm:text-base font-light max-w-2xl mx-auto"
+              style={{ fontFamily: JOST }}
+            >
+              These values are consistently translated into all RAVELLE products through:
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto">
-            <div className="space-y-4">
-              {[
-                {
-                  text: "Modern and innovative product designs.",
-                  icon: Sparkles,
-                  gradient: "from-orange-500 to-pink-500",
-                },
-                {
-                  text: "Colourful, creative and unique shapes and sizes",
-                  icon: Palette,
-                  gradient: "from-pink-500 to-purple-500",
-                },
-                {
-                  text: "Excellent built quality for product durability.",
-                  icon: Shield,
-                  gradient: "from-purple-500 to-blue-500",
-                },
-                {
-                  text: "Open and positive product communications to convey accurate information.",
-                  icon: MessageCircle,
-                  gradient: "from-blue-500 to-cyan-500",
-                },
-                {
-                  text: "Responsive customer service combined with excellent product knowledge for better customer piece of mind.",
-                  icon: Users,
-                  gradient: "from-cyan-500 to-teal-500",
-                },
-                {
-                  text: "Fostering good and ethical working relationship with our business partners and customers alike.",
-                  icon: Handshake,
-                  gradient: "from-teal-500 to-green-500",
-                },
-              ].map((feature, i) => {
-                const Icon = feature.icon;
-                return (
-                  <div
-                    key={i}
-                    className="group flex items-start gap-4 sm:gap-6 bg-white rounded-2xl p-5 sm:p-6 md:p-7 border-2 border-gray-100 hover:border-orange-200 transition-all hover:shadow-lg"
-                  >
-                    <div
-                      className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-md`}
-                    >
-                      <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                    </div>
-                    <div className="flex-1 pt-1">
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-orange-600 flex-shrink-0 mt-2.5" />
-                        <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
-                          {feature.text}
-                        </p>
-                      </div>
-                    </div>
+          <div className="max-w-4xl mx-auto space-y-3">
+            {[
+              { text: "Modern and innovative product designs.", icon: Sparkles },
+              { text: "Colourful, creative and unique shapes and sizes.", icon: Palette },
+              { text: "Excellent built quality for product durability.", icon: Shield },
+              { text: "Open and positive product communications to convey accurate information.", icon: MessageCircle },
+              { text: "Responsive customer service combined with excellent product knowledge for better customer piece of mind.", icon: Users },
+              { text: "Fostering good and ethical working relationship with our business partners and customers alike.", icon: Handshake },
+            ].map((feature, i) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={i}
+                  className="group flex items-start gap-5 p-5 sm:p-6 border border-neutral-100 hover:border-neutral-300 hover:bg-neutral-50 transition-all duration-300"
+                >
+                  <div className="w-10 h-10 flex items-center justify-center bg-neutral-900 text-white flex-shrink-0 group-hover:bg-black transition-colors">
+                    <Icon className="w-4 h-4" />
                   </div>
-                );
-              })}
-            </div>
+                  <p
+                    className="text-sm sm:text-base font-light text-neutral-600 leading-relaxed pt-2"
+                    style={{ fontFamily: JOST }}
+                  >
+                    {feature.text}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* ── STATS ── */}
         <section className="py-16 sm:py-20 md:py-24">
-          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl p-8 sm:p-12 md:p-16 relative overflow-hidden shadow-2xl">
-            {/* Animated Background */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
-            <div
-              className="absolute bottom-0 left-0 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl animate-pulse"
-              style={{ animationDelay: "1000ms" }}
-            />
+          <div className="bg-neutral-900 p-8 sm:p-12 md:p-16 relative overflow-hidden">
 
             <div className="relative z-10">
               <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
-                  Proud Achievements
+                <div className="inline-flex items-center gap-2.5 mb-4">
+                  <div className="w-5 h-[1px] bg-white/30" />
+                  <span
+                    className="text-white/50 font-medium text-[11px] uppercase tracking-[0.25em]"
+                    style={{ fontFamily: JOST }}
+                  >
+                    Achievements
+                  </span>
+                  <div className="w-5 h-[1px] bg-white/30" />
+                </div>
+                <h2
+                  className="text-4xl sm:text-5xl font-light text-white mb-3"
+                  style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+                >
+                  Proud{" "}
+                  <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
+                    Achievements
+                  </em>
                 </h2>
-                <p className="text-gray-300 text-base sm:text-lg max-w-2xl mx-auto">
+                <div className="flex justify-center mb-4">
+                  <div className="w-10 h-[1px] bg-white/20" />
+                </div>
+                <p
+                  className="text-white/50 text-sm font-light max-w-xl mx-auto"
+                  style={{ fontFamily: JOST }}
+                >
                   Numbers that prove our dedication to delivering the best
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
                 {[
-                  {
-                    icon: Users,
-                    value: "10,000+",
-                    label: "Happy Customers",
-                    color: "from-orange-400 to-orange-600",
-                  },
-                  {
-                    icon: Award,
-                    value: "6+",
-                    label: "Years Experience",
-                    color: "from-pink-400 to-pink-600",
-                  },
-                  {
-                    icon: Globe,
-                    value: "50+",
-                    label: "Cities in Indonesia",
-                    color: "from-purple-400 to-purple-600",
-                  },
-                  {
-                    icon: TrendingUp,
-                    value: "99%",
-                    label: "Customer Satisfaction",
-                    color: "from-blue-400 to-blue-600",
-                  },
+                  { icon: Users, value: "10,000+", label: "Happy Customers" },
+                  { icon: Award, value: "6+", label: "Years Experience" },
+                  { icon: Globe, value: "50+", label: "Cities in Indonesia" },
+                  { icon: TrendingUp, value: "99%", label: "Customer Satisfaction" },
                 ].map((stat, i) => {
                   const Icon = stat.icon;
                   return (
-                    <div key={i} className="text-center group">
+                    <div
+                      key={i}
+                      className="text-center py-10 px-6 bg-neutral-900 hover:bg-neutral-800 transition-colors duration-300"
+                    >
+                      <Icon className="w-6 h-6 text-white/40 mx-auto mb-4" />
                       <div
-                        className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg`}
+                        className="text-4xl sm:text-5xl font-light text-white mb-2"
+                        style={{ fontFamily: CORMORANT }}
                       >
-                        <Icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                      </div>
-                      <div className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-2">
                         {stat.value}
                       </div>
-                      <div className="text-sm sm:text-base text-gray-300 font-medium">
+                      <div
+                        className="text-[11px] text-white/45 tracking-[0.18em] uppercase font-medium"
+                        style={{ fontFamily: JOST }}
+                      >
                         {stat.label}
                       </div>
                     </div>
@@ -328,165 +347,183 @@ export default function Company() {
           </div>
         </section>
 
-        {/* Vision & Mission */}
-        <section className="py-16 sm:py-20">
+        {/* ── VISION & MISSION ── */}
+        <section className="py-16 sm:py-20 border-t border-neutral-100">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              Vision &{" "}
-              <span className="bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
-                Mission
+            <div className="inline-flex items-center gap-2.5 mb-4">
+              <div className="w-5 h-[1px] bg-neutral-400" />
+              <span
+                className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
+                style={{ fontFamily: JOST }}
+              >
+                Direction
               </span>
+              <div className="w-5 h-[1px] bg-neutral-400" />
+            </div>
+            <h2
+              className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900"
+              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+            >
+              Vision &amp;{" "}
+              <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
+                Mission
+              </em>
             </h2>
-            <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
-              Our goals and direction to create positive impact
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
             {/* Vision */}
-            <div className="group relative bg-gradient-to-br from-orange-500 to-pink-500 rounded-3xl p-8 sm:p-10 md:p-12 text-white overflow-hidden">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Target className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-black mb-4">Vision</h3>
-                <p className="text-white/90 text-base sm:text-lg leading-relaxed">
-                  To become the leading kitchen appliance brand in Indonesia,
-                  known for innovation, premium quality, and high customer trust
-                  by 2030.
-                </p>
+            <div className="bg-neutral-900 p-8 sm:p-10 md:p-12 text-white">
+              <div className="w-10 h-10 flex items-center justify-center border border-white/20 mb-6">
+                <Target className="w-5 h-5 text-white" />
               </div>
+              <p
+                className="text-[11px] tracking-[0.22em] uppercase text-white/40 font-medium mb-3"
+                style={{ fontFamily: JOST }}
+              >
+                Vision
+              </p>
+              <h3
+                className="text-3xl sm:text-4xl font-light text-white mb-5"
+                style={{ fontFamily: CORMORANT }}
+              >
+                Leading with <em style={{ fontStyle: "italic" }}>Purpose</em>
+              </h3>
+              <div className="w-8 h-[1px] bg-white/20 mb-5" />
+              <p
+                className="text-white/65 text-sm sm:text-base font-light leading-relaxed"
+                style={{ fontFamily: JOST }}
+              >
+                To become the leading kitchen appliance brand in Indonesia,
+                known for innovation, premium quality, and high customer trust
+                by 2030.
+              </p>
             </div>
 
             {/* Mission */}
-            <div className="group relative bg-white rounded-3xl p-8 sm:p-10 md:p-12 border-2 border-gray-100 hover:border-orange-200 transition-all hover:shadow-2xl overflow-hidden">
-              <div className="absolute bottom-0 left-0 w-40 h-40 bg-orange-50 rounded-full blur-2xl" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/20 to-pink-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Zap className="w-8 h-8 text-orange-600" />
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-black text-gray-900 mb-4">
-                  Mission
-                </h3>
-                <ul className="space-y-3 text-gray-700 text-base sm:text-lg">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-1" />
-                    <span>Deliver innovative high-quality products</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-1" />
-                    <span>Provide best-in-class customer service</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-1" />
-                    <span>Continuously innovate based on market needs</span>
-                  </li>
-                </ul>
+            <div className="border border-neutral-200 bg-white p-8 sm:p-10 md:p-12">
+              <div className="w-10 h-10 flex items-center justify-center border border-neutral-200 mb-6">
+                <Zap className="w-5 h-5 text-neutral-700" />
               </div>
+              <p
+                className="text-[11px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-3"
+                style={{ fontFamily: JOST }}
+              >
+                Mission
+              </p>
+              <h3
+                className="text-3xl sm:text-4xl font-light text-neutral-900 mb-5"
+                style={{ fontFamily: CORMORANT }}
+              >
+                Built to <em style={{ fontStyle: "italic" }}>Serve</em>
+              </h3>
+              <div className="w-8 h-[1px] bg-neutral-200 mb-5" />
+              <ul className="space-y-4">
+                {[
+                  "Deliver innovative high-quality products",
+                  "Provide best-in-class customer service",
+                  "Continuously innovate based on market needs",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="w-4 h-[1px] bg-neutral-400 flex-shrink-0 mt-[10px]" />
+                    <span
+                      className="text-sm text-neutral-600 font-light leading-relaxed"
+                      style={{ fontFamily: JOST }}
+                    >
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>
 
-        {/* Timeline Section */}
-        <section className="py-16 sm:py-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              Our{" "}
-              <span className="bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
-                Journey
+        {/* ── TIMELINE ── */}
+        <section className="py-16 sm:py-20 border-t border-neutral-100">
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-flex items-center gap-2.5 mb-4">
+              <div className="w-5 h-[1px] bg-neutral-400" />
+              <span
+                className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
+                style={{ fontFamily: JOST }}
+              >
+                Milestones
               </span>
+              <div className="w-5 h-[1px] bg-neutral-400" />
+            </div>
+            <h2
+              className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900"
+              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+            >
+              Our{" "}
+              <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
+                Journey
+              </em>
             </h2>
-            <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
-              Important milestones we've achieved since our inception
-            </p>
           </div>
 
           <div className="relative max-w-4xl mx-auto">
-            {/* Timeline Line */}
-            <div className="absolute left-8 sm:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-orange-500 via-pink-500 to-purple-500" />
+            {/* Timeline line */}
+            <div className="absolute left-8 sm:left-1/2 top-0 bottom-0 w-[1px] bg-neutral-200" />
 
-            <div className="space-y-12">
+            <div className="space-y-10">
               {[
-                {
-                  year: "2020",
-                  title: "RAVELLE Founded",
-                  description:
-                    "Started our journey with a vision to provide quality kitchen appliances for every Indonesian home.",
-                  icon: Star,
-                },
-                {
-                  year: "2021",
-                  title: "Product Expansion",
-                  description:
-                    "Launched complete product lines including rice cookers, blenders, and juicers with modern technology.",
-                  icon: TrendingUp,
-                },
-                {
-                  year: "2023",
-                  title: "10,000+ Customers",
-                  description:
-                    "Reached milestone of 10,000+ satisfied customers across Indonesia with 4.8/5 rating.",
-                  icon: Users,
-                },
-                {
-                  year: "2024",
-                  title: "Quality Award",
-                  description:
-                    "Received 'Best Kitchen Appliance Brand' award from Indonesia Home & Living Awards.",
-                  icon: Award,
-                },
-                {
-                  year: "2026",
-                  title: "Continuous Innovation",
-                  description:
-                    "Launching smart kitchen appliances with IoT technology for the kitchen of the future.",
-                  icon: Zap,
-                },
+                { year: "2020", title: "RAVELLE Founded", description: "Started our journey with a vision to provide quality kitchen appliances for every Indonesian home.", icon: Star },
+                { year: "2021", title: "Product Expansion", description: "Launched complete product lines including rice cookers, blenders, and juicers with modern technology.", icon: TrendingUp },
+                { year: "2023", title: "10,000+ Customers", description: "Reached milestone of 10,000+ satisfied customers across Indonesia with 4.8/5 rating.", icon: Users },
+                { year: "2024", title: "Quality Award", description: "Received 'Best Kitchen Appliance Brand' award from Indonesia Home & Living Awards.", icon: Award },
+                { year: "2026", title: "Continuous Innovation", description: "Launching smart kitchen appliances with IoT technology for the kitchen of the future.", icon: Zap },
               ].map((item, i) => {
                 const Icon = item.icon;
                 return (
                   <div
                     key={i}
-                    className={`relative flex items-center gap-8 ${
-                      i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"
-                    }`}
+                    className={`relative flex items-start gap-8 ${i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"
+                      }`}
                     onMouseEnter={() => setActiveTimeline(i)}
                   >
-                    {/* Timeline Dot */}
-                    <div className="absolute left-8 sm:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 border-4 border-white shadow-lg z-10" />
+                    {/* Dot */}
+                    <div className="absolute left-8 sm:left-1/2 -translate-x-1/2 w-3 h-3 bg-neutral-900 border-2 border-white ring-1 ring-neutral-300 z-10 mt-5" />
 
-                    {/* Content */}
+                    {/* Card */}
                     <div
-                      className={`flex-1 ${i % 2 === 0 ? "sm:text-right" : "sm:text-left"} ml-20 sm:ml-0`}
+                      className={`flex-1 ml-20 sm:ml-0 ${i % 2 === 0 ? "sm:pr-12" : "sm:pl-12"
+                        }`}
                     >
                       <div
-                        className={`group bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 ${
-                          activeTimeline === i
-                            ? "scale-105 border-orange-300"
-                            : ""
-                        }`}
+                        className={`border p-6 sm:p-8 transition-all duration-300 ${activeTimeline === i
+                            ? "border-neutral-800 bg-neutral-900 text-white"
+                            : "border-neutral-100 bg-white hover:border-neutral-300"
+                          }`}
                       >
-                        <div
-                          className={`flex items-center gap-4 mb-4 ${i % 2 === 0 ? "sm:justify-end" : "sm:justify-start"}`}
-                        >
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <Icon className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="text-3xl font-black bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
+                        <div className="flex items-center gap-3 mb-3">
+                          <Icon
+                            className={`w-4 h-4 ${activeTimeline === i ? "text-white/60" : "text-neutral-400"}`}
+                          />
+                          <span
+                            className={`text-3xl sm:text-4xl font-light ${activeTimeline === i ? "text-white" : "text-neutral-900"}`}
+                            style={{ fontFamily: CORMORANT }}
+                          >
                             {item.year}
-                          </div>
+                          </span>
                         </div>
-                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                        <h3
+                          className={`text-base sm:text-lg font-medium mb-2 tracking-wide ${activeTimeline === i ? "text-white" : "text-neutral-900"}`}
+                          style={{ fontFamily: JOST }}
+                        >
                           {item.title}
                         </h3>
-                        <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                        <p
+                          className={`text-sm font-light leading-relaxed ${activeTimeline === i ? "text-white/60" : "text-neutral-500"}`}
+                          style={{ fontFamily: JOST }}
+                        >
                           {item.description}
                         </p>
                       </div>
                     </div>
 
-                    {/* Spacer for alternating layout */}
+                    {/* Spacer */}
                     <div className="hidden sm:block flex-1" />
                   </div>
                 );
@@ -494,6 +531,7 @@ export default function Company() {
             </div>
           </div>
         </section>
+
       </div>
 
       <Footer />

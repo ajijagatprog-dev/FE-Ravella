@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Instagram, Phone, Facebook } from "lucide-react";
+
+const JOST = "'Jost', system-ui, sans-serif";
 
 interface HeaderProps {
   userName?: string;
@@ -13,269 +15,262 @@ interface HeaderProps {
 export default function Header({
   userName = "User",
   avatarUrl = "",
-  onSearch = () => {},
+  onSearch = () => { },
 }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartCount, setCartCount] = useState(3); // Example cart count
+  const [cartCount] = useState(3);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    onSearch(value);
-  };
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   const menus = [
-    { label: "Home", href: "/" },
-    { label: "Company", href: "/company" },
-    { label: "Product", href: "/product" },
-    { label: "News", href: "/news" },
-    { label: "Contact", href: "/contact" },
+    { label: "HOME", href: "/" },
+    { label: "COMPANY", href: "/company" },
+    { label: "PRODUCT", href: "/product" },
+    { label: "NEWS", href: "/news" },
+    { label: "CONTACT", href: "/contact" },
   ];
 
   return (
     <>
-      {/* HEADER */}
       <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300
-        ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-md"
-            : "bg-white border-b border-gray-200"
-        }`}
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled
+            ? "bg-white/90 backdrop-blur-md border-b border-neutral-200"
+            : "bg-white border-b border-neutral-200"
+          }`}
+        style={{ fontFamily: JOST }}
       >
-        <div className="mx-auto max-w-[1280px] px-4 md:px-10 lg:px-16 py-4">
+        <div className="mx-auto max-w-[1320px] px-6 md:px-12 py-3">
           <div className="flex items-center justify-between">
+
             {/* LEFT */}
-            <div className="flex items-center gap-12">
+            <div className="flex items-center gap-14">
               {/* LOGO */}
-              <Link href="/" className="flex items-center gap-3 group">
-                <div className="flex items-center justify-center size-10 rounded-xl bg-gradient-to-br from-orange-500 to-pink-500 text-white shadow-lg group-hover:scale-110 transition-transform">
-                  <svg
-                    className="size-5"
-                    fill="none"
-                    viewBox="0 0 48 48"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 6H42L36 24L42 42H6L12 24L6 6Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-black tracking-[0.15em] bg-gradient-to-r bg-black bg-clip-text text-transparent">
-                  RAVELLE
-                </h2>
+              <Link href="/" className="group flex items-center">
+                <img
+                  src="/lg-ravella-gold.png"
+                  alt="Ravelle Logo"
+                  className="h-4 sm:h-5 md:h-6 lg:h-7 w-auto transition-transform duration-300 group-hover:scale-105"
+                />
               </Link>
 
               {/* DESKTOP NAV */}
-              <nav className="hidden lg:flex items-center gap-8">
+              <nav className="hidden lg:flex items-center gap-10">
                 {menus.map((menu) => (
                   <Link
                     key={menu.label}
                     href={menu.href}
-                    className="relative text-sm font-semibold text-gray-700 hover:text-orange-600 transition-colors group"
+                    className="group relative text-[13px] tracking-[0.18em] font-medium text-neutral-800 hover:text-black transition-colors duration-300"
                   >
                     {menu.label}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r bg-black group-hover:w-full transition-all duration-300" />
+                    <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full" />
                   </Link>
                 ))}
               </nav>
             </div>
 
             {/* RIGHT */}
-            <div className="flex items-center gap-3 md:gap-4">
-              {/* SEARCH - Desktop */}
+            <div className="flex items-center gap-5">
+
+              {/* SEARCH — borderless icon */}
               <div className="hidden md:block relative">
                 {!searchOpen ? (
                   <button
                     onClick={() => setSearchOpen(true)}
-                    className="flex items-center justify-center w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all hover:scale-105"
+                    className="flex items-center justify-center text-neutral-800 hover:text-black transition-colors duration-200"
+                    aria-label="Search"
                   >
-                    <Search className="w-5 h-5 text-gray-600" />
+                    <Search className="w-5 h-5" />
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 border-2 border-orange-300 animate-slideIn">
-                    <Search className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                  <div className="flex items-center gap-2 px-3 py-1.5 border border-neutral-300">
+                    <Search className="w-4 h-4 text-neutral-700" />
                     <input
                       type="text"
-                      placeholder="Search products..."
+                      placeholder="Search..."
                       value={searchQuery}
-                      onChange={handleSearchChange}
-                      onBlur={() => {
-                        if (!searchQuery) {
-                          setTimeout(() => setSearchOpen(false), 200);
-                        }
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        onSearch(e.target.value);
                       }}
                       autoFocus
-                      className="w-48 bg-transparent border-none text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none"
+                      className="w-40 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
+                      style={{ fontFamily: JOST }}
                     />
-                    {searchQuery && (
-                      <button
-                        onClick={() => {
-                          setSearchQuery("");
-                          onSearch("");
-                        }}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
+                    <button onClick={() => setSearchOpen(false)}>
+                      <X className="w-4 h-4 text-neutral-700" />
+                    </button>
                   </div>
                 )}
               </div>
 
-              {/* CART */}
+              {/* CART — borderless icon */}
               <Link
                 href="/cart"
-                className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gray-100 hover:bg-gradient-to-br hover:from-orange-500 hover:to-pink-500 hover:text-white transition-all hover:scale-105 group"
+                className="relative flex items-center justify-center text-neutral-800 hover:text-black transition-colors duration-200"
+                aria-label="Cart"
               >
-                <ShoppingCart className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors" />
+                <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-orange-500 to-pink-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                  <span className="absolute -top-2 -right-2.5 w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center rounded-full">
                     {cartCount}
                   </span>
                 )}
               </Link>
 
-              {/* LOGIN BUTTON - Desktop */}
+              {/* LOGIN — border dipertahankan sesuai screenshot */}
               <Link
                 href="/auth/login"
-                className="hidden md:inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r bg-black text-white font-bold text-sm hover:shadow-xl hover:scale-105 transition-all group"
+                className="hidden md:flex items-center gap-2 px-5 py-2 text-[12px] tracking-[0.15em] font-medium border border-black text-black hover:bg-black hover:text-white transition-all duration-300"
               >
-                <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                <span>Login</span>
+                <User className="w-4 h-4" />
+                LOGIN
               </Link>
 
-              {/* HAMBURGER */}
+              {/* MOBILE MENU TOGGLE — borderless */}
               <button
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-gray-900 hover:bg-gray-800 transition-all hover:scale-105"
+                className="lg:hidden flex items-center justify-center text-neutral-800 hover:text-black transition-colors"
+                aria-label="Open menu"
               >
-                <Menu className="w-5 h-5 text-white" />
+                <Menu className="w-6 h-6" />
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* MOBILE OVERLAY */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm lg:hidden"
-          onClick={() => setMobileOpen(false)}
-        >
-          {/* SLIDE PANEL */}
-          <div
-            className="absolute top-0 right-0 h-full w-[85%] max-w-sm bg-white shadow-2xl animate-slideIn"
-            onClick={(e) => e.stopPropagation()}
+      {/* ── MOBILE PANEL ── */}
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+        onClick={() => setMobileOpen(false)}
+      />
+
+      {/* Drawer */}
+      <div
+        className={`fixed right-0 top-0 h-full z-50 w-[85%] max-w-[340px] bg-white flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        style={{ fontFamily: JOST }}
+      >
+        {/* Panel Header */}
+        <div className="flex items-center justify-between px-7 py-5 border-b border-neutral-100">
+          <img
+            src="/lg-ravella-gold.png"
+            alt="Ravelle Logo"
+            className="h-5 w-auto"
+          />
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="w-8 h-8 flex items-center justify-center border border-neutral-200 hover:border-black hover:bg-black hover:text-white transition-all duration-200"
+            aria-label="Close menu"
           >
-            {/* HEADER MOBILE */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-pink-50">
-              <h3 className="text-lg font-black bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
-                MENU
-              </h3>
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-200 hover:border-orange-300 transition-all hover:scale-110"
-              >
-                <X className="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
-            {/* SEARCH MOBILE */}
-            <div className="px-6 py-4 border-b border-gray-100">
-              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gray-100 border-2 border-gray-200 focus-within:border-orange-300 transition-all">
-                <Search className="w-5 h-5 text-gray-500" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className="w-full bg-transparent border-none text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery("");
-                      onSearch("");
-                    }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* MENU LIST */}
-            <nav className="flex flex-col px-6 py-6 space-y-2">
-              {menus.map((menu) => (
-                <Link
-                  key={menu.label}
-                  href={menu.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-pink-50 hover:text-orange-600 transition-all"
-                >
-                  {menu.label}
-                </Link>
-              ))}
-
-              {/* CART MOBILE */}
-              <Link
-                href="/cart"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-pink-50 hover:text-orange-600 transition-all mt-4"
-              >
-                <div className="flex items-center gap-3">
-                  <ShoppingCart className="w-5 h-5" />
-                  <span>Shopping Cart</span>
-                </div>
-                {cartCount > 0 && (
-                  <span className="px-2.5 py-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold rounded-full">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-
-              {/* LOGIN MOBILE */}
-              <Link
-                href="/auth/login"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 mt-6 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all"
-              >
-                <User className="w-5 h-5" />
-                <span>Login to Account</span>
-              </Link>
-            </nav>
+        {/* Mobile Search */}
+        <div className="px-7 py-4 border-b border-neutral-100">
+          <div className="flex items-center gap-2 px-3 py-2 border border-neutral-200">
+            <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="Cari produk..."
+              className="flex-1 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
+              style={{ fontFamily: JOST }}
+            />
           </div>
         </div>
-      )}
 
-      {/* ANIMATION */}
-      <style jsx>{`
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out forwards;
-        }
-        @keyframes slideIn {
-          from {
-            transform: translateX(100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
+        {/* Nav Links */}
+        <nav className="flex-1 overflow-y-auto px-7 py-6">
+          <p className="text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-4">
+            Menu
+          </p>
+          <div className="flex flex-col">
+            {menus.map((menu) => (
+              <Link
+                key={menu.label}
+                href={menu.href}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-between py-4 border-b border-neutral-100 text-[13px] tracking-[0.2em] font-medium text-neutral-800 hover:text-black transition-colors duration-200 group"
+              >
+                <span>{menu.label}</span>
+                <span className="w-0 h-[1px] bg-black group-hover:w-4 transition-all duration-300" />
+              </Link>
+            ))}
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="mt-8 flex flex-col gap-3">
+            <Link
+              href="/auth/login"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-800 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              Login / Daftar
+            </Link>
+            <Link
+              href="/cart"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-center gap-2 w-full py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-100 transition-colors"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Keranjang
+              {cartCount > 0 && (
+                <span className="ml-1 w-5 h-5 bg-black text-white text-[10px] flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        </nav>
+
+        {/* Panel Footer */}
+        <div className="px-7 py-5 border-t border-neutral-100">
+          <p className="text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-3">
+            Ikuti Kami
+          </p>
+          <div className="flex gap-2.5 mb-4">
+            {[
+              { icon: Instagram, href: "https://instagram.com/ravelle", label: "Instagram" },
+              { icon: Facebook, href: "https://facebook.com/ravelle", label: "Facebook" },
+              { icon: Phone, href: "https://wa.me/628123456789", label: "WhatsApp" },
+            ].map(({ icon: Icon, href, label }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="w-8 h-8 flex items-center justify-center border border-neutral-200 text-neutral-600 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
+              >
+                <Icon className="w-3.5 h-3.5" />
+              </a>
+            ))}
+          </div>
+          <p className="text-[10px] text-neutral-400 font-light tracking-wide">
+            © 2026 Ravelle. All rights reserved.
+          </p>
+        </div>
+      </div>
     </>
   );
 }

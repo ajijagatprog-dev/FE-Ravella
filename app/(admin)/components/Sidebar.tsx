@@ -126,10 +126,9 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
                   relative flex items-center gap-3 rounded-xl text-sm font-medium
                   transition-all duration-150 group
                   ${collapsed ? "justify-center px-0 py-3" : "px-3 py-2.5"}
-                  ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-200"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  ${isActive
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-200"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }
                 `}
               >
@@ -150,9 +149,8 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
                 {/* Badge */}
                 {!collapsed && badge && (
                   <span
-                    className={`min-w-[20px] h-5 flex items-center justify-center px-1.5 text-[10px] font-bold text-white rounded-full ${
-                      isActive ? "bg-white/30" : badge.color
-                    }`}
+                    className={`min-w-[20px] h-5 flex items-center justify-center px-1.5 text-[10px] font-bold text-white rounded-full ${isActive ? "bg-white/30" : badge.color
+                      }`}
                   >
                     {badge.count}
                   </span>
@@ -174,42 +172,6 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
             );
           })}
         </nav>
-
-        {/* ── Footer: User Profile ─────────────────────────── */}
-        <div className="shrink-0 border-t border-gray-100 p-3">
-          <div
-            className={`flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group ${
-              collapsed ? "justify-center" : ""
-            }`}
-            title={collapsed ? "Alex Rivera — Store Manager" : undefined}
-          >
-            {/* Avatar */}
-            <div className="relative shrink-0">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-xs font-bold shadow">
-                AR
-              </div>
-              {/* Online dot */}
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
-            </div>
-
-            {!collapsed && (
-              <>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 truncate">
-                    Alex Rivera
-                  </p>
-                  <p className="text-[11px] text-gray-400 truncate">Store Manager</p>
-                </div>
-                <button
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all"
-                  title="Keluar"
-                >
-                  <LogOut size={14} />
-                </button>
-              </>
-            )}
-          </div>
-        </div>
       </aside>
     </>
   );
