@@ -6,10 +6,13 @@ import { X } from "lucide-react";
 type Product = {
   id: number;
   name: string;
+  category: string;
+  image: string;
   sku: string;
-  retail_price: number;
-  b2b_price: number;
   stock: number;
+  stockStatus: "high" | "medium" | "low";
+  retailPrice: number;
+  b2bPrice: number;
 };
 
 type Props = {
@@ -37,7 +40,9 @@ export default function ModalEdit({
     setForm({
       ...form,
       [e.target.name]:
-        e.target.type === "number" ? Number(e.target.value) : e.target.value,
+        e.target.type === "number"
+          ? Number(e.target.value)
+          : e.target.value,
     });
   };
 
@@ -92,24 +97,7 @@ export default function ModalEdit({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              Gambar
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                className="w-full rounded-xl border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 hover:border-gray-300"
-                placeholder="Masukkan nama produk"
-              />
-            </div>
-          </div>
-
-          {/* Price + Stock Grid */}
+          {/* Retail + B2B + Stock */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
@@ -122,8 +110,8 @@ export default function ModalEdit({
                 </span>
                 <input
                   type="number"
-                  name="retail_price"
-                  value={form.retail_price}
+                  name="retailPrice"
+                  value={form.retailPrice}
                   onChange={handleChange}
                   className="w-full rounded-xl border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all duration-200 hover:border-gray-300"
                   placeholder="0"
@@ -142,8 +130,8 @@ export default function ModalEdit({
                 </span>
                 <input
                   type="number"
-                  name="b2b_price"
-                  value={form.b2b_price}
+                  name="b2bPrice"
+                  value={form.b2bPrice}
                   onChange={handleChange}
                   className="w-full rounded-xl border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all duration-200 hover:border-gray-300"
                   placeholder="0"
