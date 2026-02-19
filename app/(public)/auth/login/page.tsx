@@ -28,11 +28,40 @@ export default function AdminLoginPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     setIsSubmitting(true);
+
     setTimeout(() => {
+      // Dummy Seeder Admin
+      const dummyAdmin = {
+        email: "admin@example.com",
+        password: "admin123",
+        role: "admin",
+      };
+
+      if (
+        formData.email === dummyAdmin.email &&
+        formData.password === dummyAdmin.password
+      ) {
+        // Simpan session dummy
+        localStorage.setItem(
+          "auth",
+          JSON.stringify({
+            email: dummyAdmin.email,
+            role: dummyAdmin.role,
+            loggedIn: true,
+          })
+        );
+
+        router.push("/dashboard"); // atau "/admin/dashboard"
+      } else {
+        setErrors({
+          general: "Email atau password salah",
+        });
+      }
+
       setIsSubmitting(false);
-      alert("Login berhasil 🎉");
-    }, 1500);
+    }, 1000);
   };
+
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSubmit();
@@ -156,10 +185,9 @@ export default function AdminLoginPage() {
           disabled={isSubmitting}
           className={`w-full h-12 rounded-xl font-bold text-white text-sm tracking-wide
             transition-all duration-200 flex items-center justify-center gap-2
-            ${
-              isSubmitting
-                ? "bg-[#8B5E3C]/50 cursor-not-allowed"
-                : "bg-[#8B5E3C] hover:bg-[#7a5234] active:scale-[0.98] shadow-md shadow-[#8B5E3C]/30 hover:shadow-lg hover:shadow-[#8B5E3C]/40"
+            ${isSubmitting
+              ? "bg-[#8B5E3C]/50 cursor-not-allowed"
+              : "bg-[#8B5E3C] hover:bg-[#7a5234] active:scale-[0.98] shadow-md shadow-[#8B5E3C]/30 hover:shadow-lg hover:shadow-[#8B5E3C]/40"
             }`}
         >
           {isSubmitting ? (

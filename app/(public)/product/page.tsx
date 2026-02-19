@@ -21,7 +21,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+// useRouter removed - no redirect on add to cart
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 
@@ -42,7 +42,7 @@ export default function ProductPage() {
     visible: false,
     productName: "",
   });
-  const router = useRouter();
+
 
   const categories = [
     { id: "all", name: "ALL PRODUCTS", icon: Package, count: 48 },
@@ -65,14 +65,37 @@ export default function ProductPage() {
   ];
 
   const handleAddToCart = (product: (typeof products)[number]) => {
-    localStorage.setItem("ravelle_pending_product", JSON.stringify({
-      id: product.id, name: product.name, price: product.price,
-      originalPrice: product.originalPrice, image: product.image,
-      badge: product.badge, discount: product.discount, category: product.category,
-    }));
+    // Baca cart yang ada
+    const stored = localStorage.getItem("ravelle_cart");
+    let cart: any[] = stored ? JSON.parse(stored) : [];
+
+    // Tambahkan atau update qty
+    const exists = cart.find((item) => item.id === product.id);
+    if (exists) {
+      cart = cart.map((item) =>
+        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    } else {
+      cart = [
+        ...cart,
+        {
+          id: product.id, name: product.name, price: product.price,
+          originalPrice: product.originalPrice, image: product.image,
+          badge: product.badge, discount: product.discount,
+          category: product.category, quantity: 1, selected: true,
+        },
+      ];
+    }
+
+    // Simpan ke localStorage
+    localStorage.setItem("ravelle_cart", JSON.stringify(cart));
+
+    // Beritahu Header agar update cart badge
+    window.dispatchEvent(new Event("ravelle_cart_updated"));
+
+    // Tampilkan toast — TIDAK redirect ke /cart
     setToast({ visible: true, productName: product.name });
     setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
-    router.push(`/cart?add=${product.id}`);
   };
 
   const filteredProducts = useMemo(() => {

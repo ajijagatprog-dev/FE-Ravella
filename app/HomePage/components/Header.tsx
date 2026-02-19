@@ -6,6 +6,19 @@ import { Search, ShoppingCart, User, Menu, X, Instagram, Phone, Facebook } from 
 
 const JOST = "'Jost', system-ui, sans-serif";
 
+// Baca total qty dari localStorage
+function readCartCount(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const stored = localStorage.getItem("ravelle_cart");
+    if (!stored) return 0;
+    const cart: { quantity: number }[] = JSON.parse(stored);
+    return cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  } catch {
+    return 0;
+  }
+}
+
 interface HeaderProps {
   userName?: string;
   avatarUrl?: string;
@@ -21,22 +34,35 @@ export default function Header({
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartCount] = useState(3);
+  const [cartCount, setCartCount] = useState(0);
 
+  // Scroll listener
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Body scroll lock
   useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  // Baca cart dari localStorage saat mount + listen event update
+  useEffect(() => {
+    setCartCount(readCartCount());
+
+    const handleCartUpdate = () => setCartCount(readCartCount());
+    // Custom event dari ProductPage setiap kali user add to cart
+    window.addEventListener("ravelle_cart_updated", handleCartUpdate);
+    // Storage event untuk sinkronisasi antar tab
+    window.addEventListener("storage", handleCartUpdate);
+    return () => {
+      window.removeEventListener("ravelle_cart_updated", handleCartUpdate);
+      window.removeEventListener("storage", handleCartUpdate);
+    };
+  }, []);
 
   const menus = [
     { label: "HOME", href: "/" },
@@ -60,7 +86,6 @@ export default function Header({
 
             {/* LEFT */}
             <div className="flex items-center gap-14">
-              {/* LOGO */}
               <Link href="/" className="group flex items-center">
                 <img
                   src="/lg-ravella-gold.png"
@@ -69,7 +94,6 @@ export default function Header({
                 />
               </Link>
 
-              {/* DESKTOP NAV */}
               <nav className="hidden lg:flex items-center gap-10">
                 {menus.map((menu) => (
                   <Link
@@ -87,7 +111,7 @@ export default function Header({
             {/* RIGHT */}
             <div className="flex items-center gap-5">
 
-              {/* SEARCH — borderless icon */}
+              {/* SEARCH */}
               <div className="hidden md:block relative">
                 {!searchOpen ? (
                   <button
@@ -119,7 +143,7 @@ export default function Header({
                 )}
               </div>
 
-              {/* CART — borderless icon */}
+              {/* CART — badge muncul otomatis dari localStorage */}
               <Link
                 href="/cart"
                 className="relative flex items-center justify-center text-neutral-800 hover:text-black transition-colors duration-200"
@@ -127,13 +151,16 @@ export default function Header({
               >
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2.5 w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center rounded-full">
-                    {cartCount}
+                  <span
+                    className="absolute -top-2 -right-2.5 min-w-[16px] h-4 px-1 bg-black text-white text-[10px] flex items-center justify-center rounded-full font-medium leading-none"
+                    style={{ fontFamily: JOST }}
+                  >
+                    {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
               </Link>
 
-              {/* LOGIN — border dipertahankan sesuai screenshot */}
+              {/* LOGIN */}
               <Link
                 href="/auth/login"
                 className="hidden md:flex items-center gap-2 px-5 py-2 text-[12px] tracking-[0.15em] font-medium border border-black text-black hover:bg-black hover:text-white transition-all duration-300"
@@ -142,7 +169,7 @@ export default function Header({
                 LOGIN
               </Link>
 
-              {/* MOBILE MENU TOGGLE — borderless */}
+              {/* MOBILE TOGGLE */}
               <button
                 onClick={() => setMobileOpen(true)}
                 className="lg:hidden flex items-center justify-center text-neutral-800 hover:text-black transition-colors"
@@ -156,14 +183,12 @@ export default function Header({
       </header>
 
       {/* ── MOBILE PANEL ── */}
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           }`}
         onClick={() => setMobileOpen(false)}
       />
 
-      {/* Drawer */}
       <div
         className={`fixed right-0 top-0 h-full z-50 w-[85%] max-w-[340px] bg-white flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"
           }`}
@@ -171,11 +196,7 @@ export default function Header({
       >
         {/* Panel Header */}
         <div className="flex items-center justify-between px-7 py-5 border-b border-neutral-100">
-          <img
-            src="/lg-ravella-gold.png"
-            alt="Ravelle Logo"
-            className="h-5 w-auto"
-          />
+          <img src="/lg-ravella-gold.png" alt="Ravelle Logo" className="h-5 w-auto" />
           <button
             onClick={() => setMobileOpen(false)}
             className="w-8 h-8 flex items-center justify-center border border-neutral-200 hover:border-black hover:bg-black hover:text-white transition-all duration-200"
@@ -235,8 +256,11 @@ export default function Header({
               <ShoppingCart className="w-4 h-4" />
               Keranjang
               {cartCount > 0 && (
-                <span className="ml-1 w-5 h-5 bg-black text-white text-[10px] flex items-center justify-center rounded-full">
-                  {cartCount}
+                <span
+                  className="ml-1 min-w-[20px] h-5 px-1 bg-black text-white text-[10px] flex items-center justify-center rounded-full"
+                  style={{ fontFamily: JOST }}
+                >
+                  {cartCount > 99 ? "99+" : cartCount}
                 </span>
               )}
             </Link>

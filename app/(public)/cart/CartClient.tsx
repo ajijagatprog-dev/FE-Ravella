@@ -1,24 +1,16 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
-  ShoppingCart,
-  Trash2,
-  ArrowLeft,
-  Plus,
-  Minus,
-  Tag,
-  Truck,
-  Shield,
-  ChevronRight,
-  Store,
-  Package,
-  CheckCircle,
-  X,
-  Ticket,
+  ShoppingCart, Trash2, ArrowLeft, Plus, Minus,
+  Tag, Truck, Shield, ChevronRight, Store, Package,
+  CheckCircle, X, Ticket,
 } from "lucide-react";
 import Link from "next/link";
+
+const JOST = "'Jost', system-ui, sans-serif";
+const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 interface CartItem {
   id: number;
@@ -34,99 +26,69 @@ interface CartItem {
 }
 
 export default function CartClient() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const productId = searchParams.get("add");
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
   const [selectAll, setSelectAll] = useState(true);
   const [showCheckoutAnim, setShowCheckoutAnim] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
+  // ── LOAD cart dari localStorage sekali saat mount ──
   useEffect(() => {
-    const stored = localStorage.getItem("ravelle_cart");
-    let currentCart: CartItem[] = stored ? JSON.parse(stored) : [];
-
-    if (productId) {
-      const pendingRaw = localStorage.getItem("ravelle_pending_product");
-      let newItem: CartItem;
-
-      if (pendingRaw) {
-        const pending = JSON.parse(pendingRaw);
-        newItem = {
-          id: pending.id,
-          name: pending.name,
-          price: pending.price,
-          originalPrice: pending.originalPrice || pending.price,
-          image: pending.image,
-          badge: pending.badge,
-          discount: pending.discount,
-          category: pending.category,
-          quantity: 1,
-          selected: true,
-        };
-        localStorage.removeItem("ravelle_pending_product");
-      } else {
-        const id = Number(productId);
-        newItem = {
-          id,
-          name: `Product ${id}`,
-          price: 500000,
-          originalPrice: 650000,
-          image:
-            "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=500&q=80",
-          quantity: 1,
-          selected: true,
-        };
+    try {
+      const stored = localStorage.getItem("ravelle_cart");
+      if (stored) {
+        const parsed: CartItem[] = JSON.parse(stored);
+        // Pastikan semua item punya field selected
+        const normalized = parsed.map((item) => ({
+          ...item,
+          selected: item.selected !== false, // default true
+        }));
+        setCart(normalized);
       }
-
-      const exists = currentCart.find((item) => item.id === newItem.id);
-      if (exists) {
-        currentCart = currentCart.map((item) =>
-          item.id === newItem.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        );
-      } else {
-        currentCart = [...currentCart, newItem];
-      }
-
-      localStorage.setItem("ravelle_cart", JSON.stringify(currentCart));
+    } catch (e) {
+      console.error("Failed to parse cart:", e);
     }
+    setHydrated(true);
+  }, []);
 
-    setCart(currentCart);
-  }, [productId]);
-
+  // ── SIMPAN ke localStorage setiap kali cart berubah (setelah hydrated) ──
   useEffect(() => {
-    if (cart.length > 0 || productId === null) {
+    if (!hydrated) return;
+    try {
       localStorage.setItem("ravelle_cart", JSON.stringify(cart));
+      // Update badge di header
+      window.dispatchEvent(new Event("ravelle_cart_updated"));
+    } catch (e) {
+      console.error("Failed to save cart:", e);
     }
-  }, [cart, productId]);
+  }, [cart, hydrated]);
 
+  // ── SYNC selectAll state ──
+  useEffect(() => {
+    setSelectAll(cart.length > 0 && cart.every((i) => i.selected));
+  }, [cart]);
+
+  // ── ACTIONS ──
   const updateQty = (id: number, delta: number) => {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.id === id
-            ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-            : item,
+          item.id === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item
         )
-        .filter((item) => item.quantity > 0),
+        .filter((item) => item.quantity > 0)
     );
   };
 
-  const removeItem = (id: number) => {
+  const removeItem = (id: number) =>
     setCart((prev) => prev.filter((item) => item.id !== id));
-  };
 
-  const toggleSelect = (id: number) => {
+  const toggleSelect = (id: number) =>
     setCart((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, selected: !item.selected } : item,
-      ),
+      prev.map((item) => item.id === id ? { ...item, selected: !item.selected } : item)
     );
-  };
 
   const handleSelectAll = () => {
     const newVal = !selectAll;
@@ -134,68 +96,59 @@ export default function CartClient() {
     setCart((prev) => prev.map((item) => ({ ...item, selected: newVal })));
   };
 
-  useEffect(() => {
-    const allSelected = cart.length > 0 && cart.every((i) => i.selected);
-    setSelectAll(allSelected);
-  }, [cart]);
-
   const applyCoupon = () => {
-    if (couponCode.trim().toLowerCase() === "ravelle10") {
-      setCouponApplied(true);
-    }
+    if (couponCode.trim().toLowerCase() === "ravelle10") setCouponApplied(true);
   };
 
+  const handleCheckout = () => {
+    setShowCheckoutAnim(true);
+    setTimeout(() => router.push("/checkout"), 1200);
+  };
+
+  // ── COMPUTED ──
   const selectedItems = cart.filter((i) => i.selected);
-  const subtotal = selectedItems.reduce(
-    (sum, i) => sum + i.price * i.quantity,
-    0,
-  );
-  const originalTotal = selectedItems.reduce(
-    (sum, i) => sum + (i.originalPrice || i.price) * i.quantity,
-    0,
-  );
+  const subtotal = selectedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const originalTotal = selectedItems.reduce((sum, i) => sum + (i.originalPrice || i.price) * i.quantity, 0);
   const totalDiscount = originalTotal - subtotal;
   const couponDiscount = couponApplied ? Math.floor(subtotal * 0.1) : 0;
   const shippingFee = subtotal > 500000 ? 0 : 25000;
   const grandTotal = subtotal - couponDiscount + shippingFee;
 
+  const stores = Array.from(new Set(cart.map((item) => item.category || "Ravelle Official")));
+
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
+      style: "currency", currency: "IDR", minimumFractionDigits: 0,
     }).format(price);
 
-  const handleCheckout = () => {
-    setShowCheckoutAnim(true);
-    setTimeout(() => {
-      router.push("/checkout");
-    }, 1200);
-  };
-
-  const stores = Array.from(
-    new Set(cart.map((item) => item.category || "Ravelle Official")),
-  );
+  // Jangan render sampai localStorage sudah dibaca
+  if (!hydrated) return null;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Top Bar */}
-      <div className="bg-white shadow-sm sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
+    <div className="min-h-screen bg-neutral-50" style={{ fontFamily: JOST }}>
+
+      {/* ── TOP BAR ── */}
+      <div className="bg-white border-b border-neutral-200 sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-5">
           <Link
             href="/product"
-            className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors"
+            className="flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-semibold text-sm hidden sm:block">
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-[11px] tracking-[0.18em] uppercase font-medium hidden sm:block" style={{ fontFamily: JOST }}>
               Lanjut Belanja
             </span>
           </Link>
-          <div className="flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-orange-500" />
-            <h1 className="text-lg font-black text-gray-900">Keranjang</h1>
+
+          <div className="w-[1px] h-4 bg-neutral-200 hidden sm:block" />
+
+          <div className="flex items-center gap-2.5">
+            <ShoppingCart className="w-4 h-4 text-neutral-600" />
+            <h1 className="text-base font-medium text-neutral-900 tracking-wide" style={{ fontFamily: JOST }}>
+              Keranjang
+            </h1>
             {cart.length > 0 && (
-              <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-neutral-900 text-white text-[10px] font-medium px-2 py-0.5 tracking-wide">
                 {cart.reduce((sum, i) => sum + i.quantity, 0)}
               </span>
             )}
@@ -203,54 +156,53 @@ export default function CartClient() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+
+        {/* ── EMPTY STATE ── */}
         {cart.length === 0 ? (
-          /* Empty State */
-          <div className="bg-white rounded-2xl shadow-sm p-16 text-center">
-            <div className="w-28 h-28 mx-auto mb-6 bg-orange-50 rounded-full flex items-center justify-center">
-              <ShoppingCart className="w-14 h-14 text-orange-300" />
-            </div>
-            <h2 className="text-2xl font-black text-gray-900 mb-2">
-              Keranjang Kosong
+          <div className="bg-white border border-neutral-100 p-16 text-center">
+            <ShoppingCart className="w-12 h-12 text-neutral-200 mx-auto mb-5" />
+            <h2 className="text-4xl font-light text-neutral-900 mb-2" style={{ fontFamily: CORMORANT }}>
+              Keranjang <em style={{ fontStyle: "italic" }}>Kosong</em>
             </h2>
-            <p className="text-gray-500 mb-8">
+            <div className="w-8 h-[1px] bg-neutral-200 mx-auto mb-4" />
+            <p className="text-neutral-400 text-sm font-light mb-8" style={{ fontFamily: JOST }}>
               Yuk, temukan produk yang kamu suka!
             </p>
             <Link
               href="/product"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-xl hover:scale-105 transition-all"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-neutral-900 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-black transition-colors"
+              style={{ fontFamily: JOST }}
             >
-              <Package className="w-5 h-5" />
+              <Package className="w-4 h-4" />
               Lihat Produk
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-6 items-start">
-            {/* Left - Cart Items */}
-            <div className="flex-1 space-y-4">
-              {/* Select All Row */}
-              <div className="bg-white rounded-2xl shadow-sm px-5 py-4 flex items-center gap-4">
+          <div className="flex flex-col lg:flex-row gap-5 items-start">
+
+            {/* ── LEFT — CART ITEMS ── */}
+            <div className="flex-1 space-y-3">
+
+              {/* Select All */}
+              <div className="bg-white border border-neutral-100 px-5 py-4 flex items-center gap-4">
                 <button
                   onClick={handleSelectAll}
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                    selectAll
-                      ? "bg-orange-500 border-orange-500"
-                      : "border-gray-300"
-                  }`}
+                  className={`w-4 h-4 border flex items-center justify-center transition-all flex-shrink-0 ${selectAll ? "bg-neutral-900 border-neutral-900" : "border-neutral-300"
+                    }`}
                 >
-                  {selectAll && <CheckCircle className="w-4 h-4 text-white" />}
+                  {selectAll && <CheckCircle className="w-3 h-3 text-white" />}
                 </button>
-                <span className="text-sm font-semibold text-gray-700">
+                <span className="text-[11px] tracking-[0.15em] uppercase text-neutral-600 font-medium" style={{ fontFamily: JOST }}>
                   Pilih Semua ({cart.length} produk)
                 </span>
                 {selectedItems.length > 0 && (
                   <button
-                    onClick={() =>
-                      setCart((prev) => prev.filter((item) => !item.selected))
-                    }
-                    className="ml-auto text-sm text-red-500 hover:text-red-700 font-semibold flex items-center gap-1"
+                    onClick={() => setCart((prev) => prev.filter((item) => !item.selected))}
+                    className="ml-auto flex items-center gap-1.5 text-[11px] tracking-[0.12em] uppercase text-neutral-400 hover:text-neutral-900 font-medium transition-colors"
+                    style={{ fontFamily: JOST }}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                     Hapus Dipilih
                   </button>
                 )}
@@ -259,73 +211,70 @@ export default function CartClient() {
               {/* Store Groups */}
               {stores.map((store) => {
                 const storeItems = cart.filter(
-                  (item) => (item.category || "Ravelle Official") === store,
+                  (item) => (item.category || "Ravelle Official") === store
                 );
                 return (
-                  <div
-                    key={store}
-                    className="bg-white rounded-2xl shadow-sm overflow-hidden"
-                  >
+                  <div key={store} className="bg-white border border-neutral-100 overflow-hidden">
+
                     {/* Store Header */}
-                    <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-                      <Store className="w-4 h-4 text-orange-500" />
-                      <span className="font-bold text-sm text-gray-900 capitalize">
+                    <div className="px-5 py-3.5 border-b border-neutral-100 flex items-center gap-2">
+                      <Store className="w-3.5 h-3.5 text-neutral-400" />
+                      <span className="text-[11px] tracking-[0.18em] uppercase text-neutral-700 font-medium" style={{ fontFamily: JOST }}>
                         Ravelle Official Store
                       </span>
-                      <ChevronRight className="w-4 h-4 text-gray-400 ml-auto" />
+                      <ChevronRight className="w-3.5 h-3.5 text-neutral-300 ml-auto" />
                     </div>
 
                     {/* Items */}
-                    <div className="divide-y divide-gray-50">
+                    <div className="divide-y divide-neutral-50">
                       {storeItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="px-5 py-5 flex items-start gap-4"
-                        >
+                        <div key={item.id} className="px-5 py-5 flex items-start gap-4">
+
                           {/* Checkbox */}
                           <button
                             onClick={() => toggleSelect(item.id)}
-                            className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                              item.selected
-                                ? "bg-orange-500 border-orange-500"
-                                : "border-gray-300"
-                            }`}
+                            className={`mt-1 w-4 h-4 border flex items-center justify-center transition-all flex-shrink-0 ${item.selected ? "bg-neutral-900 border-neutral-900" : "border-neutral-300"
+                              }`}
                           >
-                            {item.selected && (
-                              <CheckCircle className="w-4 h-4 text-white" />
-                            )}
+                            {item.selected && <CheckCircle className="w-3 h-3 text-white" />}
                           </button>
 
-                          {/* Product Image */}
+                          {/* Image */}
                           <div className="relative flex-shrink-0">
                             <img
                               src={item.image}
                               alt={item.name}
-                              className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-gray-100"
+                              className="w-20 h-20 sm:w-24 sm:h-24 object-cover border border-neutral-100"
                             />
                             {item.discount && item.discount > 0 && (
-                              <span className="absolute -top-2 -right-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-lg">
+                              <span
+                                className="absolute -top-1.5 -right-1.5 bg-neutral-900 text-white text-[10px] font-medium px-1.5 py-0.5 tracking-wide"
+                                style={{ fontFamily: JOST }}
+                              >
                                 -{item.discount}%
                               </span>
                             )}
                           </div>
 
-                          {/* Product Info */}
+                          {/* Info */}
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 mb-1">
+                            <p className="font-light text-neutral-900 text-sm leading-snug line-clamp-2 mb-1.5" style={{ fontFamily: JOST }}>
                               {item.name}
                             </p>
                             {item.badge && (
-                              <span className="inline-block text-xs px-2 py-0.5 bg-orange-50 text-orange-600 border border-orange-200 rounded-md font-semibold mb-2">
+                              <span
+                                className="inline-block text-[10px] px-2 py-0.5 bg-white text-neutral-600 border border-neutral-200 tracking-[0.1em] uppercase font-medium mb-2"
+                                style={{ fontFamily: JOST }}
+                              >
                                 {item.badge}
                               </span>
                             )}
                             <div className="flex items-baseline gap-2 mb-3">
-                              <span className="text-base font-black text-orange-600">
+                              <span className="text-base font-medium text-neutral-900" style={{ fontFamily: JOST }}>
                                 {formatPrice(item.price)}
                               </span>
                               {item.originalPrice > item.price && (
-                                <span className="text-xs text-gray-400 line-through">
+                                <span className="text-xs text-neutral-400 line-through font-light" style={{ fontFamily: JOST }}>
                                   {formatPrice(item.originalPrice)}
                                 </span>
                               )}
@@ -333,32 +282,31 @@ export default function CartClient() {
 
                             {/* Qty + Delete */}
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1 border-2 border-gray-200 rounded-xl overflow-hidden">
+                              <div className="flex items-center border border-neutral-200 overflow-hidden">
                                 <button
                                   onClick={() => updateQty(item.id, -1)}
-                                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-600 transition-colors"
+                                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 text-neutral-500 transition-colors border-r border-neutral-200"
                                 >
-                                  <Minus className="w-3.5 h-3.5" />
+                                  <Minus className="w-3 h-3" />
                                 </button>
-                                <span className="w-8 text-center text-sm font-bold text-gray-900">
+                                <span className="w-9 text-center text-sm font-medium text-neutral-900" style={{ fontFamily: JOST }}>
                                   {item.quantity}
                                 </span>
                                 <button
                                   onClick={() => updateQty(item.id, 1)}
-                                  className="w-8 h-8 flex items-center justify-center hover:bg-orange-50 text-orange-500 transition-colors"
+                                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 text-neutral-500 transition-colors border-l border-neutral-200"
                                 >
-                                  <Plus className="w-3.5 h-3.5" />
+                                  <Plus className="w-3 h-3" />
                                 </button>
                               </div>
 
                               <button
                                 onClick={() => removeItem(item.id)}
-                                className="flex items-center gap-1 text-sm text-gray-400 hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-red-50"
+                                className="flex items-center gap-1 text-[10px] tracking-[0.12em] uppercase text-neutral-400 hover:text-neutral-900 transition-colors px-2 py-1 hover:bg-neutral-50"
+                                style={{ fontFamily: JOST }}
                               >
-                                <Trash2 className="w-4 h-4" />
-                                <span className="hidden sm:block text-xs font-medium">
-                                  Hapus
-                                </span>
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span className="hidden sm:block">Hapus</span>
                               </button>
                             </div>
                           </div>
@@ -366,12 +314,12 @@ export default function CartClient() {
                       ))}
                     </div>
 
-                    {/* Shipping info per store */}
-                    <div className="px-5 py-3 bg-blue-50 border-t border-blue-100 flex items-center gap-2">
-                      <Truck className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                      <span className="text-xs text-blue-700 font-semibold">
+                    {/* Shipping info */}
+                    <div className="px-5 py-3 bg-neutral-50 border-t border-neutral-100 flex items-center gap-2">
+                      <Truck className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
+                      <span className="text-[11px] text-neutral-500 font-light tracking-wide" style={{ fontFamily: JOST }}>
                         {subtotal > 500000
-                          ? "✓ Gratis ongkir untuk pesanan ini"
+                          ? "Gratis ongkir untuk pesanan ini"
                           : "Tambah belanja untuk gratis ongkir"}
                       </span>
                     </div>
@@ -379,116 +327,107 @@ export default function CartClient() {
                 );
               })}
 
-              {/* Voucher / Coupon */}
-              <div className="bg-white rounded-2xl shadow-sm px-5 py-4">
+              {/* Coupon */}
+              <div className="bg-white border border-neutral-100 px-5 py-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Ticket className="w-4 h-4 text-orange-500" />
-                  <span className="font-bold text-sm text-gray-900">
+                  <Ticket className="w-3.5 h-3.5 text-neutral-400" />
+                  <span className="text-[11px] tracking-[0.18em] uppercase text-neutral-600 font-medium" style={{ fontFamily: JOST }}>
                     Kode Promo
                   </span>
                 </div>
+
                 {couponApplied ? (
-                  <div className="flex items-center justify-between p-3 bg-green-50 border-2 border-green-300 rounded-xl">
+                  <div className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200">
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span className="font-bold text-green-700 text-sm">
-                        RAVELLE10 — Diskon 10% diterapkan!
+                      <CheckCircle className="w-4 h-4 text-neutral-600" />
+                      <span className="font-medium text-neutral-900 text-[11px] tracking-wide" style={{ fontFamily: JOST }}>
+                        RAVELLE10 — Diskon 10% diterapkan
                       </span>
                     </div>
                     <button
-                      onClick={() => {
-                        setCouponApplied(false);
-                        setCouponCode("");
-                      }}
-                      className="text-gray-400 hover:text-red-500"
+                      onClick={() => { setCouponApplied(false); setCouponCode(""); }}
+                      className="text-neutral-400 hover:text-neutral-900 transition-colors"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-300" />
                       <input
                         type="text"
                         placeholder="Masukkan kode promo..."
                         value={couponCode}
-                        onChange={(e) =>
-                          setCouponCode(e.target.value.toUpperCase())
-                        }
-                        className="w-full pl-9 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-gray-400 font-semibold focus:border-orange-400 focus:outline-none transition-colors"
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        className="w-full pl-9 pr-4 py-3 border border-neutral-200 text-sm text-neutral-700 font-light focus:border-neutral-800 focus:outline-none transition-colors placeholder:text-neutral-400"
+                        style={{ fontFamily: JOST }}
                       />
                     </div>
                     <button
                       onClick={applyCoupon}
-                      className="px-5 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-xl text-sm hover:shadow-lg transition-all"
+                      className="px-5 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors"
+                      style={{ fontFamily: JOST }}
                     >
                       Pakai
                     </button>
                   </div>
                 )}
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-[10px] text-neutral-400 mt-2 font-light tracking-wide" style={{ fontFamily: JOST }}>
                   Coba kode: RAVELLE10 untuk diskon 10%
                 </p>
               </div>
             </div>
 
-            {/* Right - Order Summary */}
-            <div className="w-full lg:w-80 space-y-4 lg:sticky lg:top-24">
-              {/* Summary Card */}
-              <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-100">
-                  <h2 className="font-black text-gray-900">
-                    Ringkasan Belanja
+            {/* ── RIGHT — ORDER SUMMARY ── */}
+            <div className="w-full lg:w-72 space-y-3 lg:sticky lg:top-24">
+
+              {/* Summary */}
+              <div className="bg-white border border-neutral-100 overflow-hidden">
+                <div className="px-5 py-4 border-b border-neutral-100">
+                  <h2 className="text-2xl font-light text-neutral-900" style={{ fontFamily: CORMORANT }}>
+                    Ringkasan <em style={{ fontStyle: "italic" }}>Belanja</em>
                   </h2>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-[11px] text-neutral-400 font-light tracking-wide mt-0.5" style={{ fontFamily: JOST }}>
                     {selectedItems.length} produk dipilih
                   </p>
                 </div>
 
                 <div className="px-5 py-4 space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total Harga</span>
-                    <span className="font-semibold text-gray-900">
-                      {formatPrice(originalTotal)}
-                    </span>
+                  <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
+                    <span className="text-neutral-500 font-light">Total Harga</span>
+                    <span className="font-medium text-neutral-900">{formatPrice(originalTotal)}</span>
                   </div>
                   {totalDiscount > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Total Diskon Produk</span>
-                      <span className="font-semibold text-green-600">
-                        -{formatPrice(totalDiscount)}
-                      </span>
+                    <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
+                      <span className="text-neutral-500 font-light">Diskon Produk</span>
+                      <span className="font-medium text-neutral-700">-{formatPrice(totalDiscount)}</span>
                     </div>
                   )}
                   {couponApplied && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Diskon Kode Promo</span>
-                      <span className="font-semibold text-green-600">
-                        -{formatPrice(couponDiscount)}
-                      </span>
+                    <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
+                      <span className="text-neutral-500 font-light">Diskon Promo</span>
+                      <span className="font-medium text-neutral-700">-{formatPrice(couponDiscount)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Ongkos Kirim</span>
-                    <span
-                      className={`font-semibold ${shippingFee === 0 ? "text-green-600" : "text-gray-900"}`}
-                    >
-                      {shippingFee === 0 ? "Gratis!" : formatPrice(shippingFee)}
+                  <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
+                    <span className="text-neutral-500 font-light">Ongkos Kirim</span>
+                    <span className={`font-medium ${shippingFee === 0 ? "text-neutral-700" : "text-neutral-900"}`}>
+                      {shippingFee === 0 ? "Gratis" : formatPrice(shippingFee)}
                     </span>
                   </div>
 
-                  <div className="pt-3 border-t-2 border-dashed border-gray-100">
+                  <div className="pt-3 border-t border-neutral-100">
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-gray-900">
+                      <span className="text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium" style={{ fontFamily: JOST }}>
                         Total Belanja
                       </span>
-                      <span className="text-xl font-black text-orange-600">
+                      <span className="text-xl font-light text-neutral-900" style={{ fontFamily: CORMORANT }}>
                         {formatPrice(grandTotal)}
                       </span>
                     </div>
                     {(totalDiscount > 0 || couponApplied) && (
-                      <p className="text-right text-xs text-green-600 font-semibold mt-1">
+                      <p className="text-right text-[11px] text-neutral-500 font-light mt-1 tracking-wide" style={{ fontFamily: JOST }}>
                         Hemat {formatPrice(totalDiscount + couponDiscount)}
                       </p>
                     )}
@@ -499,17 +438,17 @@ export default function CartClient() {
                   <button
                     onClick={handleCheckout}
                     disabled={selectedItems.length === 0 || showCheckoutAnim}
-                    className={`w-full py-4 font-black rounded-xl text-white transition-all relative overflow-hidden ${
-                      selectedItems.length === 0
-                        ? "bg-gray-300 cursor-not-allowed"
-                        : "bg-gradient-to-r from-orange-500 to-pink-500 hover:shadow-2xl hover:scale-105 active:scale-95"
-                    }`}
+                    className={`w-full py-4 text-[11px] tracking-[0.22em] uppercase font-medium transition-all flex items-center justify-center gap-2 ${selectedItems.length === 0
+                        ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+                        : "bg-neutral-900 text-white hover:bg-black"
+                      }`}
+                    style={{ fontFamily: JOST }}
                   >
                     {showCheckoutAnim ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <CheckCircle className="w-5 h-5 animate-bounce" />
+                      <>
+                        <CheckCircle className="w-4 h-4" />
                         Memproses...
-                      </span>
+                      </>
                     ) : (
                       `Beli Sekarang (${selectedItems.length})`
                     )}
@@ -518,36 +457,17 @@ export default function CartClient() {
               </div>
 
               {/* Trust Badges */}
-              <div className="bg-white rounded-2xl shadow-sm px-5 py-4 space-y-3">
+              <div className="bg-white border border-neutral-100 px-5 py-4 space-y-3.5">
                 {[
-                  {
-                    icon: Shield,
-                    color: "text-green-500",
-                    bg: "bg-green-50",
-                    text: "Pembayaran 100% Aman & Terenkripsi",
-                  },
-                  {
-                    icon: Truck,
-                    color: "text-blue-500",
-                    bg: "bg-blue-50",
-                    text: "Pengiriman ke seluruh Indonesia",
-                  },
-                  {
-                    icon: Package,
-                    color: "text-orange-500",
-                    bg: "bg-orange-50",
-                    text: "Garansi Resmi 1 Tahun",
-                  },
+                  { icon: Shield, text: "Pembayaran 100% Aman & Terenkripsi" },
+                  { icon: Truck, text: "Pengiriman ke seluruh Indonesia" },
+                  { icon: Package, text: "Garansi Resmi 1 Tahun" },
                 ].map((item, i) => {
                   const Icon = item.icon;
                   return (
                     <div key={i} className="flex items-center gap-3">
-                      <div
-                        className={`w-8 h-8 ${item.bg} rounded-lg flex items-center justify-center flex-shrink-0`}
-                      >
-                        <Icon className={`w-4 h-4 ${item.color}`} />
-                      </div>
-                      <span className="text-xs text-gray-600 font-medium">
+                      <Icon className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+                      <span className="text-[11px] text-neutral-500 font-light tracking-wide" style={{ fontFamily: JOST }}>
                         {item.text}
                       </span>
                     </div>
@@ -555,6 +475,7 @@ export default function CartClient() {
                 })}
               </div>
             </div>
+
           </div>
         )}
       </div>
