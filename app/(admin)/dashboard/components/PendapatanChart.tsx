@@ -43,10 +43,10 @@ export default function PendapatanChart() {
       {/* ── Header ─────────────────────────────── */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h3 className="text-base font-bold text-gray-900">Sales Trend</h3>
+          <h3 className="text-base font-bold text-gray-900">Trafic Penjualan</h3>
           <p className="text-xs text-gray-500 mt-0.5">
-            Revenue analytics over the last{" "}
-            {range === "week" ? "7 days" : "30 days"}
+           Total Ringkasan Penjualan{" "}
+            {range === "week" ? "7 hari" : "30 hari"}
           </p>
         </div>
         <button

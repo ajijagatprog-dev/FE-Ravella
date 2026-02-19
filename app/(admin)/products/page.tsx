@@ -1,11 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import {
-  Plus,
-  Search,
-  Download,
-} from "lucide-react";
+import { Plus, Search, Download } from "lucide-react";
 
 import ProductTable from "./components/ProductTable";
 import BulkActionBar from "./components/BulkActionBar";
@@ -66,7 +62,8 @@ const initialProducts: Product[] = [
     id: 4,
     name: "Product 4",
     category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-004",
     stock: 24,
     stockStatus: "medium",
@@ -77,7 +74,8 @@ const initialProducts: Product[] = [
     id: 5,
     name: "Product 5",
     category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-005",
     stock: 24,
     stockStatus: "medium",
@@ -88,7 +86,8 @@ const initialProducts: Product[] = [
     id: 6,
     name: "Product 6",
     category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-006",
     stock: 24,
     stockStatus: "medium",
@@ -99,7 +98,8 @@ const initialProducts: Product[] = [
     id: 7,
     name: "Product 7",
     category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-007",
     stock: 24,
     stockStatus: "medium",
@@ -110,7 +110,8 @@ const initialProducts: Product[] = [
     id: 8,
     name: "Product 8",
     category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-008",
     stock: 24,
     stockStatus: "medium",
@@ -121,7 +122,8 @@ const initialProducts: Product[] = [
     id: 9,
     name: "Product 9",
     category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-009",
     stock: 24,
     stockStatus: "medium",
@@ -132,7 +134,8 @@ const initialProducts: Product[] = [
     id: 10,
     name: "Product 10",
     category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-010",
     stock: 24,
     stockStatus: "medium",
@@ -143,7 +146,8 @@ const initialProducts: Product[] = [
     id: 11,
     name: "Product 11",
     category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image:
+      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-011",
     stock: 24,
     stockStatus: "medium",
@@ -249,7 +253,11 @@ export default function ProductManagementPage() {
     } else {
       pages.push(1);
       if (currentPage > 3) pages.push("...");
-      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      for (
+        let i = Math.max(2, currentPage - 1);
+        i <= Math.min(totalPages - 1, currentPage + 1);
+        i++
+      ) {
         pages.push(i);
       }
       if (currentPage < totalPages - 2) pages.push("...");
@@ -260,7 +268,6 @@ export default function ProductManagementPage() {
 
   return (
     <div className="space-y-6 px-4 sm:px-0">
-
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -287,7 +294,6 @@ export default function ProductManagementPage() {
       {/* ── Filters ── */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-
           {/* Search */}
           <div className="relative flex-1 max-w-md">
             <Search
@@ -327,7 +333,11 @@ export default function ProductManagementPage() {
         {searchQuery && (
           <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
             <span>
-              Showing <span className="font-semibold text-slate-700">{filteredProducts.length}</span> result{filteredProducts.length !== 1 ? "s" : ""} for
+              Showing{" "}
+              <span className="font-semibold text-slate-700">
+                {filteredProducts.length}
+              </span>{" "}
+              result{filteredProducts.length !== 1 ? "s" : ""} for
             </span>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium ring-1 ring-blue-200">
               "{searchQuery}"
@@ -355,7 +365,9 @@ export default function ProductManagementPage() {
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-slate-500">
-            Page <span className="font-semibold text-slate-700">{currentPage}</span> of{" "}
+            Page{" "}
+            <span className="font-semibold text-slate-700">{currentPage}</span>{" "}
+            of{" "}
             <span className="font-semibold text-slate-700">{totalPages}</span>
             <span className="ml-2 text-slate-400">
               ({filteredProducts.length} total)
@@ -392,7 +404,7 @@ export default function ProductManagementPage() {
                 >
                   {page}
                 </button>
-              )
+              ),
             )}
 
             {/* Next */}

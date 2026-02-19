@@ -107,28 +107,28 @@ export default function OrderPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {/* Total Revenue */}
+        {/* Total Pendapatan */}
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Total Revenue
+              Total Pendapatan
             </p>
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
               <ShoppingBag size={15} className="text-blue-500" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">$45,280.00</p>
+          <p className="mt-3 text-2xl font-bold text-gray-900">Rp.45,280.00</p>
           <div className="mt-2 flex items-center gap-1 text-xs font-medium text-emerald-600">
             <TrendingUp size={12} />
             +12.5% vs last month
           </div>
         </div>
 
-        {/* Active Orders */}
+        {/* Pesanan Aktif */}
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Active Orders
+              Pesanan Aktif
             </p>
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
               <ShoppingBag size={15} className="text-emerald-500" />
@@ -141,11 +141,11 @@ export default function OrderPage() {
           </div>
         </div>
 
-        {/* Pending Shipments */}
+        {/* Pengiriman Tertunda */}
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Pending Shipments
+              Pengiriman Tertunda
             </p>
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
               <Truck size={15} className="text-red-400" />
@@ -200,7 +200,7 @@ export default function OrderPage() {
               placeholder="Search ID, customer..."
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-56"
+              className="w-full mb-2 rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-56"
             />
           </div>
         </div>

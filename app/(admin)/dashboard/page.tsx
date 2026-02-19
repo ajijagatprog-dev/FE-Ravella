@@ -40,24 +40,24 @@ export default function DashboardPage() {
       {/* ── Stat Cards ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          title="Today's Sales"
-          value="$12,450.00"
+          title="Ringkasan Penjualan"
+          value="Rp 45.500.000"
           change="+12.5%"
           trend="up"
           icon={<ShoppingBag size={18} className="text-emerald-600" />}
           iconBg="bg-emerald-50"
         />
         <StatCard
-          title="Total Orders"
-          value="1,240"
+          title="Total Pesanan"
+          value="150"
           change="+8.2%"
           trend="up"
           icon={<Zap size={18} className="text-blue-600" />}
           iconBg="bg-blue-50"
         />
         <StatCard
-          title="Active Users"
-          value="450"
+          title="Pengguna Aktif"
+          value="100"
           change="-2.4%"
           trend="down"
           icon={<Users size={18} className="text-amber-600" />}
