@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
           })
         );
 
-        router.push("/dashboard"); // atau "/admin/dashboard"
+        router.push("/admin/dashboard");
       } else {
         setErrors({
           general: "Email atau password salah",
