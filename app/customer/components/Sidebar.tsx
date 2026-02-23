@@ -25,10 +25,6 @@ const menuItems = [
   { label: "Saved Addresses", href: "/customer/savedAddress", icon: MapPin },
 ];
 
-const accountItems = [
-  { label: "Account Settings", href: "/customer/account", icon: User },
-];
-
 // ── Badge helper ──────────────────────────────────────────────────────────────
 
 const menuBadges: Record<string, { count: number; color: string }> = {
@@ -152,27 +148,6 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
           )}
 
           {renderMenu(menuItems)}
-
-          {/* Account Section */}
-          {!collapsed && (
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-3 pt-6 pb-2">
-              Account
-            </p>
-          )}
-
-          {renderMenu(accountItems)}
-
-          {/* Logout */}
-          <button
-            className={`
-              mt-2 w-full flex items-center gap-3 rounded-xl text-sm font-medium
-              text-red-500 hover:bg-red-50 transition-all
-              ${collapsed ? "justify-center px-0 py-3" : "px-3 py-2.5"}
-            `}
-          >
-            <LogOut size={18} />
-            {!collapsed && <span>Logout</span>}
-          </button>
         </nav>
       </aside>
     </>
