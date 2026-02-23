@@ -7,31 +7,23 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
-  Users,
-  Award,
-  BarChart3,
   X,
   ChevronRight,
-  LogOut,
-  Building2,
 } from "lucide-react";
 
 // ── Menu Config ───────────────────────────────────────────────────────────────
 
 const menuItems = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Product Management", href: "/admin/products", icon: Package },
-  { label: "Order Management", href: "/admin/order", icon: ShoppingCart },
-  { label: "User Management", href: "/admin/users_management", icon: Users },
-  { label: "Loyalty System", href: "/admin/loyalty", icon: Award },
-  { label: "Reporting", href: "/admin/reports", icon: BarChart3 },
+  { label: "Dashboard", href: "/b2b/dashboard", icon: LayoutDashboard },
+  { label: "Product Management", href: "/b2b/products", icon: Package },
+  { label: "Order Management", href: "/b2b/order", icon: ShoppingCart },
 ];
 
 // ── Badge helper (optional per-menu badge) ────────────────────────────────────
 
 const menuBadges: Record<string, { count: number; color: string }> = {
-  "/admin/order": { count: 12, color: "bg-blue-500" },
-  "/admin/products": { count: 3, color: "bg-amber-500" },
+  "/b2b/order": { count: 12, color: "bg-blue-500" },
+  "/b2b/products": { count: 3, color: "bg-amber-500" },
 };
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -72,12 +64,12 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
         <div className="flex items-center justify-between px-4 py-5 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-blue-200 shrink-0">
-              R
+              B2B
             </div>
             {!collapsed && (
               <div className="min-w-0">
                 <p className="text-sm font-bold text-gray-900 truncate">Ravelle Fashion</p>
-                <p className="text-[11px] text-gray-400 truncate">Admin Panel</p>
+                <p className="text-[11px] text-gray-400 truncate">B2B Panel</p>
               </div>
             )}
           </div>
