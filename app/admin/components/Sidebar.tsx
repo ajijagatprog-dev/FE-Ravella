@@ -19,19 +19,19 @@ import {
 // ── Menu Config ───────────────────────────────────────────────────────────────
 
 const menuItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Product Management", href: "/products", icon: Package },
-  { label: "Order Management", href: "/order", icon: ShoppingCart },
-  { label: "User Management", href: "/users_management", icon: Users },
-  { label: "Loyalty System", href: "/loyalty", icon: Award },
-  { label: "Reporting", href: "/reports", icon: BarChart3 },
+  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { label: "Product Management", href: "/admin/products", icon: Package },
+  { label: "Order Management", href: "/admin/order", icon: ShoppingCart },
+  { label: "User Management", href: "/admin/users_management", icon: Users },
+  { label: "Loyalty System", href: "/admin/loyalty", icon: Award },
+  { label: "Reporting", href: "/admin/reports", icon: BarChart3 },
 ];
 
 // ── Badge helper (optional per-menu badge) ────────────────────────────────────
 
 const menuBadges: Record<string, { count: number; color: string }> = {
-  "/order": { count: 12, color: "bg-blue-500" },
-  "/products": { count: 3, color: "bg-amber-500" },
+  "/admin/order": { count: 12, color: "bg-blue-500" },
+  "/admin/products": { count: 3, color: "bg-amber-500" },
 };
 
 // ── Props ─────────────────────────────────────────────────────────────────────

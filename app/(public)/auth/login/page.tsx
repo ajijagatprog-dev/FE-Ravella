@@ -16,9 +16,13 @@ export default function AdminLoginPage() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.email) newErrors.email = "Email wajib diisi";
-    else if (!formData.email.includes("@")) newErrors.email = "Format email tidak valid";
+    else if (!formData.email.includes("@"))
+      newErrors.email = "Format email tidak valid";
+
     if (!formData.password) newErrors.password = "Password wajib diisi";
-    else if (formData.password.length < 8) newErrors.password = "Minimal 8 karakter";
+    else if (formData.password.length < 8)
+      newErrors.password = "Minimal 8 karakter";
+
     return newErrors;
   };
 
@@ -30,28 +34,44 @@ export default function AdminLoginPage() {
     setIsSubmitting(true);
 
     setTimeout(() => {
-      // Dummy Seeder Admin
-      const dummyAdmin = {
-        email: "admin@example.com",
-        password: "admin123",
-        role: "admin",
-      };
+      // ─────────────────────────────────────────────
+      // Dummy Seeder Admin & Customer
+      // ─────────────────────────────────────────────
+      const dummyUsers = [
+        {
+          email: "admin@example.com",
+          password: "admin123",
+          role: "admin",
+        },
+        {
+          email: "customer@example.com",
+          password: "customer123",
+          role: "customer",
+        },
+      ];
 
-      if (
-        formData.email === dummyAdmin.email &&
-        formData.password === dummyAdmin.password
-      ) {
-        // Simpan session dummy
+      const foundUser = dummyUsers.find(
+        (user) =>
+          user.email === formData.email &&
+          user.password === formData.password
+      );
+
+      if (foundUser) {
         localStorage.setItem(
           "auth",
           JSON.stringify({
-            email: dummyAdmin.email,
-            role: dummyAdmin.role,
+            email: foundUser.email,
+            role: foundUser.role,
             loggedIn: true,
           })
         );
 
-        router.push("/dashboard"); // atau "/admin/dashboard"
+        // Redirect berdasarkan role
+        if (foundUser.role === "admin") {
+          router.push("/admin/dashboard");
+        } else if (foundUser.role === "customer") {
+          router.push("/customer/dashboard");
+        }
       } else {
         setErrors({
           general: "Email atau password salah",
@@ -62,7 +82,6 @@ export default function AdminLoginPage() {
     }, 1000);
   };
 
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSubmit();
   };
@@ -72,12 +91,19 @@ export default function AdminLoginPage() {
       {/* Heading */}
       <div className="mb-8">
         <h1 className="text-[#1a1a1a] text-2xl font-black mb-1 tracking-tight">
-          Admin Portal
+          Portal Login
         </h1>
         <p className="text-gray-500 text-sm">
-          Please enter your credentials to access the secure dashboard.
+          Please enter your credentials to access the dashboard.
         </p>
       </div>
+
+      {/* Error General */}
+      {errors.general && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+          {errors.general}
+        </div>
+      )}
 
       {/* Form */}
       <div className="space-y-4">
@@ -95,12 +121,15 @@ export default function AdminLoginPage() {
                 setFormData((p) => ({ ...p, email: e.target.value }))
               }
               onKeyDown={handleKeyDown}
-              placeholder="admin@ravellehome.com"
+              placeholder="admin@example.com"
               className={`w-full h-11 rounded-xl pl-10 pr-4
                 border bg-white text-sm text-[#1a1a1a]
                 placeholder:text-gray-300
                 transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
-                ${errors.email ? "border-red-400" : "border-gray-200 hover:border-gray-300 focus:border-[#8B5E3C]"}`}
+                ${errors.email
+                  ? "border-red-400"
+                  : "border-gray-200 hover:border-gray-300 focus:border-[#8B5E3C]"
+                }`}
             />
           </div>
           {errors.email && (
@@ -136,7 +165,10 @@ export default function AdminLoginPage() {
                 border bg-white text-sm text-[#1a1a1a]
                 placeholder:text-gray-300
                 transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
-                ${errors.password ? "border-red-400" : "border-gray-200 hover:border-gray-300 focus:border-[#8B5E3C]"}`}
+                ${errors.password
+                  ? "border-red-400"
+                  : "border-gray-200 hover:border-gray-300 focus:border-[#8B5E3C]"
+                }`}
             />
             <button
               type="button"
@@ -160,7 +192,10 @@ export default function AdminLoginPage() {
           <div
             onClick={() => setKeepLogged(!keepLogged)}
             className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all cursor-pointer
-              ${keepLogged ? "bg-[#8B5E3C] border-[#8B5E3C]" : "border-gray-300 bg-white"}`}
+              ${keepLogged
+                ? "bg-[#8B5E3C] border-[#8B5E3C]"
+                : "border-gray-300 bg-white"
+              }`}
           >
             {keepLogged && (
               <svg viewBox="0 0 10 8" fill="none" className="w-2.5 h-2.5">
@@ -203,71 +238,14 @@ export default function AdminLoginPage() {
           )}
         </button>
 
-        {/* Divider */}
-        <div className="flex items-center gap-3 my-2">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">or</span>
-          <div className="flex-1 h-px bg-gray-200" />
-        </div>
-
-        {/* Back & Register */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#8B5E3C] transition-colors font-medium"
-          >
-            <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
-              <path
-                d="M10 12L6 8L10 4"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Kembali
-          </Link>
-
-          <p className="text-sm text-gray-500">
-            Belum punya akun?{" "}
-            <Link
-              href="/auth/register"
-              className="text-[#8B5E3C] font-bold hover:underline"
-            >
-              Register
-            </Link>
-          </p>
-        </div>
-
-        {/* Security Badges */}
-        <div className="border-t border-gray-100 pt-5 mt-2 flex items-center justify-center gap-6">
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center">
-              <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5">
-                <path
-                  d="M2 5L4 7L8 3"
-                  stroke="#22c55e"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-              SSL Encrypted Session
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center">
-              <svg viewBox="0 0 10 10" fill="#3b82f6" className="w-2.5 h-2.5">
-                <path d="M5 1L9 3V6C9 8 5 9 5 9C5 9 1 8 1 6V3L5 1Z" />
-              </svg>
-            </div>
-            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-              Internal Network
-            </span>
-          </div>
-        </div>
+        {/* Dummy Info
+        <div className="text-xs text-gray-400 mt-3 text-center">
+          Dummy Login:
+          <br />
+          admin@example.com / admin123
+          <br />
+          customer@example.com / customer123
+        </div> */}
       </div>
     </div>
   );
