@@ -4,8 +4,6 @@ import { useState, useCallback } from "react";
 import { getCartItems, saveCartItems } from "../cartUtils";
 import type { CartItem } from "./types";
 
-// Hook ini aman karena hanya dipanggil dari KeranjangContent
-// yang di-import dengan ssr:false — tidak pernah jalan di server
 export function useCart() {
     const [items, setItems] = useState<CartItem[]>(() => getCartItems());
 

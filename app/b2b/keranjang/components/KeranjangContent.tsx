@@ -2,14 +2,11 @@
 
 import { useCart } from "../useCart";
 import CartBreadcrumb from "./CartBreadcrumb";
-import MinOrderBanner from "./MinOrderBanner";
 import CartItemRow from "./CartItemRow";
 import CartActions from "./CartActions";
 import OrderSummary from "./OrderSummary";
 import EmptyCart from "./EmptyCart";
 
-// Komponen ini HANYA dirender di client (dipanggil via dynamic ssr:false)
-// Jadi aman akses localStorage tanpa hydration error
 export default function KeranjangContent() {
     const { items, subtotal, totalItems, updateQty, removeItem, clearCart } = useCart();
 
