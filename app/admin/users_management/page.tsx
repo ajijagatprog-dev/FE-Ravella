@@ -1,6 +1,7 @@
 // app/user-managements/page.tsx
 // ✅ Server Component — TIDAK pakai "use client"
 
+import { Users, UserPlus, Download, ShieldCheck } from "lucide-react";
 import UserManagementClient from "./components/UserManagementClient";
 
 export const metadata = {
@@ -9,74 +10,60 @@ export const metadata = {
 };
 
 export default async function UsersManagementPage() {
-  // Nanti bisa fetch data di sini dari API/DB:
+  // Simulasi fetch data jika nanti dibutuhkan:
   // const stats = await fetchStats();
-  // const users = await fetchUsers({ page: 1, limit: 10 });
 
   return (
-    <div className="space-y-6">
-
+    <div className="max-w-7xl mx-auto space-y-8 px-4 py-6 sm:px-6 lg:px-8 bg-slate-50/30 min-h-screen">
+      
       {/* ── Page Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-            Integrated User Management
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Manage retail customers and B2B partners, monitor transaction
-            activity, and handle verifications.
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+             <div className="p-2.5 bg-blue-600 rounded-2xl text-white shadow-xl shadow-blue-200">
+                <Users size={26} strokeWidth={2.5} />
+             </div>
+             <div>
+                <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                  User Management
+                </h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <ShieldCheck size={14} className="text-emerald-500" />
+                  <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Verified System</span>
+                </div>
+             </div>
+          </div>
+          <p className="text-slate-500 font-medium max-w-2xl mt-3 text-sm leading-relaxed">
+            Manage your ecosystem of retail customers and B2B partners. 
+            Monitor activity, verify accounts, and handle partnership tiers seamlessly.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
-            </svg>
-            Export List
+        {/* ── Action Buttons ── */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+          <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 active:scale-95 transition-all shadow-sm">
+            <Download size={18} className="text-slate-400" />
+            Export Database
           </button>
 
-          <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-              />
-            </svg>
-            Create User
+          <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all shadow-xl shadow-blue-100 group">
+            <UserPlus size={18} className="group-hover:rotate-12 transition-transform" />
+            Create New Account
           </button>
         </div>
       </div>
 
+      {/* ── Visual Separator ── */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
       {/* ── Client Component: Stats + Tabs + Table ── */}
-      {/*
-        Pass hasil fetch dari server ke sini kalau sudah ada API:
-        <UserManagementClient
-          initialData={users.data}
-          totalUsers={stats.totalUsers}
-          b2bPartners={stats.b2bPartners}
-          pendingVerifications={stats.pendingVerifications}
-          retailCustomers={stats.retailCustomers}
-        />
+      {/* Tempat UserManagementClient merender statistik (Cards), 
+          Filter Tabs (Retail vs B2B), dan Tabel utama.
       */}
-      <UserManagementClient />
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <UserManagementClient />
+      </div>
+      
     </div>
   );
 }
