@@ -6,22 +6,21 @@ import PointHistory from "./components/PointHistory";
 
 export default function CustomerDashboardPage() {
     return (
-        <div className="w-full max-w-7xl mx-auto space-y-8">
+        <div className="w-full max-w-4xl mx-auto space-y-5">
             {/* Welcome */}
             <WelcomeHeader />
 
-            {/* Membership */}
+            {/* Membership Banner */}
             <MembershipCard />
 
-            {/* Summary */}
+            {/* Summary Stats */}
             <SummaryCards />
 
             {/* Bottom Section */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                 <div className="xl:col-span-2">
                     <RecentOrders />
                 </div>
-
                 <PointHistory />
             </div>
         </div>

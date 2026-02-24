@@ -94,11 +94,10 @@ export default function ProductTable({
                 key={product.id}
                 onMouseEnter={() => setHoveredRow(product.id)}
                 onMouseLeave={() => setHoveredRow(null)}
-                className={`transition-all duration-200 ${
-                  hoveredRow === product.id
+                className={`transition-all duration-200 ${hoveredRow === product.id
                     ? "bg-gradient-to-r from-blue-50/50 via-indigo-50/30 to-purple-50/50 shadow-inner"
                     : "hover:bg-gray-50/50"
-                }`}
+                  }`}
               >
                 <td className="px-6 py-5">
                   <input
@@ -158,11 +157,10 @@ export default function ProductTable({
 
                 <td className="px-6 py-5">
                   <div
-                    className={`flex items-center justify-end gap-2 transition-all duration-300 ${
-                      hoveredRow === product.id
+                    className={`flex items-center justify-end gap-2 transition-all duration-300 ${hoveredRow === product.id
                         ? "opacity-100 translate-x-0"
                         : "opacity-0 translate-x-2"
-                    }`}
+                      }`}
                   >
                     <button
                       onClick={(e) => {

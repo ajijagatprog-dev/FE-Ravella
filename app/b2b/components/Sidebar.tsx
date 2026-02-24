@@ -5,26 +5,47 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard,
-  Package,
+  Boxes,
+  ClipboardList,
+  CreditCard,
   ShoppingCart,
+  UserCircle,
   X,
   ChevronRight,
 } from "lucide-react";
 
-// ── Menu Config ───────────────────────────────────────────────────────────────
-
 const menuItems = [
-  { label: "Dashboard", href: "/b2b/dashboard", icon: LayoutDashboard },
-  { label: "Product Management", href: "/b2b/products", icon: Package },
-  { label: "Order Management", href: "/b2b/order", icon: ShoppingCart },
+  {
+    label: "Dashboard",
+    href: "/b2b/dashboard",
+    icon: LayoutDashboard
+  },
+  {
+    label: "Products",
+    href: "/b2b/products",
+    icon: Boxes
+  },
+  {
+    label: "Orders",
+    href: "/b2b/orders",
+    icon: ClipboardList
+  },
+  {
+    label: "Payments",
+    href: "/b2b/payments",
+    icon: CreditCard
+  },
+  {
+    label: "Keranjang",
+    href: "/b2b/keranjang",
+    icon: ShoppingCart
+  },
+  {
+    label: "My Profile",
+    href: "/b2b/profile",
+    icon: UserCircle
+  },
 ];
-
-// ── Badge helper (optional per-menu badge) ────────────────────────────────────
-
-const menuBadges: Record<string, { count: number; color: string }> = {
-  "/b2b/order": { count: 12, color: "bg-blue-500" },
-  "/b2b/products": { count: 3, color: "bg-amber-500" },
-};
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -106,7 +127,6 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
-            const badge = menuBadges[item.href];
 
             return (
               <Link
@@ -136,29 +156,6 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
 
                 {!collapsed && (
                   <span className="flex-1 truncate">{item.label}</span>
-                )}
-
-                {/* Badge */}
-                {!collapsed && badge && (
-                  <span
-                    className={`min-w-[20px] h-5 flex items-center justify-center px-1.5 text-[10px] font-bold text-white rounded-full ${isActive ? "bg-white/30" : badge.color
-                      }`}
-                  >
-                    {badge.count}
-                  </span>
-                )}
-
-                {/* Collapsed tooltip */}
-                {collapsed && (
-                  <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-xl transition-opacity">
-                    {item.label}
-                    {badge && (
-                      <span className={`ml-1.5 px-1.5 py-0.5 text-[9px] font-bold rounded-full ${badge.color}`}>
-                        {badge.count}
-                      </span>
-                    )}
-                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900" />
-                  </div>
                 )}
               </Link>
             );
