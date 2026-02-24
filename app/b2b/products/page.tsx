@@ -10,13 +10,12 @@ import AddToOrderToast from "./components/AddToOrderToast";
 import QuickOrderModal from "./components/QuickOrderModal";
 import { MOCK_PRODUCTS } from "./mockData";
 import type { Category, Product } from "./types";
-import { useCart } from "../keranjang/useCart";
+import { addProductToCart } from "../cartUtils"; // ← dari b2b/cartUtils
 
 const PAGE_SIZE = 8;
 
 export default function B2BProductsPage() {
     const router = useRouter();
-    const { addToCart } = useCart();
 
     const [search, setSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState<Category>("All Products");
@@ -42,9 +41,8 @@ export default function B2BProductsPage() {
     const handleSearchChange = (v: string) => { setSearch(v); setPage(1); };
     const handleCategoryChange = (c: Category) => { setActiveCategory(c); setPage(1); };
 
-    // Add to cart then show toast
     const handleAddToOrder = (product: Product) => {
-        addToCart(product);
+        addProductToCart(product); // ← pure function, tidak ada React state
         setToastProduct(product.name);
     };
 
