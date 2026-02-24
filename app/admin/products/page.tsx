@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { Plus, Search, Download } from "lucide-react";
+import { Plus, Search, Download, Package, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 import ProductTable from "./components/ProductTable";
 import BulkActionBar from "./components/BulkActionBar";
@@ -26,8 +26,7 @@ const initialProducts: Product[] = [
     id: 1,
     name: "Ravelle Airflex Vacuum Cleaner",
     category: "homeliving",
-    image:
-      "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
+    image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
     sku: "RV-TSH-001",
     stock: 142,
     stockStatus: "high",
@@ -38,8 +37,7 @@ const initialProducts: Product[] = [
     id: 2,
     name: "Ravelle SOLIS Dehumidifier & Air Purifier 2in1 2L",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/224-20250520175323.png",
+    image: "https://www.ravelle.co.id/data/product_cover/224-20250520175323.png",
     sku: "RV-JNS-402",
     stock: 8,
     stockStatus: "low",
@@ -50,8 +48,7 @@ const initialProducts: Product[] = [
     id: 3,
     name: "Ravelle High Speed Hair Dryer-grey",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-JKT-115",
     stock: 24,
     stockStatus: "medium",
@@ -62,8 +59,7 @@ const initialProducts: Product[] = [
     id: 4,
     name: "Product 4",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-004",
     stock: 24,
     stockStatus: "medium",
@@ -74,8 +70,7 @@ const initialProducts: Product[] = [
     id: 5,
     name: "Product 5",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-005",
     stock: 24,
     stockStatus: "medium",
@@ -86,8 +81,7 @@ const initialProducts: Product[] = [
     id: 6,
     name: "Product 6",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-006",
     stock: 24,
     stockStatus: "medium",
@@ -98,8 +92,7 @@ const initialProducts: Product[] = [
     id: 7,
     name: "Product 7",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-007",
     stock: 24,
     stockStatus: "medium",
@@ -110,8 +103,7 @@ const initialProducts: Product[] = [
     id: 8,
     name: "Product 8",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-008",
     stock: 24,
     stockStatus: "medium",
@@ -122,8 +114,7 @@ const initialProducts: Product[] = [
     id: 9,
     name: "Product 9",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-009",
     stock: 24,
     stockStatus: "medium",
@@ -134,8 +125,7 @@ const initialProducts: Product[] = [
     id: 10,
     name: "Product 10",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-010",
     stock: 24,
     stockStatus: "medium",
@@ -146,8 +136,7 @@ const initialProducts: Product[] = [
     id: 11,
     name: "Product 11",
     category: "homeliving",
-    image:
-      "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
+    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
     sku: "RV-011",
     stock: 24,
     stockStatus: "medium",
@@ -168,7 +157,6 @@ export default function ProductManagementPage() {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 8;
 
@@ -212,7 +200,6 @@ export default function ProductManagementPage() {
     setProducts((prev) =>
       prev.filter((product) => !deleteTargetIds.includes(product.id)),
     );
-
     setSelectedProducts([]);
     setDeleteTargetIds([]);
     setOpenDeleteModal(false);
@@ -220,21 +207,13 @@ export default function ProductManagementPage() {
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
-
     if (searchQuery) {
       result = result.filter((product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
-
-    if (sortBy === "stock-low") {
-      result.sort((a, b) => a.stock - b.stock);
-    }
-
-    if (sortBy === "price-high") {
-      result.sort((a, b) => b.retailPrice - a.retailPrice);
-    }
-
+    if (sortBy === "stock-low") result.sort((a, b) => a.stock - b.stock);
+    if (sortBy === "price-high") result.sort((a, b) => b.retailPrice - a.retailPrice);
     return result;
   }, [products, searchQuery, sortBy]);
 
@@ -245,7 +224,6 @@ export default function ProductManagementPage() {
     return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
-  // Pagination pages with ellipsis
   const getPageNumbers = () => {
     const pages: (number | "...")[] = [];
     if (totalPages <= 5) {
@@ -253,11 +231,7 @@ export default function ProductManagementPage() {
     } else {
       pages.push(1);
       if (currentPage > 3) pages.push("...");
-      for (
-        let i = Math.max(2, currentPage - 1);
-        i <= Math.min(totalPages - 1, currentPage + 1);
-        i++
-      ) {
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
         pages.push(i);
       }
       if (currentPage < totalPages - 2) pages.push("...");
@@ -267,159 +241,155 @@ export default function ProductManagementPage() {
   };
 
   return (
-    <div className="space-y-6 px-4 sm:px-0">
+    <div className="max-w-7xl mx-auto space-y-8 px-4 py-6 sm:px-6 lg:px-8 bg-slate-50/30 min-h-screen">
       {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-            Product Management
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Organize inventory and manage SKU logistics.
-            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 ring-1 ring-slate-200">
-              {products.length} products
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-blue-600 rounded-lg text-white shadow-lg shadow-blue-200">
+                <Package size={24} />
+             </div>
+             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                Product Inventory
+             </h1>
+          </div>
+          <p className="text-slate-500 font-medium flex items-center gap-2 mt-2">
+            Manage your store's stock and pricing in one place.
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 uppercase tracking-wider">
+              {products.length} Items Total
             </span>
           </p>
         </div>
 
         <button
           onClick={() => setOpenAddModal(true)}
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-colors"
+          className="group inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-xl shadow-blue-100 transition-all duration-200 w-full md:w-auto"
         >
-          <Plus size={16} />
+          <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
           Add New Product
         </button>
       </div>
 
-      {/* ── Filters ── */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
+      {/* ── Filter Card ── */}
+      <div className="bg-white/80 backdrop-blur-sm p-5 rounded-3xl border border-slate-200/60 shadow-xl shadow-slate-200/50">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* Search Box */}
+          <div className="relative flex-1 group">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              size={16}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"
+              size={18}
             />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by product name..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Search product name, SKU, or category..."
+              className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-white text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Sort */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-            >
-              <option value="latest">Sort: Latest</option>
-              <option value="stock-low">Stock: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-            </select>
+          <div className="flex items-center gap-3">
+            {/* Sort Dropdown */}
+            <div className="relative flex-1 sm:flex-none">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full appearance-none bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 px-5 py-3 pr-10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 cursor-pointer transition-all"
+              >
+                <option value="latest">Latest Entries</option>
+                <option value="stock-low">Low Stock First</option>
+                <option value="price-high">Highest Price</option>
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                 <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M19 9l-7 7-7-7"/></svg>
+              </div>
+            </div>
 
-            {/* Export */}
-            <button className="inline-flex items-center gap-1.5 px-3 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 text-sm font-medium transition-colors">
-              <Download size={15} />
-              <span className="hidden sm:inline">Export</span>
+            {/* Export Button */}
+            <button className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-slate-100 active:bg-slate-200 text-slate-700 text-sm font-bold transition-all">
+              <Download size={18} className="text-slate-500" />
+              <span className="hidden sm:inline">Export CSV</span>
             </button>
           </div>
         </div>
 
-        {/* Active search hint */}
+        {/* Active search filter badge */}
         {searchQuery && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
-            <span>
-              Showing{" "}
-              <span className="font-semibold text-slate-700">
-                {filteredProducts.length}
-              </span>{" "}
-              result{filteredProducts.length !== 1 ? "s" : ""} for
-            </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium ring-1 ring-blue-200">
+          <div className="mt-4 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Results for:</span>
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold ring-1 ring-blue-200/50">
               "{searchQuery}"
               <button
                 onClick={() => setSearchQuery("")}
-                className="ml-0.5 hover:text-blue-900"
+                className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
               >
-                ×
+                <X size={14} />
               </button>
             </span>
           </div>
         )}
       </div>
 
-      {/* ── Table ── */}
-      <ProductTable
-        products={paginatedProducts}
-        selectedProducts={selectedProducts}
-        onSelectProduct={handleSelectProduct}
-        onDeleteProduct={handleSingleDelete}
-        onEditProduct={handleEditClick}
-      />
+      {/* ── Table Container ── */}
+      <div className="rounded-3xl border border-slate-200/60 bg-white shadow-2xl shadow-slate-200/40 overflow-hidden">
+        <ProductTable
+          products={paginatedProducts}
+          selectedProducts={selectedProducts}
+          onSelectProduct={handleSelectProduct}
+          onDeleteProduct={handleSingleDelete}
+          onEditProduct={handleEditClick}
+        />
+      </div>
 
       {/* ── Pagination ── */}
       {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-slate-500">
-            Page{" "}
-            <span className="font-semibold text-slate-700">{currentPage}</span>{" "}
-            of{" "}
-            <span className="font-semibold text-slate-700">{totalPages}</span>
-            <span className="ml-2 text-slate-400">
-              ({filteredProducts.length} total)
-            </span>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
+          <p className="text-sm font-medium text-slate-500 order-2 sm:order-1">
+            Showing <span className="text-slate-900 font-bold">{paginatedProducts.length}</span> of{" "}
+            <span className="text-slate-900 font-bold">{filteredProducts.length}</span> products
           </p>
 
-          <div className="flex items-center gap-1">
-            {/* Prev */}
+          <div className="flex items-center gap-2 order-1 sm:order-2">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((prev) => prev - 1)}
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
+              className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-white hover:shadow-md disabled:opacity-30 disabled:hover:shadow-none transition-all"
             >
-              ‹
+              <ChevronLeft size={20} />
             </button>
 
-            {getPageNumbers().map((page, i) =>
-              page === "..." ? (
-                <span
-                  key={`ellipsis-${i}`}
-                  className="w-8 h-8 flex items-center justify-center text-slate-400 text-sm"
-                >
-                  …
-                </span>
-              ) : (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page as number)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
-                    currentPage === page
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  {page}
-                </button>
-              ),
-            )}
+            <div className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200">
+              {getPageNumbers().map((page, i) =>
+                page === "..." ? (
+                  <span key={`ellipsis-${i}`} className="px-3 text-slate-400 font-bold">...</span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page as number)}
+                    className={`min-w-[40px] h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                      currentPage === page
+                        ? "bg-white text-blue-600 shadow-sm scale-105"
+                        : "text-slate-500 hover:text-slate-900"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+            </div>
 
-            {/* Next */}
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((prev) => prev + 1)}
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
+              className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-white hover:shadow-md disabled:opacity-30 disabled:hover:shadow-none transition-all"
             >
-              ›
+              <ChevronRight size={20} />
             </button>
           </div>
         </div>
       )}
 
-      {/* ── Bulk Action Bar ── */}
+      {/* ── Floating Bulk Action Bar ── */}
       <BulkActionBar
         selectedCount={selectedProducts.length}
         onBulkDelete={handleBulkDelete}
@@ -447,10 +417,12 @@ export default function ProductManagementPage() {
         onConfirm={confirmDelete}
         title={
           deleteTargetIds.length > 1
-            ? `Delete ${deleteTargetIds.length} Products`
+            ? `Hapus ${deleteTargetIds.length} Produk Terpilih?`
             : "Hapus Produk"
         }
-        description="Apakah anda yakin ingin menghapus produk ini?"
+        description={`Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus ${
+          deleteTargetIds.length > 1 ? "produk-produk ini" : "produk ini"
+        }?`}
       />
     </div>
   );
