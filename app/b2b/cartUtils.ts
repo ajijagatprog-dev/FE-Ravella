@@ -27,10 +27,10 @@ export function addProductToCart(product: Product) {
     const next = existing
         ? items.map((i) =>
             i.product.id === product.id
-                ? { ...i, qty: i.qty + 1 } 
+                ? { ...i, qty: i.qty + 1 }
                 : i
         )
-        : [...items, { product, qty: product.minOrder }];
+        : [...items, { product, qty: 1 }];
 
     saveCartItems(next);
 }

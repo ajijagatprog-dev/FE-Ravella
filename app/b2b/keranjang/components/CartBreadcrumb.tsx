@@ -11,22 +11,9 @@ import EmptyCart from "./EmptyCart";
 export default function KeranjangPage() {
     const { items, hydrated, subtotal, totalItems, updateQty, removeItem, clearCart } = useCart();
 
-    // Prevent hydration mismatch
+    // Wait for hydration before rendering cart content
     if (!hydrated) {
-        return (
-            <div className="px-6 py-6 max-w-screen-xl mx-auto">
-                <div className="h-8 w-48 bg-stone-100 rounded-xl animate-pulse mb-2" />
-                <div className="h-6 w-72 bg-stone-100 rounded-xl animate-pulse mb-6" />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 space-y-3">
-                        {[1, 2].map((i) => (
-                            <div key={i} className="h-36 bg-stone-100 rounded-2xl animate-pulse" />
-                        ))}
-                    </div>
-                    <div className="h-96 bg-stone-100 rounded-2xl animate-pulse" />
-                </div>
-            </div>
-        );
+        return null;
     }
 
     return (

@@ -9,11 +9,9 @@ export function useCart() {
 
     const updateQty = useCallback((productId: string, qty: number) => {
         setItems((prev) => {
-            const item = prev.find((i) => i.product.id === productId);
-            const minQty = item?.product.minOrder ?? 1;
             const next = prev.map((i) =>
                 i.product.id === productId
-                    ? { ...i, qty: Math.max(minQty, qty) }
+                    ? { ...i, qty: Math.max(1, qty) }
                     : i
             );
             saveCartItems(next);

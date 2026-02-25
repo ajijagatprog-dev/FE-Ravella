@@ -15,7 +15,7 @@ interface Props {
 export default function CartItemRow({ item, onUpdateQty, onRemove }: Props) {
     const { product, qty } = item;
     const subtotal = product.price * qty;
-    const canDecrease = qty > product.minOrder;
+    const canDecrease = qty > 1;
 
     return (
         <div className="bg-white rounded-2xl border border-stone-200 p-4 flex gap-4 items-start hover:border-stone-300 transition-colors">
@@ -70,10 +70,10 @@ export default function CartItemRow({ item, onUpdateQty, onRemove }: Props) {
                             <input
                                 type="number"
                                 value={qty}
-                                min={product.minOrder}
+                                min={1}
                                 onChange={(e) => {
                                     const v = parseInt(e.target.value);
-                                    if (!isNaN(v) && v >= product.minOrder) {
+                                    if (!isNaN(v) && v >= 1) {
                                         onUpdateQty(product.id, v);
                                     }
                                 }}
