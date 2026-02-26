@@ -21,9 +21,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useState, useMemo } from "react";
-// useRouter removed - no redirect on add to cart
+import Link from "next/link";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
+import { products } from "./products";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -51,17 +52,6 @@ export default function ProductPage() {
     { id: "ezy", name: "EZY SERIES", icon: TrendingUp, count: 6 },
     { id: "homeliving", name: "HOMELIVING", icon: Shield, count: 10 },
     { id: "keyboard", name: "KEYBOARD", icon: Sparkles, count: 0 },
-  ];
-
-  const products = [
-    { id: 1, name: "Ravelle Airflex Vacuum Cleaner", price: 598900, originalPrice: 798900, image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80", category: "homeliving", rating: 4.8, reviews: 124, badge: "Best Seller", discount: 25, features: ["HEPA Filter", "Cordless", "2h Battery"], inStock: true, isNew: false, description: "Vacuum cleaner cordless dengan teknologi HEPA filter untuk pembersihan maksimal. Dilengkapi baterai tahan lama hingga 2 jam.", specifications: { Power: "120W", Battery: "2000mAh", Weight: "2.5kg", Warranty: "1 Year" } },
-    { id: 2, name: "Ravelle SOLIS Dehumidifier & Air Purifier 2in1 2L", price: 1399900, originalPrice: 1799900, image: "https://www.ravelle.co.id/data/product_cover/224-20250520175323.png", category: "homeliving", rating: 4.9, reviews: 89, badge: "Premium", discount: 22, features: ["2-in-1", "Smart Sensor", "Ultra Quiet"], inStock: true, isNew: true, description: "Dehumidifier dan air purifier 2 in 1 dengan smart sensor otomatis.", specifications: { Capacity: "2L", Coverage: "30m²", "Noise Level": "35dB", Warranty: "1 Year" } },
-    { id: 3, name: "Ravelle High Speed Hair Dryer-grey", price: 799900, originalPrice: 899900, image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png", category: "homeliving", rating: 4.7, reviews: 156, badge: "Popular", discount: 20, features: ["Digital Display", "Auto Shutoff", "Portable"], inStock: true, isNew: false, description: "Hair dryer berkecepatan tinggi dengan teknologi digital untuk hasil terbaik.", specifications: { Capacity: "1L", Coverage: "20m²", Weight: "1.8kg", Warranty: "1 Year" } },
-    { id: 4, name: "Ravelle Luxe Air Purifier HEPA13 + Anti-Allergen", price: 1199900, originalPrice: 1499900, image: "https://www.ravelle.co.id/data/product_cover/223-20250520175032.png", category: "homeliving", rating: 4.9, reviews: 203, badge: "Premium", discount: 20, features: ["HEPA13", "Anti-Allergen", "Smart Mode"], inStock: true, isNew: false, description: "Air purifier premium dengan HEPA13 filter yang mampu menyaring 99.97% partikel allergen.", specifications: { Filter: "HEPA13", Coverage: "50m²", CADR: "300m³/h", Warranty: "1 Year" } },
-    { id: 5, name: "Ravelle Ezy Squeenze Citrus Juicer- Cream", price: 559900, originalPrice: 749900, image: "https://www.ravelle.co.id/data/product_cover/218-20250520162617.png", category: "homeliving", rating: 4.6, reviews: 98, badge: "New", discount: 25, features: ["Aromatherapy", "Night Light", "Compact"], inStock: true, isNew: true, description: "Juicer compact dengan fitur aromatherapy dan night light.", specifications: { Filter: "HEPA13", Coverage: "25m²", Features: "Aromatherapy, LED Light", Warranty: "1 Year" } },
-    { id: 6, name: "Ravelle Smart Rice Cooker 1.8L", price: 899900, originalPrice: 1199900, image: "https://cdn.ruparupa.io/fit-in/850x850/filters:format(webp)/filters:watermark(content.ruparupa.io,products/wm/rr.png,0,-0,0,100,100)/ruparupa-com/image/upload/Products/10632435_1.jpg", category: "appliance", rating: 4.8, reviews: 234, badge: "Best Seller", discount: 25, features: ["Smart Cook", "Keep Warm", "Non-stick"], inStock: true, isNew: false, description: "Rice cooker pintar dengan teknologi smart cook untuk hasil nasi sempurna.", specifications: { Capacity: "1.8L", Power: "600W", Material: "Non-stick coating", Warranty: "1 Year" } },
-    { id: 7, name: "Ravelle Premium Blender 2L", price: 699900, originalPrice: 899900, image: "https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=500&q=80", category: "appliance", rating: 4.7, reviews: 167, badge: "Popular", discount: 22, features: ["800W Motor", "Glass Jar", "6 Speeds"], inStock: true, isNew: false, description: "Blender premium dengan motor 800W untuk hasil blending sempurna.", specifications: { Power: "800W", Capacity: "2L", Material: "Glass Jar", Warranty: "1 Year" } },
-    { id: 8, name: "Ravelle Professional Knife Set 8pcs", price: 1299900, originalPrice: 1799900, image: "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=500&q=80", category: "knife", rating: 4.9, reviews: 145, badge: "Premium", discount: 28, features: ["German Steel", "Ergonomic", "Block Included"], inStock: true, isNew: true, description: "Set pisau profesional 8 pieces dengan material German steel berkualitas tinggi.", specifications: { Material: "German Stainless Steel", Pieces: "8pcs", Includes: "Wooden Block", Warranty: "1 Year" } },
   ];
 
   const handleAddToCart = (product: (typeof products)[number]) => {
@@ -234,8 +224,8 @@ export default function ProductPage() {
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.name)}
                     className={`flex items-center gap-2 px-4 py-2.5 text-[11px] tracking-[0.15em] uppercase font-medium transition-all whitespace-nowrap ${activeCategory === cat.name
-                        ? "bg-neutral-900 text-white"
-                        : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-400 hover:text-neutral-900"
+                      ? "bg-neutral-900 text-white"
+                      : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-400 hover:text-neutral-900"
                       }`}
                     style={{ fontFamily: JOST }}
                   >
@@ -417,14 +407,14 @@ export default function ProductPage() {
 
                   {/* View Details — grid only */}
                   {viewMode === "grid" && (
-                    <button
-                      onClick={() => openQuickView(product)}
+                    <Link
+                      href={`/product/${product.id}`}
                       className="w-full py-2.5 border border-neutral-200 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all flex items-center justify-center gap-2 group/btn mt-1"
                       style={{ fontFamily: JOST }}
                     >
                       View Details
                       <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                    </button>
+                    </Link>
                   )}
                 </div>
 
@@ -434,9 +424,9 @@ export default function ProductPage() {
                     <button onClick={() => handleAddToCart(product)} className="px-5 py-2.5 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors" style={{ fontFamily: JOST }}>
                       Add to Cart
                     </button>
-                    <button onClick={() => openQuickView(product)} className="px-5 py-2.5 border border-neutral-200 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium hover:border-neutral-800 transition-colors" style={{ fontFamily: JOST }}>
+                    <Link href={`/product/${product.id}`} className="px-5 py-2.5 border border-neutral-200 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium hover:border-neutral-800 transition-colors" style={{ fontFamily: JOST }}>
                       Details
-                    </button>
+                    </Link>
                   </div>
                 )}
               </div>
