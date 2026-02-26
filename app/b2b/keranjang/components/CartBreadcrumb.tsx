@@ -1,65 +1,31 @@
 "use client";
 
-import { useCart } from "../useCart";
-import CartBreadcrumb from "./CartBreadcrumb";
-import MinOrderBanner from "./MinOrderBanner";
-import CartItemRow from "./CartItemRow";
-import CartActions from "./CartActions";
-import OrderSummary from "./OrderSummary";
-import EmptyCart from "./EmptyCart";
+import Link from "next/link";
+import { ChevronRight, Home } from "lucide-react";
 
-export default function KeranjangPage() {
-    const { items, hydrated, subtotal, totalItems, updateQty, removeItem, clearCart } = useCart();
-
-    // Wait for hydration before rendering cart content
-    if (!hydrated) {
-        return null;
-    }
-
+export default function CartBreadcrumb() {
     return (
-        <div className="px-6 py-6 max-w-screen-xl mx-auto">
-            {/* Breadcrumb */}
-            <CartBreadcrumb />
+        <nav className="flex items-center gap-2 text-sm mb-4">
+            <Link
+                href="/b2b/dashboard"
+                className="flex items-center gap-1 text-stone-500 hover:text-stone-800 transition-colors"
+            >
+                <Home className="w-4 h-4" />
+                <span>Home</span>
+            </Link>
 
-            {/* Page Header */}
-            <div className="mb-5">
-                <h1 className="text-2xl font-black text-stone-800 tracking-tight">
-                    Shopping Cart
-                </h1>
-                <p className="text-sm text-stone-500 mt-0.5">
-                    Review your wholesale selections and adjust quantities before final checkout.
-                </p>
-            </div>
+            <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
 
-            {items.length === 0 ? (
-                <EmptyCart />
-            ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                    {/* Left — Cart Items */}
-                    <div className="lg:col-span-2 space-y-3">
-                        {/* Min Order Banner */}
-                        <MinOrderBanner subtotal={subtotal} />
+            <Link
+                href="/b2b/products"
+                className="text-stone-500 hover:text-stone-800 transition-colors"
+            >
+                Products
+            </Link>
 
-                        {/* Items */}
-                        {items.map((item) => (
-                            <CartItemRow
-                                key={item.product.id}
-                                item={item}
-                                onUpdateQty={updateQty}
-                                onRemove={removeItem}
-                            />
-                        ))}
+            <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
 
-                        {/* Actions */}
-                        <CartActions onClear={clearCart} />
-                    </div>
-
-                    {/* Right — Order Summary */}
-                    <div className="lg:col-span-1">
-                        <OrderSummary subtotal={subtotal} totalItems={totalItems} />
-                    </div>
-                </div>
-            )}
-        </div>
+            <span className="font-bold text-stone-800">Shopping Cart</span>
+        </nav>
     );
 }

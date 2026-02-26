@@ -6,12 +6,15 @@ import CartItemRow from "./CartItemRow";
 import CartActions from "./CartActions";
 import OrderSummary from "./OrderSummary";
 import EmptyCart from "./EmptyCart";
+import MinOrderBanner from "./MinOrderBanner";
 
 export default function KeranjangContent() {
-    const { items, subtotal, totalItems, updateQty, removeItem, clearCart } = useCart();
+    const { items, hydrated, subtotal, totalItems, updateQty, removeItem, clearCart } = useCart();
+
+    if (!hydrated) return null;
 
     return (
-        <div className="px-6 py-6 max-w-5xl mx-auto">
+        <div className="px-6 py-6 max-w-screen-xl mx-auto">
             <CartBreadcrumb />
 
             <div className="mb-6">
@@ -29,6 +32,7 @@ export default function KeranjangContent() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     {/* Left — Items */}
                     <div className="lg:col-span-2 space-y-3">
+                        <MinOrderBanner subtotal={subtotal} />
                         {items.map((item) => (
                             <CartItemRow
                                 key={item.product.id}
