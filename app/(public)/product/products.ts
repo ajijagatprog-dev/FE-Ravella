@@ -16,7 +16,9 @@ export interface Product {
     specifications: Record<string, string>;
 }
 
-export const products: Product[] = [
+const STORAGE_KEY = "ravelle_public_products";
+
+export const defaultProducts: Product[] = [
     {
         id: 1,
         name: "Ravelle Airflex Vacuum Cleaner",
@@ -202,3 +204,21 @@ export const products: Product[] = [
         },
     },
 ];
+
+/** kept for backward-compat — same as defaultProducts */
+export const products = defaultProducts;
+
+export function getProducts(): Product[] {
+    if (typeof window === "undefined") return defaultProducts;
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw) as Product[];
+    } catch { /* ignore */ }
+    return defaultProducts;
+}
+
+export function saveProducts(items: Product[]): void {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    window.dispatchEvent(new Event("ravelle_products_updated"));
+}

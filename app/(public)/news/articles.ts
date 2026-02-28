@@ -12,7 +12,9 @@ export interface Article {
     content: string[];
 }
 
-export const articles: Article[] = [
+const STORAGE_KEY = "ravelle_public_articles";
+
+export const defaultArticles: Article[] = [
     {
         id: 1,
         title: "5 Kebiasaan Sehari-hari yang Membuat Rice Cooker Cepat Rusak",
@@ -193,3 +195,21 @@ export const articles: Article[] = [
         ],
     },
 ];
+
+/** kept for backward-compat */
+export const articles = defaultArticles;
+
+export function getArticles(): Article[] {
+    if (typeof window === "undefined") return defaultArticles;
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw) as Article[];
+    } catch { /* ignore */ }
+    return defaultArticles;
+}
+
+export function saveArticles(items: Article[]): void {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    window.dispatchEvent(new Event("ravelle_articles_updated"));
+}
