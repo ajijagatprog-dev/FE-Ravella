@@ -287,11 +287,11 @@ function HeroContent({ active, isLoaded }: { active: number; isLoaded: boolean }
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              href="/promo"
+              href="/auth/register"
               className="w-full sm:w-auto px-8 py-3.5 border border-white/40 text-white hover:bg-white/10 hover:border-white/70 transition-all duration-300 font-light text-[11px] tracking-[0.22em] uppercase text-center"
               style={{ fontFamily: JOST }}
             >
-              Lihat Semua Promo
+              Ayo Gabung Kemitraan
             </Link>
           </div>
 

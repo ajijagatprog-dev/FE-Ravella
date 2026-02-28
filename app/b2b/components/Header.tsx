@@ -464,11 +464,11 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 transition-colors group"
               >
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow shrink-0">
-                  A
+                  B2B
                 </div>
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-semibold text-gray-900 leading-tight">
-                    Admin
+                    B2B
                   </p>
                   <p className="text-xs text-gray-500 leading-tight">
                     Ravelle Fashion
@@ -486,15 +486,15 @@ export default function Header({ onMenuClick }: HeaderProps) {
                   <div className="px-4 py-4 bg-gradient-to-br from-blue-50 to-white border-b border-gray-100">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow">
-                        A
+                        B2B
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-900">Admin</p>
+                        <p className="text-sm font-bold text-gray-900">B2B</p>
                         <p className="text-xs text-gray-500">
-                          admin@ravelle.com
+                          b2b@ravelle.com
                         </p>
                         <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-600 text-[10px] font-semibold rounded-full">
-                          Super Admin
+                          B2B
                         </span>
                       </div>
                     </div>

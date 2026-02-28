@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { MoreVertical, Edit, Trash2 } from "lucide-react";
+import { MoreVertical, Edit, Trash2, Package } from "lucide-react";
 import { useState } from "react";
 
 interface Product {
@@ -34,167 +34,157 @@ export default function ProductTable({
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
 
   const getStockBadge = (stock: number, status: string) => {
-    if (status === "low") {
-      return (
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-red-50 to-rose-50 border border-red-200/60 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-lg shadow-red-500/50" />
-          <span className="text-xs font-bold text-red-700">{stock}</span>
-        </div>
-      );
-    } else if (status === "medium") {
-      return (
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/60 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-amber-500 shadow-lg shadow-amber-500/50" />
-          <span className="text-xs font-bold text-amber-700">{stock}</span>
-        </div>
-      );
-    } else {
-      return (
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
-          <span className="text-xs font-bold text-green-700">{stock}</span>
-        </div>
-      );
-    }
+    const styles = {
+      low: "bg-red-50 text-red-700 border-red-100 ring-red-500/20",
+      medium: "bg-amber-50 text-amber-700 border-amber-100 ring-amber-500/20",
+      high: "bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-500/20",
+    };
+
+    const currentStyle = styles[status as keyof typeof styles] || styles.high;
+
+    return (
+      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-bold tracking-tight ring-2 transition-all ${currentStyle}`}>
+        <span className={`w-1.5 h-1.5 rounded-full ${status === 'low' ? 'animate-pulse bg-red-500' : status === 'medium' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+        {stock} <span className="font-medium opacity-80 uppercase ml-0.5">Units</span>
+      </div>
+    );
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-lg shadow-gray-200/50">
-      <div className="overflow-x-auto">
-        <table className="w-full">
+    <div className="relative">
+      <div className="overflow-x-auto scrollbar-hide">
+        <table className="w-full border-separate border-spacing-0">
           <thead>
-            <tr className="bg-gradient-to-r from-gray-50 via-slate-50 to-gray-50 border-b border-gray-200/80">
-              <th className="px-6 py-4 text-left">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded border-2 border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all"
-                />
+            <tr className="bg-slate-50/80 backdrop-blur-sm">
+              <th className="sticky top-0 z-10 px-6 py-4 text-left border-b border-slate-200">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500/20 transition-all cursor-pointer"
+                  />
+                </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-extrabold text-gray-600 uppercase tracking-wider">
-                Product Name
+              <th className="sticky top-0 z-10 px-6 py-4 text-left border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                Product Info
               </th>
-              <th className="px-6 py-4 text-center text-xs font-extrabold text-gray-600 uppercase tracking-wider">
-                Stock
+              <th className="sticky top-0 z-10 px-6 py-4 text-center border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                Inventory
               </th>
-              <th className="px-6 py-4 text-left text-xs font-extrabold text-gray-600 uppercase tracking-wider">
-                Retail Price
+              <th className="sticky top-0 z-10 px-6 py-4 text-left border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                Pricing Details
               </th>
-              <th className="px-6 py-4 text-left text-xs font-extrabold text-gray-600 uppercase tracking-wider">
-                B2B Price
-              </th>
-              <th className="px-6 py-4 text-right text-xs font-extrabold text-gray-600 uppercase tracking-wider">
+              <th className="sticky top-0 z-10 px-6 py-4 text-right border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                 Actions
               </th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-100/80">
-            {products.map((product) => (
-              <tr
-                key={product.id}
-                onMouseEnter={() => setHoveredRow(product.id)}
-                onMouseLeave={() => setHoveredRow(null)}
-                className={`transition-all duration-200 ${
-                  hoveredRow === product.id
-                    ? "bg-gradient-to-r from-blue-50/50 via-indigo-50/30 to-purple-50/50 shadow-inner"
-                    : "hover:bg-gray-50/50"
-                }`}
-              >
-                <td className="px-6 py-5">
-                  <input
-                    type="checkbox"
-                    checked={selectedProducts.includes(product.id)}
-                    onChange={() => onSelectProduct?.(product.id)}
-                    className="w-4 h-4 rounded border-2 border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all hover:border-blue-400"
-                  />
-                </td>
+          <tbody className="divide-y divide-slate-100 bg-white">
+            {products.length > 0 ? (
+              products.map((product) => (
+                <tr
+                  key={product.id}
+                  onMouseEnter={() => setHoveredRow(product.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                  className="group transition-all duration-200 hover:bg-blue-50/30"
+                >
+                  <td className="px-6 py-5">
+                    <input
+                      type="checkbox"
+                      checked={selectedProducts.includes(product.id)}
+                      onChange={() => onSelectProduct?.(product.id)}
+                      className="w-4 h-4 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500/20 transition-all cursor-pointer"
+                    />
+                  </td>
 
-                <td className="px-6 py-5">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden flex-shrink-0 relative ring-2 ring-gray-200/50 shadow-md">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                      />
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-14 h-14 rounded-2xl overflow-hidden ring-1 ring-slate-200 shadow-sm transition-transform group-hover:scale-105 duration-300 bg-slate-50">
+                        <Image
+                          src={product.image}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="max-w-[200px] sm:max-w-xs">
+                        <p className="text-sm font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                          {product.name}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 uppercase tracking-tighter">
+                            {product.sku}
+                          </span>
+                          <span className="text-xs text-slate-400 font-medium capitalize">
+                            {product.category}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 mb-0.5">
-                        {product.name}
-                      </p>
-                      <p className="text-xs text-gray-500 font-medium">
-                        {product.category}
-                      </p>
+                  </td>
+
+                  <td className="px-6 py-5 text-center">
+                    {getStockBadge(product.stock, product.stockStatus)}
+                  </td>
+
+                  <td className="px-6 py-5">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-[10px] font-bold text-slate-400">RP</span>
+                        <span className="text-sm font-extrabold text-slate-900 tracking-tight">
+                          {product.retailPrice.toLocaleString("id-ID")}
+                        </span>
+                        <span className="text-[10px] font-medium text-slate-400 bg-slate-50 px-1 rounded">Retail</span>
+                      </div>
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-[10px] font-bold text-blue-400">RP</span>
+                        <span className="text-sm font-bold text-blue-600 tracking-tight">
+                          {product.b2bPrice.toLocaleString("id-ID")}
+                        </span>
+                        <span className="text-[10px] font-medium text-blue-400 bg-blue-50 px-1 rounded">B2B</span>
+                      </div>
                     </div>
-                  </div>
-                </td>
+                  </td>
 
-                <td className="px-6 py-5 text-center">
-                  {getStockBadge(product.stock, product.stockStatus)}
-                </td>
+                  <td className="px-6 py-5 text-right">
+                    <div className={`flex items-center justify-end gap-1 transition-all duration-300 ${
+                      hoveredRow === product.id ? "opacity-100 translate-x-0" : "opacity-0 md:opacity-40 translate-x-1"
+                    }`}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditProduct?.(product);
+                        }}
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-xl border border-transparent hover:border-blue-100 transition-all active:scale-90"
+                        title="Edit Data"
+                      >
+                        <Edit size={16} />
+                      </button>
 
-                <td className="px-6 py-5">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-gray-900">
-                      Rp {product.retailPrice.toLocaleString("id-ID")}
-                    </span>
-                    <span className="text-xs text-gray-400 font-medium">
-                      Retail
-                    </span>
-                  </div>
-                </td>
-
-                <td className="px-6 py-5">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-gray-900">
-                      Rp {product.b2bPrice.toLocaleString("id-ID")}
-                    </span>
-                    <span className="text-xs text-gray-400 font-medium">
-                      Wholesale
-                    </span>
-                  </div>
-                </td>
-
-                <td className="px-6 py-5">
-                  <div
-                    className={`flex items-center justify-end gap-2 transition-all duration-300 ${
-                      hoveredRow === product.id
-                        ? "opacity-100 translate-x-0"
-                        : "opacity-0 translate-x-2"
-                    }`}
-                  >
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditProduct?.(product);
-                      }}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-110 active:scale-95 group"
-                      title="Edit Product"
-                    >
-                      <Edit
-                        size={16}
-                        className="group-hover:rotate-12 transition-transform"
-                      />
-                    </button>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteProduct?.(product.id);
-                      }}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-110 active:scale-95 group"
-                      title="Delete Product"
-                    >
-                      <Trash2
-                        size={16}
-                        className="group-hover:rotate-12 transition-transform"
-                      />
-                    </button>
-                  </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteProduct?.(product.id);
+                        }}
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-white hover:shadow-sm rounded-xl border border-transparent hover:border-red-100 transition-all active:scale-90"
+                        title="Hapus Produk"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-6 py-20 text-center">
+                   <div className="flex flex-col items-center gap-2">
+                      <Package size={40} className="text-slate-200" />
+                      <p className="text-slate-400 font-medium">No products found matching your criteria.</p>
+                   </div>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

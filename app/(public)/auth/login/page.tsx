@@ -20,8 +20,8 @@ export default function AdminLoginPage() {
       newErrors.email = "Format email tidak valid";
 
     if (!formData.password) newErrors.password = "Password wajib diisi";
-    else if (formData.password.length < 8)
-      newErrors.password = "Minimal 8 karakter";
+    else if (formData.password.length < 6)
+      newErrors.password = "Minimal 6 karakter";
 
     return newErrors;
   };
@@ -35,7 +35,7 @@ export default function AdminLoginPage() {
 
     setTimeout(() => {
       // ─────────────────────────────────────────────
-      // Dummy Seeder Admin & Customer
+      // Dummy Seeder Admin, Customer & B2B
       // ─────────────────────────────────────────────
       const dummyUsers = [
         {
@@ -47,6 +47,11 @@ export default function AdminLoginPage() {
           email: "customer@example.com",
           password: "customer123",
           role: "customer",
+        },
+        {
+          email: "b2b@example.com",
+          password: "b2b123",
+          role: "b2b",
         },
       ];
 
@@ -71,6 +76,8 @@ export default function AdminLoginPage() {
           router.push("/admin/dashboard");
         } else if (foundUser.role === "customer") {
           router.push("/customer/dashboard");
+        } else if (foundUser.role === "b2b") {
+          router.push("/b2b/dashboard");
         }
       } else {
         setErrors({
@@ -245,6 +252,8 @@ export default function AdminLoginPage() {
           admin@example.com / admin123
           <br />
           customer@example.com / customer123
+          <br />
+          b2b@example.com / b2b123
         </div> */}
       </div>
     </div>
