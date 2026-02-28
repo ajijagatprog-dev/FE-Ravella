@@ -2,6 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Search, ShoppingCart, User, Menu, X, Instagram, Phone, Facebook } from "lucide-react";
+
+const JOST = "'Jost', system-ui, sans-serif";
+
+// Baca total qty dari localStorage
+function readCartCount(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const stored = localStorage.getItem("ravelle_cart");
+    if (!stored) return 0;
+    const cart: { quantity: number }[] = JSON.parse(stored);
+    return cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  } catch {
+    return 0;
+  }
+}
 
 interface HeaderProps {
   userName?: string;
@@ -12,201 +28,273 @@ interface HeaderProps {
 export default function Header({
   userName = "User",
   avatarUrl = "",
-  onSearch = () => {},
+  onSearch = () => { },
 }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cartCount, setCartCount] = useState(0);
 
+  // Scroll listener
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Body scroll lock
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
+  // Baca cart dari localStorage saat mount + listen event update
+  useEffect(() => {
+    setCartCount(readCartCount());
+
+    const handleCartUpdate = () => setCartCount(readCartCount());
+    // Custom event dari ProductPage setiap kali user add to cart
+    window.addEventListener("ravelle_cart_updated", handleCartUpdate);
+    // Storage event untuk sinkronisasi antar tab
+    window.addEventListener("storage", handleCartUpdate);
+    return () => {
+      window.removeEventListener("ravelle_cart_updated", handleCartUpdate);
+      window.removeEventListener("storage", handleCartUpdate);
+    };
+  }, []);
+
   const menus = [
-    { label: "Home", href: "/" },
-    { label: "Company", href: "/company" },
-    { label: "Product", href: "/product" },
-    { label: "News", href: "/news" },
-    { label: "Contact", href: "/contact" },
+    { label: "HOME", href: "/" },
+    { label: "COMPANY", href: "/company" },
+    { label: "PRODUCT", href: "/product" },
+    { label: "NEWS", href: "/news" },
+    { label: "CONTACT", href: "/contact" },
   ];
 
   return (
     <>
-      {/* HEADER */}
       <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300
-        ${
-          scrolled
-            ? "bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm"
-            : "bg-white border-b border-gray-200"
-        }`}
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled
+            ? "bg-white/90 backdrop-blur-md border-b border-neutral-200"
+            : "bg-white border-b border-neutral-200"
+          }`}
+        style={{ fontFamily: JOST }}
       >
-        <div className="mx-auto max-w-[1280px] px-4 md:px-10 lg:px-16 py-4">
+        <div className="mx-auto max-w-[1320px] px-6 md:px-12 py-3">
           <div className="flex items-center justify-between">
+
             {/* LEFT */}
-            <div className="flex items-center gap-12">
-              {/* LOGO */}
-              <Link href="/" className="flex items-center gap-3">
-                <div className="flex items-center justify-center size-9 rounded-lg bg-black text-white">
-                  <svg
-                    className="size-4"
-                    fill="none"
-                    viewBox="0 0 48 48"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 6H42L36 24L42 42H6L12 24L6 6Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-                <h2 className="text-lg font-semibold tracking-[0.15em] text-gray-900">
-                  RAVELLE
-                </h2>
+            <div className="flex items-center gap-14">
+              <Link href="/" className="group flex items-center">
+                <img
+                  src="/lg-ravella-gold.png"
+                  alt="Ravelle Logo"
+                  className="h-4 sm:h-5 md:h-6 lg:h-7 w-auto transition-transform duration-300 group-hover:scale-105"
+                />
               </Link>
 
-              {/* DESKTOP NAV */}
-              <nav className="hidden md:flex items-center gap-10">
+              <nav className="hidden lg:flex items-center gap-10">
                 {menus.map((menu) => (
                   <Link
                     key={menu.label}
                     href={menu.href}
-                    className="text-sm font-medium tracking-wide text-gray-700
-                    hover:text-black transition-colors"
+                    className="group relative text-[13px] tracking-[0.18em] font-medium text-neutral-800 hover:text-black transition-colors duration-300"
                   >
                     {menu.label}
+                    <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full" />
                   </Link>
                 ))}
               </nav>
             </div>
 
             {/* RIGHT */}
-            <div className="flex items-center gap-4 md:gap-6">
+            <div className="flex items-center gap-5">
+
               {/* SEARCH */}
-              <div
-                className="hidden sm:flex items-center gap-2 rounded-full 
-                bg-gray-100 px-4 py-2 w-56
-                focus-within:ring-1 focus-within:ring-white transition"
-              >
-                <input
-                  type="text"
-                  placeholder="Search product..."
-                  onChange={(e) => onSearch(e.target.value)}
-                  className="w-full bg-transparent border-none text-sm 
-                  text-gray-800 placeholder:text-gray-500 focus:ring-0"
-                />
+              <div className="hidden md:block relative">
+                {!searchOpen ? (
+                  <button
+                    onClick={() => setSearchOpen(true)}
+                    className="flex items-center justify-center text-neutral-800 hover:text-black transition-colors duration-200"
+                    aria-label="Search"
+                  >
+                    <Search className="w-5 h-5" />
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-1.5 border border-neutral-300">
+                    <Search className="w-4 h-4 text-neutral-700" />
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        onSearch(e.target.value);
+                      }}
+                      autoFocus
+                      className="w-40 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
+                      style={{ fontFamily: JOST }}
+                    />
+                    <button onClick={() => setSearchOpen(false)}>
+                      <X className="w-4 h-4 text-neutral-700" />
+                    </button>
+                  </div>
+                )}
               </div>
+
+              {/* CART — badge muncul otomatis dari localStorage */}
+              <Link
+                href="/cart"
+                className="relative flex items-center justify-center text-neutral-800 hover:text-black transition-colors duration-200"
+                aria-label="Cart"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span
+                    className="absolute -top-2 -right-2.5 min-w-[16px] h-4 px-1 bg-black text-white text-[10px] flex items-center justify-center rounded-full font-medium leading-none"
+                    style={{ fontFamily: JOST }}
+                  >
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </span>
+                )}
+              </Link>
 
               {/* LOGIN */}
               <Link
                 href="/auth/login"
-                className="hidden sm:inline-flex items-center px-5 py-2 rounded-full
-                border border-gray-900 text-gray-900 text-sm font-medium
-                hover:bg-gray-900 hover:text-white transition-all"
+                className="hidden md:flex items-center gap-2 px-5 py-2 text-[12px] tracking-[0.15em] font-medium border border-black text-black hover:bg-black hover:text-white transition-all duration-300"
               >
-                Login
+                <User className="w-4 h-4" />
+                LOGIN
               </Link>
 
-              {/* HAMBURGER */}
+              {/* MOBILE TOGGLE */}
               <button
                 onClick={() => setMobileOpen(true)}
-                className="md:hidden flex items-center justify-center size-9 rounded-lg
-                border border-gray-50 bg-gray-900 hover:bg-gray-900 transition"
+                className="lg:hidden flex items-center justify-center text-neutral-800 hover:text-black transition-colors"
+                aria-label="Open menu"
               >
-                <svg
-                  className="size-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
+                <Menu className="w-6 h-6" />
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* MOBILE OVERLAY */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 md:hidden">
-          {/* SLIDE PANEL */}
-          <div className="absolute top-0 right-0 h-full w-[80%] max-w-sm bg-white shadow-xl animate-slideIn">
-            {/* HEADER MOBILE */}
-            <div className="flex items-center justify-between px-6 py-5 border-b">
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="size-9 flex items-center justify-center rounded-lg
-                border border-gray-300 hover:bg-gray-100"
-              >
-                <svg
-                  className="size-5 text-red-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
+      {/* ── MOBILE PANEL ── */}
+      <div
+        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+        onClick={() => setMobileOpen(false)}
+      />
 
-            {/* MENU LIST */}
-            <nav className="flex flex-col px-6 py-6 space-y-6">
-              {menus.map((menu) => (
-                <Link
-                  key={menu.label}
-                  href={menu.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-base font-medium text-gray-800
-                  hover:text-black transition"
-                >
-                  {menu.label}
-                </Link>
-              ))}
+      <div
+        className={`fixed right-0 top-0 h-full z-50 w-[85%] max-w-[340px] bg-white flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        style={{ fontFamily: JOST }}
+      >
+        {/* Panel Header */}
+        <div className="flex items-center justify-between px-7 py-5 border-b border-neutral-100">
+          <img src="/lg-ravella-gold.png" alt="Ravelle Logo" className="h-5 w-auto" />
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="w-8 h-8 flex items-center justify-center border border-neutral-200 hover:border-black hover:bg-black hover:text-white transition-all duration-200"
+            aria-label="Close menu"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
-              <Link
-                href="/auth/login"
-                onClick={() => setMobileOpen(false)}
-                className="mt-6 inline-flex items-center justify-center py-3 rounded-full
-                border border-gray-900 text-gray-900 text-sm font-medium
-                hover:bg-gray-900 hover:text-white transition"
-              >
-                Login
-              </Link>
-            </nav>
+        {/* Mobile Search */}
+        <div className="px-7 py-4 border-b border-neutral-100">
+          <div className="flex items-center gap-2 px-3 py-2 border border-neutral-200">
+            <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="Cari produk..."
+              className="flex-1 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
+              style={{ fontFamily: JOST }}
+            />
           </div>
         </div>
-      )}
 
-      {/* ANIMATION */}
-      <style jsx>{`
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out forwards;
-        }
-        @keyframes slideIn {
-          from {
-            transform: translateX(100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
+        {/* Nav Links */}
+        <nav className="flex-1 overflow-y-auto px-7 py-6">
+          <p className="text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-4">
+            Menu
+          </p>
+          <div className="flex flex-col">
+            {menus.map((menu) => (
+              <Link
+                key={menu.label}
+                href={menu.href}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-between py-4 border-b border-neutral-100 text-[13px] tracking-[0.2em] font-medium text-neutral-800 hover:text-black transition-colors duration-200 group"
+              >
+                <span>{menu.label}</span>
+                <span className="w-0 h-[1px] bg-black group-hover:w-4 transition-all duration-300" />
+              </Link>
+            ))}
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="mt-8 flex flex-col gap-3">
+            <Link
+              href="/auth/login"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-800 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              Login / Daftar
+            </Link>
+            <Link
+              href="/cart"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-center gap-2 w-full py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-100 transition-colors"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Keranjang
+              {cartCount > 0 && (
+                <span
+                  className="ml-1 min-w-[20px] h-5 px-1 bg-black text-white text-[10px] flex items-center justify-center rounded-full"
+                  style={{ fontFamily: JOST }}
+                >
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        </nav>
+
+        {/* Panel Footer */}
+        <div className="px-7 py-5 border-t border-neutral-100">
+          <p className="text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-3">
+            Ikuti Kami
+          </p>
+          <div className="flex gap-2.5 mb-4">
+            {[
+              { icon: Instagram, href: "https://instagram.com/ravelle", label: "Instagram" },
+              { icon: Facebook, href: "https://facebook.com/ravelle", label: "Facebook" },
+              { icon: Phone, href: "https://wa.me/628123456789", label: "WhatsApp" },
+            ].map(({ icon: Icon, href, label }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="w-8 h-8 flex items-center justify-center border border-neutral-200 text-neutral-600 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
+              >
+                <Icon className="w-3.5 h-3.5" />
+              </a>
+            ))}
+          </div>
+          <p className="text-[10px] text-neutral-400 font-light tracking-wide">
+            © 2026 Ravelle. All rights reserved.
+          </p>
+        </div>
+      </div>
     </>
   );
 }

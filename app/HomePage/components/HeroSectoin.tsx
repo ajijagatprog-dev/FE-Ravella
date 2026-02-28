@@ -4,12 +4,27 @@ import {
   ArrowRight,
   ShieldCheck,
   Truck,
-  Sparkles,
   Star,
   Award,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import Link from "next/link";
+
+// ─── SETUP FONT (tambahkan ke layout.tsx / _document.tsx) ────────────────────
+// <link rel="preconnect" href="https://fonts.googleapis.com" />
+// <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+// <link
+//   href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap"
+//   rel="stylesheet"
+// />
+//
+// tailwind.config.ts:
+// fontFamily: {
+//   serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+//   sans:  ['Jost', 'system-ui', 'sans-serif'],
+// }
+// ─────────────────────────────────────────────────────────────────────────────
 
 const HERO_IMAGES = [
   "/Hero/banner1.png",
@@ -19,30 +34,36 @@ const HERO_IMAGES = [
 
 const HERO_DATA = [
   {
-    badge: "🔥 PENAWARAN TERBAIK",
+    badge: "PENAWARAN TERBAIK",
     title: "Peralatan Dapur Premium",
     subtitle: "Koleksi Best Seller",
     description:
       "Temukan peralatan dapur berkualitas tinggi dengan harga terjangkau. Sempurnakan setiap masakan Anda.",
     cta: "Belanja Sekarang",
+    link: "/products",
   },
   {
-    badge: "✨ KOLEKSI TERBARU",
+    badge: "KOLEKSI TERBARU",
     title: "Inovasi Dapur Modern",
     subtitle: "New Arrival 2025",
     description:
       "Hadirkan inovasi terbaru ke dapur Anda. Desain modern, fungsi maksimal, kualitas terjamin.",
     cta: "Lihat Koleksi",
+    link: "/products/new",
   },
   {
-    badge: "💎 KUALITAS PREMIUM",
+    badge: "KUALITAS PREMIUM",
     title: "Investasi Terbaik Anda",
     subtitle: "Garansi Resmi",
     description:
       "Produk original dengan garansi resmi. Layanan purna jual terpercaya untuk kepuasan Anda.",
     cta: "Jelajahi Sekarang",
+    link: "/products",
   },
 ];
+
+const JOST = "'Jost', system-ui, sans-serif";
+const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function HeroSection() {
   const [active, setActive] = useState(0);
@@ -72,149 +93,105 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative w-full overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Subtle animated background */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
-      </div>
-
-      {/* HERO CONTAINER */}
+    <section
+      className="relative w-full overflow-hidden bg-neutral-900"
+      style={{ fontFamily: JOST }}
+    >
       <div className="relative max-w-[1600px] mx-auto">
-        {/* HERO IMAGE & CONTENT */}
+
+        {/* ── HERO IMAGE & CONTENT ── */}
         <div className="relative h-[480px] sm:h-[540px] md:h-[600px] lg:h-[680px] xl:h-[720px] w-full">
           <HeroBackground active={active} />
 
-          {/* Navigation Arrows */}
+          {/* Nav Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center hover:scale-110 group"
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center border border-white/25 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 group"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 group-hover:-translate-x-0.5 transition-transform" />
+            <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center hover:scale-110 group"
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center border border-white/25 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 group"
             aria-label="Next slide"
           >
-            <ChevronRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
           </button>
 
           <HeroContent active={active} isLoaded={isLoaded} />
         </div>
 
-        {/* CONTROLS & INDICATORS */}
-        <div className="relative px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
-          {/* Navigation Dots & Progress */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 py-6 sm:py-8">
-            {/* Dots */}
-            <div className="flex items-center gap-3">
+        {/* ── CONTROLS ── */}
+        <div className="relative px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 border-t border-white/10">
+
+          {/* Dots & Progress */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 py-5 sm:py-6">
+            <div className="flex items-center gap-4">
               {HERO_IMAGES.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => {
-                    setActive(i);
-                    setProgress(0);
-                  }}
+                  onClick={() => { setActive(i); setProgress(0); }}
                   className="relative group"
                   aria-label={`Go to slide ${i + 1}`}
                 >
                   <div
-                    className={`h-2 rounded-full transition-all duration-500 ${
-                      active === i
-                        ? "w-12 sm:w-16 bg-gradient-to-r from-orange-500 to-pink-500 shadow-lg shadow-orange-500/50"
-                        : "w-2 bg-white/30 hover:bg-white/50 hover:w-8"
-                    }`}
+                    className={`h-[1px] transition-all duration-500 ${active === i
+                        ? "w-10 sm:w-12 bg-white"
+                        : "w-4 bg-white/30 hover:bg-white/60 hover:w-7"
+                      }`}
                   />
-                  {/* Tooltip */}
                   <div
-                    className={`absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg transition-all duration-300 shadow-xl pointer-events-none ${
-                      active === i
+                    className={`absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 bg-neutral-900 border border-white/10 text-white/80 text-[9px] tracking-[0.2em] uppercase pointer-events-none transition-all duration-200 ${active === i
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
-                    }`}
+                      }`}
+                    style={{ fontFamily: JOST }}
                   >
-                    <div className="font-semibold">{HERO_DATA[i].subtitle}</div>
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                    {HERO_DATA[i].subtitle}
                   </div>
                 </button>
               ))}
             </div>
 
-            {/* Progress Bar */}
             <div className="w-full sm:w-56 md:w-64 flex items-center gap-3">
-              <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
+              <div className="flex-1 h-[1px] bg-white/15 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 transition-all rounded-full"
+                  className="h-full bg-white transition-all duration-100"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className="text-white/60 text-xs font-medium min-w-[3rem]">
-                {active + 1} / {HERO_IMAGES.length}
+              <span
+                className="text-white/50 text-[11px] font-light tracking-[0.2em] min-w-[3rem]"
+                style={{ fontFamily: JOST }}
+              >
+                {String(active + 1).padStart(2, "0")} /{" "}
+                {String(HERO_IMAGES.length).padStart(2, "0")}
               </span>
             </div>
           </div>
 
           {/* Feature Badges */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pb-8 sm:pb-10 md:pb-12">
-            <FeatureBadge
-              icon={<Truck className="w-5 h-5" />}
-              label="Gratis Ongkir"
-              subtext="Min. Belanja 100k"
-            />
-            <FeatureBadge
-              icon={<ShieldCheck className="w-5 h-5" />}
-              label="Garansi Resmi"
-              subtext="100% Original"
-            />
-            <FeatureBadge
-              icon={<Award className="w-5 h-5" />}
-              label="Kualitas Premium"
-              subtext="Trusted Quality"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10 border-t border-white/10 mb-8 sm:mb-10">
+            <FeatureBadge icon={<Truck className="w-4 h-4" />} label="Gratis Ongkir" subtext="Min. Belanja 100k" />
+            <FeatureBadge icon={<ShieldCheck className="w-4 h-4" />} label="Garansi Resmi" subtext="100% Original" />
+            <FeatureBadge icon={<Award className="w-4 h-4" />} label="Kualitas Premium" subtext="Trusted Quality" />
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes blob {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </section>
   );
 }
 
-/* ================= BACKGROUND ================= */
+/* ── BACKGROUND ── */
 function HeroBackground({ active }: { active: number }) {
   return (
-    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className="absolute inset-0 bg-neutral-900">
       {HERO_IMAGES.map((img, i) => (
         <div
           key={i}
-          className={`absolute inset-0 transition-all duration-[1200ms] ease-in-out ${
-            active === i ? "opacity-100 scale-100" : "opacity-0 scale-105"
-          }`}
+          className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out ${active === i ? "opacity-100" : "opacity-0"
+            }`}
         >
           <div
             className="absolute inset-0"
@@ -222,121 +199,133 @@ function HeroBackground({ active }: { active: number }) {
               backgroundImage: `url(${img})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
             }}
           />
         </div>
       ))}
-
-      {/* Sophisticated gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/80" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
+      {/* Left-to-right gradient — text sits on the darker left side */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25" />
     </div>
   );
 }
 
-/* ================= CONTENT ================= */
-function HeroContent({
-  active,
-  isLoaded,
-}: {
-  active: number;
-  isLoaded: boolean;
-}) {
+/* ── CONTENT ── */
+function HeroContent({ active, isLoaded }: { active: number; isLoaded: boolean }) {
   const data = HERO_DATA[active];
+  const anim = (delay: string) =>
+    `transform transition-all duration-700 ${delay} ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
+    }`;
 
   return (
     <div className="relative z-10 h-full flex items-center">
       <div className="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
-        <div className="max-w-2xl lg:max-w-3xl">
+        <div className="max-w-xl lg:max-w-2xl">
+
           {/* Badge */}
-          <div
-            className={`transform transition-all duration-700 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-          >
-            <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-4 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 backdrop-blur-xl border border-orange-400/30 text-white rounded-full shadow-lg">
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-300" />
-              <span className="text-xs sm:text-sm font-bold tracking-wide">
+          <div className={anim("delay-0")}>
+            <div className="inline-flex items-center gap-2.5 mb-4 sm:mb-5">
+              <div className="w-5 h-[1px] bg-white/50" />
+              <span
+                className="text-[10px] sm:text-[11px] font-medium tracking-[0.28em] uppercase text-white/70"
+                style={{ fontFamily: JOST }}
+              >
                 {data.badge}
               </span>
             </div>
           </div>
 
           {/* Subtitle */}
-          <div
-            className={`transform transition-all duration-700 delay-75 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-          >
-            <p className="text-orange-400 font-semibold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 tracking-wide uppercase">
+          <div className={anim("delay-75")}>
+            <p
+              className="text-white/60 font-light text-[11px] sm:text-xs mb-3 tracking-[0.22em] uppercase"
+              style={{ fontFamily: JOST }}
+            >
               {data.subtitle}
             </p>
           </div>
 
-          {/* Title */}
-          <div
-            className={`transform transition-all duration-700 delay-150 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-          >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.1] text-white mb-4 sm:mb-5 md:mb-6">
-              {data.title.split(" ").slice(0, 2).join(" ")}{" "}
-              <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent drop-shadow-lg">
+          {/* Title — Cormorant Garamond, brand-matched serif */}
+          <div className={anim("delay-150")}>
+            <h1
+              className="text-[42px] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[78px] font-light leading-[1.05] text-white mb-4 sm:mb-5"
+              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+            >
+              {data.title.split(" ").slice(0, 2).join(" ")}
+              <em
+                className="block not-italic font-semibold mt-0.5"
+                style={{ fontFamily: CORMORANT, fontStyle: "italic" }}
+              >
                 {data.title.split(" ").slice(2).join(" ")}
-              </span>
+              </em>
             </h1>
           </div>
 
+          {/* Thin rule */}
+          <div className={anim("delay-[200ms]")}>
+            <div className="w-10 h-[1px] bg-white/30 mb-4 sm:mb-5" />
+          </div>
+
           {/* Description */}
-          <div
-            className={`transform transition-all duration-700 delay-225 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-          >
-            <p className="text-gray-200 text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed max-w-xl mb-6 sm:mb-8">
+          <div className={anim("delay-[225ms]")}>
+            <p
+              className="text-white/75 text-sm sm:text-base leading-relaxed max-w-md mb-7 sm:mb-8 font-light"
+              style={{ fontFamily: JOST }}
+            >
               {data.description}
             </p>
           </div>
 
-          {/* CTA Buttons */}
-          <div
-            className={`flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 transform transition-all duration-700 delay-300 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-          >
-            <button className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold text-sm sm:text-base hover:shadow-2xl hover:shadow-orange-500/50 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2">
-              <span>{data.cta}</span>
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl border-2 border-white/60 text-white backdrop-blur-xl bg-white/5 hover:bg-white/10 hover:border-white/80 transition-all duration-300 font-semibold text-sm sm:text-base hover:scale-[1.02]">
+          {/* CTA */}
+          <div className={`flex flex-col sm:flex-row gap-3 sm:gap-4 mb-7 ${anim("delay-300")}`}>
+            <Link
+              href="/product"
+              className="group w-full sm:w-auto px-8 py-3.5 bg-white text-neutral-900 font-medium text-[11px] tracking-[0.22em] uppercase hover:bg-neutral-100 transition-all duration-300 flex items-center justify-center gap-3"
+              style={{ fontFamily: JOST }}
+            >
+              {data.cta}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/promo"
+              className="w-full sm:w-auto px-8 py-3.5 border border-white/40 text-white hover:bg-white/10 hover:border-white/70 transition-all duration-300 font-light text-[11px] tracking-[0.22em] uppercase text-center"
+              style={{ fontFamily: JOST }}
+            >
               Lihat Semua Promo
-            </button>
+            </Link>
           </div>
 
-          {/* Rating & Trust Indicators */}
-          <div
-            className={`flex flex-wrap items-center gap-4 sm:gap-6 transform transition-all duration-700 delay-375 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-          >
-            <div className="flex items-center gap-2 backdrop-blur-xl bg-white/10 px-3 sm:px-4 py-2 rounded-full border border-white/20">
-              <div className="flex gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-yellow-400 text-yellow-400"
-                  />
-                ))}
-              </div>
-              <span className="text-white font-bold text-xs sm:text-sm">
+          {/* Trust */}
+          <div className={`flex flex-wrap items-center gap-5 sm:gap-6 ${anim("delay-[375ms]")}`}>
+            <div className="flex items-center gap-2">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+              ))}
+              <span
+                className="text-white font-medium text-xs tracking-[0.1em] ml-1"
+                style={{ fontFamily: JOST }}
+              >
                 4.9
               </span>
             </div>
-            <div className="flex items-center gap-2 text-white/90">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
-              <span className="text-xs sm:text-sm font-medium">
-                <span className="font-bold text-white">12,500+</span> Pelanggan
-                Puas
+            <div
+              className="flex items-center gap-2"
+              style={{ fontFamily: JOST }}
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+              <span className="text-white/65 text-xs font-light tracking-[0.08em]">
+                <span className="font-medium text-white">12,500+</span> Pelanggan Puas
               </span>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   );
 }
 
-/* ================= FEATURE BADGE ================= */
+/* ── FEATURE BADGE ── */
 function FeatureBadge({
   icon,
   label,
@@ -347,18 +336,18 @@ function FeatureBadge({
   subtext: string;
 }) {
   return (
-    <div className="group relative overflow-hidden flex items-center gap-3 sm:gap-4 bg-white/5 backdrop-blur-xl border border-white/10 px-4 sm:px-5 py-3 sm:py-4 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
-      {/* Hover gradient effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-      <div className="relative flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-orange-500/20 to-pink-500/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
+    <div
+      className="group flex items-center gap-3 px-5 sm:px-6 py-4 sm:py-5 hover:bg-white/5 transition-colors duration-300"
+      style={{ fontFamily: JOST }}
+    >
+      <div className="flex-shrink-0 text-white/60 group-hover:text-white/90 transition-colors duration-300">
         {icon}
       </div>
-      <div className="relative">
-        <div className="font-bold text-white text-xs sm:text-sm md:text-base leading-tight">
+      <div>
+        <div className="font-medium text-white text-[11px] tracking-[0.18em] uppercase leading-tight">
           {label}
         </div>
-        <div className="text-white/60 text-[10px] sm:text-xs mt-0.5">
+        <div className="text-white/45 text-[10px] mt-0.5 tracking-[0.12em] font-light">
           {subtext}
         </div>
       </div>
