@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Shield, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import api from "@/lib/axios";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -33,60 +34,54 @@ export default function AdminLoginPage() {
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      // ─────────────────────────────────────────────
-      // Dummy Seeder Admin, Customer & B2B
-      // ─────────────────────────────────────────────
-      const dummyUsers = [
-        {
-          email: "admin@example.com",
-          password: "admin123",
-          role: "admin",
-        },
-        {
-          email: "customer@example.com",
-          password: "customer123",
-          role: "customer",
-        },
-        {
-          email: "b2b@example.com",
-          password: "b2b123",
-          role: "b2b",
-        },
-      ];
+    try {
+      const response = await api.post('/auth/login', {
+        email: formData.email,
+        password: formData.password
+      });
 
-      const foundUser = dummyUsers.find(
-        (user) =>
-          user.email === formData.email &&
-          user.password === formData.password
-      );
+      if (response.data.status === 'success') {
+        const { user, access_token } = response.data.data;
 
-      if (foundUser) {
+        // Save the real token
+        // In the existing code, role might not be explicitly set.
+        // If 'role' is not in user table, we'll map using email domain or an explicit type field.
+        // Default to admin for now if type isn't present, or use user.role if you add it.
+        const userRole = user.role || 'admin';
+
         localStorage.setItem(
           "auth",
           JSON.stringify({
-            email: foundUser.email,
-            role: foundUser.role,
+            email: user.email,
+            role: userRole,
+            token: access_token,
             loggedIn: true,
           })
         );
 
-        // Redirect berdasarkan role
-        if (foundUser.role === "admin") {
+        if (userRole === "admin") {
           router.push("/admin/dashboard");
-        } else if (foundUser.role === "customer") {
+        } else if (userRole === "customer") {
           router.push("/customer/dashboard");
-        } else if (foundUser.role === "b2b") {
+        } else if (userRole === "b2b") {
           router.push("/b2b/dashboard");
+        } else {
+          router.push("/admin/dashboard");
         }
+      }
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        setErrors({
+          general: error.response.data.message,
+        });
       } else {
         setErrors({
           general: "Email atau password salah",
         });
       }
+    }
 
-      setIsSubmitting(false);
-    }, 1000);
+    setIsSubmitting(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -111,6 +106,8 @@ export default function AdminLoginPage() {
           {errors.general}
         </div>
       )}
+
+
 
       {/* Form */}
       <div className="space-y-4">

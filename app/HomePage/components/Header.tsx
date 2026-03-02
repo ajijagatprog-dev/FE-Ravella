@@ -76,8 +76,8 @@ export default function Header({
     <>
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled
-            ? "bg-white/90 backdrop-blur-md border-b border-neutral-200"
-            : "bg-white border-b border-neutral-200"
+          ? "bg-white/90 backdrop-blur-md border-b border-neutral-200"
+          : "bg-white border-b border-neutral-200"
           }`}
         style={{ fontFamily: JOST }}
       >
@@ -160,14 +160,38 @@ export default function Header({
                 )}
               </Link>
 
-              {/* LOGIN */}
-              <Link
-                href="/auth/login"
-                className="hidden md:flex items-center gap-2 px-5 py-2 text-[12px] tracking-[0.15em] font-medium border border-black text-black hover:bg-black hover:text-white transition-all duration-300"
-              >
-                <User className="w-4 h-4" />
-                LOGIN
-              </Link>
+              {/* LOGIN / ACCOUNT */}
+              <div className="hidden md:block relative group">
+                <Link
+                  href="/auth/login"
+                  className="flex items-center gap-2 px-5 py-2 text-[12px] tracking-[0.15em] font-medium border border-black text-black hover:bg-black hover:text-white transition-all duration-300"
+                >
+                  <User className="w-4 h-4" />
+                  ACCOUNT
+                </Link>
+
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-neutral-100 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top translate-y-2 group-hover:translate-y-0">
+                  <Link
+                    href="/auth/login"
+                    className="block px-4 py-3 text-[11px] tracking-[0.1em] text-neutral-800 hover:bg-neutral-50 hover:text-black border-b border-neutral-50"
+                  >
+                    LOGIN
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="block px-4 py-3 text-[11px] tracking-[0.1em] text-neutral-800 hover:bg-neutral-50 hover:text-black border-b border-neutral-50"
+                  >
+                    DAFTAR CUSTOMER
+                  </Link>
+                  <Link
+                    href="/auth/register-b2b"
+                    className="block px-4 py-3 text-[11px] tracking-[0.1em] text-neutral-800 hover:bg-neutral-50 hover:text-[#8B5E3C]"
+                  >
+                    DAFTAR MITRA B2B
+                  </Link>
+                </div>
+              </div>
 
               {/* MOBILE TOGGLE */}
               <button

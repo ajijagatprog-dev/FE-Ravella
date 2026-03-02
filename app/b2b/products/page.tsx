@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import CatalogHeader from "./components/CatalogHeader";
 import CatalogFilters from "./components/CatalogFilters";
@@ -8,9 +8,9 @@ import ProductGrid from "./components/ProductGrid";
 import CatalogPagination from "./components/CatalogPagination";
 import AddToOrderToast from "./components/AddToOrderToast";
 import QuickOrderModal from "./components/QuickOrderModal";
-import { MOCK_PRODUCTS } from "./mockData";
 import type { Category, Product } from "./types";
 import { addProductToCart } from "../cartUtils"; // ← dari b2b/cartUtils
+import api from "@/lib/axios";
 
 const PAGE_SIZE = 8;
 
@@ -23,20 +23,33 @@ export default function B2BProductsPage() {
     const [toastProduct, setToastProduct] = useState<string | null>(null);
     const [quickOrderOpen, setQuickOrderOpen] = useState(false);
 
-    const filtered = useMemo(() => {
-        return MOCK_PRODUCTS.filter((p) => {
-            const matchSearch =
-                search === "" ||
-                p.name.toLowerCase().includes(search.toLowerCase()) ||
-                p.sku.toLowerCase().includes(search.toLowerCase());
-            const matchCategory =
-                activeCategory === "All Products" || p.category === activeCategory;
-            return matchSearch && matchCategory;
-        });
-    }, [search, activeCategory]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [totalProducts, setTotalProducts] = useState(0);
 
-    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-    const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const fetchProducts = async () => {
+        try {
+            const res = await api.get('/products', {
+                params: {
+                    limit: PAGE_SIZE,
+                    page,
+                    search: search || undefined,
+                    category: activeCategory !== "All Products" ? activeCategory : undefined
+                }
+            });
+            if (res.data.status === 'success') {
+                setProducts(res.data.data.data);
+                setTotalProducts(res.data.data.total);
+            }
+        } catch (error) {
+            console.error("Failed to fetch products", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, [page, search, activeCategory]);
+
+    const totalPages = Math.max(1, Math.ceil(totalProducts / PAGE_SIZE));
 
     const handleSearchChange = (v: string) => { setSearch(v); setPage(1); };
     const handleCategoryChange = (c: Category) => { setActiveCategory(c); setPage(1); };
@@ -57,7 +70,7 @@ export default function B2BProductsPage() {
     return (
         <div className="px-6 py-6 max-w-screen-xl mx-auto">
             <CatalogHeader
-                total={MOCK_PRODUCTS.length}
+                total={totalProducts}
                 onExportPDF={handleExportPDF}
                 onQuickOrder={() => setQuickOrderOpen(true)}
             />
@@ -67,11 +80,11 @@ export default function B2BProductsPage() {
                 activeCategory={activeCategory}
                 onCategoryChange={handleCategoryChange}
             />
-            <ProductGrid products={paginated} onAddToOrder={handleAddToOrder} />
+            <ProductGrid products={products} onAddToOrder={handleAddToOrder} />
             <CatalogPagination
                 page={page}
                 totalPages={totalPages}
-                totalItems={filtered.length}
+                totalItems={totalProducts}
                 pageSize={PAGE_SIZE}
                 onPageChange={setPage}
             />

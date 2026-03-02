@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, Mail, Phone, Lock, Eye, EyeOff, Check, X, AlertCircle, Loader2 } from "lucide-react";
+import api from "@/lib/axios";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -71,10 +72,48 @@ export default function RegisterPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("Register berhasil 🚀");
-    }, 1500);
+    try {
+      const response = await api.post('/auth/register', {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phone_number: formData.phone
+      });
+
+      if (response.data.status === 'success') {
+        const { user, access_token } = response.data.data;
+        const userRole = user.role || 'customer';
+
+        // Auto login logic after registration
+        localStorage.setItem(
+          "auth",
+          JSON.stringify({
+            email: user.email,
+            role: userRole,
+            token: access_token,
+            loggedIn: true,
+          })
+        );
+
+        alert("Register berhasil 🚀");
+        router.push("/customer/dashboard");
+      }
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        // Mapping backend validation errors to frontend
+        const backendErrors = error.response.data.errors;
+        const formattedErrors: Record<string, string> = {};
+        if (backendErrors.email) formattedErrors.email = backendErrors.email[0];
+        if (backendErrors.name) formattedErrors.fullName = backendErrors.name[0];
+        if (backendErrors.password) formattedErrors.password = backendErrors.password[0];
+
+        setErrors(formattedErrors);
+      } else {
+        alert(error.response?.data?.message || "Terjadi kesalahan saat pendaftaran");
+      }
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -162,12 +201,11 @@ export default function RegisterPage() {
                 border bg-white text-sm text-[#1a1a1a]
                 placeholder:text-gray-300
                 transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
-                ${
-                  touched.password && errors.password
-                    ? "border-red-400"
-                    : focused === "password"
-                      ? "border-[#8B5E3C] shadow-sm"
-                      : "border-gray-200 hover:border-gray-300"
+                ${touched.password && errors.password
+                  ? "border-red-400"
+                  : focused === "password"
+                    ? "border-[#8B5E3C] shadow-sm"
+                    : "border-gray-200 hover:border-gray-300"
                 }`}
             />
             <button
@@ -223,10 +261,9 @@ export default function RegisterPage() {
           disabled={isSubmitting || !agreeTerms}
           className={`w-full h-12 rounded-xl font-bold text-white text-sm tracking-wide
             transition-all duration-200 flex items-center justify-center gap-2
-            ${
-              isSubmitting || !agreeTerms
-                ? "bg-[#8B5E3C]/40 cursor-not-allowed"
-                : "bg-[#8B5E3C] hover:bg-[#7a5234] active:scale-[0.98] shadow-md shadow-[#8B5E3C]/30 hover:shadow-lg hover:shadow-[#8B5E3C]/40"
+            ${isSubmitting || !agreeTerms
+              ? "bg-[#8B5E3C]/40 cursor-not-allowed"
+              : "bg-[#8B5E3C] hover:bg-[#7a5234] active:scale-[0.98] shadow-md shadow-[#8B5E3C]/30 hover:shadow-lg hover:shadow-[#8B5E3C]/40"
             }`}
         >
           {isSubmitting ? (
@@ -336,12 +373,11 @@ function Field({
             border bg-white text-sm text-[#1a1a1a]
             placeholder:text-gray-300
             transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
-            ${
-              touched && error
-                ? "border-red-400"
-                : isFocused
-                  ? "border-[#8B5E3C] shadow-sm"
-                  : "border-gray-200 hover:border-gray-300"
+            ${touched && error
+              ? "border-red-400"
+              : isFocused
+                ? "border-[#8B5E3C] shadow-sm"
+                : "border-gray-200 hover:border-gray-300"
             }`}
         />
         {touched && !error && value && (

@@ -8,6 +8,7 @@ import BulkActionBar from "./components/BulkActionBar";
 import ModalDelete from "./components/ModalDelete";
 import ModalTambah from "./components/ModalTambah";
 import ModalEdit from "./components/ModalEdit";
+import api from "@/lib/axios";
 
 interface Product {
   id: number;
@@ -21,132 +22,9 @@ interface Product {
   b2bPrice: number;
 }
 
-const initialProducts: Product[] = [
-  {
-    id: 1,
-    name: "Ravelle Airflex Vacuum Cleaner",
-    category: "homeliving",
-    image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
-    sku: "RV-TSH-001",
-    stock: 142,
-    stockStatus: "high",
-    retailPrice: 798900,
-    b2bPrice: 598900,
-  },
-  {
-    id: 2,
-    name: "Ravelle SOLIS Dehumidifier & Air Purifier 2in1 2L",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/224-20250520175323.png",
-    sku: "RV-JNS-402",
-    stock: 8,
-    stockStatus: "low",
-    retailPrice: 1799900,
-    b2bPrice: 850000,
-  },
-  {
-    id: 3,
-    name: "Ravelle High Speed Hair Dryer-grey",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-JKT-115",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-  {
-    id: 4,
-    name: "Product 4",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-004",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-  {
-    id: 5,
-    name: "Product 5",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-005",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-  {
-    id: 6,
-    name: "Product 6",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-006",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-  {
-    id: 7,
-    name: "Product 7",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-007",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-  {
-    id: 8,
-    name: "Product 8",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-008",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-  {
-    id: 9,
-    name: "Product 9",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-009",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-  {
-    id: 10,
-    name: "Product 10",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-010",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-  {
-    id: 11,
-    name: "Product 11",
-    category: "homeliving",
-    image: "https://www.ravelle.co.id/data/product_cover/207-20250109102859.png",
-    sku: "RV-011",
-    stock: 24,
-    stockStatus: "medium",
-    retailPrice: 899900,
-    b2bPrice: 799900,
-  },
-];
-
 export default function ProductManagementPage() {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("latest");
@@ -159,6 +37,48 @@ export default function ProductManagementPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 8;
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const res = await api.get('/products', {
+        params: {
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          search: searchQuery || undefined,
+          sort: sortBy 
+        }
+      });
+      if (res.data.status === 'success') {
+        const fetchedData = res.data.data.data;
+        // Map the backend product model to frontend Product interface if necessary
+        // Assuming backend has: id, name, category, image, price (retailPrice), sale_price (b2bPrice), stock
+        const mappedProducts = fetchedData.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          category: item.category || 'homeliving',
+          image: item.image || 'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80',
+          sku: item.slug || `SKU-${item.id}`,
+          stock: item.stock,
+          stockStatus: item.stock > 50 ? 'high' : item.stock > 10 ? 'medium' : 'low',
+          retailPrice: item.price,
+          b2bPrice: item.sale_price !== null ? item.sale_price : item.price,
+        }));
+
+        setProducts(mappedProducts);
+        setTotalProducts(res.data.data.total);
+      }
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [currentPage, searchQuery, sortBy]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -171,7 +91,7 @@ export default function ProductManagementPage() {
   };
 
   const handleAddProduct = (product: Product) => {
-    setProducts((prev) => [product, ...prev]);
+    fetchProducts();
   };
 
   const handleEditClick = (product: Product) => {
@@ -180,9 +100,7 @@ export default function ProductManagementPage() {
   };
 
   const handleUpdateProduct = (updatedProduct: Product) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)),
-    );
+    fetchProducts();
   };
 
   const handleSingleDelete = (id: number) => {
@@ -196,33 +114,23 @@ export default function ProductManagementPage() {
     setOpenDeleteModal(true);
   };
 
-  const confirmDelete = () => {
-    setProducts((prev) =>
-      prev.filter((product) => !deleteTargetIds.includes(product.id)),
-    );
+  const confirmDelete = async () => {
+    try {
+      // Delete each product selected
+      for (const id of deleteTargetIds) {
+        await api.delete(`/products/${id}`);
+      }
+      fetchProducts();
+    } catch (error) {
+      console.error("Failed to delete product", error);
+    }
+
     setSelectedProducts([]);
     setDeleteTargetIds([]);
     setOpenDeleteModal(false);
   };
 
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
-    if (searchQuery) {
-      result = result.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-    }
-    if (sortBy === "stock-low") result.sort((a, b) => a.stock - b.stock);
-    if (sortBy === "price-high") result.sort((a, b) => b.retailPrice - a.retailPrice);
-    return result;
-  }, [products, searchQuery, sortBy]);
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredProducts, currentPage]);
+  const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
 
   const getPageNumbers = () => {
     const pages: (number | "...")[] = [];
@@ -246,17 +154,17 @@ export default function ProductManagementPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
-             <div className="p-2 bg-blue-600 rounded-lg text-white shadow-lg shadow-blue-200">
-                <Package size={24} />
-             </div>
-             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                Product Inventory
-             </h1>
+            <div className="p-2 bg-blue-600 rounded-lg text-white shadow-lg shadow-blue-200">
+              <Package size={24} />
+            </div>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+              Product Inventory
+            </h1>
           </div>
           <p className="text-slate-500 font-medium flex items-center gap-2 mt-2">
             Manage your store's stock and pricing in one place.
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 uppercase tracking-wider">
-              {products.length} Items Total
+              {totalProducts} Items Total
             </span>
           </p>
         </div>
@@ -301,7 +209,7 @@ export default function ProductManagementPage() {
                 <option value="price-high">Highest Price</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                 <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M19 9l-7 7-7-7"/></svg>
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M19 9l-7 7-7-7" /></svg>
               </div>
             </div>
 
@@ -333,7 +241,7 @@ export default function ProductManagementPage() {
       {/* ── Table Container ── */}
       <div className="rounded-3xl border border-slate-200/60 bg-white shadow-2xl shadow-slate-200/40 overflow-hidden">
         <ProductTable
-          products={paginatedProducts}
+          products={products}
           selectedProducts={selectedProducts}
           onSelectProduct={handleSelectProduct}
           onDeleteProduct={handleSingleDelete}
@@ -345,8 +253,8 @@ export default function ProductManagementPage() {
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
           <p className="text-sm font-medium text-slate-500 order-2 sm:order-1">
-            Showing <span className="text-slate-900 font-bold">{paginatedProducts.length}</span> of{" "}
-            <span className="text-slate-900 font-bold">{filteredProducts.length}</span> products
+            Showing page <span className="text-slate-900 font-bold">{currentPage}</span> of{" "}
+            <span className="text-slate-900 font-bold">{totalPages}</span>
           </p>
 
           <div className="flex items-center gap-2 order-1 sm:order-2">
@@ -366,11 +274,10 @@ export default function ProductManagementPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page as number)}
-                    className={`min-w-[40px] h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                      currentPage === page
+                    className={`min-w-[40px] h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${currentPage === page
                         ? "bg-white text-blue-600 shadow-sm scale-105"
                         : "text-slate-500 hover:text-slate-900"
-                    }`}
+                      }`}
                   >
                     {page}
                   </button>
@@ -393,8 +300,8 @@ export default function ProductManagementPage() {
       <BulkActionBar
         selectedCount={selectedProducts.length}
         onBulkDelete={handleBulkDelete}
-        onChangeCategory={() => {}}
-        onMarkInactive={() => {}}
+        onChangeCategory={() => { }}
+        onMarkInactive={() => { }}
       />
 
       {/* ── Modals ── */}
@@ -420,9 +327,8 @@ export default function ProductManagementPage() {
             ? `Hapus ${deleteTargetIds.length} Produk Terpilih?`
             : "Hapus Produk"
         }
-        description={`Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus ${
-          deleteTargetIds.length > 1 ? "produk-produk ini" : "produk ini"
-        }?`}
+        description={`Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus ${deleteTargetIds.length > 1 ? "produk-produk ini" : "produk ini"
+          }?`}
       />
     </div>
   );
