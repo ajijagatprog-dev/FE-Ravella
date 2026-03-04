@@ -10,6 +10,7 @@ import {
   Box,
   DollarSign,
 } from "lucide-react";
+import api from "@/lib/axios";
 
 interface Product {
   id: number;
@@ -37,27 +38,56 @@ export default function ModalTambah({
   const [form, setForm] = useState({
     name: "",
     category: "",
-    image: "",
+    image: null as File | null,
     sku: "",
     stock: 0,
     retailPrice: 0,
     b2bPrice: 0,
+    description: "",
+    weight: 0,
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!open) return null;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name || !form.sku) return;
 
-    const newProduct: Product = {
-      id: Date.now(),
-      ...form,
-      stockStatus:
-        form.stock <= 10 ? "low" : form.stock <= 30 ? "medium" : "high",
-    };
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('category', form.category);
+      if (form.image) formData.append('image', form.image);
+      formData.append('stock', form.stock.toString());
+      formData.append('price', form.retailPrice.toString());
+      formData.append('sale_price', form.b2bPrice.toString());
+      formData.append('description', form.description || form.name);
+      formData.append('weight', form.weight.toString() || "1000");
 
-    onAddProduct(newProduct);
-    onClose();
+      const res = await api.post('/products', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (res.data.status === 'success') {
+        const mockProduct: Product = {
+          id: res.data.data?.id || Date.now(),
+          name: form.name, category: form.category, image: res.data.data?.image || "", sku: form.sku,
+          stock: form.stock, stockStatus: form.stock <= 10 ? "low" : "high",
+          retailPrice: form.retailPrice, b2bPrice: form.b2bPrice
+        };
+
+        onAddProduct(mockProduct);
+        onClose();
+      } else {
+        alert(res.data.message || "Failed to create product");
+      }
+    } catch (error: any) {
+      console.error("Error creating product:", error);
+      alert(error.response?.data?.message || "Failed to create product. Check your inputs.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -125,16 +155,17 @@ export default function ModalTambah({
               />
             </div>
 
-            {/* SKU */}
+            {/* Weight */}
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <Barcode size={16} className="text-indigo-500" />
-                SKU
+                <Box size={16} className="text-indigo-500" />
+                Weight (gram)
               </label>
               <input
-                placeholder="e.g., SKU-001"
+                type="number"
+                placeholder="1000"
                 className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 hover:border-gray-300"
-                onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                onChange={(e) => setForm({ ...form, weight: Number(e.target.value) })}
               />
             </div>
 
@@ -142,14 +173,31 @@ export default function ModalTambah({
             <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
                 <ImageIcon size={16} className="text-pink-500" />
-                Image URL
+                Product Image
               </label>
               <input
-                placeholder="https://example.com/image.jpg"
-                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all duration-200 hover:border-gray-300"
-                onChange={(e) => setForm({ ...form, image: e.target.value })}
+                type="file"
+                accept="image/*"
+                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all duration-200 hover:border-gray-300"
+                onChange={(e) => setForm({ ...form, image: e.target.files?.[0] || null })}
               />
             </div>
+
+            {/* Description */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <Package size={16} className="text-gray-500" />
+                Description
+              </label>
+              <textarea
+                placeholder="Deskripsi produk"
+                rows={3}
+                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-gray-500 focus:ring-4 focus:ring-gray-500/10 transition-all duration-200 hover:border-gray-300"
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
+            </div>
+
+
 
             {/* Stock */}
             <div className="space-y-2">

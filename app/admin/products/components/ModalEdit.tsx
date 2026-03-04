@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { X, ImageIcon, Box, Package } from "lucide-react";
+import api from "@/lib/axios";
 
 type Product = {
   id: number;
@@ -13,7 +14,11 @@ type Product = {
   stockStatus: "high" | "medium" | "low";
   retailPrice: number;
   b2bPrice: number;
+  description?: string;
+  weight?: number;
 };
+
+type FormDataState = Product & { newImage: File | null };
 
 type Props = {
   open: boolean;
@@ -28,10 +33,18 @@ export default function ModalEdit({
   onClose,
   onUpdateProduct,
 }: Props) {
-  const [form, setForm] = useState<Product | null>(product);
+  const [form, setForm] = useState<FormDataState | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setForm(product);
+    if (product) {
+      setForm({
+        ...product,
+        description: product.description || product.name,
+        weight: product.weight || 1000,
+        newImage: null
+      });
+    }
   }, [product]);
 
   if (!open || !form) return null;
@@ -46,9 +59,33 @@ export default function ModalEdit({
     });
   };
 
-  const handleSubmit = () => {
-    onUpdateProduct(form);
-    onClose();
+  const handleSubmit = async () => {
+    if (!form || !form.name) return;
+
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append('_method', 'PUT'); // Laravel requirement for multipart/form-data PUT
+      formData.append('name', form.name);
+      formData.append('category', form.category);
+      if (form.newImage) formData.append('image', form.newImage);
+      formData.append('stock', form.stock.toString());
+      formData.append('price', form.retailPrice.toString());
+      formData.append('sale_price', form.b2bPrice.toString());
+      formData.append('description', form.description || form.name);
+      formData.append('weight', form.weight?.toString() || "1000");
+
+      await api.post(`/products/${form.id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      onUpdateProduct(form);
+      onClose();
+    } catch (error) {
+      console.error("Error updating product:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -157,6 +194,49 @@ export default function ModalEdit({
                   units
                 </span>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <Box size={16} className="text-indigo-500" />
+                Weight (gram)
+              </label>
+              <input
+                type="number"
+                name="weight"
+                value={form.weight || ""}
+                placeholder="1000"
+                className="w-full rounded-xl border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 hover:border-gray-300"
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <ImageIcon size={16} className="text-pink-500" />
+                Update Image (Leave empty to keep current)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                className="w-full rounded-xl border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 text-sm font-medium focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all duration-200 hover:border-gray-300"
+                onChange={(e) => setForm({ ...form, newImage: e.target.files?.[0] || null })}
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <Package size={16} className="text-gray-500" />
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={form.description || ""}
+                placeholder="Deskripsi produk"
+                rows={3}
+                className="w-full rounded-xl border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-gray-500 focus:ring-4 focus:ring-gray-500/10 transition-all duration-200 hover:border-gray-300"
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
             </div>
           </div>
         </div>

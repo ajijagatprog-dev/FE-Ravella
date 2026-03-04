@@ -17,12 +17,8 @@ import {
     Check,
     Minus,
 } from "lucide-react";
-import {
-    type Product,
-    getProducts,
-    saveProducts,
-    defaultProducts,
-} from "../../../(public)/product/products";
+import { type Product } from "../../../(public)/product/products";
+import api from "@/lib/axios";
 
 // ── Categories ────────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -67,6 +63,7 @@ function emptyProduct(): Omit<Product, "id"> {
 // ══════════════════════════════════════════════════════════════════════════════
 export default function ProductContentPage() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [filterCat, setFilterCat] = useState("all");
     const [page, setPage] = useState(1);
@@ -74,7 +71,7 @@ export default function ProductContentPage() {
 
     // Modal state
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
-    const [editData, setEditData] = useState<Omit<Product, "id"> & { id?: number }>(emptyProduct());
+    const [editData, setEditData] = useState<Omit<Product, "id"> & { id?: number; imageFile?: File | null }>(emptyProduct());
     const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
 
     // Toast
@@ -88,9 +85,41 @@ export default function ProductContentPage() {
         setTimeout(() => setToast({ message: "", visible: false }), 2500);
     };
 
-    // Load from localStorage
+    const fetchProducts = async () => {
+        try {
+            setIsLoading(true);
+            const res = await api.get('/products', { params: { limit: 100 } });
+            if (res.data.status === 'success') {
+                const fetchedData = res.data.data.data;
+                const mapped = fetchedData.map((item: any) => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    originalPrice: item.price + (item.price * 0.2),
+                    discount: 20,
+                    image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
+                    category: item.category || "homeliving",
+                    rating: 5.0,
+                    reviews: 89,
+                    badge: item.is_featured ? "Best Seller" : "New",
+                    features: ["Premium Quality"],
+                    inStock: item.stock > 0,
+                    isNew: true,
+                    description: item.description || "Deskripsi produk",
+                    specifications: { "Berat": `${item.weight || 1000}g`, "SKU": item.slug },
+                }));
+                setProducts(mapped);
+            }
+        } catch (err) {
+            console.error("Failed to fetch backend products", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Load from backend
     useEffect(() => {
-        setProducts(getProducts());
+        fetchProducts();
     }, []);
 
     // ── Filter + Paginate ─────────────────────────────────────────────────────
@@ -108,37 +137,71 @@ export default function ProductContentPage() {
 
     // ── CRUD ──────────────────────────────────────────────────────────────────
     const openAdd = () => {
-        setEditData(emptyProduct());
+        setEditData({ ...emptyProduct(), imageFile: null });
         setModalMode("add");
     };
 
     const openEdit = (p: Product) => {
-        setEditData({ ...p });
+        setEditData({ ...p, imageFile: null });
         setModalMode("edit");
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!editData.name.trim()) return;
-        let next: Product[];
-        if (modalMode === "add") {
-            const newId = products.length ? Math.max(...products.map((p) => p.id)) + 1 : 1;
-            next = [{ ...editData, id: newId } as Product, ...products];
-        } else {
-            next = products.map((p) => (p.id === editData.id ? (editData as Product) : p));
+
+        try {
+            const formData = new FormData();
+            formData.append('name', editData.name);
+            formData.append('category', editData.category);
+            formData.append('price', editData.price.toString());
+            formData.append('sale_price', editData.originalPrice.toString());
+            formData.append('stock', editData.inStock ? "100" : "0");
+            formData.append('weight', "1000");
+            formData.append('description', editData.description || editData.name);
+
+            if (editData.badge === 'Best Seller') {
+                formData.append('is_featured', '1');
+            } else {
+                formData.append('is_featured', '0');
+            }
+
+            if (editData.imageFile) {
+                formData.append('image', editData.imageFile);
+            }
+
+            if (modalMode === "add") {
+                await api.post('/products', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                showToast("Produk berhasil ditambahkan!");
+            } else {
+                formData.append('_method', 'PUT');
+                await api.post(`/products/${editData.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                showToast("Produk berhasil diperbarui!");
+            }
+
+            setModalMode(null);
+            fetchProducts();
+        } catch (error) {
+            console.error("Error saving product:", error);
+            showToast("Gagal menyimpan produk. Periksa kembali data.");
         }
-        setProducts(next);
-        saveProducts(next);
-        setModalMode(null);
-        showToast(modalMode === "add" ? "Produk berhasil ditambahkan!" : "Produk berhasil diperbarui!");
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (!deleteTarget) return;
-        const next = products.filter((p) => p.id !== deleteTarget.id);
-        setProducts(next);
-        saveProducts(next);
-        setDeleteTarget(null);
-        showToast("Produk berhasil dihapus!");
+
+        try {
+            await api.delete(`/products/${deleteTarget.id}`);
+            showToast("Produk berhasil dihapus!");
+            setDeleteTarget(null);
+            fetchProducts();
+        } catch (error) {
+            console.error("Error deleting product:", error);
+            showToast("Gagal menghapus produk.");
+        }
     };
 
     // ── Feature / Spec helpers ────────────────────────────────────────────────
@@ -303,9 +366,9 @@ export default function ProductContentPage() {
                                         </td>
                                         <td className="px-4 py-4">
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${p.badge === "Best Seller" ? "bg-amber-100 text-amber-700" :
-                                                    p.badge === "Premium" ? "bg-purple-100 text-purple-700" :
-                                                        p.badge === "Popular" ? "bg-blue-100 text-blue-700" :
-                                                            "bg-blue-100 text-blue-700"
+                                                p.badge === "Premium" ? "bg-purple-100 text-purple-700" :
+                                                    p.badge === "Popular" ? "bg-blue-100 text-blue-700" :
+                                                        "bg-blue-100 text-blue-700"
                                                 }`}>
                                                 {p.badge}
                                             </span>
@@ -416,20 +479,24 @@ export default function ProductContentPage() {
                                 />
                             </div>
 
-                            {/* Image URL */}
+                            {/* Image URL / File */}
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                                    <ImageIcon size={12} className="inline mr-1" /> URL Gambar
+                                    <ImageIcon size={12} className="inline mr-1" /> Gambar Produk
                                 </label>
                                 <input
-                                    type="text"
-                                    value={editData.image}
-                                    onChange={(e) => setEditData((d) => ({ ...d, image: e.target.value }))}
-                                    placeholder="https://..."
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                            const file = e.target.files[0];
+                                            setEditData((d) => ({ ...d, imageFile: file, image: URL.createObjectURL(file) }));
+                                        }
+                                    }}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
                                 />
                                 {editData.image && (
-                                    <div className="mt-2 w-20 h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+                                    <div className="mt-2 w-20 h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 relative">
                                         <img src={editData.image} alt="Preview" className="w-full h-full object-cover" />
                                     </div>
                                 )}

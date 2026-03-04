@@ -16,18 +16,66 @@ import {
     Share2,
     Package,
 } from "lucide-react";
-import { useState } from "react";
 import Header from "../../../HomePage/components/Header";
 import Footer from "../../../HomePage/components/Footer";
 import { products, type Product } from "../products";
+import api from "@/lib/axios";
+import { useEffect, useState } from "react";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ProductDetail() {
     const { id } = useParams<{ id: string }>();
-    const productId = parseInt(id, 10);
-    const product = products.find((p) => p.id === productId);
+    const productId = id; // use string id or slug
+    const [product, setProduct] = useState<any | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchProductDetail = async () => {
+            try {
+                setIsLoading(true);
+                const res = await api.get(`/products/${productId}`);
+                if (res.data.status === 'success') {
+                    const item = res.data.data;
+                    setProduct({
+                        id: item.id,
+                        name: item.name,
+                        description: item.description || "Deskripsi produk",
+                        price: item.price,
+                        originalPrice: item.price + (item.price * 0.2), // Mock 20% discount if empty
+                        discount: 20,
+                        rating: 5.0, // Mock
+                        reviews: 128, // Mock
+                        category: item.category || "appliance",
+                        image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+                        features: ["Premium Quality"],
+                        specifications: { "Berat": `${item.weight || 1000}g`, "SKU": item.slug },
+                        inStock: item.stock > 0,
+                        isNew: true,
+                        badge: item.is_featured ? "Best Seller" : "",
+                    });
+
+                    // Fetch related products (mock category matching by just fetching all limit 4)
+                    const relRes = await api.get('/products', { params: { limit: 4, category: item.category || undefined } });
+                    if (relRes.data.status === 'success') {
+                        const relMapped = relRes.data.data.data.map((r: any) => ({
+                            id: r.id, name: r.name, price: r.price, image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+                            rating: 4.9, reviews: 89, originalPrice: r.price + (r.price * 0.2), discount: 20, badge: 'Hot', isNew: true
+                        }));
+                        setRelatedProducts(relMapped);
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchProductDetail();
+    }, [productId]);
+
     const [isFavorite, setIsFavorite] = useState(false);
     const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
         { visible: false, productName: "" }
@@ -71,32 +119,17 @@ export default function ProductDetail() {
         setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
     };
 
-    /* Related products: same category, excluding current */
-    const relatedProducts = product
-        ? products
-            .filter((p) => p.category === product.category && p.id !== product.id)
-            .slice(0, 4)
-        : [];
-    const suggestions =
-        relatedProducts.length >= 4
-            ? relatedProducts
-            : [
-                ...relatedProducts,
-                ...products
-                    .filter(
-                        (p) =>
-                            p.id !== productId &&
-                            !relatedProducts.some((r) => r.id === p.id)
-                    )
-                    .slice(0, 4 - relatedProducts.length),
-            ];
-
     const badgeStyle: Record<string, string> = {
         "Best Seller": "bg-neutral-900 text-white",
         Premium: "bg-neutral-700 text-white",
         Popular: "bg-neutral-100 text-neutral-700 border border-neutral-200",
         New: "bg-white text-neutral-900 border border-neutral-200",
     };
+
+    /* Loading state */
+    if (isLoading) {
+        return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-800 rounded-full animate-spin"></div></div>;
+    }
 
     /* 404 */
     if (!product) {
@@ -139,8 +172,8 @@ export default function ProductDetail() {
             {/* Toast */}
             <div
                 className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${toast.visible
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 -translate-y-4 pointer-events-none"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-4 pointer-events-none"
                     }`}
             >
                 <div
@@ -220,8 +253,8 @@ export default function ProductDetail() {
                                 <Star
                                     key={i}
                                     className={`w-4 h-4 ${i < Math.floor(product.rating)
-                                            ? "fill-yellow-400 text-yellow-400"
-                                            : "text-neutral-200"
+                                        ? "fill-yellow-400 text-yellow-400"
+                                        : "text-neutral-200"
                                         }`}
                                 />
                             ))}
@@ -288,7 +321,7 @@ export default function ProductDetail() {
                                 Fitur Utama
                             </p>
                             <div className="flex flex-wrap gap-2">
-                                {product.features.map((f, i) => (
+                                {product.features?.map((f: string, i: number) => (
                                     <span
                                         key={i}
                                         className="flex items-center gap-1.5 px-3 py-1.5 border border-neutral-200 text-neutral-600 text-[11px] tracking-[0.1em] uppercase font-medium"
@@ -310,14 +343,14 @@ export default function ProductDetail() {
                                 Spesifikasi
                             </p>
                             <div className="space-y-1.5">
-                                {Object.entries(product.specifications).map(([k, v]) => (
+                                {Object.entries(product.specifications || {}).map(([k, v]) => (
                                     <div
                                         key={k}
                                         className="flex justify-between py-2 border-b border-neutral-100 text-sm"
                                         style={{ fontFamily: JOST }}
                                     >
                                         <span className="text-neutral-400 font-light">{k}</span>
-                                        <span className="text-neutral-800 font-medium">{v}</span>
+                                        <span className="text-neutral-800 font-medium">{v as string}</span>
                                     </div>
                                 ))}
                             </div>
@@ -328,8 +361,8 @@ export default function ProductDetail() {
                             <button
                                 onClick={() => setIsFavorite(!isFavorite)}
                                 className={`w-12 h-12 flex items-center justify-center border transition-all ${isFavorite
-                                        ? "bg-neutral-900 border-neutral-900 text-white"
-                                        : "border-neutral-200 text-neutral-500 hover:border-neutral-800"
+                                    ? "bg-neutral-900 border-neutral-900 text-white"
+                                    : "border-neutral-200 text-neutral-500 hover:border-neutral-800"
                                     }`}
                             >
                                 <Heart
@@ -370,7 +403,7 @@ export default function ProductDetail() {
             </div>
 
             {/* ── RELATED PRODUCTS ── */}
-            {suggestions.length > 0 && (
+            {relatedProducts.length > 0 && (
                 <section className="bg-neutral-50 py-14 sm:py-20">
                     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
                         <div className="inline-flex items-center gap-2.5 mb-8">
@@ -385,7 +418,7 @@ export default function ProductDetail() {
                         </div>
 
                         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-                            {suggestions.map((related) => (
+                            {relatedProducts.map((related) => (
                                 <Link
                                     key={related.id}
                                     href={`/product/${related.id}`}

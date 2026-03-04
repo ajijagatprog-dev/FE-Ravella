@@ -20,16 +20,57 @@ import {
   Filter,
   Sparkles,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
-import { products } from "./products";
+import { products as fallbackProducts } from "./products";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ProductPage() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [displayLimit, setDisplayLimit] = useState(12);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const res = await api.get('/products', { params: { limit: 100 } });
+        if (res.data.status === 'success') {
+          const fetchedData = res.data.data.data;
+          const mapped = fetchedData.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description || "Deskripsi produk",
+            price: item.price,
+            originalPrice: item.price + (item.price * 0.2),
+            discount: 20,
+            rating: 5.0,
+            reviews: 89,
+            category: item.category || "appliance",
+            image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
+            features: ["Premium Quality", "Official Warranty"],
+            specifications: { "Berat": `${item.weight || 1000}g`, "SKU": item.slug },
+            inStock: item.stock > 0,
+            isNew: true,
+            badge: item.is_featured ? "Best Seller" : "",
+          }));
+          setProducts(mapped);
+        }
+      } catch (err) {
+        console.error("Failed to fetch public products", err);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL PRODUCTS");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -54,7 +95,7 @@ export default function ProductPage() {
     { id: "keyboard", name: "KEYBOARD", icon: Sparkles, count: 0 },
   ];
 
-  const handleAddToCart = (product: (typeof products)[number]) => {
+  const handleAddToCart = (product: any) => {
     // Baca cart yang ada
     const stored = localStorage.getItem("ravelle_cart");
     let cart: any[] = stored ? JSON.parse(stored) : [];
@@ -104,6 +145,14 @@ export default function ProductPage() {
       default: filtered.sort((a, b) => b.reviews - a.reviews);
     }
     return filtered;
+  }, [activeCategory, searchQuery, sortBy, priceRange, products]);
+
+  const displayedProducts = useMemo(() => {
+    return filteredProducts.slice(0, displayLimit);
+  }, [filteredProducts, displayLimit]);
+
+  useEffect(() => {
+    setDisplayLimit(12);
   }, [activeCategory, searchQuery, sortBy, priceRange]);
 
   const formatPrice = (price: number) =>
@@ -286,7 +335,7 @@ export default function ProductPage() {
         </div>
 
         {/* Products */}
-        {filteredProducts.length === 0 ? (
+        {filteredProducts.length === 0 && !isLoading ? (
           <div className="text-center py-24">
             <Package className="w-12 h-12 text-neutral-300 mx-auto mb-5" />
             <h3 className="text-4xl font-light text-neutral-900 mb-3" style={{ fontFamily: CORMORANT }}>
@@ -305,7 +354,7 @@ export default function ProductPage() {
           </div>
         ) : (
           <div className={viewMode === "grid" ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "flex flex-col gap-4"}>
-            {filteredProducts.map((product) => (
+            {displayedProducts.map((product) => (
               <div
                 key={product.id}
                 onMouseEnter={() => setHoveredProduct(product.id)}
@@ -381,7 +430,7 @@ export default function ProductPage() {
 
                   {/* Features */}
                   <div className="flex flex-wrap gap-1.5 mb-3">
-                    {product.features.map((f, i) => (
+                    {product.features?.map((f: string, i: number) => (
                       <span key={i} className="px-2 py-0.5 border border-neutral-200 text-neutral-500 text-[10px] tracking-[0.1em] uppercase font-medium" style={{ fontFamily: JOST }}>
                         {f}
                       </span>
@@ -435,9 +484,13 @@ export default function ProductPage() {
         )}
 
         {/* Load More */}
-        {filteredProducts.length > 0 && (
-          <div className="mt-14 text-center">
-            <button className="px-10 py-3.5 border border-neutral-300 text-neutral-700 text-[11px] tracking-[0.2em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all" style={{ fontFamily: JOST }}>
+        {filteredProducts.length > displayLimit && !isLoading && (
+          <div className="mt-16 text-center">
+            <button
+              onClick={() => setDisplayLimit(prev => prev + 12)}
+              className="px-10 py-3.5 border border-neutral-300 text-neutral-700 text-[11px] tracking-[0.2em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all cursor-pointer"
+              style={{ fontFamily: JOST }}
+            >
               Load More Products
             </button>
           </div>

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { ArrowRight, ShoppingBag } from "lucide-react";
+import { useState, useEffect } from "react";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -15,36 +17,31 @@ interface Product {
 }
 
 export default function NewProducts() {
-  const products: Product[] = [
-    {
-      title: "Panci Set Premium",
-      category: "Peralatan Masak",
-      price: "Rp 450.000",
-      image: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-      badge: "Best Seller",
-    },
-    {
-      title: "Knife Set Professional",
-      category: "Pisau Dapur",
-      price: "Rp 380.000",
-      image: "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=800&q=80",
-      badge: "New",
-    },
-    {
-      title: "Blender Multifungsi",
-      category: "Elektronik",
-      price: "Rp 595.000",
-      image: "https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=800&q=80",
-      badge: "Hot",
-    },
-    {
-      title: "Food Container Set",
-      category: "Penyimpanan",
-      price: "Rp 220.000",
-      image: "https://down-id.img.susercontent.com/file/d3ebf96f72eb08a71fd762fe6b6cd666_tn.webp",
-      badge: "Sale",
-    },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNewProducts = async () => {
+      try {
+        const res = await api.get('/products', { params: { limit: 4, sort: 'latest' } });
+        if (res.data.status === 'success') {
+          const mapped = res.data.data.data.map((item: any) => ({
+            title: item.name,
+            category: item.category || 'Peralatan Masak',
+            price: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(item.price),
+            image: item.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+            badge: item.is_featured ? "Best Seller" : "New",
+          }));
+          setProducts(mapped);
+        }
+      } catch (error) {
+        console.error("Failed to fetch new products", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNewProducts();
+  }, []);
 
   return (
     <section
