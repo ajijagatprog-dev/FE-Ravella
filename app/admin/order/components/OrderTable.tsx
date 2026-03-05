@@ -13,15 +13,16 @@ import {
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface Order {
-  id: string;
+  id: string; // Maps to order_number
   customer: {
     name: string;
     initials: string;
     avatarColor: string;
   };
-  date: string;
-  paymentStatus: "Success" | "Pending" | "Failed";
-  total: string;
+  date: string; // formatted date
+  status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+  total: string; // formatted total
+  rawOrder: any; // Add raw order data for modals
 }
 
 interface OrderTableProps {
@@ -31,20 +32,25 @@ interface OrderTableProps {
   limit: number;
   total: number;
   handlePageChange: (page: number) => void;
+  onUpdateStatus?: (orderNumber: string, newStatus: string) => void;
 }
 
-// ── Payment Status Badge ──────────────────────────────────────────────────────
+// ── Order Status Badge ──────────────────────────────────────────────────────
 
-export function PaymentStatusBadge({ status }: { status: Order["paymentStatus"] }) {
+export function OrderStatusBadge({ status }: { status: Order["status"] }) {
   const styles = {
-    Success: "bg-emerald-50 text-emerald-600 border border-emerald-200",
-    Pending: "bg-amber-50 text-amber-600 border border-amber-200",
-    Failed: "bg-red-50 text-red-500 border border-red-200",
+    PENDING: "bg-amber-50 text-amber-600 border border-amber-200",
+    PROCESSING: "bg-blue-50 text-blue-600 border border-blue-200",
+    SHIPPED: "bg-purple-50 text-purple-600 border border-purple-200",
+    DELIVERED: "bg-emerald-50 text-emerald-600 border border-emerald-200",
+    CANCELLED: "bg-red-50 text-red-500 border border-red-200",
   };
   const dotColors = {
-    Success: "bg-emerald-500",
-    Pending: "bg-amber-400",
-    Failed: "bg-red-500",
+    PENDING: "bg-amber-400",
+    PROCESSING: "bg-blue-500",
+    SHIPPED: "bg-purple-500",
+    DELIVERED: "bg-emerald-500",
+    CANCELLED: "bg-red-500",
   };
   return (
     <span
@@ -71,29 +77,33 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
 
 // ── Row Action Menu ───────────────────────────────────────────────────────────
 
-function RowMenu({ orderId }: { orderId: string }) {
+function RowMenu({ orderId, currentStatus, onUpdateStatus }: { orderId: string, currentStatus: string, onUpdateStatus?: (id: string, st: string) => void }) {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+        onBlur={() => setTimeout(() => setOpen(false), 200)}
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors focus:ring-2 focus:ring-blue-500 outline-none"
       >
-        <MoreHorizontal size={15} />
+        <MoreHorizontal size={18} />
       </button>
       {open && (
-        <div className="absolute right-0 z-10 mt-1 w-40 rounded-xl border border-gray-200 bg-white py-1 shadow-lg">
-          <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-            <Eye size={13} className="text-blue-500" /> View Detail
-          </button>
-          <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-            <Pencil size={13} className="text-amber-500" /> Edit Order
-          </button>
-          <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors">
-            <Trash2 size={13} /> Delete
-          </button>
+        <div className="absolute right-0 top-full z-50 mt-1 w-44 origin-top-right rounded-xl border border-gray-200 bg-white py-1.5 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 mb-1">Update Status</div>
+          {["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map(st => (
+            st !== currentStatus && (
+              <button
+                key={st}
+                disabled={!onUpdateStatus}
+                onClick={() => { onUpdateStatus?.(orderId, st); setOpen(false); }}
+                className="flex w-full items-center px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left"
+              >
+                Mark as {st}
+              </button>
+            )
+          ))}
         </div>
       )}
     </div>
@@ -123,6 +133,7 @@ export function OrderTable({
   limit,
   total,
   handlePageChange,
+  onUpdateStatus,
 }: OrderTableProps) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const startItem = total === 0 ? 0 : (page - 1) * limit + 1;
@@ -180,11 +191,11 @@ export function OrderTable({
                   </td>
                   <td className="px-4 py-4 text-gray-500">{order.date}</td>
                   <td className="px-4 py-4">
-                    <PaymentStatusBadge status={order.paymentStatus} />
+                    <OrderStatusBadge status={order.status} />
                   </td>
                   <td className="px-4 py-4 font-semibold text-gray-900">{order.total}</td>
                   <td className="px-4 py-4">
-                    <RowMenu orderId={order.id} />
+                    <RowMenu orderId={order.id} currentStatus={order.status} onUpdateStatus={onUpdateStatus} />
                   </td>
                 </tr>
               ))
@@ -218,7 +229,7 @@ export function OrderTable({
             >
               <div className="flex items-start justify-between">
                 <span className="font-semibold text-blue-500">#{order.id}</span>
-                <RowMenu orderId={order.id} />
+                <RowMenu orderId={order.id} currentStatus={order.status} onUpdateStatus={onUpdateStatus} />
               </div>
               <div className="mt-3 flex items-center gap-2.5">
                 <Avatar initials={order.customer.initials} color={order.customer.avatarColor} />
@@ -231,7 +242,7 @@ export function OrderTable({
                 </div>
                 <div className="flex flex-col gap-1 items-end">
                   <span className="text-xs text-gray-400">Status</span>
-                  <PaymentStatusBadge status={order.paymentStatus} />
+                  <OrderStatusBadge status={order.status} />
                 </div>
                 <div className="flex flex-col gap-1 items-end">
                   <span className="text-xs text-gray-400">Total</span>
@@ -264,11 +275,10 @@ export function OrderTable({
                 <button
                   key={p}
                   onClick={() => handlePageChange(Number(p))}
-                  className={`min-w-[30px] rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
-                    page === p
-                      ? "border-blue-500 bg-blue-500 text-white"
-                      : "border-gray-200 bg-white text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`min-w-[30px] rounded-md border px-2 py-1 text-xs font-medium transition-colors ${page === p
+                    ? "border-blue-500 bg-blue-500 text-white"
+                    : "border-gray-200 bg-white text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   {p}
                 </button>
