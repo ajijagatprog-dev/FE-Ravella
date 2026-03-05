@@ -41,6 +41,11 @@ export interface Article {
     status: string;
 }
 
+function toLocalYMD(dateStr?: string | null) {
+    const d = dateStr ? new Date(dateStr) : new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 // ── Empty article template ────────────────────────────────────────────────────
 function emptyArticle(): Omit<Article, "id" | "slug"> {
     return {
@@ -48,7 +53,7 @@ function emptyArticle(): Omit<Article, "id" | "slug"> {
         excerpt: "",
         image: "",
         category: "Tips & Trik",
-        date: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+        date: toLocalYMD(),
         readTime: "5 min",
         views: "0",
         isFeatured: false,
@@ -92,13 +97,13 @@ export default function NewsContentPage() {
                     excerpt: item.excerpt || (item.content ? item.content.substring(0, 100) + '...' : ''),
                     image: item.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
                     category: item.category,
-                    date: item.published_at ? new Date(item.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : '-',
+                    date: toLocalYMD(item.published_at),
                     status: item.status,
                     readTime: item.read_time || "5 min",
                     views: item.views?.toString() || "0",
                     isFeatured: item.is_featured ? true : false,
                     author: item.author || "Admin",
-                    content: [item.content],
+                    content: item.content ? item.content.split('\n\n') : [""],
                 }));
                 setArticles(mapped);
             }
@@ -149,6 +154,7 @@ export default function NewsContentPage() {
             formData.append('views', editData.views);
             formData.append('is_featured', editData.isFeatured ? '1' : '0');
             formData.append('status', editData.status || 'published');
+            formData.append('published_at', editData.date);
 
             if (editData.imageFile) {
                 formData.append('image', editData.imageFile);
@@ -344,7 +350,7 @@ export default function NewsContentPage() {
                                         <td className="px-4 py-4">
                                             <div className="flex items-center gap-1.5 text-xs text-slate-500">
                                                 <Calendar size={12} />
-                                                {a.date}
+                                                {new Date(a.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                                             </div>
                                         </td>
                                         <td className="px-4 py-4">
@@ -541,10 +547,9 @@ export default function NewsContentPage() {
                                 <div>
                                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal</label>
                                     <input
-                                        type="text"
+                                        type="date"
                                         value={editData.date}
                                         onChange={(e) => setEditData((d) => ({ ...d, date: e.target.value }))}
-                                        placeholder="15 Januari 2026"
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
                                     />
                                 </div>

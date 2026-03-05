@@ -1,7 +1,8 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -22,29 +23,31 @@ export default function Newsletter() {
     setIsSubmitting(false);
   };
 
-  const articles = [
-    {
-      title: "5 Kebiasaan yang Membuat Rice Cooker Cepat Rusak",
-      date: "10 Des 2025",
-      image:
-        "https://asset-2.tstatic.net/shopping/foto/bank/images/ilustrasi-rice-cooker-mini-untuk-kemudahan-menanak-nasi-di-dapur-mungil.jpg",
-      category: "Tips & Trik",
-    },
-    {
-      title: "Fungsi Tersembunyi Rice Cooker di Rumah Anda",
-      date: "8 Des 2025",
-      image:
-        "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=800",
-      category: "Tutorial",
-    },
-    {
-      title: "Kesalahan Umum Menggunakan Juicer",
-      date: "5 Des 2025",
-      image:
-        "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?q=80&w=800",
-      category: "Panduan",
-    },
-  ];
+  const [articles, setArticles] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const res = await api.get('/news?limit=3&status=published');
+        if (res.data.status === 'success') {
+          const mapped = res.data.data.data.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            slug: item.slug,
+            image: item.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
+            category: item.category,
+            date: item.published_at
+              ? new Date(item.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+              : '-',
+          }));
+          setArticles(mapped);
+        }
+      } catch (error) {
+        console.error("Failed to fetch news", error);
+      }
+    };
+    fetchArticles();
+  }, []);
 
   return (
     <section
@@ -103,7 +106,7 @@ export default function Newsletter() {
             {articles.map((item, i) => (
               <a
                 key={i}
-                href="/news"
+                href={`/news/${item.id}`}
                 className="group relative overflow-hidden bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
               >
                 {/* Image */}
