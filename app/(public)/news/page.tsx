@@ -11,18 +11,63 @@ import {
   Share2,
   X,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
-import { articles } from "./articles";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
+export interface PublicArticle {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  image: string;
+  category: string;
+  date: string;
+  readTime: string;
+  views: string;
+  isFeatured: boolean;
+  author: string;
+  content: string[];
+}
+
 export default function News() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
+  const [articles, setArticles] = useState<PublicArticle[]>([]);
+
+  const fetchArticles = async () => {
+    try {
+      const res = await api.get('/news?limit=100&status=published');
+      if (res.data.status === 'success') {
+        const mapped = res.data.data.data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          excerpt: item.excerpt || (item.content ? item.content.substring(0, 100) + '...' : ''),
+          image: item.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
+          category: item.category,
+          date: item.published_at ? new Date(item.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : '-',
+          readTime: item.read_time || "5 min",
+          views: item.views?.toString() || "0",
+          isFeatured: item.is_featured ? true : false,
+          author: item.author || "Admin",
+          content: [item.content],
+        }));
+        setArticles(mapped);
+      }
+    } catch (error) {
+      console.error("Failed to fetch news", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
 
   const categories = [
     { name: "Semua", count: articles.length },
@@ -38,7 +83,7 @@ export default function News() {
     if (activeCategory !== "Semua") filtered = filtered.filter((a) => a.category === activeCategory);
     if (searchQuery) filtered = filtered.filter((a) => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || a.excerpt.toLowerCase().includes(searchQuery.toLowerCase()));
     return filtered;
-  }, [activeCategory, searchQuery]);
+  }, [articles, activeCategory, searchQuery]);
 
   const featuredArticles = articles.filter((a) => a.isFeatured);
   const regularArticles = filteredArticles.filter((a) => !a.isFeatured);

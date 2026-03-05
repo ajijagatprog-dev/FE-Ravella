@@ -95,18 +95,18 @@ export default function ProductContentPage() {
                     id: item.id,
                     name: item.name,
                     price: item.price,
-                    originalPrice: item.price + (item.price * 0.2),
-                    discount: 20,
+                    originalPrice: item.sale_price !== null ? item.sale_price : item.price,
+                    discount: item.discount || 0,
                     image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
                     category: item.category || "homeliving",
-                    rating: 5.0,
-                    reviews: 89,
-                    badge: item.is_featured ? "Best Seller" : "New",
-                    features: ["Premium Quality"],
+                    rating: item.rating ? parseFloat(item.rating) : 0,
+                    reviews: item.reviews || 0,
+                    badge: item.badge || (item.is_featured ? "Best Seller" : "New"),
+                    features: Array.isArray(item.features) ? item.features : [],
                     inStock: item.stock > 0,
                     isNew: true,
                     description: item.description || "Deskripsi produk",
-                    specifications: { "Berat": `${item.weight || 1000}g`, "SKU": item.slug },
+                    specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
                 }));
                 setProducts(mapped);
             }
@@ -158,6 +158,10 @@ export default function ProductContentPage() {
             formData.append('stock', editData.inStock ? "100" : "0");
             formData.append('weight', "1000");
             formData.append('description', editData.description || editData.name);
+            formData.append('badge', editData.badge || 'New');
+            formData.append('discount', (editData.discount || 0).toString());
+            formData.append('rating', (editData.rating || 0).toString());
+            formData.append('reviews', (editData.reviews || 0).toString());
 
             if (editData.badge === 'Best Seller') {
                 formData.append('is_featured', '1');
@@ -165,19 +169,53 @@ export default function ProductContentPage() {
                 formData.append('is_featured', '0');
             }
 
+            if (editData.features && editData.features.length > 0) {
+                // Filter out empty strings
+                const cleanFeatures = editData.features.filter(f => f.trim() !== "");
+                formData.append('features', JSON.stringify(cleanFeatures));
+            }
+
+            if (editData.specifications && Object.keys(editData.specifications).length > 0) {
+                // Filter out empty keys/values
+                const cleanSpecs = Object.fromEntries(
+                    Object.entries(editData.specifications).filter(([k, v]) => k.trim() !== "" && v.trim() !== "")
+                );
+                formData.append('specifications', JSON.stringify(cleanSpecs));
+            }
+
             if (editData.imageFile) {
                 formData.append('image', editData.imageFile);
             }
 
+            // Let's log the FormData contents for debugging
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+
+            let token = "";
+            const authData = localStorage.getItem('auth');
+            if (authData) {
+                try {
+                    const parsed = JSON.parse(authData);
+                    if (parsed.token) token = parsed.token;
+                } catch (e) { }
+            }
+
             if (modalMode === "add") {
                 await api.post('/products', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
                 showToast("Produk berhasil ditambahkan!");
             } else {
                 formData.append('_method', 'PUT');
                 await api.post(`/products/${editData.id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
                 showToast("Produk berhasil diperbarui!");
             }

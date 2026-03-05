@@ -9,11 +9,13 @@ const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 interface Product {
+  id: number;
   title: string;
   category: string;
   price: string;
   image: string;
   badge: string;
+  rating: number;
 }
 
 export default function NewProducts() {
@@ -26,11 +28,13 @@ export default function NewProducts() {
         const res = await api.get('/products', { params: { limit: 4, sort: 'latest' } });
         if (res.data.status === 'success') {
           const mapped = res.data.data.data.map((item: any) => ({
+            id: item.id,
             title: item.name,
             category: item.category || 'Peralatan Masak',
             price: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(item.price),
             image: item.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-            badge: item.is_featured ? "Best Seller" : "New",
+            badge: item.badge || (item.is_featured ? "Best Seller" : "New"),
+            rating: item.rating ? parseFloat(item.rating) : 0,
           }));
           setProducts(mapped);
         }
@@ -211,7 +215,7 @@ function ProductCard({ product }: { product: Product; index: number }) {
               className="text-xs font-medium text-neutral-500 tracking-wide"
               style={{ fontFamily: JOST }}
             >
-              4.9
+              {product.rating}
             </span>
           </div>
         </div>

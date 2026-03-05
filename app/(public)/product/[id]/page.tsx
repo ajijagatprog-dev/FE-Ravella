@@ -44,17 +44,17 @@ export default function ProductDetail() {
                         name: item.name,
                         description: item.description || "Deskripsi produk",
                         price: item.price,
-                        originalPrice: item.price + (item.price * 0.2), // Mock 20% discount if empty
-                        discount: 20,
-                        rating: 5.0, // Mock
-                        reviews: 128, // Mock
+                        originalPrice: item.sale_price !== null ? item.sale_price : item.price,
+                        discount: item.discount || 0,
+                        rating: item.rating ? parseFloat(item.rating) : 0,
+                        reviews: item.reviews || 0,
                         category: item.category || "appliance",
                         image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
-                        features: ["Premium Quality"],
-                        specifications: { "Berat": `${item.weight || 1000}g`, "SKU": item.slug },
+                        features: Array.isArray(item.features) ? item.features : [],
+                        specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
                         inStock: item.stock > 0,
                         isNew: true,
-                        badge: item.is_featured ? "Best Seller" : "",
+                        badge: item.badge || (item.is_featured ? "Best Seller" : ""),
                     });
 
                     // Fetch related products (mock category matching by just fetching all limit 4)
@@ -62,7 +62,7 @@ export default function ProductDetail() {
                     if (relRes.data.status === 'success') {
                         const relMapped = relRes.data.data.data.map((r: any) => ({
                             id: r.id, name: r.name, price: r.price, image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-                            rating: 4.9, reviews: 89, originalPrice: r.price + (r.price * 0.2), discount: 20, badge: 'Hot', isNew: true
+                            rating: r.rating ? parseFloat(r.rating) : 0, reviews: r.reviews || 0, originalPrice: r.sale_price !== null ? r.sale_price : r.price, discount: r.discount || 0, badge: r.badge || (r.is_featured ? "Best Seller" : ""), isNew: true
                         }));
                         setRelatedProducts(relMapped);
                     }

@@ -19,18 +19,30 @@ import {
     Calendar,
     Clock,
 } from "lucide-react";
-import {
-    type Article,
-    getArticles,
-    saveArticles,
-    defaultArticles,
-} from "../../../(public)/news/articles";
+import api from "@/lib/axios";
 
 // ── Categories that exist in the news data ────────────────────────────────────
-const CATEGORIES = ["Tips & Trik", "Tutorial", "Panduan", "Trend", "Resep"];
+const CATEGORIES = ["Tips & Trik", "Tutorial", "Panduan", "Trend", "Resep", "General"];
+
+// Backend API returns string content, which we split roughly evenly into paragraphs for display
+export interface Article {
+    id: number;
+    title: string;
+    slug: string;
+    excerpt: string;
+    image: string;
+    category: string;
+    date: string;
+    readTime: string; // derived
+    views: string; // mock
+    isFeatured: boolean; // mock
+    author: string; // mock
+    content: string[];
+    status: string;
+}
 
 // ── Empty article template ────────────────────────────────────────────────────
-function emptyArticle(): Omit<Article, "id"> {
+function emptyArticle(): Omit<Article, "id" | "slug"> {
     return {
         title: "",
         excerpt: "",
@@ -40,14 +52,12 @@ function emptyArticle(): Omit<Article, "id"> {
         readTime: "5 min",
         views: "0",
         isFeatured: false,
-        author: "",
+        author: "Admin",
         content: [""],
+        status: "published",
     };
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// ── MAIN PAGE ─────────────────────────────────────────────────────────────────
-// ══════════════════════════════════════════════════════════════════════════════
 export default function NewsContentPage() {
     const [articles, setArticles] = useState<Article[]>([]);
     const [search, setSearch] = useState("");
@@ -57,7 +67,7 @@ export default function NewsContentPage() {
 
     // Modal state
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
-    const [editData, setEditData] = useState<Omit<Article, "id"> & { id?: number }>(emptyArticle());
+    const [editData, setEditData] = useState<Omit<Article, "id" | "slug"> & { id?: number, slug?: string, imageFile?: File }>({ ...emptyArticle() });
     const [deleteTarget, setDeleteTarget] = useState<Article | null>(null);
 
     // Toast
@@ -71,9 +81,34 @@ export default function NewsContentPage() {
         setTimeout(() => setToast({ message: "", visible: false }), 2500);
     };
 
-    // Load from localStorage
+    const fetchArticles = async () => {
+        try {
+            const res = await api.get('/news?limit=100');
+            if (res.data.status === 'success') {
+                const mapped = res.data.data.data.map((item: any) => ({
+                    id: item.id,
+                    title: item.title,
+                    slug: item.slug,
+                    excerpt: item.excerpt || (item.content ? item.content.substring(0, 100) + '...' : ''),
+                    image: item.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
+                    category: item.category,
+                    date: item.published_at ? new Date(item.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : '-',
+                    status: item.status,
+                    readTime: item.read_time || "5 min",
+                    views: item.views?.toString() || "0",
+                    isFeatured: item.is_featured ? true : false,
+                    author: item.author || "Admin",
+                    content: [item.content],
+                }));
+                setArticles(mapped);
+            }
+        } catch (error) {
+            console.error("Failed to fetch news", error);
+        }
+    };
+
     useEffect(() => {
-        setArticles(getArticles());
+        fetchArticles();
     }, []);
 
     // ── Filter + Paginate ─────────────────────────────────────────────────────
@@ -91,37 +126,87 @@ export default function NewsContentPage() {
 
     // ── CRUD ──────────────────────────────────────────────────────────────────
     const openAdd = () => {
-        setEditData(emptyArticle());
+        setEditData({ ...emptyArticle(), imageFile: undefined });
         setModalMode("add");
     };
 
     const openEdit = (a: Article) => {
-        setEditData({ ...a });
+        setEditData({ ...a, imageFile: undefined });
         setModalMode("edit");
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!editData.title.trim()) return;
-        let next: Article[];
-        if (modalMode === "add") {
-            const newId = articles.length ? Math.max(...articles.map((a) => a.id)) + 1 : 1;
-            next = [{ ...editData, id: newId } as Article, ...articles];
-        } else {
-            next = articles.map((a) => (a.id === editData.id ? (editData as Article) : a));
+
+        try {
+            const formData = new FormData();
+            formData.append('title', editData.title);
+            formData.append('content', editData.content.join("\n\n"));
+            formData.append('excerpt', editData.excerpt);
+            formData.append('category', editData.category);
+            formData.append('author', editData.author);
+            formData.append('read_time', editData.readTime);
+            formData.append('views', editData.views);
+            formData.append('is_featured', editData.isFeatured ? '1' : '0');
+            formData.append('status', editData.status || 'published');
+
+            if (editData.imageFile) {
+                formData.append('image', editData.imageFile);
+            }
+
+            let token = "";
+            const authData = localStorage.getItem('auth');
+            if (authData) {
+                try {
+                    const parsed = JSON.parse(authData);
+                    if (parsed.token) token = parsed.token;
+                } catch (e) { }
+            }
+
+            if (modalMode === "add") {
+                await api.post('/news', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${token}` }
+                });
+                showToast("Artikel berhasil ditambahkan!");
+            } else {
+                formData.append('_method', 'PUT');
+                await api.post(`/news/${editData.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${token}` }
+                });
+                showToast("Artikel berhasil diperbarui!");
+            }
+
+            setModalMode(null);
+            fetchArticles();
+        } catch (error) {
+            console.error("Error saving article:", error);
+            showToast("Gagal menyimpan artikel. Periksa kembali data.");
         }
-        setArticles(next);
-        saveArticles(next);
-        setModalMode(null);
-        showToast(modalMode === "add" ? "Artikel berhasil ditambahkan!" : "Artikel berhasil diperbarui!");
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (!deleteTarget) return;
-        const next = articles.filter((a) => a.id !== deleteTarget.id);
-        setArticles(next);
-        saveArticles(next);
-        setDeleteTarget(null);
-        showToast("Artikel berhasil dihapus!");
+
+        try {
+            let token = "";
+            const authData = localStorage.getItem('auth');
+            if (authData) {
+                try {
+                    const parsed = JSON.parse(authData);
+                    if (parsed.token) token = parsed.token;
+                } catch (e) { }
+            }
+
+            await api.delete(`/news/${deleteTarget.id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            showToast("Artikel berhasil dihapus!");
+            setDeleteTarget(null);
+            fetchArticles();
+        } catch (error) {
+            console.error("Error deleting article:", error);
+            showToast("Gagal menghapus artikel.");
+        }
     };
 
     // ── Content paragraph helpers ─────────────────────────────────────────────
@@ -381,13 +466,17 @@ export default function NewsContentPage() {
                             {/* Image URL */}
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                                    <ImageIcon size={12} className="inline mr-1" /> URL Gambar Cover
+                                    <ImageIcon size={12} className="inline mr-1" /> Gambar Cover (Kosongkan jika tidak ingin diubah)
                                 </label>
                                 <input
-                                    type="text"
-                                    value={editData.image}
-                                    onChange={(e) => setEditData((d) => ({ ...d, image: e.target.value }))}
-                                    placeholder="https://..."
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setEditData((d) => ({ ...d, imageFile: file, image: URL.createObjectURL(file) }));
+                                        }
+                                    }}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
                                 />
                                 {editData.image && (
@@ -427,9 +516,23 @@ export default function NewsContentPage() {
                                         type="text"
                                         value={editData.author}
                                         onChange={(e) => setEditData((d) => ({ ...d, author: e.target.value }))}
-                                        placeholder="Nama penulis..."
+                                        placeholder="Admin"
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
                                     />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Status Posting</label>
+                                    <select
+                                        value={editData.status || "published"}
+                                        onChange={(e) => setEditData((d) => ({ ...d, status: e.target.value }))}
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
+                                    >
+                                        <option value="draft">Draft</option>
+                                        <option value="published">Published</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -525,9 +628,7 @@ export default function NewsContentPage() {
                 </div>
             )}
 
-            {/* ══════════════════════════════════════════════════════════════════════ */}
             {/* ── DELETE MODAL ──────────────────────────────────────────────────── */}
-            {/* ══════════════════════════════════════════════════════════════════════ */}
             {deleteTarget && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
                     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md border border-slate-200/60 p-6 text-center">

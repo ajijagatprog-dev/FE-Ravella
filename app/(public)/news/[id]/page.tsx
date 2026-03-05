@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
     Calendar,
     Clock,
@@ -15,37 +16,78 @@ import {
 } from "lucide-react";
 import Header from "../../../HomePage/components/Header";
 import Footer from "../../../HomePage/components/Footer";
-import { articles, type Article } from "../articles";
+import api from "@/lib/axios";
+import { type PublicArticle } from "../page";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function NewsDetail() {
     const { id } = useParams<{ id: string }>();
-    const articleId = parseInt(id, 10);
-    const article = articles.find((a) => a.id === articleId);
+    const [article, setArticle] = useState<PublicArticle | null>(null);
+    const [relatedArticles, setRelatedArticles] = useState<PublicArticle[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    /* ─── Related articles: same category, excluding current ─── */
-    const relatedArticles = article
-        ? articles
-            .filter((a) => a.category === article.category && a.id !== article.id)
-            .slice(0, 3)
-        : [];
+    const fetchArticleData = async () => {
+        try {
+            const res = await api.get(`/news/${id}`);
+            if (res.data.status === 'success') {
+                const item = res.data.data;
+                setArticle({
+                    id: item.id,
+                    title: item.title,
+                    slug: item.slug,
+                    excerpt: item.excerpt || (item.content ? item.content.substring(0, 100) + '...' : ''),
+                    image: item.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
+                    category: item.category,
+                    date: item.published_at ? new Date(item.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : '-',
+                    readTime: item.read_time || "5 min",
+                    views: item.views?.toString() || "0",
+                    isFeatured: item.is_featured ? true : false,
+                    author: item.author || "Admin",
+                    content: item.content ? item.content.split('\n\n') : [""],
+                });
 
-    /* ─── Fallback: pad with other articles if not enough related ─── */
-    const suggestions =
-        relatedArticles.length >= 3
-            ? relatedArticles
-            : [
-                ...relatedArticles,
-                ...articles
-                    .filter(
-                        (a) =>
-                            a.id !== articleId &&
-                            !relatedArticles.some((r) => r.id === a.id)
-                    )
-                    .slice(0, 3 - relatedArticles.length),
-            ];
+                // Fetch all to get related
+                const allRes = await api.get('/news?limit=100&status=published');
+                if (allRes.data.status === 'success') {
+                    const mapped = allRes.data.data.data.map((allItem: any) => ({
+                        id: allItem.id,
+                        title: allItem.title,
+                        slug: allItem.slug,
+                        excerpt: allItem.excerpt || (allItem.content ? allItem.content.substring(0, 100) + '...' : ''),
+                        image: allItem.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
+                        category: allItem.category,
+                        date: allItem.published_at ? new Date(allItem.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : '-',
+                        readTime: allItem.read_time || "5 min",
+                        views: allItem.views?.toString() || "0",
+                        isFeatured: allItem.is_featured ? true : false,
+                        author: allItem.author || "Admin",
+                        content: [allItem.content],
+                    }));
+
+                    const catRelated = mapped.filter((a: any) => a.category === item.category && a.id !== item.id).slice(0, 3);
+                    const suggestions = catRelated.length >= 3 ? catRelated : [
+                        ...catRelated,
+                        ...mapped.filter((a: any) => a.id !== item.id && !catRelated.some((r: any) => r.id === a.id)).slice(0, 3 - catRelated.length)
+                    ];
+                    setRelatedArticles(suggestions);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch article", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchArticleData();
+    }, [id]);
+
+    if (loading) {
+        return <div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>;
+    }
 
     /* ─── 404 state ─── */
     if (!article) {
@@ -295,7 +337,7 @@ export default function NewsDetail() {
             </div>
 
             {/* ── RELATED ARTICLES ── */}
-            {suggestions.length > 0 && (
+            {relatedArticles.length > 0 && (
                 <section className="bg-neutral-50 py-14 sm:py-20">
                     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
                         <div className="inline-flex items-center gap-2.5 mb-8">
@@ -310,7 +352,7 @@ export default function NewsDetail() {
                         </div>
 
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-                            {suggestions.map((related) => (
+                            {relatedArticles.map((related: PublicArticle) => (
                                 <Link
                                     key={related.id}
                                     href={`/news/${related.id}`}
