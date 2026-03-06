@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import B2bTable from "./B2bTable";
 import UserManagementStats from "./UserManagementStats";
+import UserDetailModal from "./UserDetailModal";
 import api from "@/lib/axios";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -36,6 +37,10 @@ export default function UserManagementClient() {
   // Stats
   const [stats, setStats] = useState<UserStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+
+  // Detail modal
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -163,6 +168,17 @@ export default function UserManagementClient() {
         handlePageChange={(p) => setPage(p)}
         handleLimitChange={(l) => { setLimit(l); setPage(1); }}
         onUserAction={handleUserAction}
+        onViewDetail={(userId: number) => { setSelectedUserId(userId); setIsDetailOpen(true); }}
+      />
+
+      {/* User Detail Modal */}
+      <UserDetailModal
+        userId={selectedUserId}
+        isOpen={isDetailOpen}
+        onClose={() => { setIsDetailOpen(false); setSelectedUserId(null); }}
+        onAction={(userId, action) => {
+          handleUserAction(userId, action);
+        }}
       />
     </div>
   );

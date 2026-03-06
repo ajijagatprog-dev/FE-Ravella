@@ -13,6 +13,7 @@ interface B2bTableProps {
   handlePageChange: (page: number) => void;
   handleLimitChange: (limit: number) => void;
   onUserAction?: (userId: number, action: string) => void;
+  onViewDetail?: (userId: number) => void;
 }
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
@@ -53,8 +54,8 @@ function TypeBadge({ type }: { type: string }) {
   return (
     <span
       className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide ${isB2B
-          ? "bg-blue-100 text-blue-700 ring-1 ring-blue-200"
-          : "bg-violet-100 text-violet-700 ring-1 ring-violet-200"
+        ? "bg-blue-100 text-blue-700 ring-1 ring-blue-200"
+        : "bg-violet-100 text-violet-700 ring-1 ring-violet-200"
         }`}
     >
       {isB2B ? "B2B Partner" : "Retail"}
@@ -73,8 +74,8 @@ function Avatar({ name, isB2B }: { name: string; isB2B: boolean }) {
   return (
     <div
       className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${isB2B
-          ? "bg-blue-100 text-blue-700"
-          : "bg-violet-100 text-violet-700"
+        ? "bg-blue-100 text-blue-700"
+        : "bg-violet-100 text-violet-700"
         }`}
     >
       {initials}
@@ -83,7 +84,7 @@ function Avatar({ name, isB2B }: { name: string; isB2B: boolean }) {
 }
 
 // ─── Action Buttons ───────────────────────────────────────────────────────────
-function ActionButtons({ row, onAction }: { row: any; onAction?: (userId: number, action: string) => void }) {
+function ActionButtons({ row, onAction, onViewDetail }: { row: any; onAction?: (userId: number, action: string) => void; onViewDetail?: (userId: number) => void }) {
   const status = row.status?.toLowerCase();
   const type = row.type?.toUpperCase();
 
@@ -97,7 +98,10 @@ function ActionButtons({ row, onAction }: { row: any; onAction?: (userId: number
             </svg>
             Transactions
           </button>
-          <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+          <button
+            onClick={() => onViewDetail?.(row.id)}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          >
             Details
           </button>
         </div>
@@ -143,7 +147,10 @@ function ActionButtons({ row, onAction }: { row: any; onAction?: (userId: number
         </svg>
         View Activity
       </button>
-      <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+      <button
+        onClick={() => onViewDetail?.(row.id)}
+        className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+      >
         Details
       </button>
     </div>
@@ -221,8 +228,8 @@ function Pagination({
               key={p}
               onClick={() => handlePageChange(p as number)}
               className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${page === p
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "border border-slate-200 text-slate-600 hover:bg-slate-50"
                 }`}
             >
               {p}
@@ -254,10 +261,11 @@ export default function B2bTable({
   handlePageChange,
   handleLimitChange,
   onUserAction,
+  onViewDetail,
 }: B2bTableProps) {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("active");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   // Filter locally (or remove if server-side)
   const filtered = data.filter((row) => {
@@ -408,7 +416,7 @@ export default function B2bTable({
                     {/* Actions */}
                     <td className="px-4 py-3.5">
                       <div className="flex justify-end">
-                        <ActionButtons row={row} onAction={onUserAction} />
+                        <ActionButtons row={row} onAction={onUserAction} onViewDetail={onViewDetail} />
                       </div>
                     </td>
                   </tr>
@@ -464,7 +472,7 @@ export default function B2bTable({
                   )}
                 </div>
 
-                <ActionButtons row={row} onAction={onUserAction} />
+                <ActionButtons row={row} onAction={onUserAction} onViewDetail={onViewDetail} />
               </div>
             );
           })
