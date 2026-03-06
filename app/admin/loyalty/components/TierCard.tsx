@@ -122,8 +122,8 @@ export default function TierCard({ tier, index = 0 }: TierCardProps) {
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
               {tier.max
-                ? `$${tier.min.toLocaleString()} – $${tier.max.toLocaleString()} spent`
-                : `$${tier.min.toLocaleString()}+ spent`}
+                ? `Rp ${tier.min.toLocaleString('id-ID')} – Rp ${tier.max.toLocaleString('id-ID')}`
+                : `Rp ${tier.min.toLocaleString('id-ID')}+`}
             </p>
           </div>
         </div>
@@ -147,8 +147,8 @@ export default function TierCard({ tier, index = 0 }: TierCardProps) {
             <li key={perk} className="flex items-center gap-2.5 text-sm text-slate-700">
               <CheckIcon className={
                 tier.name === "Gold" ? "text-amber-500" :
-                tier.name === "Platinum" ? "text-blue-500" :
-                "text-slate-400"
+                  tier.name === "Platinum" ? "text-blue-500" :
+                    "text-slate-400"
               } />
               {perk}
             </li>
@@ -162,8 +162,8 @@ export default function TierCard({ tier, index = 0 }: TierCardProps) {
           ${isGold
             ? "bg-amber-400 text-white hover:bg-amber-500 border-amber-400"
             : tier.name === "Platinum"
-            ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
-            : "bg-white text-slate-600 hover:bg-slate-50 border-slate-200"
+              ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
+              : "bg-white text-slate-600 hover:bg-slate-50 border-slate-200"
           }`
         }>
           Edit Tier

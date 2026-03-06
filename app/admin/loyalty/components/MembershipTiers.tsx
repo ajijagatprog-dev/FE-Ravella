@@ -6,20 +6,20 @@ const tiers = [
   {
     name: "Basic",
     min: 0,
-    max: 500,
-    perks: ["1x Point Multiplier", "Early access to sales"],
+    max: 5000000,
+    perks: ["1x Point Multiplier", "Free ongkir > Rp 500.000", "Birthday 200 poin"],
   },
   {
     name: "Gold",
-    min: 501,
-    max: 2000,
-    perks: ["1.2x Point Multiplier", "Free standard shipping", "Birthday offer"],
+    min: 5000001,
+    max: 15000000,
+    perks: ["1.5x Point Multiplier", "Free ongkir > Rp 200.000", "Early access 24 jam", "Birthday 500 poin"],
   },
   {
     name: "Platinum",
-    min: 2001,
+    min: 15000001,
     max: null,
-    perks: ["1.5x Point Multiplier", "VIP support", "Exclusive drops"],
+    perks: ["2x Point Multiplier", "Free express semua pesanan", "VIP early access 48 jam", "Personal consultant", "Birthday 1000 poin"],
   },
 ];
 
@@ -34,15 +34,9 @@ export default function MembershipTiers() {
             Membership Tiers
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            {tiers.length} tiers configured
+            {tiers.length} tiers configured — Based on total lifetime spend
           </p>
         </div>
-        <button className="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add Tier
-        </button>
       </div>
 
       {/* ── Tier Cards ── */}
