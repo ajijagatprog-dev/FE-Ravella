@@ -1,73 +1,49 @@
 "use client";
 
-import { useState } from "react";
-import TierCard from "./components/TierCard";
+import { useState, useEffect } from "react";
+import TierCard, { type LoyaltyTier } from "./components/TierCard";
 import PointsCard from "./components/PointsCard";
 import RewardsTab, { type Reward } from "./components/RewardsTab";
 import PointHistoryTab, { type PointTransaction } from "./components/PointHistoryTab";
 import HowToEarnTab from "./components/HowToEarnTab";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+import api from "@/lib/axios";
 
-// ── Mock data — replace with real API ─────────────────────────────────────────
-const LOYALTY_DATA = {
-    tier: "GOLD" as const,
-    activeSince: "Jan 2023",
-    availablePoints: 2450,
-    expiringPoints: 150,
-    expiryDate: "Expires Nov 30, 2023",
-    progressToNext: 75,
-    nextTier: "Platinum",
-    benefits: [
-        { label: "Free Express Shipping", desc: "On all orders over $50" },
-        { label: "Early Access", desc: "Shop new drops 24hrs early" },
-        { label: "Design Consultation", desc: "1x 30min session per quarter" },
-        { label: "Birthday Bonus", desc: "500 points every year" },
-    ],
-};
-
+// ── Static rewards (these can later come from backend) ────────────────────────
 const REWARDS: Reward[] = [
     {
         id: "r1",
-        title: "$20 OFF",
-        subtitle: "Discount Voucher",
-        description: "Applicable on any furniture items",
+        title: "Rp 50.000",
+        subtitle: "Voucher Diskon",
+        description: "Berlaku untuk semua produk furnitur",
         points: 500,
         canRedeem: true,
     },
     {
         id: "r2",
         title: "FREE SHIP",
-        subtitle: "Standard Shipping",
-        description: "One time free shipping coupon",
+        subtitle: "Gratis Ongkir",
+        description: "Gratis ongkir untuk 1x pengiriman",
         points: 200,
         canRedeem: true,
     },
     {
         id: "r3",
-        title: "$50 OFF",
-        subtitle: "Premium Voucher",
-        description: "Min. spend $500 required",
-        points: 1200,
+        title: "Rp 100.000",
+        subtitle: "Voucher Premium",
+        description: "Minimal belanja Rp 1.000.000",
+        points: 1000,
         canRedeem: true,
     },
     {
         id: "r4",
-        title: "HOME KIT",
-        subtitle: "Aroma Diffuser Set",
-        description: "Limited edition seasonal set",
+        title: "GIFT SET",
+        subtitle: "Home Decor Set",
+        description: "Set dekorasi edisi terbatas",
         points: 3000,
         canRedeem: true,
     },
-];
-
-const TRANSACTIONS: PointTransaction[] = [
-    { id: "t1", description: "Purchase #RH-89231", points: 125, date: "Oct 24, 2023", type: "earn" },
-    { id: "t2", description: "Redeemed Free Shipping", points: -200, date: "Oct 10, 2023", type: "redeem" },
-    { id: "t3", description: "Purchase #RH-89104", points: 45, date: "Oct 12, 2023", type: "earn" },
-    { id: "t4", description: "Birthday Bonus", points: 500, date: "Sep 01, 2023", type: "earn" },
-    { id: "t5", description: "Write a Review — Lounge Chair", points: 10, date: "Aug 20, 2023", type: "earn" },
-    { id: "t6", description: "Redeemed $20 Voucher", points: -500, date: "Aug 05, 2023", type: "redeem" },
-    { id: "t7", description: "Referral Bonus — James T.", points: 500, date: "Jul 18, 2023", type: "earn" },
 ];
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
@@ -75,8 +51,50 @@ const TABS = ["Available Rewards", "Point History Log", "How to Earn"] as const;
 type Tab = (typeof TABS)[number];
 
 // ── Page ──────────────────────────────────────────────────────────────────────
+interface LoyaltyData {
+    points: number;
+    tier: LoyaltyTier;
+    tier_progress: number;
+    next_tier: string;
+    member_since: string;
+    total_spent: number;
+    total_orders: number;
+    benefits: { label: string; desc: string }[];
+    transactions: PointTransaction[];
+}
+
 export default function LoyaltyMembershipPage() {
     const [activeTab, setActiveTab] = useState<Tab>("Available Rewards");
+    const [data, setData] = useState<LoyaltyData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        api.get('/customer/loyalty')
+            .then(res => {
+                if (res.data.status === 'success') {
+                    setData(res.data.data);
+                }
+            })
+            .catch(err => console.error("Failed to load loyalty data", err))
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-20 gap-3">
+                <Loader2 size={24} className="animate-spin text-blue-500" />
+                <p className="text-sm text-stone-400">Loading loyalty data...</p>
+            </div>
+        );
+    }
+
+    if (!data) {
+        return (
+            <div className="text-center py-20 text-stone-400">
+                <p className="text-sm">Gagal memuat data loyalty. Silakan coba lagi.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -94,18 +112,16 @@ export default function LoyaltyMembershipPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                 <div className="lg:col-span-2">
                     <TierCard
-                        tier={LOYALTY_DATA.tier}
-                        activeSince={LOYALTY_DATA.activeSince}
-                        benefits={LOYALTY_DATA.benefits}
-                        progressToNext={LOYALTY_DATA.progressToNext}
-                        nextTier={LOYALTY_DATA.nextTier}
+                        tier={data.tier}
+                        activeSince={data.member_since}
+                        benefits={data.benefits}
+                        progressToNext={data.tier_progress}
+                        nextTier={data.next_tier}
                     />
                 </div>
                 <div>
                     <PointsCard
-                        points={LOYALTY_DATA.availablePoints}
-                        expiringPoints={LOYALTY_DATA.expiringPoints}
-                        expiryDate={LOYALTY_DATA.expiryDate}
+                        points={data.points}
                     />
                 </div>
             </div>
@@ -135,11 +151,11 @@ export default function LoyaltyMembershipPage() {
                     {activeTab === "Available Rewards" && (
                         <RewardsTab
                             rewards={REWARDS}
-                            availablePoints={LOYALTY_DATA.availablePoints}
+                            availablePoints={data.points}
                         />
                     )}
                     {activeTab === "Point History Log" && (
-                        <PointHistoryTab transactions={TRANSACTIONS} />
+                        <PointHistoryTab transactions={data.transactions} />
                     )}
                     {activeTab === "How to Earn" && <HowToEarnTab />}
                 </div>
