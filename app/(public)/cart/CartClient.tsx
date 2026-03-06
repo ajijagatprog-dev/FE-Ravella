@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ShoppingCart, Trash2, ArrowLeft, Plus, Minus,
   Tag, Truck, Shield, ChevronRight, Store, Package,
-  CheckCircle, X, Ticket,
+  CheckCircle, X, Ticket, Lock
 } from "lucide-react";
 import Link from "next/link";
 
@@ -33,6 +33,7 @@ export default function CartClient() {
   const [couponApplied, setCouponApplied] = useState(false);
   const [selectAll, setSelectAll] = useState(true);
   const [showCheckoutAnim, setShowCheckoutAnim] = useState(false);
+  const [showAuthOverlay, setShowAuthOverlay] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   // ── LOAD cart dari localStorage sekali saat mount ──
@@ -101,6 +102,23 @@ export default function CartClient() {
   };
 
   const handleCheckout = () => {
+    try {
+      const authStored = localStorage.getItem("auth");
+      if (!authStored) {
+        setShowAuthOverlay(true);
+        return;
+      }
+      const auth = JSON.parse(authStored);
+      if (!auth.loggedIn || !auth.token) {
+        setShowAuthOverlay(true);
+        return;
+      }
+    } catch (e) {
+      console.error("Auth check failed:", e);
+      setShowAuthOverlay(true);
+      return;
+    }
+
     setShowCheckoutAnim(true);
     setTimeout(() => router.push("/checkout"), 1200);
   };
@@ -439,8 +457,8 @@ export default function CartClient() {
                     onClick={handleCheckout}
                     disabled={selectedItems.length === 0 || showCheckoutAnim}
                     className={`w-full py-4 text-[11px] tracking-[0.22em] uppercase font-medium transition-all flex items-center justify-center gap-2 ${selectedItems.length === 0
-                        ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
-                        : "bg-neutral-900 text-white hover:bg-black"
+                      ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+                      : "bg-neutral-900 text-white hover:bg-black"
                       }`}
                     style={{ fontFamily: JOST }}
                   >
@@ -479,6 +497,41 @@ export default function CartClient() {
           </div>
         )}
       </div>
+
+      {/* ── AUTH REQUIRED MODAL ── */}
+      {showAuthOverlay && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4 transition-all animate-in fade-in duration-300" style={{ fontFamily: JOST }}>
+          <div className="bg-white w-full max-w-sm rounded-none border border-neutral-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-8 text-center flex flex-col items-center">
+              <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
+                <Lock className="w-8 h-8 text-neutral-800" />
+              </div>
+              <h3 className="text-xl font-light text-neutral-900 mb-3" style={{ fontFamily: CORMORANT }}>
+                Login Diperlukan
+              </h3>
+              <p className="text-sm text-neutral-500 font-light mb-8 leading-relaxed">
+                Silakan masuk ke akun Anda terlebih dahulu untuk dapat melanjutkan ke proses pembayaran dengan aman.
+              </p>
+
+              <div className="w-full flex flex-col gap-3">
+                <button
+                  onClick={() => router.push("/auth/login")}
+                  className="w-full py-3.5 bg-neutral-900 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-black transition-colors"
+                >
+                  Login Sekarang
+                </button>
+                <button
+                  onClick={() => setShowAuthOverlay(false)}
+                  className="w-full py-3.5 bg-white border border-neutral-200 text-neutral-600 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-50 hover:text-neutral-900 transition-colors"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

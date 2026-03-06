@@ -17,6 +17,7 @@ export interface Order {
 }
 
 const iconBg: Record<OrderStatus, string> = {
+    PENDING: "bg-gray-100",
     SHIPPED: "bg-blue-100",
     DELIVERED: "bg-emerald-100",
     PROCESSING: "bg-amber-100",
@@ -24,6 +25,7 @@ const iconBg: Record<OrderStatus, string> = {
 };
 
 const iconColor: Record<OrderStatus, string> = {
+    PENDING: "text-gray-500",
     SHIPPED: "text-blue-500",
     DELIVERED: "text-emerald-500",
     PROCESSING: "text-amber-500",
@@ -31,6 +33,7 @@ const iconColor: Record<OrderStatus, string> = {
 };
 
 const deliveryLabel: Record<OrderStatus, string> = {
+    PENDING: "Est. Shipping",
     SHIPPED: "Est. Delivery",
     DELIVERED: "Delivered On",
     PROCESSING: "Est. Shipping",

@@ -148,31 +148,6 @@ export default function DashboardPage() {
           <RecentOrders orders={data.recent_orders} />
         </div>
       </div>
-
-      {/* ── Help Banner ── */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white font-bold text-base">
-            ?
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-800">
-              Need help with the new B2B management tool?
-            </p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Check out our internal documentation or contact technical support.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-            Read Docs
-          </button>
-          <button className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 active:scale-95 transition-all shadow-sm">
-            Contact Support
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

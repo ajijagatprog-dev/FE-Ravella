@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, MapPin, CreditCard, ChevronRight, CheckCircle2, Loader2, Package } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Lock } from "lucide-react";
 
 const JOST = "'Jost', system-ui, sans-serif";
 
@@ -18,6 +18,7 @@ export default function CheckoutPage() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [hydrated, setHydrated] = useState(false);
+    const [authError, setAuthError] = useState(false);
 
     // Add Address State
     const [isAddingAddress, setIsAddingAddress] = useState(false);
@@ -35,6 +36,26 @@ export default function CheckoutPage() {
     useEffect(() => {
         const init = async () => {
             try {
+                // Check auth first
+                const authStored = localStorage.getItem("auth");
+                if (!authStored) {
+                    setAuthError(true);
+                    setLoading(false);
+                    return;
+                }
+                try {
+                    const auth = JSON.parse(authStored);
+                    if (!auth.loggedIn || !auth.token) {
+                        setAuthError(true);
+                        setLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    setAuthError(true);
+                    setLoading(false);
+                    return;
+                }
+
                 // Load cart
                 const stored = localStorage.getItem("ravelle_cart");
                 if (stored) {
@@ -69,6 +90,34 @@ export default function CheckoutPage() {
             <div className="w-full text-stone-500 h-[60vh] flex flex-col justify-center items-center gap-4">
                 <Loader2 className="w-8 h-8 animate-spin" />
                 <p>Loading Checkout...</p>
+            </div>
+        );
+    }
+
+    if (authError) {
+        return (
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" style={{ fontFamily: JOST }}>
+                <div className="bg-white p-10 max-w-sm w-full rounded-none border border-stone-200 text-center shadow-lg">
+                    <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Lock className="w-8 h-8 text-stone-800" />
+                    </div>
+                    <h2 className="text-xl font-bold text-stone-900 mb-3 uppercase tracking-wide">Akses Terkunci</h2>
+                    <p className="text-sm text-stone-500 mb-8 font-light leading-relaxed">
+                        Silakan masuk ke akun Anda terlebih dahulu untuk mengakses halaman checkout dan melanjutkan pembayaran.
+                    </p>
+                    <Link
+                        href="/auth/login"
+                        className="block w-full text-center bg-stone-900 text-white font-medium py-4 px-4 hover:bg-black transition-colors text-[11px] tracking-[0.2em] uppercase"
+                    >
+                        Login Sekarang
+                    </Link>
+                    <Link
+                        href="/cart"
+                        className="block mt-3 w-full text-center bg-white border border-stone-200 text-stone-600 font-medium py-4 px-4 hover:bg-stone-50 transition-colors text-[11px] tracking-[0.2em] uppercase"
+                    >
+                        Kembali Ke Keranjang
+                    </Link>
+                </div>
             </div>
         );
     }
