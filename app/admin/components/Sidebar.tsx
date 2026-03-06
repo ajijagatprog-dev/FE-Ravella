@@ -22,7 +22,7 @@ import {
 
 const menuItems = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Product Management", href: "/admin/products", icon: Package },
+  // { label: "Product Management", href: "/admin/products", icon: Package },
   { label: "Order Management", href: "/admin/order", icon: ShoppingCart },
   { label: "User Management", href: "/admin/users_management", icon: Users },
   { label: "Loyalty System", href: "/admin/loyalty", icon: Award },

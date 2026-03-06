@@ -1,28 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import {
   ChevronLeft,
   ChevronRight,
   MoreHorizontal,
-  Eye,
-  Pencil,
-  Trash2,
+  Clock,
+  RefreshCw,
+  Truck,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 export interface Order {
-  id: string; // Maps to order_number
+  id: string;
   customer: {
     name: string;
     initials: string;
     avatarColor: string;
   };
-  date: string; // formatted date
+  date: string;
   status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
-  total: string; // formatted total
-  rawOrder: any; // Add raw order data for modals
+  total: string;
+  rawOrder: any;
 }
 
 interface OrderTableProps {
@@ -75,38 +76,189 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
   );
 }
 
-// ── Row Action Menu ───────────────────────────────────────────────────────────
+const STATUS_ICONS: Record<string, React.ReactNode> = {
+  PENDING: <Clock size={14} />,
+  PROCESSING: <RefreshCw size={14} />,
+  SHIPPED: <Truck size={14} />,
+  DELIVERED: <CheckCircle size={14} />,
+  CANCELLED: <XCircle size={14} />,
+};
 
-function RowMenu({ orderId, currentStatus, onUpdateStatus }: { orderId: string, currentStatus: string, onUpdateStatus?: (id: string, st: string) => void }) {
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: "Pending",
+  PROCESSING: "Processing",
+  SHIPPED: "Shipped",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
+};
+
+const STATUS_MENU_STYLES: Record<string, { iconBg: string; iconText: string; hover: string; hoverText: string }> = {
+  PENDING: {
+    iconBg: "bg-amber-50",
+    iconText: "text-amber-500",
+    hover: "hover:bg-amber-50",
+    hoverText: "hover:text-amber-700",
+  },
+  PROCESSING: {
+    iconBg: "bg-blue-50",
+    iconText: "text-blue-500",
+    hover: "hover:bg-blue-50",
+    hoverText: "hover:text-blue-700",
+  },
+  SHIPPED: {
+    iconBg: "bg-purple-50",
+    iconText: "text-purple-500",
+    hover: "hover:bg-purple-50",
+    hoverText: "hover:text-purple-700",
+  },
+  DELIVERED: {
+    iconBg: "bg-emerald-50",
+    iconText: "text-emerald-500",
+    hover: "hover:bg-emerald-50",
+    hoverText: "hover:text-emerald-700",
+  },
+  CANCELLED: {
+    iconBg: "bg-red-50",
+    iconText: "text-red-500",
+    hover: "hover:bg-red-50",
+    hoverText: "hover:text-red-600",
+  },
+};
+
+// ── Dropdown Portal ─────────────────────────────────────────────────────────
+
+function DropdownPortal({
+  anchorRef,
+  onClose,
+  children,
+}: {
+  anchorRef: React.RefObject<HTMLButtonElement | null>;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; openUp: boolean } | null>(null);
+
+  useEffect(() => {
+    if (!anchorRef.current) return;
+    const rect = anchorRef.current.getBoundingClientRect();
+    const menuHeight = 280; // estimated max height
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUp = spaceBelow < menuHeight && rect.top > menuHeight;
+
+    setPos({
+      top: openUp ? rect.top : rect.bottom + 4,
+      left: rect.right - 208, // w-52 = 208px, align right edge
+      openUp,
+    });
+  }, [anchorRef]);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        anchorRef.current &&
+        !anchorRef.current.contains(e.target as Node)
+      ) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onClose, anchorRef]);
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  if (!pos) return null;
+
+  return createPortal(
+    <div
+      ref={menuRef}
+      className="fixed z-[9999] w-52 rounded-2xl border border-gray-100 bg-white p-1.5 shadow-[0_12px_48px_-12px_rgba(0,0,0,0.18)] ring-1 ring-black/5"
+      style={{
+        top: pos.openUp ? undefined : pos.top,
+        bottom: pos.openUp ? window.innerHeight - pos.top + 4 : undefined,
+        left: Math.max(8, pos.left),
+        animation: "dropdownIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)",
+      }}
+    >
+      {children}
+    </div>,
+    document.body
+  );
+}
+
+// ── Row Menu ────────────────────────────────────────────────────────────────
+
+function RowMenu({
+  orderId,
+  currentStatus,
+  onUpdateStatus,
+}: {
+  orderId: string;
+  currentStatus: string;
+  onUpdateStatus?: (id: string, st: string) => void;
+  isLast?: boolean;
+}) {
   const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const close = useCallback(() => setOpen(false), []);
 
   return (
-    <div className="relative">
+    <>
       <button
+        ref={btnRef}
         onClick={() => setOpen((v) => !v)}
-        onBlur={() => setTimeout(() => setOpen(false), 200)}
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors focus:ring-2 focus:ring-blue-500 outline-none"
+        className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150 outline-none ${open ? "bg-blue-50 text-blue-600 shadow-sm" : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"}`}
       >
         <MoreHorizontal size={18} />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1 w-44 origin-top-right rounded-xl border border-gray-200 bg-white py-1.5 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 mb-1">Update Status</div>
-          {["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map(st => (
-            st !== currentStatus && (
-              <button
-                key={st}
-                disabled={!onUpdateStatus}
-                onClick={() => { onUpdateStatus?.(orderId, st); setOpen(false); }}
-                className="flex w-full items-center px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left"
-              >
-                Mark as {st}
-              </button>
-            )
-          ))}
-        </div>
+        <DropdownPortal anchorRef={btnRef} onClose={close}>
+          <div className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            Update Status
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mx-2 mb-1" />
+          {(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] as const).map(
+            (st) =>
+              st !== currentStatus && (
+                <button
+                  key={st}
+                  disabled={!onUpdateStatus}
+                  onClick={() => {
+                    onUpdateStatus?.(orderId, st);
+                    setOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition-all duration-150 text-left group ${STATUS_MENU_STYLES[st].hover} ${STATUS_MENU_STYLES[st].hoverText} disabled:opacity-40 disabled:cursor-not-allowed`}
+                >
+                  <span
+                    className={`flex items-center justify-center w-7 h-7 rounded-lg ${STATUS_MENU_STYLES[st].iconBg} ${STATUS_MENU_STYLES[st].iconText} transition-transform duration-150 group-hover:scale-110`}
+                  >
+                    {STATUS_ICONS[st]}
+                  </span>
+                  <span className="leading-tight">Mark as {STATUS_LABELS[st]}</span>
+                </button>
+              )
+          )}
+        </DropdownPortal>
       )}
-    </div>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @keyframes dropdownIn {
+          from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+      ` }} />
+    </>
   );
 }
 
@@ -176,7 +328,7 @@ export function OrderTable({
                 </td>
               </tr>
             ) : (
-              data.map((order) => (
+              data.map((order, i) => (
                 <tr key={order.id} className="hover:bg-gray-50 transition-colors duration-100">
                   <td className="px-4 py-4">
                     <span className="font-semibold text-blue-500 hover:underline cursor-pointer">
@@ -195,7 +347,7 @@ export function OrderTable({
                   </td>
                   <td className="px-4 py-4 font-semibold text-gray-900">{order.total}</td>
                   <td className="px-4 py-4">
-                    <RowMenu orderId={order.id} currentStatus={order.status} onUpdateStatus={onUpdateStatus} />
+                    <RowMenu orderId={order.id} currentStatus={order.status} onUpdateStatus={onUpdateStatus} isLast={i >= (data.length > 2 ? data.length - 2 : data.length - 1)} />
                   </td>
                 </tr>
               ))
@@ -222,14 +374,14 @@ export function OrderTable({
         ) : data.length === 0 ? (
           <p className="py-8 text-center text-sm text-gray-400">No orders found.</p>
         ) : (
-          data.map((order) => (
+          data.map((order, i) => (
             <div
               key={order.id}
               className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
             >
               <div className="flex items-start justify-between">
                 <span className="font-semibold text-blue-500">#{order.id}</span>
-                <RowMenu orderId={order.id} currentStatus={order.status} onUpdateStatus={onUpdateStatus} />
+                <RowMenu orderId={order.id} currentStatus={order.status} onUpdateStatus={onUpdateStatus} isLast={i >= data.length - 1} />
               </div>
               <div className="mt-3 flex items-center gap-2.5">
                 <Avatar initials={order.customer.initials} color={order.customer.avatarColor} />
