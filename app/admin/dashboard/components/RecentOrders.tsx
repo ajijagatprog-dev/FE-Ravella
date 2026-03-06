@@ -1,81 +1,72 @@
 "use client";
 
-import { ShoppingBag, Users, CheckCircle, RefreshCw, AlertTriangle } from "lucide-react";
+import { ShoppingBag, CheckCircle, Clock, Truck, XCircle } from "lucide-react";
 
-const activities = [
-  {
-    icon: ShoppingBag,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-    title: "New Order #12344",
-    subtitle: "2 minutes ago by Sarah Jenkins",
-  },
-  {
-    icon: Users,
-    iconBg: "bg-purple-100",
-    iconColor: "text-purple-600",
-    title: "New Loyalty Member",
-    subtitle: "15 minutes ago from California, US",
-  },
-  {
-    icon: CheckCircle,
-    iconBg: "bg-emerald-100",
-    iconColor: "text-emerald-600",
-    title: "B2B Application Approved",
-    subtitle: "1 hour ago · FashionHub Inc.",
-  },
-  {
-    icon: RefreshCw,
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-600",
-    title: "Inventory Synced",
-    subtitle: "3 hours ago · 420 items updated",
-  },
-  {
-    icon: AlertTriangle,
-    iconBg: "bg-red-100",
-    iconColor: "text-red-500",
-    title: "Low Stock Warning",
-    subtitle: '5 hours ago · "Silk Midi Dress" (Blue)',
-  },
-];
+interface Order {
+  order_number: string;
+  customer: string;
+  total: number;
+  status: string;
+  time_ago: string;
+}
 
-export default function RecentOrders() {
+interface RecentOrdersProps {
+  orders: Order[];
+}
+
+const statusConfig: Record<string, { icon: React.ElementType; bg: string; color: string }> = {
+  DELIVERED: { icon: CheckCircle, bg: "bg-emerald-100", color: "text-emerald-600" },
+  PENDING: { icon: Clock, bg: "bg-amber-100", color: "text-amber-600" },
+  PROCESSING: { icon: Clock, bg: "bg-blue-100", color: "text-blue-600" },
+  SHIPPED: { icon: Truck, bg: "bg-cyan-100", color: "text-cyan-600" },
+  CANCELLED: { icon: XCircle, bg: "bg-red-100", color: "text-red-500" },
+};
+
+export default function RecentOrders({ orders }: RecentOrdersProps) {
   return (
     <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow h-fit">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-base font-bold text-gray-900">Latest Activity</h3>
-        <button className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-          View All
-        </button>
+        <h3 className="text-base font-bold text-gray-900">Pesanan Terbaru</h3>
+        <span className="text-xs font-medium text-gray-400">{orders.length} orders</span>
       </div>
 
       {/* Activity List */}
       <div className="flex flex-col gap-4">
-        {activities.map((item, i) => {
-          const Icon = item.icon;
-          return (
-            <div
-              key={i}
-              className="flex items-start gap-3 group cursor-pointer"
-            >
+        {orders.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-6">No recent orders</p>
+        ) : (
+          orders.map((order) => {
+            const cfg = statusConfig[order.status] || statusConfig.PENDING;
+            const Icon = cfg.icon;
+            return (
               <div
-                className={`w-8 h-8 rounded-lg ${item.iconBg} flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-110 transition-transform`}
+                key={order.order_number}
+                className="flex items-start gap-3 group cursor-pointer"
               >
-                <Icon size={14} className={item.iconColor} />
+                <div
+                  className={`w-8 h-8 rounded-lg ${cfg.bg} flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-110 transition-transform`}
+                >
+                  <Icon size={14} className={cfg.color} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition-colors truncate">
+                      #{order.order_number}
+                    </p>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {order.customer} · Rp {order.total.toLocaleString('id-ID')}
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{order.time_ago}</p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition-colors truncate">
-                  {item.title}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
-                  {item.subtitle}
-                </p>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

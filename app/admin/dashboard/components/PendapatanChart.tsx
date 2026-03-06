@@ -3,30 +3,42 @@
 import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-const weekData = [
-  { height: 44, label: "Mon", value: "200k" },
-  { height: 70, label: "Tue", value: "350k" },
-  { height: 55, label: "Wed", value: "275k" },
-  { height: 100, label: "Thu", value: "450k" },
-  { height: 50, label: "Fri", value: "250k" },
-  { height: 65, label: "Sat", value: "325k" },
-  { height: 60, label: "Sun", value: "300k" },
-];
+interface ChartDataPoint {
+  label: string;
+  value: number;
+}
 
-const monthData = [
-  { height: 48, label: "W1", value: "2.1jt" },
-  { height: 62, label: "W2", value: "2.8jt" },
-  { height: 100, label: "W3", value: "3.7jt" },
-  { height: 75, label: "W4", value: "3.2jt" },
-];
+interface PendapatanChartProps {
+  dailyData: ChartDataPoint[];
+  weeklyData: ChartDataPoint[];
+  summary: {
+    total: number;
+    avg_daily: number;
+    peak: { label: string; value: number };
+  };
+}
 
-const CHART_H = 180; // fixed px height
+const CHART_H = 180;
 
-export default function PendapatanChart() {
+function formatRp(val: number): string {
+  if (val >= 1000000) return `Rp ${(val / 1000000).toFixed(1)}jt`;
+  if (val >= 1000) return `Rp ${Math.round(val / 1000)}k`;
+  return `Rp ${val.toLocaleString('id-ID')}`;
+}
+
+export default function PendapatanChart({ dailyData, weeklyData, summary }: PendapatanChartProps) {
   const [animate, setAnimate] = useState(false);
   const [range, setRange] = useState<"week" | "month">("week");
 
-  const chartData = range === "week" ? weekData : monthData;
+  const rawData = range === "week" ? dailyData : weeklyData;
+
+  // Normalize data to percentage of max for bar heights
+  const maxVal = Math.max(...rawData.map(d => d.value), 1);
+  const chartData = rawData.map(d => ({
+    ...d,
+    height: Math.max(5, Math.round((d.value / maxVal) * 100)),
+  }));
+
   const peakIdx = chartData.reduce(
     (mi, d, i, arr) => (d.height > arr[mi].height ? i : mi),
     0
@@ -40,13 +52,12 @@ export default function PendapatanChart() {
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-      {/* ── Header ─────────────────────────────── */}
+      {/* ── Header ── */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h3 className="text-base font-bold text-gray-900">Trafic Penjualan</h3>
+          <h3 className="text-base font-bold text-gray-900">Trafik Penjualan</h3>
           <p className="text-xs text-gray-500 mt-0.5">
-           Total Ringkasan Penjualan{" "}
-            {range === "week" ? "7 hari" : "30 hari"}
+            Total Ringkasan Penjualan {range === "week" ? "7 hari" : "30 hari"}
           </p>
         </div>
         <button
@@ -58,11 +69,8 @@ export default function PendapatanChart() {
         </button>
       </div>
 
-      {/* ── Bar Chart (fixed px height so bars always show) ── */}
-      <div
-        className="flex gap-2 sm:gap-3 items-end"
-        style={{ height: CHART_H }}
-      >
+      {/* ── Bar Chart ── */}
+      <div className="flex gap-2 sm:gap-3 items-end" style={{ height: CHART_H }}>
         {chartData.map((d, i) => {
           const barPx = Math.round((d.height / 100) * CHART_H);
           const isPeak = i === peakIdx;
@@ -75,17 +83,16 @@ export default function PendapatanChart() {
             >
               {/* Tooltip */}
               <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-xl">
-                Rp {d.value}
+                {formatRp(d.value)}
                 <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
               </div>
 
               {/* Bar */}
               <div
-                className={`w-full rounded-t-xl transition-all duration-700 ease-out ${
-                  isPeak
+                className={`w-full rounded-t-xl transition-all duration-700 ease-out ${isPeak
                     ? "bg-blue-600 shadow-lg shadow-blue-200"
                     : "bg-blue-100 group-hover:bg-blue-200"
-                }`}
+                  }`}
                 style={{
                   height: animate ? barPx : 0,
                   transitionDelay: `${i * 60}ms`,
@@ -94,9 +101,8 @@ export default function PendapatanChart() {
 
               {/* Label */}
               <span
-                className={`absolute -bottom-6 text-[11px] font-semibold transition-colors ${
-                  isPeak ? "text-blue-600" : "text-gray-400"
-                }`}
+                className={`absolute -bottom-6 text-[11px] font-semibold transition-colors ${isPeak ? "text-blue-600" : "text-gray-400"
+                  }`}
               >
                 {d.label}
               </span>
@@ -105,34 +111,31 @@ export default function PendapatanChart() {
         })}
       </div>
 
-      {/* Spacer for labels */}
       <div className="h-8" />
-
-      {/* Divider */}
       <div className="h-px bg-gray-100 mb-5" />
 
-      {/* ── Summary cards ──────────────────────── */}
+      {/* ── Summary cards ── */}
       <div className="grid grid-cols-3 gap-3">
         {[
           {
             emoji: "💰",
             label: "TOTAL",
-            value: "Rp 2.3jt",
-            sub: "↑ 12.5% vs period lalu",
+            value: formatRp(summary.total),
+            sub: "periode ini",
             subColor: "text-emerald-600",
           },
           {
             emoji: "📊",
             label: "RATA-RATA",
-            value: "Rp 330k",
+            value: formatRp(summary.avg_daily),
             sub: "per hari",
             subColor: "text-gray-400",
           },
           {
             emoji: "🏆",
             label: "TERTINGGI",
-            value: "Rp 450k",
-            sub: range === "week" ? "Kamis" : "Week 3",
+            value: formatRp(summary.peak.value),
+            sub: summary.peak.label,
             subColor: "text-blue-500",
           },
         ].map((s) => (
