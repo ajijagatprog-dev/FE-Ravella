@@ -22,12 +22,39 @@ const LIMIT = 5;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+interface OrderStats {
+  total_revenue: number;
+  revenue_trend: number;
+  active_orders: number;
+  active_trend: number;
+  pending_shipments: number;
+  pending_trend: number;
+}
+
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount);
+
 export default function OrderPage() {
   const [activeTab, setActiveTab] = useState<TabStatus>("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<OrderStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  const fetchStats = async () => {
+    try {
+      const res = await api.get('/admin/orders/stats');
+      if (res.data.status === 'success') {
+        setStats(res.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -57,6 +84,7 @@ export default function OrderPage() {
       }
     };
     fetchOrders();
+    fetchStats();
   }, []);
 
   const filtered = useMemo(() => {
@@ -91,6 +119,7 @@ export default function OrderPage() {
       const res = await api.put(`/admin/orders/${orderNumber}/status`, { status });
       if (res.data.status === 'success') {
         setOrders(prev => prev.map(o => o.id === orderNumber ? { ...o, status: res.data.data.status as any } : o));
+        fetchStats(); // Refresh stats after status change
         alert("Order status updated successfully!");
       }
     } catch (error: any) {
@@ -134,10 +163,16 @@ export default function OrderPage() {
               <ShoppingBag size={15} className="text-blue-500" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">Rp.45,280.00</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-emerald-600">
-            <TrendingUp size={12} />
-            +12.5% vs last month
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-36 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">
+              {formatCurrency(stats?.total_revenue ?? 0)}
+            </p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.revenue_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.revenue_trend ?? 0) >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+            {(stats?.revenue_trend ?? 0) >= 0 ? "+" : ""}{stats?.revenue_trend ?? 0}% vs last month
           </div>
         </div>
 
@@ -151,10 +186,14 @@ export default function OrderPage() {
               <ShoppingBag size={15} className="text-emerald-500" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">124</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-emerald-600">
-            <TrendingUp size={12} />
-            +3.2% from yesterday
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-16 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">{stats?.active_orders ?? 0}</p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.active_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.active_trend ?? 0) >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+            {(stats?.active_trend ?? 0) >= 0 ? "+" : ""}{stats?.active_trend ?? 0}% from yesterday
           </div>
         </div>
 
@@ -168,10 +207,14 @@ export default function OrderPage() {
               <Truck size={15} className="text-red-400" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">18</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-red-500">
-            <TrendingDown size={12} />
-            -5.1% since Monday
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-12 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">{stats?.pending_shipments ?? 0}</p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.pending_trend ?? 0) <= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.pending_trend ?? 0) <= 0 ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
+            {(stats?.pending_trend ?? 0) >= 0 ? "+" : ""}{stats?.pending_trend ?? 0}% since last week
           </div>
         </div>
       </div>

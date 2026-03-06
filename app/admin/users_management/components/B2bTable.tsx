@@ -12,6 +12,7 @@ interface B2bTableProps {
   total: number;
   handlePageChange: (page: number) => void;
   handleLimitChange: (limit: number) => void;
+  onUserAction?: (userId: number, action: string) => void;
 }
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
@@ -51,11 +52,10 @@ function TypeBadge({ type }: { type: string }) {
   const isB2B = type?.toUpperCase() === "B2B PARTNER" || type?.toUpperCase() === "B2B";
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide ${
-        isB2B
+      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide ${isB2B
           ? "bg-blue-100 text-blue-700 ring-1 ring-blue-200"
           : "bg-violet-100 text-violet-700 ring-1 ring-violet-200"
-      }`}
+        }`}
     >
       {isB2B ? "B2B Partner" : "Retail"}
     </span>
@@ -72,11 +72,10 @@ function Avatar({ name, isB2B }: { name: string; isB2B: boolean }) {
     .toUpperCase();
   return (
     <div
-      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
-        isB2B
+      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${isB2B
           ? "bg-blue-100 text-blue-700"
           : "bg-violet-100 text-violet-700"
-      }`}
+        }`}
     >
       {initials}
     </div>
@@ -84,7 +83,7 @@ function Avatar({ name, isB2B }: { name: string; isB2B: boolean }) {
 }
 
 // ─── Action Buttons ───────────────────────────────────────────────────────────
-function ActionButtons({ row }: { row: any }) {
+function ActionButtons({ row, onAction }: { row: any; onAction?: (userId: number, action: string) => void }) {
   const status = row.status?.toLowerCase();
   const type = row.type?.toUpperCase();
 
@@ -104,36 +103,37 @@ function ActionButtons({ row }: { row: any }) {
         </div>
       );
     }
+    if (status === "pending review") {
+      return (
+        <div className="flex gap-2">
+          <button
+            onClick={() => onAction?.(row.id, 'approve')}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          >
+            Verify Now
+          </button>
+          <button
+            onClick={() => onAction?.(row.id, 'reject')}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+          >
+            Reject
+          </button>
+        </div>
+      );
+    }
     return (
       <div className="flex gap-2">
-        <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-          Verify Now
-        </button>
-        <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
-          Reject
+        <button
+          onClick={() => onAction?.(row.id, 'approve')}
+          className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+        >
+          Re-activate
         </button>
       </div>
     );
   }
 
-  // Retail
-  if (status === "active") {
-    return (
-      <div className="flex gap-2">
-        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-          View Activity
-        </button>
-        <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-          Details
-        </button>
-      </div>
-    );
-  }
-
+  // Retail — always active
   return (
     <div className="flex gap-2">
       <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors">
@@ -143,8 +143,8 @@ function ActionButtons({ row }: { row: any }) {
         </svg>
         View Activity
       </button>
-      <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors">
-        Enable
+      <button className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        Details
       </button>
     </div>
   );
@@ -220,11 +220,10 @@ function Pagination({
             <button
               key={p}
               onClick={() => handlePageChange(p as number)}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
-                page === p
+              className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${page === p
                   ? "bg-blue-600 text-white shadow-sm"
                   : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-              }`}
+                }`}
             >
               {p}
             </button>
@@ -254,6 +253,7 @@ export default function B2bTable({
   total,
   handlePageChange,
   handleLimitChange,
+  onUserAction,
 }: B2bTableProps) {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -333,7 +333,7 @@ export default function B2bTable({
             ))}
           </select>
         </div>
-      </div>    
+      </div>
 
       {/* ── Table (desktop) ── */}
       <div className="hidden md:block overflow-x-auto">
@@ -408,7 +408,7 @@ export default function B2bTable({
                     {/* Actions */}
                     <td className="px-4 py-3.5">
                       <div className="flex justify-end">
-                        <ActionButtons row={row} />
+                        <ActionButtons row={row} onAction={onUserAction} />
                       </div>
                     </td>
                   </tr>
@@ -464,7 +464,7 @@ export default function B2bTable({
                   )}
                 </div>
 
-                <ActionButtons row={row} />
+                <ActionButtons row={row} onAction={onUserAction} />
               </div>
             );
           })
