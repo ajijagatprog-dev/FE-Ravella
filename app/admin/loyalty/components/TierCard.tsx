@@ -10,6 +10,8 @@ interface Tier {
 interface TierCardProps {
   tier: Tier;
   index?: number;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 // ─── Per-tier visual config ───────────────────────────────────────────────────
@@ -86,7 +88,7 @@ function CheckIcon({ className }: { className: string }) {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function TierCard({ tier, index = 0 }: TierCardProps) {
+export default function TierCard({ tier, index = 0, onEdit, onDelete }: TierCardProps) {
   const cfg = TIER_CONFIG[tier.name] ?? TIER_CONFIG["Basic"];
   const isGold = tier.name === "Gold";
 
@@ -157,17 +159,31 @@ export default function TierCard({ tier, index = 0 }: TierCardProps) {
       </div>
 
       {/* ── Footer ── */}
-      <div className="px-5 pb-4">
-        <button className={`w-full py-2 text-xs font-semibold rounded-xl border transition-colors
+      <div className="px-5 pb-4 flex gap-2">
+        <button
+          onClick={onEdit}
+          className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-colors
           ${isGold
-            ? "bg-amber-400 text-white hover:bg-amber-500 border-amber-400"
-            : tier.name === "Platinum"
-              ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
-              : "bg-white text-slate-600 hover:bg-slate-50 border-slate-200"
-          }`
-        }>
+              ? "bg-amber-400 text-white hover:bg-amber-500 border-amber-400"
+              : tier.name === "Platinum"
+                ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
+                : "bg-white text-slate-600 hover:bg-slate-50 border-slate-200"
+            }`
+          }>
           Edit Tier
         </button>
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="px-3 py-2 text-xs font-semibold rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
+            title="Delete Tier"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );
