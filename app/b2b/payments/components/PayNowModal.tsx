@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { X, AlertCircle, Loader2, CheckCircle2, QrCode, Building2 } from "lucide-react";
 import { Transaction, formatRp } from "../types";
+import api from "@/lib/axios";
+import toast from "react-hot-toast";
 
 type PayStep = "confirm" | "processing" | "success";
 
@@ -15,13 +17,27 @@ interface PayNowModalProps {
 export default function PayNowModal({ transaction, onClose, onSuccess }: PayNowModalProps) {
   const [step, setStep] = useState<PayStep>("confirm");
 
-  function handlePay() {
+  async function handlePay() {
     setStep("processing");
-    // TODO Midtrans: window.snap.pay(snapToken, { onSuccess, onPending, onError })
-    setTimeout(() => {
-      setStep("success");
-      onSuccess(transaction.id);
-    }, 2200);
+    try {
+      const res = await api.post('/payments/webhook', {
+        order_number: transaction.id,
+        status: 'success'
+      });
+      if (res.data?.status === 'success') {
+        setTimeout(() => {
+          setStep("success");
+          onSuccess(transaction.id);
+        }, 800);
+      } else {
+        toast.error("Gagal memproses pembayaran");
+        setStep("confirm");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Terjadi kesalahan sistem");
+      setStep("confirm");
+    }
   }
 
   return (
