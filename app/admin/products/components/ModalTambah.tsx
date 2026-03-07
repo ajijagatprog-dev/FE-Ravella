@@ -21,7 +21,9 @@ interface Product {
   stock: number;
   stockStatus: "low" | "medium" | "high";
   retailPrice: number;
+  salePrice: number;
   b2bPrice: number;
+  b2bMinOrder: number;
 }
 
 interface ModalTambahProps {
@@ -42,9 +44,11 @@ export default function ModalTambah({
     sku: "",
     stock: 0,
     retailPrice: 0,
+    salePrice: 0,
     b2bPrice: 0,
+    b2bMinOrder: 1,
     description: "",
-    weight: 0,
+    weight: 1000,
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -61,7 +65,9 @@ export default function ModalTambah({
       if (form.image) formData.append('image', form.image);
       formData.append('stock', form.stock.toString());
       formData.append('price', form.retailPrice.toString());
-      formData.append('sale_price', form.b2bPrice.toString());
+      formData.append('sale_price', form.salePrice.toString());
+      formData.append('b2b_price', form.b2bPrice.toString());
+      formData.append('b2b_min_order', form.b2bMinOrder.toString());
       formData.append('description', form.description || form.name);
       formData.append('weight', form.weight.toString() || "1000");
 
@@ -74,7 +80,7 @@ export default function ModalTambah({
           id: res.data.data?.id || Date.now(),
           name: form.name, category: form.category, image: res.data.data?.image || "", sku: form.sku,
           stock: form.stock, stockStatus: form.stock <= 10 ? "low" : "high",
-          retailPrice: form.retailPrice, b2bPrice: form.b2bPrice
+          retailPrice: form.retailPrice, salePrice: form.salePrice, b2bPrice: form.b2bPrice, b2bMinOrder: form.b2bMinOrder
         };
 
         onAddProduct(mockProduct);
@@ -241,6 +247,27 @@ export default function ModalTambah({
               </div>
             </div>
 
+            {/* Sale Price */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <DollarSign size={16} className="text-rose-500" />
+                Sale Price
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
+                  Rp
+                </span>
+                <input
+                  type="number"
+                  placeholder="0"
+                  className="w-full border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 transition-all duration-200 hover:border-gray-300"
+                  onChange={(e) =>
+                    setForm({ ...form, salePrice: Number(e.target.value) })
+                  }
+                />
+              </div>
+            </div>
+
             {/* B2B Price */}
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
@@ -257,6 +284,24 @@ export default function ModalTambah({
                   className="w-full border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all duration-200 hover:border-gray-300"
                   onChange={(e) =>
                     setForm({ ...form, b2bPrice: Number(e.target.value) })
+                  }
+                />
+              </div>
+            </div>
+
+            {/* B2B Min Order */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <Package size={16} className="text-yellow-500" />
+                B2B Min Order
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  placeholder="1"
+                  className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all duration-200 hover:border-gray-300"
+                  onChange={(e) =>
+                    setForm({ ...form, b2bMinOrder: Number(e.target.value) })
                   }
                 />
               </div>

@@ -13,7 +13,9 @@ type Product = {
   stock: number;
   stockStatus: "high" | "medium" | "low";
   retailPrice: number;
+  salePrice: number;
   b2bPrice: number;
+  b2bMinOrder: number;
   description?: string;
   weight?: number;
 };
@@ -42,6 +44,7 @@ export default function ModalEdit({
         ...product,
         description: product.description || product.name,
         weight: product.weight || 1000,
+        b2bMinOrder: product.b2bMinOrder || 1,
         newImage: null
       });
     }
@@ -65,13 +68,15 @@ export default function ModalEdit({
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append('_method', 'PUT'); // Laravel requirement for multipart/form-data PUT
+      formData.append('_method', 'PUT');
       formData.append('name', form.name);
       formData.append('category', form.category);
       if (form.newImage) formData.append('image', form.newImage);
       formData.append('stock', form.stock.toString());
       formData.append('price', form.retailPrice.toString());
-      formData.append('sale_price', form.b2bPrice.toString());
+      formData.append('sale_price', form.salePrice.toString());
+      formData.append('b2b_price', form.b2bPrice.toString());
+      formData.append('b2b_min_order', form.b2bMinOrder.toString());
       formData.append('description', form.description || form.name);
       formData.append('weight', form.weight?.toString() || "1000");
 
@@ -151,6 +156,27 @@ export default function ModalEdit({
                   value={form.retailPrice}
                   onChange={handleChange}
                   className="w-full rounded-xl border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all duration-200 hover:border-gray-300"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            {/* Sale Price */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                Sale Price
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
+                  Rp
+                </span>
+                <input
+                  type="number"
+                  name="salePrice"
+                  value={form.salePrice}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 transition-all duration-200 hover:border-gray-300"
                   placeholder="0"
                 />
               </div>

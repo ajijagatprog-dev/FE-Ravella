@@ -46,9 +46,9 @@ export default function ProductCard({ product, onAddToOrder }: Props) {
                     <div className="absolute top-3 left-3 z-10">
                         <span className={cn(
                             "text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg shadow-sm",
-                            badgeConfig[product.badge].className
+                            product.badge && badgeConfig[product.badge as keyof typeof badgeConfig]?.className
                         )}>
-                            {badgeConfig[product.badge].label}
+                            {product.badge && (badgeConfig[product.badge as keyof typeof badgeConfig]?.label || product.badge)}
                         </span>
                     </div>
                 )}

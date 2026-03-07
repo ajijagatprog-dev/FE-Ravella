@@ -37,7 +37,15 @@ export default function B2BProductsPage() {
                 }
             });
             if (res.data.status === 'success') {
-                setProducts(res.data.data.data);
+                const fetchedProducts = res.data.data.data.map((p: any) => ({
+                    ...p,
+                    price: p.b2b_price && p.b2b_price > 0 ? p.b2b_price : p.price,
+                    msrp: p.price,
+                    minOrder: p.b2b_min_order && p.b2b_min_order > 0 ? p.b2b_min_order : 1,
+                    inStock: p.stock > 0,
+                    features: Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features || "[]") : []),
+                }));
+                setProducts(fetchedProducts);
                 setTotalProducts(res.data.data.total);
             }
         } catch (error) {
