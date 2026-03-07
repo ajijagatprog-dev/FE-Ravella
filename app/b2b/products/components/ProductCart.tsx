@@ -1,6 +1,7 @@
 "use client";
 
 import { ShoppingCart, Package } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { Product } from "../types";
 
@@ -31,7 +32,7 @@ export default function ProductCard({ product, onAddToOrder }: Props) {
     return (
         <div className="group bg-white rounded-2xl border border-stone-200 overflow-hidden hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50/60 transition-all duration-200 flex flex-col">
             {/* Image */}
-            <div className="relative h-52 bg-stone-50 overflow-hidden flex-shrink-0">
+            <Link href={`/b2b/products/${product.id}`} className="relative h-52 bg-stone-50 overflow-hidden flex-shrink-0 block">
                 <img
                     src={product.image}
                     alt={product.name}
@@ -65,7 +66,7 @@ export default function ProductCard({ product, onAddToOrder }: Props) {
                         IN STOCK
                     </span>
                 </div>
-            </div>
+            </Link>
 
             {/* Content */}
             <div className="p-4 flex flex-col flex-1 gap-2.5">
@@ -73,9 +74,9 @@ export default function ProductCard({ product, onAddToOrder }: Props) {
                     SKU: {product.sku}
                 </p>
 
-                <p className="text-sm font-bold text-stone-800 leading-snug line-clamp-2 min-h-[2.5rem]">
+                <Link href={`/b2b/products/${product.id}`} className="text-sm font-bold text-stone-800 leading-snug line-clamp-2 min-h-[2.5rem] hover:text-blue-600 transition-colors">
                     {product.name}
-                </p>
+                </Link>
 
                 {/* Pricing */}
                 <div className="flex items-baseline gap-2 flex-wrap">

@@ -22,10 +22,11 @@ import api from "@/lib/axios";
 
 // ── Categories ────────────────────────────────────────────────────────────────
 const CATEGORIES = [
-    { value: "homeliving", label: "Home Living" },
-    { value: "appliance", label: "Appliance" },
-    { value: "ezy", label: "Ezy Series" },
-    { value: "knife", label: "Knife" },
+    { value: "Home & Kitchen Appliance", label: "Home & Kitchen Appliance" },
+    { value: "Knife set", label: "Knife set" },
+    { value: "ezy series", label: "ezy series" },
+    { value: "home living", label: "home living" },
+    { value: "keyboard", label: "keyboard" },
 ];
 
 const BADGES = ["Best Seller", "Premium", "Popular", "New"];

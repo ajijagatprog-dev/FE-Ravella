@@ -13,7 +13,9 @@ interface Product {
   stock: number;
   stockStatus: "low" | "medium" | "high";
   retailPrice: number;
+  salePrice: number;
   b2bPrice: number;
+  b2bMinOrder: number;
 }
 
 interface ProductTableProps {
@@ -147,9 +149,8 @@ export default function ProductTable({
                   </td>
 
                   <td className="px-6 py-5 text-right">
-                    <div className={`flex items-center justify-end gap-1 transition-all duration-300 ${
-                      hoveredRow === product.id ? "opacity-100 translate-x-0" : "opacity-0 md:opacity-40 translate-x-1"
-                    }`}>
+                    <div className={`flex items-center justify-end gap-1 transition-all duration-300 ${hoveredRow === product.id ? "opacity-100 translate-x-0" : "opacity-0 md:opacity-40 translate-x-1"
+                      }`}>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -178,10 +179,10 @@ export default function ProductTable({
             ) : (
               <tr>
                 <td colSpan={5} className="px-6 py-20 text-center">
-                   <div className="flex flex-col items-center gap-2">
-                      <Package size={40} className="text-slate-200" />
-                      <p className="text-slate-400 font-medium">No products found matching your criteria.</p>
-                   </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Package size={40} className="text-slate-200" />
+                    <p className="text-slate-400 font-medium">No products found matching your criteria.</p>
+                  </div>
                 </td>
               </tr>
             )}

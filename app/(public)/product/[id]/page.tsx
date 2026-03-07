@@ -43,8 +43,8 @@ export default function ProductDetail() {
                         id: item.id,
                         name: item.name,
                         description: item.description || "Deskripsi produk",
-                        price: item.price,
-                        originalPrice: item.sale_price !== null ? item.sale_price : item.price,
+                        price: item.sale_price && item.sale_price > 0 ? item.sale_price : item.price,
+                        originalPrice: item.price,
                         discount: item.discount || 0,
                         rating: item.rating ? parseFloat(item.rating) : 0,
                         reviews: item.reviews || 0,
@@ -61,8 +61,8 @@ export default function ProductDetail() {
                     const relRes = await api.get('/products', { params: { limit: 4, category: item.category || undefined } });
                     if (relRes.data.status === 'success') {
                         const relMapped = relRes.data.data.data.map((r: any) => ({
-                            id: r.id, name: r.name, price: r.price, image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-                            rating: r.rating ? parseFloat(r.rating) : 0, reviews: r.reviews || 0, originalPrice: r.sale_price !== null ? r.sale_price : r.price, discount: r.discount || 0, badge: r.badge || (r.is_featured ? "Best Seller" : ""), isNew: true
+                            id: r.id, name: r.name, price: r.sale_price && r.sale_price > 0 ? r.sale_price : r.price, image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+                            rating: r.rating ? parseFloat(r.rating) : 0, reviews: r.reviews || 0, originalPrice: r.price, discount: r.discount || 0, badge: r.badge || (r.is_featured ? "Best Seller" : ""), isNew: true
                         }));
                         setRelatedProducts(relMapped);
                     }

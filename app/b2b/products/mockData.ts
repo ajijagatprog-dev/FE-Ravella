@@ -155,7 +155,9 @@ export const MOCK_PRODUCTS: Product[] = [
 
 export const CATEGORIES = [
     "All Products",
-    "Home Living",
-    "Kitchen",
-    "Personal Care",
+    "Home & Kitchen Appliance",
+    "Knife set",
+    "ezy series",
+    "home living",
+    "keyboard",
 ] as const;

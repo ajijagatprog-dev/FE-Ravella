@@ -154,11 +154,18 @@ export default function ModalTambah({
                 <Tag size={16} className="text-purple-500" />
                 Category
               </label>
-              <input
-                placeholder="e.g., Electronics"
-                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200 hover:border-gray-300"
+              <select
+                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200 hover:border-gray-300 appearance-none cursor-pointer"
+                value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-              />
+              >
+                <option value="" disabled>Pilih Kategori</option>
+                <option value="Home & Kitchen Appliance">Home & Kitchen Appliance</option>
+                <option value="Knife set">Knife set</option>
+                <option value="ezy series">ezy series</option>
+                <option value="home living">home living</option>
+                <option value="keyboard">keyboard</option>
+              </select>
             </div>
 
             {/* Weight */}

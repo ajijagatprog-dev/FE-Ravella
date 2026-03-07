@@ -16,4 +16,4 @@ export interface Product {
     description: string;
 }
 
-export type Category = "All Products" | "Home Living" | "Kitchen" | "Personal Care";
+export type Category = "All Products" | "Home & Kitchen Appliance" | "Knife set" | "ezy series" | "home living" | "keyboard";

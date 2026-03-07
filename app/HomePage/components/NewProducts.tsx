@@ -27,15 +27,18 @@ export default function NewProducts() {
       try {
         const res = await api.get('/products', { params: { limit: 4, sort: 'latest' } });
         if (res.data.status === 'success') {
-          const mapped = res.data.data.data.map((item: any) => ({
-            id: item.id,
-            title: item.name,
-            category: item.category || 'Peralatan Masak',
-            price: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(item.price),
-            image: item.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-            badge: item.badge || (item.is_featured ? "Best Seller" : "New"),
-            rating: item.rating ? parseFloat(item.rating) : 0,
-          }));
+          const mapped = res.data.data.data.map((item: any) => {
+            const displayPrice = item.sale_price && item.sale_price > 0 ? item.sale_price : item.price;
+            return {
+              id: item.id,
+              title: item.name,
+              category: item.category || 'Peralatan Masak',
+              price: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(displayPrice),
+              image: item.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+              badge: item.badge || (item.is_featured ? "Best Seller" : "New"),
+              rating: item.rating ? parseFloat(item.rating) : 0,
+            };
+          });
           setProducts(mapped);
         }
       } catch (error) {

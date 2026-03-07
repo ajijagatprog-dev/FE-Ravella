@@ -19,7 +19,9 @@ interface Product {
   stock: number;
   stockStatus: "high" | "medium" | "low";
   retailPrice: number;
+  salePrice: number;
   b2bPrice: number;
+  b2bMinOrder: number;
 }
 
 export default function ProductManagementPage() {
@@ -47,7 +49,7 @@ export default function ProductManagementPage() {
           page: currentPage,
           limit: ITEMS_PER_PAGE,
           search: searchQuery || undefined,
-          sort: sortBy 
+          sort: sortBy
         }
       });
       if (res.data.status === 'success') {
@@ -63,7 +65,9 @@ export default function ProductManagementPage() {
           stock: item.stock,
           stockStatus: item.stock > 50 ? 'high' : item.stock > 10 ? 'medium' : 'low',
           retailPrice: item.price,
-          b2bPrice: item.sale_price !== null ? item.sale_price : item.price,
+          salePrice: item.sale_price !== null ? item.sale_price : 0,
+          b2bPrice: item.b2b_price !== null ? item.b2b_price : item.price,
+          b2bMinOrder: item.b2b_min_order !== null ? item.b2b_min_order : 1,
         }));
 
         setProducts(mappedProducts);
@@ -275,8 +279,8 @@ export default function ProductManagementPage() {
                     key={page}
                     onClick={() => setCurrentPage(page as number)}
                     className={`min-w-[40px] h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${currentPage === page
-                        ? "bg-white text-blue-600 shadow-sm scale-105"
-                        : "text-slate-500 hover:text-slate-900"
+                      ? "bg-white text-blue-600 shadow-sm scale-105"
+                      : "text-slate-500 hover:text-slate-900"
                       }`}
                   >
                     {page}
