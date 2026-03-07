@@ -1,5 +1,4 @@
 import { Download, Plus } from "lucide-react";
-import StatsCards from "./components/StatsCards";
 import OrdersClient from "./components/OrdersClient";
 
 export default function B2BOrdersPage() {
@@ -24,9 +23,6 @@ export default function B2BOrdersPage() {
           </button>
         </div>
       </div>
-
-      {/* Stats */}
-      <StatsCards />
 
       {/* Interactive: Tabs + Table + Pagination + Modal */}
       <OrdersClient />

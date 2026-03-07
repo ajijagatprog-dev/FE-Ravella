@@ -6,6 +6,7 @@ import { OrderTable, Order } from "./components/OrderTable";
 
 import api from "@/lib/axios";
 import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 type TabStatus = "all" | "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 
@@ -120,11 +121,11 @@ export default function OrderPage() {
       if (res.data.status === 'success') {
         setOrders(prev => prev.map(o => o.id === orderNumber ? { ...o, status: res.data.data.status as any } : o));
         fetchStats(); // Refresh stats after status change
-        alert("Order status updated successfully!");
+        toast.success("Order status updated successfully!");
       }
     } catch (error: any) {
       console.error("Failed to update status", error);
-      alert("Failed to update status. Please try again.");
+      toast.error("Failed to update status. Please try again.");
     }
   };
 

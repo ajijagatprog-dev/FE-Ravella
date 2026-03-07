@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Eye,
   Calendar,
@@ -24,6 +24,7 @@ interface OrderItem {
   name: string;
   qty: number;
   price: string;
+  image?: string;
 }
 
 interface Order {
@@ -40,198 +41,93 @@ interface Order {
   notes?: string;
 }
 
-// ─── Dummy Data ───────────────────────────────────────────────────────────────
+import api from "@/lib/axios";
 
-const ALL_ORDERS: Order[] = [
-  {
-    id: "#RVL-8901",
-    customer: "Urban Outfitters Ltd.",
-    location: "London, UK",
-    date: "Oct 24, 2023",
-    paymentStatus: "Paid",
-    orderStatus: "Completed",
-    totalAmount: "Rp. 4,250.00",
-    email: "buyer@urbanoutfitters.co.uk",
-    phone: "+44 20 7946 0958",
-    items: [
-      { name: "Classic Denim Jacket", qty: 20, price: "Rp. 1,200.00" },
-      { name: "Striped Linen Shirt", qty: 30, price: "Rp. 900.00" },
-      { name: "Floral Midi Dress", qty: 25, price: "Rp. 2,150.00" },
-    ],
-    notes: "Delivery to Warehouse B, loading dock 3.",
-  },
-  {
-    id: "#RVL-8902",
-    customer: "Nordstrom Rack",
-    location: "New York, US",
-    date: "Oct 23, 2023",
-    paymentStatus: "Pending",
-    orderStatus: "Processing",
-    totalAmount: "Rp. 12,840.50",
-    email: "wholesale@nordstromrack.com",
-    phone: "+1 212 555 0192",
-    items: [
-      { name: "Wool Blend Coat", qty: 50, price: "Rp. 7,500.00" },
-      { name: "Leather Ankle Boots", qty: 40, price: "Rp. 3,200.00" },
-      { name: "Cashmere Scarf", qty: 30, price: "Rp. 2,140.50" },
-    ],
-    notes: "Urgent order — customer requested expedited processing.",
-  },
-  {
-    id: "#RVL-8899",
-    customer: "Zara Flagship",
-    location: "Madrid, ES",
-    date: "Oct 22, 2023",
-    paymentStatus: "Failed",
-    orderStatus: "On Hold",
-    totalAmount: "Rp. 2,100.00",
-    email: "orders@zara-flagship.es",
-    phone: "+34 91 123 4567",
-    items: [
-      { name: "Satin Slip Dress", qty: 15, price: "Rp. 900.00" },
-      { name: "Wide Leg Trousers", qty: 20, price: "Rp. 1,200.00" },
-    ],
-    notes: "Payment failed — contact finance team to retry.",
-  },
-  {
-    id: "#RVL-8895",
-    customer: "Selfridges & Co",
-    location: "Birmingham, UK",
-    date: "Oct 20, 2023",
-    paymentStatus: "Paid",
-    orderStatus: "Completed",
-    totalAmount: "Rp. 7.430.000",
-    email: "buying@selfridges.com",
-    phone: "+44 121 600 6677",
-    items: [
-      { name: "Embroidered Blouse", qty: 35, price: "Rp. 2,800.00" },
-      { name: "Tailored Blazer", qty: 28, price: "Rp. 3,080.25" },
-      { name: "Silk Camisole", qty: 20, price: "Rp. 1,550.00" },
-    ],
-  },
-  {
-    id: "#RVL-8890",
-    customer: "H&M Group",
-    location: "Stockholm, SE",
-    date: "Oct 19, 2023",
-    paymentStatus: "Paid",
-    orderStatus: "Completed",
-    totalAmount: "Rp. 1,890.00",
-    email: "wholesale@hm.com",
-    phone: "+46 8 796 5500",
-    items: [
-      { name: "Cotton Oversized Tee", qty: 60, price: "Rp. 1,200.00" },
-      { name: "Jersey Joggers", qty: 30, price: "Rp. 690.00" },
-    ],
-  },
-  {
-    id: "#RVL-8885",
-    customer: "ASOS Wholesale",
-    location: "London, UK",
-    date: "Oct 18, 2023",
-    paymentStatus: "Paid",
-    orderStatus: "Completed",
-    totalAmount: "Rp. 9,100.00",
-    email: "wholesale@asos.com",
-    phone: "+44 20 7042 7000",
-    items: [
-      { name: "Ribbed Knit Jumper", qty: 50, price: "Rp. 4,500.00" },
-      { name: "Cargo Trousers", qty: 45, price: "Rp. 4,600.00" },
-    ],
-  },
-  {
-    id: "#RVL-8880",
-    customer: "Marks & Spencer",
-    location: "Manchester, UK",
-    date: "Oct 17, 2023",
-    paymentStatus: "Pending",
-    orderStatus: "Processing",
-    totalAmount: "Rp. 5,670.00",
-    email: "trade@marksandspencer.com",
-    phone: "+44 161 930 3333",
-    items: [
-      { name: "Formal Shirt Pack", qty: 40, price: "Rp. 2,400.00" },
-      { name: "Chino Trousers", qty: 35, price: "Rp. 3,270.00" },
-    ],
-    notes: "Scheduled delivery: Nov 1, 2023.",
-  },
-  {
-    id: "#RVL-8875",
-    customer: "Zalando SE",
-    location: "Berlin, DE",
-    date: "Oct 15, 2023",
-    paymentStatus: "Paid",
-    orderStatus: "Completed",
-    totalAmount: "Rp. 3,320.00",
-    email: "sourcing@zalando.de",
-    phone: "+49 30 200 089 500",
-    items: [
-      { name: "Summer Sundress", qty: 40, price: "Rp. 1,600.00" },
-      { name: "Linen Shorts", qty: 40, price: "Rp. 1,720.00" },
-    ],
-  },
-  {
-    id: "#RVL-8870",
-    customer: "Mango Fashion",
-    location: "Barcelona, ES",
-    date: "Oct 13, 2023",
-    paymentStatus: "Failed",
-    orderStatus: "On Hold",
-    totalAmount: "Rp. 4,800.00",
-    email: "b2b@mango.com",
-    phone: "+34 93 860 9922",
-    items: [
-      { name: "Pleated Midi Skirt", qty: 30, price: "Rp. 2,100.00" },
-      { name: "Cropped Jacket", qty: 25, price: "Rp. 2,700.00" },
-    ],
-    notes: "Pending payment verification.",
-  },
-  {
-    id: "#RVL-8865",
-    customer: "Next PLC",
-    location: "Leeds, UK",
-    date: "Oct 12, 2023",
-    paymentStatus: "Paid",
-    orderStatus: "Completed",
-    totalAmount: "Rp. 6,250.00",
-    email: "wholesale@next.co.uk",
-    phone: "+44 113 399 6000",
-    items: [
-      { name: "Padded Gilet", qty: 50, price: "Rp. 3,500.00" },
-      { name: "Knit Cardigan", qty: 45, price: "Rp. 2,750.00" },
-    ],
-  },
-  {
-    id: "#RVL-8860",
-    customer: "River Island",
-    location: "London, UK",
-    date: "Oct 10, 2023",
-    paymentStatus: "Paid",
-    orderStatus: "Completed",
-    totalAmount: "Rp. 8,900.00",
-    email: "trade@riverisland.com",
-    phone: "+44 20 8991 4904",
-    items: [
-      { name: "Faux Leather Jacket", qty: 60, price: "Rp. 5,400.00" },
-      { name: "High Waist Jeans", qty: 55, price: "Rp. 3,500.00" },
-    ],
-  },
-  {
-    id: "#RVL-8855",
-    customer: "Topshop Group",
-    location: "Dublin, IE",
-    date: "Oct 9, 2023",
-    paymentStatus: "Pending",
-    orderStatus: "Processing",
-    totalAmount: "Rp. 2,780.00",
-    email: "buying@topshop.ie",
-    phone: "+353 1 677 6486",
-    items: [
-      { name: "Ruched Bodycon Dress", qty: 20, price: "Rp. 1,400.00" },
-      { name: "Satin Pyjama Set", qty: 18, price: "Rp. 1,380.00" },
-    ],
-  },
-];
+// ─── Laravel API Interface ──────────────────────────────────────────────────────────
+
+interface AddressSnapshot {
+  recipient_name: string;
+  phone_number: string;
+  full_address: string;
+  city: string;
+  province: string;
+  postal_code: string;
+}
+
+interface ProductItem {
+  id: number;
+  name: string;
+  price: number;
+  image?: string;
+  // other fields...
+}
+
+interface LaravelOrderItem {
+  id: number;
+  order_id: number;
+  product_id: number;
+  quantity: number;
+  price: number;
+  product: ProductItem;
+}
+
+interface LaravelOrder {
+  id: number;
+  order_number: string;
+  user_id: number;
+  total_amount: number;
+  status: string;
+  payment_method: string;
+  shipping_address: string; // JSON string
+  created_at: string;
+  updated_at: string;
+  items: LaravelOrderItem[];
+}
+
+// Transform Laravel order to UI order
+function transformOrder(lo: LaravelOrder): Order {
+  let addr: AddressSnapshot | null = null;
+  try {
+    addr = JSON.parse(lo.shipping_address);
+  } catch (e) { }
+
+  const paymentStatusMap: Record<string, PaymentStatus> = {
+    PENDING: "Pending",
+    PROCESSING: "Paid",
+    SHIPPED: "Paid",
+    DELIVERED: "Paid",
+    CANCELLED: "Failed"
+  };
+
+  const orderStatusMap: Record<string, OrderStatus> = {
+    PENDING: "Processing",
+    PROCESSING: "Processing",
+    SHIPPED: "Processing",
+    DELIVERED: "Completed",
+    CANCELLED: "On Hold"
+  };
+
+  const fmtPrice = (p: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(p);
+
+  return {
+    id: lo.order_number,
+    customer: addr ? addr.recipient_name : "Customer",
+    location: addr ? addr.city : "N/A",
+    date: new Date(lo.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    paymentStatus: paymentStatusMap[lo.status] || "Pending",
+    orderStatus: orderStatusMap[lo.status] || "Processing",
+    totalAmount: fmtPrice(lo.total_amount),
+    email: addr ? addr.phone_number : "N/A", // Reusing email field for phone in UI 
+    phone: addr ? addr.phone_number : "N/A",
+    items: lo.items.map(i => ({
+      name: i.product?.name || "Unknown Product",
+      qty: i.quantity,
+      price: fmtPrice(i.price),
+      image: i.product?.image || ""
+    })),
+    notes: `Payment via: ${lo.payment_method}`
+  };
+}
 
 const ITEMS_PER_PAGE = 5;
 
@@ -285,9 +181,8 @@ function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
           {/* Status Row */}
           <div className="flex items-center gap-3">
             <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
-                paymentBadge[order.paymentStatus]
-              }`}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${paymentBadge[order.paymentStatus]
+                }`}
             >
               <span
                 className={`w-1.5 h-1.5 rounded-full ${paymentDot[order.paymentStatus]}`}
@@ -295,9 +190,8 @@ function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
               {order.paymentStatus}
             </span>
             <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                orderBadge[order.orderStatus]
-              }`}
+              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${orderBadge[order.orderStatus]
+                }`}
             >
               {order.orderStatus}
             </span>
@@ -338,9 +232,20 @@ function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
                   key={i}
                   className="flex items-center justify-between text-sm py-2 border-b border-gray-100 last:border-0"
                 >
-                  <div>
-                    <p className="font-medium text-gray-800">{item.name}</p>
-                    <p className="text-xs text-gray-400">Qty: {item.qty}</p>
+                  <div className="flex items-center gap-3">
+                    {item.image ? (
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Package size={16} className="text-gray-400" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-medium text-gray-800">{item.name}</p>
+                      <p className="text-xs text-gray-400">Qty: {item.qty}</p>
+                    </div>
                   </div>
                   <span className="font-semibold text-gray-700">
                     {item.price}
@@ -371,14 +276,32 @@ function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
   );
 }
 
+import StatsCards from "./StatsCards";
+
 // ─── Main Client Component ────────────────────────────────────────────────────
 
 export default function OrdersClient() {
+  const [ALL_ORDERS, setAllOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("All Orders");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const tabs: TabType[] = ["All Orders", "Pending", "Completed"];
+
+  // Fetch orders
+  useEffect(() => {
+    setIsLoading(true);
+    api.get('/customer/orders')
+      .then(res => {
+        if (res.data?.status === 'success') {
+          const mapped = res.data.data.map((lo: LaravelOrder) => transformOrder(lo));
+          setAllOrders(mapped);
+        }
+      })
+      .catch(err => console.error("Failed to fetch customer orders", err))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   // Filter berdasarkan tab
   const filteredOrders = useMemo(() => {
@@ -389,7 +312,7 @@ export default function OrdersClient() {
     if (activeTab === "Completed")
       return ALL_ORDERS.filter((o) => o.orderStatus === "Completed");
     return ALL_ORDERS;
-  }, [activeTab]);
+  }, [activeTab, ALL_ORDERS]);
 
   const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
 
@@ -411,8 +334,25 @@ export default function OrdersClient() {
     return pages;
   }, [totalPages]);
 
+  // Derive stats
+  const totalRevenue = useMemo(() => {
+    return ALL_ORDERS.reduce((sum, order) => {
+      const numeric = Number(order.totalAmount.replace(/[^0-9,-]+/g, "").replace(",", "."));
+      return sum + (numeric || 0);
+    }, 0);
+  }, [ALL_ORDERS]);
+  const activeCount = ALL_ORDERS.filter(o => ["Processing", "Completed"].includes(o.orderStatus)).length;
+  const pendingCount = ALL_ORDERS.filter(o => o.orderStatus === "On Hold" || o.paymentStatus === "Pending").length;
+
   return (
     <>
+      {/* Stats */}
+      <StatsCards
+        revenueMonth={totalRevenue}
+        activeOrders={activeCount}
+        pendingQuotes={pendingCount}
+      />
+
       {/* Filter Tabs + Date Filter */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
@@ -420,11 +360,10 @@ export default function OrdersClient() {
             <button
               key={tab}
               onClick={() => handleTabChange(tab)}
-              className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                activeTab === tab
-                  ? "bg-white text-gray-800 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === tab
+                ? "bg-white text-gray-800 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+                }`}
             >
               {tab}
             </button>
@@ -447,7 +386,7 @@ export default function OrdersClient() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
-                {["Order ID", "Customer", "Date", "Payment Status", "Order Status", "Total Amount", "Actions"].map(
+                {["Order ID", "Items", "Customer", "Date", "Payment Status", "Order Status", "Total Amount", "Actions"].map(
                   (col) => (
                     <th
                       key={col}
@@ -460,9 +399,15 @@ export default function OrdersClient() {
               </tr>
             </thead>
             <tbody>
-              {paginatedOrders.length === 0 ? (
+              {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-gray-400">
+                  <td colSpan={8} className="text-center py-12 text-gray-400 font-medium">
+                    Loading orders...
+                  </td>
+                </tr>
+              ) : paginatedOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="text-center py-12 text-gray-400">
                     <Package size={36} className="mx-auto mb-2 opacity-30" />
                     No orders found.
                   </td>
@@ -471,12 +416,28 @@ export default function OrdersClient() {
                 paginatedOrders.map((order, index) => (
                   <tr
                     key={order.id}
-                    className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                      index === paginatedOrders.length - 1 ? "border-b-0" : ""
-                    }`}
+                    className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${index === paginatedOrders.length - 1 ? "border-b-0" : ""
+                      }`}
                   >
                     <td className="px-5 py-4">
                       <span className="text-blue-600 font-medium">{order.id}</span>
+                    </td>
+                    <td className="px-5 py-4 min-w-[150px]">
+                      {order.items.length > 0 && (
+                        <div className="flex items-center gap-3">
+                          {order.items[0].image ? (
+                            <img src={order.items[0].image} alt="product" className="w-10 h-10 rounded-md object-cover border border-gray-200" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center border border-gray-200">
+                              <Package size={16} className="text-gray-400" />
+                            </div>
+                          )}
+                          <div className="text-xs">
+                            <p className="font-medium text-gray-800 line-clamp-1">{order.items[0].name}</p>
+                            {order.items.length > 1 && <p className="text-gray-400 mt-0.5">+{order.items.length - 1} items more</p>}
+                          </div>
+                        </div>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <p className="font-medium text-gray-800 whitespace-nowrap">
@@ -489,9 +450,8 @@ export default function OrdersClient() {
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                          paymentBadge[order.paymentStatus]
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${paymentBadge[order.paymentStatus]
+                          }`}
                       >
                         <span
                           className={`w-1.5 h-1.5 rounded-full ${paymentDot[order.paymentStatus]}`}
@@ -501,9 +461,8 @@ export default function OrdersClient() {
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                          orderBadge[order.orderStatus]
-                        }`}
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${orderBadge[order.orderStatus]
+                          }`}
                       >
                         {order.orderStatus}
                       </span>
@@ -550,11 +509,10 @@ export default function OrdersClient() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 text-sm rounded-md transition-colors ${
-                  page === currentPage
-                    ? "bg-blue-600 text-white font-medium"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
+                className={`w-8 h-8 text-sm rounded-md transition-colors ${page === currentPage
+                  ? "bg-blue-600 text-white font-medium"
+                  : "text-gray-500 hover:bg-gray-100"
+                  }`}
               >
                 {page}
               </button>

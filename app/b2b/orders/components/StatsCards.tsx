@@ -1,6 +1,13 @@
-import { TrendingUp, ShoppingCart, FileText } from "lucide-react";
+import { ShoppingCart, FileText } from "lucide-react";
 
-export default function StatsCards() {
+interface Props {
+  revenueMonth: number;
+  activeOrders: number;
+  pendingQuotes: number;
+}
+
+export default function StatsCards({ revenueMonth, activeOrders, pendingQuotes }: Props) {
+  const formatPrice = (val: number) => "Rp. " + val.toLocaleString("id-ID");
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Revenue Month */}
@@ -9,12 +16,8 @@ export default function StatsCards() {
           <span className="text-green-600 text-xl">💵</span>
         </div>
         <div>
-          <p className="text-sm text-gray-500 font-medium">Revenue Month</p>
-          <p className="text-2xl font-bold text-gray-800 mt-1">Rp. 42,500.80</p>
-          {/* <p className="text-xs text-green-500 font-medium mt-1 flex items-center gap-1">
-            <TrendingUp size={12} />
-            +12.5% from last month
-          </p> */}
+          <p className="text-sm text-gray-500 font-medium">Revenue (Total Delivered/Paid)</p>
+          <p className="text-2xl font-bold text-gray-800 mt-1">{formatPrice(revenueMonth)}</p>
         </div>
       </div>
 
@@ -25,8 +28,8 @@ export default function StatsCards() {
         </div>
         <div>
           <p className="text-sm text-gray-500 font-medium">Active Orders</p>
-          <p className="text-2xl font-bold text-gray-800 mt-1">48</p>
-          <p className="text-xs text-gray-400 mt-1">12 orders currently in transit</p>
+          <p className="text-2xl font-bold text-gray-800 mt-1">{activeOrders}</p>
+          <p className="text-xs text-gray-400 mt-1">Orders currently processing</p>
         </div>
       </div>
 
@@ -36,8 +39,8 @@ export default function StatsCards() {
           <FileText className="text-orange-500" size={22} />
         </div>
         <div>
-          <p className="text-sm text-gray-500 font-medium">Pending Quotes</p>
-          <p className="text-2xl font-bold text-gray-800 mt-1">07</p>
+          <p className="text-sm text-gray-500 font-medium">Pending Approvals</p>
+          <p className="text-2xl font-bold text-gray-800 mt-1">{pendingQuotes}</p>
           <p className="text-xs text-gray-400 mt-1">Requiring immediate review</p>
         </div>
       </div>

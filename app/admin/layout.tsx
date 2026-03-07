@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Toaster } from "react-hot-toast";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 
@@ -21,6 +22,7 @@ export default function AdminLayout({
 
       {/* Main area */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <Toaster position="top-center" reverseOrder={false} />
         {/* Header */}
         <Header onMenuClick={() => setIsMobileOpen((v) => !v)} />
 
