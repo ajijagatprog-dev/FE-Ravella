@@ -24,7 +24,8 @@ export default function B2BDashboardPage() {
                     setOrders(ordersRes.data.data);
                 }
                 if (userRes.data?.status === 'success') {
-                    setUser(userRes.data.data);
+                    // Fix: Access nested user object
+                    setUser(userRes.data.data.user);
                 }
             } catch (err) {
                 console.error("Failed to fetch dashboard data", err);

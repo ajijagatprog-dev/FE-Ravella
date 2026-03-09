@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, Mail, Phone, Lock, Eye, EyeOff, Check, X, AlertCircle, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 import api from "@/lib/axios";
 
 export default function RegisterPage() {
@@ -65,7 +66,7 @@ export default function RegisterPage() {
     setErrors(newErrors);
 
     if (!agreeTerms) {
-      alert("Please agree to Terms & Conditions");
+      toast.error("Silakan setujui Syarat & Ketentuan");
       return;
     }
 
@@ -95,7 +96,7 @@ export default function RegisterPage() {
           })
         );
 
-        alert("Register berhasil 🚀");
+        toast.success("Register berhasil! Selamat bergabung 🚀");
         router.push("/customer/dashboard");
       }
     } catch (error: any) {
@@ -109,7 +110,7 @@ export default function RegisterPage() {
 
         setErrors(formattedErrors);
       } else {
-        alert(error.response?.data?.message || "Terjadi kesalahan saat pendaftaran");
+        toast.error(error.response?.data?.message || "Terjadi kesalahan saat pendaftaran");
       }
     }
 

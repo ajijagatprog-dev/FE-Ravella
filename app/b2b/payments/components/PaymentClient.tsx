@@ -88,7 +88,6 @@ export default function PaymentClient() {
   );
   const pendingCount = transactions.filter((t) => t.status === "Pending").length;
 
-  // ─── Handlers ───────────────────────────────────────────────────────────────
   function handlePaySuccess(id: string) {
     setTransactions((prev) =>
       prev.map((t) => (t.id === id ? { ...t, status: "Paid", isNew: false } : t))

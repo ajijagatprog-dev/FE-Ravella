@@ -29,9 +29,9 @@ export default function RecentOrders({ orders }: { orders: any[] }) {
             </div>
 
             {/* Table Header */}
-            <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-6 py-2.5 bg-stone-50/60 border-b border-stone-100">
-                {["Order ID", "Date", "Total", "Status", ""].map((h, i) => (
-                    <p key={i} className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+            <div className="grid grid-cols-[1.2fr_1fr_1fr_1fr] gap-4 px-6 py-3 bg-stone-50/80 border-b border-stone-100">
+                {["Order ID", "Date", "Total Amount", "Status"].map((h, i) => (
+                    <p key={i} className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">
                         {h}
                     </p>
                 ))}
@@ -40,7 +40,7 @@ export default function RecentOrders({ orders }: { orders: any[] }) {
             {/* Rows */}
             <div className="divide-y divide-stone-100">
                 {displayOrders.length === 0 ? (
-                    <div className="px-6 py-8 text-center text-sm text-stone-500">
+                    <div className="px-6 py-12 text-center text-sm text-stone-500">
                         No recent orders found.
                     </div>
                 ) : displayOrders.map((order) => {
@@ -48,23 +48,20 @@ export default function RecentOrders({ orders }: { orders: any[] }) {
                     const { label, className } = statusConfig[statusStr] || statusConfig.PENDING;
 
                     const dateObj = new Date(order.created_at);
-                    const formattedDate = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    const formattedDate = dateObj.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
 
                     return (
                         <div
                             key={order.id}
-                            className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-6 py-3.5 hover:bg-stone-50/60 transition-colors"
+                            className="grid grid-cols-[1.2fr_1fr_1fr_1fr] gap-4 items-center px-6 py-4 hover:bg-stone-50/40 transition-colors"
                         >
-                            <p className="text-sm font-bold text-stone-800">{order.order_number}</p>
-                            <p className="text-xs text-stone-400">{formattedDate}</p>
-                            <p className="text-sm font-semibold text-stone-700">Rp {parseInt(order.total_amount).toLocaleString('id-ID')}</p>
-                            <div className="flex items-center gap-2">
-                                <span className={cn("text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide", className)}>
+                            <p className="text-sm font-bold text-stone-900 tracking-tight">{order.order_number}</p>
+                            <p className="text-xs font-medium text-stone-500">{formattedDate}</p>
+                            <p className="text-sm font-bold text-[#8B5E3C]">Rp {parseInt(order.total_amount).toLocaleString('id-ID')}</p>
+                            <div className="flex items-center">
+                                <span className={cn("text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm", className)}>
                                     {label}
                                 </span>
-                                <button className="p-1.5 rounded-lg hover:bg-blue-50 text-stone-400 hover:text-blue-600 transition-colors">
-                                    <Eye className="w-3.5 h-3.5" />
-                                </button>
                             </div>
                         </div>
                     );

@@ -58,8 +58,8 @@ export default function RecentOrders({ orders }: RecentOrdersProps) {
                       {order.status}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {order.customer} · Rp {order.total.toLocaleString('id-ID')}
+                  <p className="text-xs font-medium text-gray-500 mt-1">
+                    {order.customer} • <span className="text-gray-900 font-semibold">Rp {Number(order.total).toLocaleString('id-ID')}</span>
                   </p>
                   <p className="text-[10px] text-gray-400 mt-0.5">{order.time_ago}</p>
                 </div>

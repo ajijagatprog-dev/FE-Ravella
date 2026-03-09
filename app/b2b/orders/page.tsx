@@ -4,7 +4,6 @@ import OrdersClient from "./components/OrdersClient";
 export default function B2BOrdersPage() {
   return (
     <div className="text-gray-800 p-6 min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Order History</h1>
@@ -23,8 +22,6 @@ export default function B2BOrdersPage() {
           </button>
         </div>
       </div>
-
-      {/* Interactive: Tabs + Table + Pagination + Modal */}
       <OrdersClient />
     </div>
   );
