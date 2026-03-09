@@ -9,11 +9,13 @@ const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 interface Product {
+  id: number;
   title: string;
   category: string;
   price: string;
   image: string;
   badge: string;
+  rating: number;
 }
 
 export default function NewProducts() {
@@ -25,13 +27,18 @@ export default function NewProducts() {
       try {
         const res = await api.get('/products', { params: { limit: 4, sort: 'latest' } });
         if (res.data.status === 'success') {
-          const mapped = res.data.data.data.map((item: any) => ({
-            title: item.name,
-            category: item.category || 'Peralatan Masak',
-            price: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(item.price),
-            image: item.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-            badge: item.is_featured ? "Best Seller" : "New",
-          }));
+          const mapped = res.data.data.data.map((item: any) => {
+            const displayPrice = item.sale_price && item.sale_price > 0 ? item.sale_price : item.price;
+            return {
+              id: item.id,
+              title: item.name,
+              category: item.category || 'Peralatan Masak',
+              price: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(displayPrice),
+              image: item.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+              badge: item.badge || (item.is_featured ? "Best Seller" : "New"),
+              rating: item.rating ? parseFloat(item.rating) : 0,
+            };
+          });
           setProducts(mapped);
         }
       } catch (error) {
@@ -145,7 +152,7 @@ function ProductCard({ product }: { product: Product; index: number }) {
       style={{ fontFamily: JOST }}
     >
       {/* Image Container */}
-      <div className="relative aspect-[3/4] overflow-hidden mb-4 bg-neutral-100">
+      <div className="relative aspect-square overflow-hidden mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-6 flex items-center justify-center">
 
         {/* Badge */}
         <div className="absolute top-3 left-3 z-10">
@@ -159,9 +166,10 @@ function ProductCard({ product }: { product: Product; index: number }) {
         </div>
 
         {/* Product Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-          style={{ backgroundImage: `url(${product.image})` }}
+        <img
+          src={product.image}
+          alt={product.title}
+          className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
         />
 
         {/* Hover overlay */}
@@ -211,7 +219,7 @@ function ProductCard({ product }: { product: Product; index: number }) {
               className="text-xs font-medium text-neutral-500 tracking-wide"
               style={{ fontFamily: JOST }}
             >
-              4.9
+              {product.rating}
             </span>
           </div>
         </div>

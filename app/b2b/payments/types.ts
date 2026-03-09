@@ -13,6 +13,8 @@ export interface Transaction {
   status: TxStatus;
   isNew?: boolean;
   description: string;
+  customerName?: string;
+  companyName?: string;
 }
 
 export interface PaymentMethod {
@@ -68,8 +70,8 @@ export function generateInvoicePDF(trx: Transaction): void {
   <div class="grid">
     <div>
       <div class="label">Tagihan Kepada</div>
-      <div class="value">Retail Partner</div>
-      <div style="color:6b7280;font-size:13px;margin-top:2px">B2B Account</div>
+      <div class="value">${trx.customerName || "Retail Partner"}</div>
+      <div style="color:6b7280;font-size:13px;margin-top:2px">${trx.companyName || "B2B Account"}</div>
     </div>
     <div>
       <div class="label">Tanggal Invoice</div>
@@ -113,24 +115,24 @@ export function generateInvoicePDF(trx: Transaction): void {
 // ─── Initial Data ─────────────────────────────────────────────────────────────
 
 export const INIT_TRANSACTIONS: Transaction[] = [
-  { id: "TRX-9950", date: "03 Nov 2023", method: "QRIS", amount: 5700000,  status: "Pending", isNew: true, description: "Wholesale Order RVL-8902 — Nordstrom Rack" },
-  { id: "TRX-9945", date: "02 Nov 2023", method: "VA",   amount: 6500000,  status: "Pending",              description: "Wholesale Order RVL-8901 — Urban Outfitters" },
-  { id: "TRX-9928", date: "24 Okt 2023", method: "VA",   amount: 4200000,  status: "Paid",                 description: "Wholesale Order RVL-8895 — Selfridges & Co" },
-  { id: "TRX-9921", date: "20 Okt 2023", method: "QRIS", amount: 1500000,  status: "Paid",                 description: "Wholesale Order RVL-8890 — H&M Group" },
-  { id: "TRX-9910", date: "15 Okt 2023", method: "VA",   amount: 8320000,  status: "Paid",                 description: "Wholesale Order RVL-8885 — ASOS Wholesale" },
-  { id: "TRX-9905", date: "12 Okt 2023", method: "QRIS", amount: 2150000,  status: "Paid",                 description: "Wholesale Order RVL-8880 — Marks & Spencer" },
-  { id: "TRX-9898", date: "10 Okt 2023", method: "VA",   amount: 9800000,  status: "Paid",                 description: "Wholesale Order RVL-8875 — Zalando SE" },
-  { id: "TRX-9890", date: "07 Okt 2023", method: "QRIS", amount: 3400000,  status: "Paid",                 description: "Wholesale Order RVL-8870 — Mango Fashion" },
-  { id: "TRX-9882", date: "04 Okt 2023", method: "VA",   amount: 7600000,  status: "Paid",                 description: "Wholesale Order RVL-8865 — Next PLC" },
-  { id: "TRX-9875", date: "01 Okt 2023", method: "QRIS", amount: 4780000,  status: "Paid",                 description: "Wholesale Order RVL-8860 — River Island" },
-  { id: "TRX-9860", date: "28 Sep 2023", method: "VA",   amount: 11200000, status: "Paid",                 description: "Wholesale Order RVL-8855 — Topshop Group" },
-  { id: "TRX-9852", date: "25 Sep 2023", method: "QRIS", amount: 2900000,  status: "Paid",                 description: "Wholesale Order RVL-8848 — Zara Flagship" },
+  { id: "TRX-9950", date: "03 Nov 2023", method: "QRIS", amount: 5700000, status: "Pending", isNew: true, description: "Wholesale Order RVL-8902 — Nordstrom Rack" },
+  { id: "TRX-9945", date: "02 Nov 2023", method: "VA", amount: 6500000, status: "Pending", description: "Wholesale Order RVL-8901 — Urban Outfitters" },
+  { id: "TRX-9928", date: "24 Okt 2023", method: "VA", amount: 4200000, status: "Paid", description: "Wholesale Order RVL-8895 — Selfridges & Co" },
+  { id: "TRX-9921", date: "20 Okt 2023", method: "QRIS", amount: 1500000, status: "Paid", description: "Wholesale Order RVL-8890 — H&M Group" },
+  { id: "TRX-9910", date: "15 Okt 2023", method: "VA", amount: 8320000, status: "Paid", description: "Wholesale Order RVL-8885 — ASOS Wholesale" },
+  { id: "TRX-9905", date: "12 Okt 2023", method: "QRIS", amount: 2150000, status: "Paid", description: "Wholesale Order RVL-8880 — Marks & Spencer" },
+  { id: "TRX-9898", date: "10 Okt 2023", method: "VA", amount: 9800000, status: "Paid", description: "Wholesale Order RVL-8875 — Zalando SE" },
+  { id: "TRX-9890", date: "07 Okt 2023", method: "QRIS", amount: 3400000, status: "Paid", description: "Wholesale Order RVL-8870 — Mango Fashion" },
+  { id: "TRX-9882", date: "04 Okt 2023", method: "VA", amount: 7600000, status: "Paid", description: "Wholesale Order RVL-8865 — Next PLC" },
+  { id: "TRX-9875", date: "01 Okt 2023", method: "QRIS", amount: 4780000, status: "Paid", description: "Wholesale Order RVL-8860 — River Island" },
+  { id: "TRX-9860", date: "28 Sep 2023", method: "VA", amount: 11200000, status: "Paid", description: "Wholesale Order RVL-8855 — Topshop Group" },
+  { id: "TRX-9852", date: "25 Sep 2023", method: "QRIS", amount: 2900000, status: "Paid", description: "Wholesale Order RVL-8848 — Zara Flagship" },
 ];
 
 export const INIT_PAYMENT_METHODS: PaymentMethod[] = [
-  { id: "pm1", type: "VA",   label: "BCA Virtual Account",     detail: "8277-0912-3456-7890", bank: "BCA",     isPrimary: true },
-  { id: "pm2", type: "VA",   label: "Mandiri Virtual Account", detail: "8927-1234-5678-0011", bank: "Mandiri" },
-  { id: "pm3", type: "QRIS", label: "QRIS",                    detail: "Scan QR untuk bayar" },
+  { id: "pm1", type: "VA", label: "BCA Virtual Account", detail: "8277-0912-3456-7890", bank: "BCA", isPrimary: true },
+  { id: "pm2", type: "VA", label: "Mandiri Virtual Account", detail: "8927-1234-5678-0011", bank: "Mandiri" },
+  { id: "pm3", type: "QRIS", label: "QRIS", detail: "Scan QR untuk bayar" },
 ];
 
 export const ITEMS_PER_PAGE = 4;

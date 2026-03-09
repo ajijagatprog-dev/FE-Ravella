@@ -137,14 +137,14 @@ export default function HeroSection() {
                 >
                   <div
                     className={`h-[1px] transition-all duration-500 ${active === i
-                        ? "w-10 sm:w-12 bg-white"
-                        : "w-4 bg-white/30 hover:bg-white/60 hover:w-7"
+                      ? "w-10 sm:w-12 bg-white"
+                      : "w-4 bg-white/30 hover:bg-white/60 hover:w-7"
                       }`}
                   />
                   <div
                     className={`absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 bg-neutral-900 border border-white/10 text-white/80 text-[9px] tracking-[0.2em] uppercase pointer-events-none transition-all duration-200 ${active === i
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
                       }`}
                     style={{ fontFamily: JOST }}
                   >
@@ -285,13 +285,6 @@ function HeroContent({ active, isLoaded }: { active: number; isLoaded: boolean }
             >
               {data.cta}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/auth/register"
-              className="w-full sm:w-auto px-8 py-3.5 border border-white/40 text-white hover:bg-white/10 hover:border-white/70 transition-all duration-300 font-light text-[11px] tracking-[0.22em] uppercase text-center"
-              style={{ fontFamily: JOST }}
-            >
-              Ayo Gabung Kemitraan
             </Link>
           </div>
 

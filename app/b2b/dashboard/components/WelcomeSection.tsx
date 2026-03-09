@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Plus } from "lucide-react";
+import { Download, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
 interface WelcomeSectionProps {
@@ -32,9 +32,9 @@ export default function WelcomeSection({ userName, partnerId }: WelcomeSectionPr
                     href="/b2b/products"
                     className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 rounded-xl text-sm font-bold text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex-shrink-0"
                 >
-                    <Plus size={18} />
-                    Add New Product
-                </Link> 
+                    <ShoppingBag size={18} />
+                    Browse Catalog
+                </Link>
             </div>
         </div>
     );

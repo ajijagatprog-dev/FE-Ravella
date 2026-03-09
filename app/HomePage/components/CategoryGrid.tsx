@@ -1,11 +1,16 @@
+"use client";
+
 import { ArrowRight, Home, Utensils, Package, Sofa, Laptop } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function CategoryGrid() {
+  const router = useRouter();
   const categories = [
     {
+      id: "Home & Kitchen Appliance",
       title: "Home & Kitchen Appliance",
       subtitle: "Peralatan Rumah & Dapur",
       icon: Home,
@@ -13,6 +18,7 @@ export default function CategoryGrid() {
       count: "150+ Produk",
     },
     {
+      id: "Knife set",
       title: "Knife Set",
       subtitle: "Pisau & Alat Potong",
       icon: Utensils,
@@ -20,6 +26,7 @@ export default function CategoryGrid() {
       count: "80+ Produk",
     },
     {
+      id: "ezy series",
       title: "Ezy Series",
       subtitle: "Koleksi Premium",
       icon: Package,
@@ -27,6 +34,7 @@ export default function CategoryGrid() {
       count: "120+ Produk",
     },
     {
+      id: "home living",
       title: "Home Living",
       subtitle: "Dekorasi & Furniture",
       icon: Sofa,
@@ -34,6 +42,7 @@ export default function CategoryGrid() {
       count: "200+ Produk",
     },
     {
+      id: "Kitchen Tools",
       title: "Kitchen Tools",
       subtitle: "Alat Masak Modern",
       icon: Laptop,
@@ -41,6 +50,10 @@ export default function CategoryGrid() {
       count: "95+ Produk",
     },
   ];
+
+  const handleCategoryClick = (categoryId: string) => {
+    router.push(`/product?category=${encodeURIComponent(categoryId)}`);
+  };
 
   return (
     <section
@@ -94,7 +107,12 @@ export default function CategoryGrid() {
         {/* ── Grid ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
           {categories.map((cat, i) => (
-            <CategoryCard key={i} category={cat} index={i} />
+            <CategoryCard
+              key={i}
+              category={cat}
+              index={i}
+              onClick={() => handleCategoryClick(cat.id)}
+            />
           ))}
         </div>
 
@@ -113,11 +131,12 @@ export default function CategoryGrid() {
   );
 }
 
-function CategoryCard({ category, index }: { category: any; index: number }) {
+function CategoryCard({ category, index, onClick }: { category: any; index: number; onClick: () => void }) {
   const Icon = category.icon;
 
   return (
     <div
+      onClick={onClick}
       className={`group relative h-[280px] sm:h-[320px] md:h-[380px] lg:h-[420px] overflow-hidden cursor-pointer
         shadow-sm hover:shadow-xl transition-all duration-700 ease-out
         hover:-translate-y-1 ${index === 1 ? "lg:mt-8" : index === 3 ? "lg:mt-4" : ""}`}

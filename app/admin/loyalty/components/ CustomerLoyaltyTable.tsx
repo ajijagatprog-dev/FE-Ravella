@@ -1,29 +1,22 @@
 "use client";
 
-import { useState } from "react";
-
-const customers = [
-  { name: "Adrienne Laurent", tier: "Platinum", points: 4820 },
-  { name: "Julian Black", tier: "Gold", points: 1450 },
-  { name: "Elena Martinez", tier: "Basic", points: 280 },
-];
+import { useState, useEffect } from "react";
+import api from "@/lib/axios";
+import { Loader2 } from "lucide-react";
 
 // ─── Per-tier visual config ───────────────────────────────────────────────────
-const TIER_CONFIG: Record<string, { pill: string; dot: string; max: number }> = {
-  Platinum: {
+const TIER_CONFIG: Record<string, { pill: string; dot: string }> = {
+  PLATINUM: {
     pill: "bg-blue-100 text-blue-700 ring-1 ring-blue-200",
     dot: "bg-blue-500",
-    max: 5000,
   },
-  Gold: {
+  GOLD: {
     pill: "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
     dot: "bg-amber-400",
-    max: 2000,
   },
-  Basic: {
+  BASIC: {
     pill: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
     dot: "bg-slate-400",
-    max: 500,
   },
 };
 
@@ -31,9 +24,9 @@ const TIER_CONFIG: Record<string, { pill: string; dot: string; max: number }> = 
 function Avatar({ name, tier }: { name: string; tier: string }) {
   const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   const color =
-    tier === "Platinum" ? "bg-blue-100 text-blue-700" :
-    tier === "Gold"     ? "bg-amber-100 text-amber-700" :
-                          "bg-slate-100 text-slate-600";
+    tier === "PLATINUM" ? "bg-blue-100 text-blue-700" :
+      tier === "GOLD" ? "bg-amber-100 text-amber-700" :
+        "bg-slate-100 text-slate-600";
   return (
     <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${color}`}>
       {initials}
@@ -41,11 +34,36 @@ function Avatar({ name, tier }: { name: string; tier: string }) {
   );
 }
 
+interface LoyaltyCustomer {
+  id: number;
+  name: string;
+  email: string;
+  tier: string;
+  points: number;
+  total_spent: number;
+  total_orders: number;
+  member_since: string;
+}
+
 export default function CustomerLoyaltyTable() {
   const [search, setSearch] = useState("");
+  const [customers, setCustomers] = useState<LoyaltyCustomer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/admin/loyalty')
+      .then(res => {
+        if (res.data.status === 'success') {
+          setCustomers(res.data.data.customers);
+        }
+      })
+      .catch(err => console.error("Failed to load loyalty data", err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = customers.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+    c.name.toLowerCase().includes(search.toLowerCase()) ||
+    c.email.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -58,7 +76,7 @@ export default function CustomerLoyaltyTable() {
             Customer Loyalty Overview
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            {filtered.length} customers found
+            {loading ? "Loading..." : `${filtered.length} customers found`}
           </p>
         </div>
 
@@ -91,31 +109,47 @@ export default function CustomerLoyaltyTable() {
               <th className="text-left px-3 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Tier
               </th>
+              <th className="text-left px-3 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Points
+              </th>
+              <th className="text-left px-3 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Total Spent
+              </th>
               <th className="text-left px-3 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wider rounded-tr-lg">
-                Total Points
+                Orders
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {filtered.length === 0 ? (
+            {loading ? (
               <tr>
-                <td colSpan={3} className="px-3 py-10 text-center text-slate-400 text-sm">
+                <td colSpan={5} className="px-3 py-10 text-center">
+                  <div className="flex items-center justify-center gap-2 text-slate-400">
+                    <Loader2 size={16} className="animate-spin" />
+                    <span className="text-sm">Loading loyalty data...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : filtered.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-3 py-10 text-center text-slate-400 text-sm">
                   No customers found
                 </td>
               </tr>
             ) : (
-              filtered.map((customer, index) => {
-                const cfg = TIER_CONFIG[customer.tier] ?? TIER_CONFIG["Basic"];
-                const pct = Math.min((customer.points / cfg.max) * 100, 100);
+              filtered.map((customer) => {
+                const cfg = TIER_CONFIG[customer.tier] ?? TIER_CONFIG["BASIC"];
 
                 return (
-                  <tr key={index} className="hover:bg-slate-50/70 transition-colors">
-
+                  <tr key={customer.id} className="hover:bg-slate-50/70 transition-colors">
                     {/* Customer */}
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2.5">
                         <Avatar name={customer.name} tier={customer.tier} />
-                        <span className="font-medium text-gray-900">{customer.name}</span>
+                        <div>
+                          <span className="font-medium text-gray-900">{customer.name}</span>
+                          <p className="text-xs text-slate-400">{customer.email}</p>
+                        </div>
                       </div>
                     </td>
 
@@ -129,20 +163,23 @@ export default function CustomerLoyaltyTable() {
 
                     {/* Points */}
                     <td className="px-3 py-3">
-                      <div className="space-y-1.5">
-                        <span className="font-semibold text-gray-900 tabular-nums">
-                          {customer.points.toLocaleString()}
-                          <span className="text-xs font-normal text-slate-400 ml-1">pts</span>
-                        </span>
-                        <div className="w-24 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${cfg.dot}`}
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
+                      <span className="font-semibold text-gray-900 tabular-nums">
+                        {customer.points.toLocaleString()}
+                        <span className="text-xs font-normal text-slate-400 ml-1">pts</span>
+                      </span>
                     </td>
 
+                    {/* Total Spent */}
+                    <td className="px-3 py-3">
+                      <span className="text-sm font-medium text-gray-800">
+                        Rp {customer.total_spent.toLocaleString('id-ID')}
+                      </span>
+                    </td>
+
+                    {/* Orders */}
+                    <td className="px-3 py-3">
+                      <span className="text-sm text-gray-700">{customer.total_orders}</span>
+                    </td>
                   </tr>
                 );
               })

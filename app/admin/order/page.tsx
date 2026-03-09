@@ -1,63 +1,96 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Download, Search, TrendingUp, TrendingDown, ShoppingBag, Truck } from "lucide-react";
 import { OrderTable, Order } from "./components/OrderTable";
 
-// ── Dummy Data ────────────────────────────────────────────────────────────────
+import api from "@/lib/axios";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
-const ALL_ORDERS: Order[] = [
-  { id: "RVL-4921", customer: { name: "Sarah Jenkins", initials: "SJ", avatarColor: "#8B5CF6" }, date: "Oct 24, 2023", paymentStatus: "Success", total: "$248.50" },
-  { id: "RVL-4922", customer: { name: "Marcus Thorne", initials: "MT", avatarColor: "#EC4899" }, date: "Oct 24, 2023", paymentStatus: "Pending", total: "$1,120.00" },
-  { id: "RVL-4923", customer: { name: "Emma Laurent", initials: "EL", avatarColor: "#10B981" }, date: "Oct 23, 2023", paymentStatus: "Failed", total: "$84.99" },
-  { id: "RVL-4924", customer: { name: "Brian Kim", initials: "BK", avatarColor: "#3B82F6" }, date: "Oct 23, 2023", paymentStatus: "Success", total: "$312.00" },
-  { id: "RVL-4925", customer: { name: "Chloe Davis", initials: "CD", avatarColor: "#F59E0B" }, date: "Oct 22, 2023", paymentStatus: "Success", total: "$145.20" },
-  { id: "RVL-4926", customer: { name: "Noah Patel", initials: "NP", avatarColor: "#EF4444" }, date: "Oct 22, 2023", paymentStatus: "Pending", total: "$670.00" },
-  { id: "RVL-4927", customer: { name: "Lily Zhang", initials: "LZ", avatarColor: "#06B6D4" }, date: "Oct 21, 2023", paymentStatus: "Success", total: "$390.75" },
-  { id: "RVL-4928", customer: { name: "James Ford", initials: "JF", avatarColor: "#84CC16" }, date: "Oct 21, 2023", paymentStatus: "Failed", total: "$55.00" },
-  { id: "RVL-4929", customer: { name: "Ava Morgan", initials: "AM", avatarColor: "#F97316" }, date: "Oct 20, 2023", paymentStatus: "Success", total: "$820.00" },
-  { id: "RVL-4930", customer: { name: "Ethan Cole", initials: "EC", avatarColor: "#6366F1" }, date: "Oct 20, 2023", paymentStatus: "Success", total: "$199.99" },
-  { id: "RVL-4931", customer: { name: "Mia Turner", initials: "MT", avatarColor: "#D946EF" }, date: "Oct 19, 2023", paymentStatus: "Pending", total: "$445.00" },
-  { id: "RVL-4932", customer: { name: "Oliver Brooks", initials: "OB", avatarColor: "#0EA5E9" }, date: "Oct 19, 2023", paymentStatus: "Success", total: "$230.50" },
-  { id: "RVL-4933", customer: { name: "Isabelle Scott", initials: "IS", avatarColor: "#14B8A6" }, date: "Oct 18, 2023", paymentStatus: "Failed", total: "$92.00" },
-  { id: "RVL-4934", customer: { name: "Liam Harris", initials: "LH", avatarColor: "#A78BFA" }, date: "Oct 18, 2023", paymentStatus: "Success", total: "$560.00" },
-  { id: "RVL-4935", customer: { name: "Sophia Reed", initials: "SR", avatarColor: "#FB7185" }, date: "Oct 17, 2023", paymentStatus: "Success", total: "$310.00" },
-  { id: "RVL-4936", customer: { name: "Lucas Wright", initials: "LW", avatarColor: "#22C55E" }, date: "Oct 17, 2023", paymentStatus: "Pending", total: "$785.00" },
-  { id: "RVL-4937", customer: { name: "Charlotte King", initials: "CK", avatarColor: "#FB923C" }, date: "Oct 16, 2023", paymentStatus: "Success", total: "$140.00" },
-  { id: "RVL-4938", customer: { name: "Benjamin Hall", initials: "BH", avatarColor: "#38BDF8" }, date: "Oct 16, 2023", paymentStatus: "Success", total: "$920.50" },
-  { id: "RVL-4939", customer: { name: "Amelia Young", initials: "AY", avatarColor: "#C084FC" }, date: "Oct 15, 2023", paymentStatus: "Failed", total: "$67.00" },
-  { id: "RVL-4940", customer: { name: "Henry Adams", initials: "HA", avatarColor: "#4ADE80" }, date: "Oct 15, 2023", paymentStatus: "Success", total: "$450.00" },
-  { id: "RVL-4941", customer: { name: "Grace Nelson", initials: "GN", avatarColor: "#F472B6" }, date: "Oct 14, 2023", paymentStatus: "Success", total: "$275.00" },
-  { id: "RVL-4942", customer: { name: "William Carter", initials: "WC", avatarColor: "#60A5FA" }, date: "Oct 14, 2023", paymentStatus: "Pending", total: "$1,050.00" },
-  { id: "RVL-4943", customer: { name: "Hannah Evans", initials: "HE", avatarColor: "#2DD4BF" }, date: "Oct 13, 2023", paymentStatus: "Success", total: "$385.00" },
-  { id: "RVL-4944", customer: { name: "Jack Martinez", initials: "JM", avatarColor: "#FDE047" }, date: "Oct 13, 2023", paymentStatus: "Failed", total: "$110.00" },
-  { id: "RVL-4945", customer: { name: "Ella Thompson", initials: "ET", avatarColor: "#FB7185" }, date: "Oct 12, 2023", paymentStatus: "Success", total: "$599.99" },
-  { id: "RVL-4946", customer: { name: "Mason White", initials: "MW", avatarColor: "#818CF8" }, date: "Oct 12, 2023", paymentStatus: "Success", total: "$230.00" },
-  { id: "RVL-4947", customer: { name: "Victoria Lee", initials: "VL", avatarColor: "#A3E635" }, date: "Oct 11, 2023", paymentStatus: "Pending", total: "$870.00" },
-  { id: "RVL-4948", customer: { name: "Daniel Brown", initials: "DB", avatarColor: "#67E8F9" }, date: "Oct 11, 2023", paymentStatus: "Success", total: "$160.00" },
-];
-
-type TabStatus = "all" | "Pending" | "Success" | "Failed";
+type TabStatus = "all" | "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 
 const TABS: { key: TabStatus; label: string }[] = [
   { key: "all", label: "All Orders" },
-  { key: "Pending", label: "Pending" },
-  { key: "Success", label: "Success" },
-  { key: "Failed", label: "Failed" },
+  { key: "PENDING", label: "Pending" },
+  { key: "PROCESSING", label: "Processing" },
+  { key: "SHIPPED", label: "Shipped" },
+  { key: "DELIVERED", label: "Delivered" },
+  { key: "CANCELLED", label: "Cancelled" },
 ];
 
 const LIMIT = 5;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+interface OrderStats {
+  total_revenue: number;
+  revenue_trend: number;
+  active_orders: number;
+  active_trend: number;
+  pending_shipments: number;
+  pending_trend: number;
+}
+
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount);
+
 export default function OrderPage() {
   const [activeTab, setActiveTab] = useState<TabStatus>("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<OrderStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  const fetchStats = async () => {
+    try {
+      const res = await api.get('/admin/orders/stats');
+      if (res.data.status === 'success') {
+        setStats(res.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await api.get('/admin/orders');
+        if (res.data.status === 'success') {
+          const formatted: Order[] = res.data.data.map((o: any) => ({
+            id: o.order_number,
+            customer: {
+              name: o.user.name,
+              initials: o.user.name.substring(0, 2).toUpperCase(),
+              avatarColor: "#8B5CF6"
+            },
+            date: new Date(o.created_at).toLocaleDateString("id-ID", {
+              year: "numeric", month: "short", day: "numeric"
+            }),
+            status: o.status,
+            total: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(o.total_amount),
+            rawOrder: o
+          }));
+          setOrders(formatted);
+        }
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+    fetchStats();
+  }, []);
 
   const filtered = useMemo(() => {
-    let result = ALL_ORDERS;
-    if (activeTab !== "all") result = result.filter((o) => o.paymentStatus === activeTab);
+    let result = orders;
+    if (activeTab !== "all") result = result.filter((o) => o.status === activeTab);
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -65,12 +98,12 @@ export default function OrderPage() {
       );
     }
     return result;
-  }, [activeTab, search]);
+  }, [orders, activeTab, search]);
 
   const paginated = filtered.slice((page - 1) * LIMIT, page * LIMIT);
 
   const tabCount = (key: TabStatus) =>
-    key === "all" ? ALL_ORDERS.length : ALL_ORDERS.filter((o) => o.paymentStatus === key).length;
+    key === "all" ? orders.length : orders.filter((o) => o.status === key).length;
 
   const handleTabChange = (key: TabStatus) => {
     setActiveTab(key);
@@ -80,6 +113,20 @@ export default function OrderPage() {
   const handleSearch = (val: string) => {
     setSearch(val);
     setPage(1);
+  };
+
+  const handleUpdateStatus = async (orderNumber: string, status: string) => {
+    try {
+      const res = await api.put(`/admin/orders/${orderNumber}/status`, { status });
+      if (res.data.status === 'success') {
+        setOrders(prev => prev.map(o => o.id === orderNumber ? { ...o, status: res.data.data.status as any } : o));
+        fetchStats(); // Refresh stats after status change
+        toast.success("Order status updated successfully!");
+      }
+    } catch (error: any) {
+      console.error("Failed to update status", error);
+      toast.error("Failed to update status. Please try again.");
+    }
   };
 
   return (
@@ -117,10 +164,16 @@ export default function OrderPage() {
               <ShoppingBag size={15} className="text-blue-500" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">Rp.45,280.00</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-emerald-600">
-            <TrendingUp size={12} />
-            +12.5% vs last month
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-36 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">
+              {formatCurrency(stats?.total_revenue ?? 0)}
+            </p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.revenue_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.revenue_trend ?? 0) >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+            {(stats?.revenue_trend ?? 0) >= 0 ? "+" : ""}{stats?.revenue_trend ?? 0}% vs last month
           </div>
         </div>
 
@@ -134,10 +187,14 @@ export default function OrderPage() {
               <ShoppingBag size={15} className="text-emerald-500" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">124</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-emerald-600">
-            <TrendingUp size={12} />
-            +3.2% from yesterday
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-16 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">{stats?.active_orders ?? 0}</p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.active_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.active_trend ?? 0) >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+            {(stats?.active_trend ?? 0) >= 0 ? "+" : ""}{stats?.active_trend ?? 0}% from yesterday
           </div>
         </div>
 
@@ -151,10 +208,14 @@ export default function OrderPage() {
               <Truck size={15} className="text-red-400" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">18</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-red-500">
-            <TrendingDown size={12} />
-            -5.1% since Monday
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-12 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">{stats?.pending_shipments ?? 0}</p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.pending_trend ?? 0) <= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.pending_trend ?? 0) <= 0 ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
+            {(stats?.pending_trend ?? 0) >= 0 ? "+" : ""}{stats?.pending_trend ?? 0}% since last week
           </div>
         </div>
       </div>
@@ -169,19 +230,17 @@ export default function OrderPage() {
               <button
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
-                className={`relative flex shrink-0 items-center gap-1.5 px-4 pb-3 text-sm font-medium transition-colors ${
-                  activeTab === tab.key
-                    ? "text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-500"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`relative flex shrink-0 items-center gap-1.5 px-4 pb-3 text-sm font-medium transition-colors ${activeTab === tab.key
+                  ? "text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-500"
+                  : "text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 {tab.label}
                 <span
-                  className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold ${
-                    activeTab === tab.key
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100 text-gray-500"
-                  }`}
+                  className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold ${activeTab === tab.key
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-500"
+                    }`}
                 >
                   {tabCount(tab.key)}
                 </span>
@@ -213,6 +272,8 @@ export default function OrderPage() {
             limit={LIMIT}
             total={filtered.length}
             handlePageChange={setPage}
+            isLoading={loading}
+            onUpdateStatus={handleUpdateStatus}
           />
         </div>
       </div>

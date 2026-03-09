@@ -1,11 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "@/lib/axios";
+import { Loader2, Check, AlertCircle } from "lucide-react";
 
 export default function GlobalPointSettings() {
-  const [multiplier, setMultiplier] = useState(10);
-  const [redemption, setRedemption] = useState(5);
-  const [expiration, setExpiration] = useState(12);
+  const [multiplier, setMultiplier] = useState("10");
+  const [redemption, setRedemption] = useState("5");
+  const [expiration, setExpiration] = useState("12");
+
+  const handleNumericChange = (value: string, setter: (v: string) => void) => {
+    const cleaned = value.replace(/[^0-9]/g, '').replace(/^0+/, '') || '';
+    setter(cleaned);
+  };
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+
+  // Fetch settings on mount
+  useEffect(() => {
+    api.get('/admin/loyalty/settings')
+      .then(res => {
+        if (res.data.status === 'success') {
+          setMultiplier(String(res.data.data.earning_multiplier));
+          setRedemption(String(res.data.data.redemption_value));
+          setExpiration(String(res.data.data.point_expiration));
+        }
+      })
+      .catch(() => setToast({ type: "error", msg: "Failed to load settings" }))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Save settings
+  const handleSave = async () => {
+    setSaving(true);
+    setToast(null);
+    try {
+      const res = await api.put('/admin/loyalty/settings', {
+        earning_multiplier: parseInt(multiplier) || 1,
+        redemption_value: parseInt(redemption) || 1,
+        point_expiration: parseInt(expiration) || 1,
+      });
+      if (res.data.status === 'success') {
+        setToast({ type: "success", msg: "Settings saved successfully!" });
+        setTimeout(() => setToast(null), 3000);
+      }
+    } catch {
+      setToast({ type: "error", msg: "Failed to save settings" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 flex items-center justify-center gap-2 text-slate-400">
+        <Loader2 size={16} className="animate-spin" />
+        <span className="text-sm">Loading settings...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
@@ -46,9 +100,11 @@ export default function GlobalPointSettings() {
           </div>
           <div className="relative">
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={multiplier}
-              onChange={(e) => setMultiplier(Number(e.target.value))}
+              onChange={(e) => handleNumericChange(e.target.value, setMultiplier)}
+              placeholder="10"
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-gray-900 text-sm font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-12"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">
@@ -78,14 +134,16 @@ export default function GlobalPointSettings() {
               Rp
             </span>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={redemption}
-              onChange={(e) => setRedemption(Number(e.target.value))}
+              onChange={(e) => handleNumericChange(e.target.value, setRedemption)}
+              placeholder="5"
               className="w-full border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-gray-900 text-sm font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
             />
           </div>
           <p className="text-xs text-slate-400">
-            Discount per 100 points
+            Discount per 1 point redeemed
           </p>
         </div>
 
@@ -104,9 +162,11 @@ export default function GlobalPointSettings() {
           </div>
           <div className="relative">
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={expiration}
-              onChange={(e) => setExpiration(Number(e.target.value))}
+              onChange={(e) => handleNumericChange(e.target.value, setExpiration)}
+              placeholder="12"
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-gray-900 text-sm font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-400 transition-colors pr-16"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">
@@ -120,14 +180,35 @@ export default function GlobalPointSettings() {
 
       </div>
 
-      {/* ── Save Button ── */}
-      <div className="flex justify-end pt-1">
-        <button className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M5 13l4 4L19 7" />
-          </svg>
-          Save Changes
+      {/* ── Toast + Save Button ── */}
+      <div className="flex items-center justify-between pt-1">
+        {toast && (
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium ${toast.type === "success"
+            ? "bg-emerald-50 text-emerald-700"
+            : "bg-red-50 text-red-600"
+            }`}>
+            {toast.type === "success"
+              ? <Check size={14} />
+              : <AlertCircle size={14} />
+            }
+            {toast.msg}
+          </div>
+        )}
+        <div className="flex-1" />
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {saving ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+          {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
 

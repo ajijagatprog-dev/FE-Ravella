@@ -9,10 +9,7 @@ import {
   BadgePercent,
   X,
   ChevronRight,
-  CreditCard,
   MapPin,
-  User,
-  LogOut,
 } from "lucide-react";
 
 // ── Menu Config ───────────────────────────────────────────────────────────────
@@ -20,7 +17,6 @@ import {
 const menuItems = [
   { label: "Dashboard", href: "/customer/dashboard", icon: LayoutDashboard },
   { label: "My Orders", href: "/customer/myOrders", icon: ReceiptText },
-  { label: "Payments & Invoice", href: "/customer/paymentInvoice", icon: CreditCard },
   { label: "Loyalty & Membership", href: "/customer/loyaltyMembership", icon: BadgePercent },
   { label: "Saved Addresses", href: "/customer/savedAddress", icon: MapPin },
 ];
@@ -29,7 +25,6 @@ const menuItems = [
 
 const menuBadges: Record<string, { count: number; color: string }> = {
   "/customer/myOrders": { count: 2, color: "bg-blue-500" },
-  "/customer/paymentInvoice": { count: 1, color: "bg-amber-500" },
 };
 
 // ── Props ─────────────────────────────────────────────────────────────────────

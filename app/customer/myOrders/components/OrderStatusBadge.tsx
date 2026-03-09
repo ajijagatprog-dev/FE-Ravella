@@ -1,8 +1,13 @@
 import { cn } from "@/lib/utils";
 
-export type OrderStatus = "SHIPPED" | "DELIVERED" | "PROCESSING" | "CANCELLED";
+export type OrderStatus = "SHIPPED" | "DELIVERED" | "PROCESSING" | "CANCELLED" | "PENDING";
 
 const config: Record<OrderStatus, { label: string; dot: string; pill: string }> = {
+    PENDING: {
+        label: "Pending",
+        dot: "bg-amber-400",
+        pill: "bg-amber-50 text-amber-700 border-amber-200",
+    },
     SHIPPED: {
         label: "Shipped",
         dot: "bg-blue-500",

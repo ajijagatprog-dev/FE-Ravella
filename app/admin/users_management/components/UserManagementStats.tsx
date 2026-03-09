@@ -105,44 +105,56 @@ interface UserManagementStatsProps {
   b2bPartners?: number;
   pendingVerifications?: number;
   retailCustomers?: number;
+  usersTrend?: number;
+  newThisMonth?: number;
+  b2bNewThisMonth?: number;
+  retailNewThisMonth?: number;
+  isLoading?: boolean;
 }
 
 export default function UserManagementStats({
-  totalUsers = 1252,
-  b2bPartners = 48,
-  pendingVerifications = 12,
-  retailCustomers = 1204,
+  totalUsers = 0,
+  b2bPartners = 0,
+  pendingVerifications = 0,
+  retailCustomers = 0,
+  usersTrend = 0,
+  newThisMonth = 0,
+  b2bNewThisMonth = 0,
+  retailNewThisMonth = 0,
+  isLoading = false,
 }: UserManagementStatsProps) {
   const stats: Stat[] = [
     {
       label: "Total Users",
-      value: totalUsers,
+      value: isLoading ? "—" : totalUsers,
       sub: "Across all types",
-      trend: { value: "+8.2% this month", up: true },
+      trend: { value: `${usersTrend >= 0 ? "+" : ""}${usersTrend}% this month`, up: usersTrend >= 0 },
       icon: <UsersIcon />,
       color: "blue",
     },
     {
       label: "B2B Partners",
-      value: b2bPartners,
+      value: isLoading ? "—" : b2bPartners,
       sub: "Active partnerships",
-      trend: { value: "+3 this week", up: true },
+      trend: { value: `+${b2bNewThisMonth} this month`, up: true },
       icon: <BuildingIcon />,
       color: "violet",
     },
     {
       label: "Pending Verifications",
-      value: pendingVerifications,
+      value: isLoading ? "—" : pendingVerifications,
       sub: "Awaiting review",
-      trend: { value: "Needs attention", up: false },
+      trend: pendingVerifications > 0
+        ? { value: "Needs attention", up: false }
+        : { value: "All clear", up: true },
       icon: <ClockIcon />,
       color: "amber",
     },
     {
       label: "Retail Customers",
-      value: retailCustomers,
+      value: isLoading ? "—" : retailCustomers,
       sub: "Registered shoppers",
-      trend: { value: "+124 this month", up: true },
+      trend: { value: `+${retailNewThisMonth} this month`, up: true },
       icon: <ShoppingBagIcon />,
       color: "emerald",
     },
