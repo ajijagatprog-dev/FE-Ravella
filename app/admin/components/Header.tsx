@@ -44,14 +44,19 @@ export default function Header({ onMenuClick }: HeaderProps) {
   useOutsideClick(userRef, closeUser);
 
   useEffect(() => {
-    api.get('/auth/me')
-      .then(res => {
-        if (res.data?.status === 'success') {
-          // Fix: Access the nested user object
-          setUserData(res.data.data.user);
-        }
-      })
-      .catch(err => console.error("Failed to load user profile", err));
+    const fetchUser = () => {
+      api.get('/auth/me')
+        .then(res => {
+          if (res.data?.status === 'success') {
+            setUserData(res.data.data.user);
+          }
+        })
+        .catch(err => console.error("Failed to load user profile", err));
+    };
+
+    fetchUser();
+    window.addEventListener('profileUpdated', fetchUser);
+    return () => window.removeEventListener('profileUpdated', fetchUser);
   }, []);
 
   const handleLogout = async () => {
@@ -67,7 +72,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
     }
   };
 
-  const userInitial = userData?.name ? userData.name.charAt(0).toUpperCase() : 'A';
+  const displayName = userData?.name === 'Super Admin' ? 'Admin' : (userData?.name || "Admin");
+  const userInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
@@ -110,7 +116,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 </div>
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-semibold text-gray-900 leading-tight">
-                    {userData?.name || "Loading..."}
+                    {displayName}
                   </p>
                   <p className="text-xs text-gray-500 leading-tight">
                     {userData?.role === "admin" ? "Admin" : "Pengurus"}
@@ -131,7 +137,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                         {userInitial}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-900">{userData?.name || "Admin"}</p>
+                        <p className="text-sm font-bold text-gray-900">{displayName}</p>
                         <p className="text-xs text-gray-500">
                           {userData?.email || "Memuat..."}
                         </p>

@@ -27,12 +27,22 @@ export default function PaymentClient() {
   const [payMethods, setPayMethods] = useState<PaymentMethod[]>(INIT_PAYMENT_METHODS);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    api.get('/customer/orders')
-      .then(res => {
-        if (res.data?.status === 'success') {
-          const formatted = res.data.data.map((o: any) => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const profileRes = await api.get('/customer/profile');
+        let currentProfile = null;
+        if (profileRes.data?.status === 'success') {
+          currentProfile = profileRes.data.data;
+          setProfile(currentProfile);
+        }
+
+        const ordersRes = await api.get('/customer/orders');
+        if (ordersRes.data?.status === 'success') {
+          const formatted = ordersRes.data.data.map((o: any) => {
             const date = new Date(o.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
             return {
               id: o.order_number,
@@ -40,14 +50,20 @@ export default function PaymentClient() {
               method: o.payment_method === 'VA' ? 'VA' : 'QRIS',
               amount: parseFloat(o.total_amount) || 0,
               status: (o.status !== 'PENDING' || o.payment_token) ? "Paid" : "Pending",
-              description: `Wholesale Order ${o.order_number}`
+              description: `Wholesale Order ${o.order_number}`,
+              customerName: currentProfile?.name || "Retail Partner",
+              companyName: currentProfile?.company_name || "B2B Account"
             };
           });
           setTransactions(formatted);
         }
-      })
-      .catch(err => console.error("Failed to fetch payments", err))
-      .finally(() => setIsLoading(false));
+      } catch (err) {
+        console.error("Failed to fetch payments data", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   // Modals

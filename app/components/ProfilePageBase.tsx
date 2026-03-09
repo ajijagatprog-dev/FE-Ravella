@@ -44,12 +44,28 @@ export default function ProfilePageBase({ role, backUrl }: ProfilePageProps) {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!userData) return;
+
         setIsSaving(true);
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            const res = await api.put('/customer/profile', {
+                name: userData.name,
+                phone_number: userData.phone_number,
+                address: userData.address
+            });
+
+            if (res.data?.status === 'success') {
+                setUserData(res.data.data);
+                toast.success("Profil berhasil diperbarui!");
+                // Trigger profile update event for header
+                window.dispatchEvent(new Event('profileUpdated'));
+            }
+        } catch (err) {
+            console.error("Failed to update profile", err);
+            toast.error("Gagal memperbarui profil");
+        } finally {
             setIsSaving(false);
-            toast.success("Profil berhasil diperbarui!");
-        }, 1000);
+        }
     };
 
     if (isLoading) {
@@ -60,7 +76,9 @@ export default function ProfilePageBase({ role, backUrl }: ProfilePageProps) {
         );
     }
 
-    const userInitial = userData?.name ? userData.name.charAt(0).toUpperCase() : 'U';
+    // Standardize "Super Admin" to "Admin"
+    const displayName = userData?.name === 'Super Admin' ? 'Admin' : (userData?.name || "User");
+    const userInitial = displayName.charAt(0).toUpperCase();
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
@@ -91,9 +109,9 @@ export default function ProfilePageBase({ role, backUrl }: ProfilePageProps) {
                                 <Camera size={14} className="text-gray-600" />
                             </button>
                         </div>
-                        <h2 className="mt-4 text-lg font-bold text-gray-900">{userData?.name || "Admin"}</h2>
+                        <h2 className="mt-4 text-lg font-bold text-gray-900">{displayName}</h2>
                         <p className="text-sm text-gray-500 font-medium capitalize">
-                            {userData?.role.toLowerCase().includes('admin') ? 'Admin' : userData?.role}
+                            Admin
                         </p>
 
                         <div className="mt-6 pt-6 border-t border-gray-100 space-y-4">

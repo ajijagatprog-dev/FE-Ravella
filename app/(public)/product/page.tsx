@@ -20,8 +20,9 @@ import {
   Filter,
   Sparkles,
 } from "lucide-react";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import { products as fallbackProducts } from "./products";
@@ -31,9 +32,23 @@ const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ProductPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900"></div>
+      </div>
+    }>
+      <ProductPageContent />
+    </Suspense>
+  );
+}
+
+function ProductPageContent() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [displayLimit, setDisplayLimit] = useState(12);
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -84,15 +99,23 @@ export default function ProductPage() {
     productName: "",
   });
 
-
   const categories = useMemo(() => [
     { id: "all", name: "ALL PRODUCTS", icon: Package, count: products.length },
     { id: "Home & Kitchen Appliance", name: "HOME & KITCHEN APPLIANCE", icon: Zap, count: products.filter(p => p.category === "Home & Kitchen Appliance").length },
     { id: "Knife set", name: "KNIFE SET", icon: Award, count: products.filter(p => p.category === "Knife set").length },
     { id: "ezy series", name: "EZY SERIES", icon: TrendingUp, count: products.filter(p => p.category === "ezy series").length },
     { id: "home living", name: "HOMELIVING", icon: Shield, count: products.filter(p => p.category === "home living").length },
-    { id: "keyboard", name: "KEYBOARD", icon: Sparkles, count: products.filter(p => p.category === "keyboard").length },
+    { id: "Kitchen Tools", name: "KITCHEN TOOLS", icon: Sparkles, count: products.filter(p => p.category === "Kitchen Tools").length },
   ], [products]);
+
+  useEffect(() => {
+    if (initialCategory) {
+      const match = categories.find(c => c.id.toLowerCase() === initialCategory.toLowerCase());
+      if (match) {
+        setActiveCategory(match.name);
+      }
+    }
+  }, [initialCategory, categories]);
 
   const handleAddToCart = (product: any) => {
     // Baca cart yang ada
@@ -360,13 +383,13 @@ export default function ProductPage() {
                 className={`group relative bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-300 ${viewMode === "list" ? "flex flex-row" : ""}`}
               >
                 {/* Image */}
-                <div className={`relative overflow-hidden bg-neutral-50 ${viewMode === "grid" ? "aspect-[3/4]" : "w-56 sm:w-72 flex-shrink-0 aspect-square"}`}>
+                <div className={`relative overflow-hidden bg-neutral-50 flex items-center justify-center p-6 ${viewMode === "grid" ? "aspect-square" : "w-56 sm:w-72 flex-shrink-0 aspect-square"}`}>
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">

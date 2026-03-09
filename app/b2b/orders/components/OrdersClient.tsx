@@ -85,7 +85,7 @@ interface LaravelOrder {
 }
 
 // Transform Laravel order to UI order
-function transformOrder(lo: LaravelOrder): Order {
+function transformOrder(lo: LaravelOrder, profile?: any): Order {
   let addr: AddressSnapshot | null = null;
   try {
     addr = JSON.parse(lo.shipping_address);
@@ -109,16 +109,27 @@ function transformOrder(lo: LaravelOrder): Order {
 
   const fmtPrice = (p: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(p);
 
+  // Fallback logic for simulation data
+  let customerName = addr ? addr.recipient_name : "Customer";
+  let location = addr ? addr.city : "N/A";
+  let phone = addr ? addr.phone_number : "N/A";
+
+  if (customerName.includes("Simulation") && profile) {
+    customerName = profile.name;
+    location = profile.address?.split(',').pop()?.trim() || location;
+    phone = profile.phone_number || phone;
+  }
+
   return {
     id: lo.order_number,
-    customer: addr ? addr.recipient_name : "Customer",
-    location: addr ? addr.city : "N/A",
+    customer: customerName,
+    location: location,
     date: new Date(lo.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     paymentStatus: paymentStatusMap[lo.status] || "Pending",
     orderStatus: orderStatusMap[lo.status] || "Processing",
     totalAmount: fmtPrice(lo.total_amount),
-    email: addr ? addr.phone_number : "N/A", // Reusing email field for phone in UI 
-    phone: addr ? addr.phone_number : "N/A",
+    email: profile?.email || "N/A",
+    phone: phone,
     items: lo.items.map(i => ({
       name: i.product?.name || "Unknown Product",
       qty: i.quantity,
@@ -286,21 +297,34 @@ export default function OrdersClient() {
   const [activeTab, setActiveTab] = useState<TabType>("All Orders");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [profile, setProfile] = useState<any>(null);
 
   const tabs: TabType[] = ["All Orders", "Pending", "Completed"];
 
-  // Fetch orders
+  // Fetch profile then orders
   useEffect(() => {
-    setIsLoading(true);
-    api.get('/customer/orders')
-      .then(res => {
-        if (res.data?.status === 'success') {
-          const mapped = res.data.data.map((lo: LaravelOrder) => transformOrder(lo));
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const profileRes = await api.get('/customer/profile');
+        let currentProfile = null;
+        if (profileRes.data?.status === 'success') {
+          currentProfile = profileRes.data.data;
+          setProfile(currentProfile);
+        }
+
+        const ordersRes = await api.get('/customer/orders');
+        if (ordersRes.data?.status === 'success') {
+          const mapped = ordersRes.data.data.map((lo: LaravelOrder) => transformOrder(lo, currentProfile));
           setAllOrders(mapped);
         }
-      })
-      .catch(err => console.error("Failed to fetch customer orders", err))
-      .finally(() => setIsLoading(false));
+      } catch (err) {
+        console.error("Failed to fetch data in OrdersClient", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   // Filter berdasarkan tab

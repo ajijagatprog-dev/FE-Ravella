@@ -152,7 +152,7 @@ function ProductCard({ product }: { product: Product; index: number }) {
       style={{ fontFamily: JOST }}
     >
       {/* Image Container */}
-      <div className="relative aspect-[3/4] overflow-hidden mb-4 bg-neutral-100">
+      <div className="relative aspect-square overflow-hidden mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-6 flex items-center justify-center">
 
         {/* Badge */}
         <div className="absolute top-3 left-3 z-10">
@@ -166,9 +166,10 @@ function ProductCard({ product }: { product: Product; index: number }) {
         </div>
 
         {/* Product Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-          style={{ backgroundImage: `url(${product.image})` }}
+        <img
+          src={product.image}
+          alt={product.title}
+          className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
         />
 
         {/* Hover overlay */}

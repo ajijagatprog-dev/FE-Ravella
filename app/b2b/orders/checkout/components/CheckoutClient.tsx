@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, CreditCard, Receipt, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useCart } from "../../../keranjang/useCart";
 import api from "@/lib/axios";
+import { cn } from "@/lib/utils";
 
 const formatIDR = (n: number) => "Rp " + n.toLocaleString("id-ID");
-const SHIPPING = 450000;
-const TAX_RATE = 0.08;
+const SHIPPING_THRESHOLD = 500000;
+const SHIPPING_FREE = 0;
+const SHIPPING_FLAT = 25000;
 const BULK_DISCOUNT_THRESHOLD = 2000000;
 const BULK_DISCOUNT_RATE = 0.10;
 
@@ -19,12 +21,27 @@ export default function CheckoutClient() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [profile, setProfile] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await api.get('/customer/profile');
+                if (res.data.status === 'success') {
+                    setProfile(res.data.data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch profile", err);
+            }
+        };
+        fetchProfile();
+    }, []);
 
     // Derived Financials (same as keranjang)
     const bulkDiscount = subtotal >= BULK_DISCOUNT_THRESHOLD ? subtotal * BULK_DISCOUNT_RATE : 0;
     const afterDiscount = subtotal - bulkDiscount;
-    const tax = afterDiscount * TAX_RATE;
-    const total = afterDiscount + SHIPPING + tax;
+    const shippingFee = subtotal > SHIPPING_THRESHOLD ? SHIPPING_FREE : SHIPPING_FLAT;
+    const total = afterDiscount + shippingFee;
 
     if (!hydrated) return null;
 
@@ -63,10 +80,10 @@ export default function CheckoutClient() {
             // If no address, create one
             if (!addressId) {
                 const newAddrRes = await api.post('/customer/addresses', {
-                    label: "Kantor B2B",
-                    recipient_name: "B2B Admin (Simulation)",
-                    phone_number: "08123456789",
-                    full_address: "Graha Ravelle, Level 5",
+                    label: `Kantor ${profile?.company_name || "B2B"}`,
+                    recipient_name: profile?.name || "B2B Partner",
+                    phone_number: profile?.phone_number || "08123456789",
+                    full_address: profile?.address || "Graha Ravelle, Level 5",
                     city: "Jakarta Pusat",
                     province: "DKI Jakarta",
                     postal_code: "10220",
@@ -154,15 +171,15 @@ export default function CheckoutClient() {
                         <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
                             <div>
                                 <p className="text-stone-500 mb-1">Company Name</p>
-                                <p className="font-medium text-stone-800">PT Maju Bersama Corp.</p>
+                                <p className="font-medium text-stone-800">{profile?.company_name || "Loading..."}</p>
                             </div>
                             <div>
                                 <p className="text-stone-500 mb-1">Tax ID (NPWP)</p>
-                                <p className="font-medium text-stone-800">01.234.567.8-901.000</p>
+                                <p className="font-medium text-stone-800">{profile?.npwp || "-"}</p>
                             </div>
                             <div className="col-span-2">
                                 <p className="text-stone-500 mb-1">Company Address</p>
-                                <p className="font-medium text-stone-800">Graha Ravelle Level 5, Jakarta Pusat, DKI Jakarta 10220</p>
+                                <p className="font-medium text-stone-800">{profile?.address || "Loading..."}</p>
                             </div>
                         </div>
                     </div>
@@ -226,12 +243,9 @@ export default function CheckoutClient() {
 
                             <div className="flex justify-between text-stone-600">
                                 <span>Shipping Fee</span>
-                                <span className="font-semibold text-stone-800">{formatIDR(SHIPPING)}</span>
-                            </div>
-
-                            <div className="flex justify-between text-stone-600">
-                                <span>Tax (VAT 8%)</span>
-                                <span className="font-semibold text-stone-800">{formatIDR(tax)}</span>
+                                <span className={cn("font-semibold", shippingFee === 0 ? "text-emerald-600" : "text-stone-800")}>
+                                    {shippingFee === 0 ? "FREE" : formatIDR(shippingFee)}
+                                </span>
                             </div>
                         </div>
 

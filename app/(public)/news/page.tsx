@@ -207,10 +207,11 @@ export default function News() {
                 <Link key={article.id} href={`/news/${article.id}`} className="group relative bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-500 overflow-hidden block">
 
                   {/* Image */}
-                  <div className="relative h-64 sm:h-80 overflow-hidden">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                      style={{ backgroundImage: `url(${article.image})` }}
+                  <div className="relative aspect-[16/9] overflow-hidden">
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
@@ -302,10 +303,11 @@ export default function News() {
                 <Link key={article.id} href={`/news/${article.id}`} className="group bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-300 overflow-hidden block">
 
                   {/* Image */}
-                  <div className="relative h-48 sm:h-56 overflow-hidden">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                      style={{ backgroundImage: `url(${article.image})` }}
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
