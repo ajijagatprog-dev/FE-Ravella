@@ -35,7 +35,7 @@ export default function ModalEdit({
 }: Props) {
   const [form, setForm] = useState<FormDataState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+ 
   useEffect(() => {
     if (product) {
       setForm({
@@ -65,7 +65,7 @@ export default function ModalEdit({
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append('_method', 'PUT'); // Laravel requirement for multipart/form-data PUT
+      formData.append('_method', 'PUT');
       formData.append('name', form.name);
       formData.append('category', form.category);
       if (form.newImage) formData.append('image', form.newImage);
