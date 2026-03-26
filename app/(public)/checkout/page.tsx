@@ -141,8 +141,8 @@ export default function CheckoutPage() {
     }
 
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = subtotal > 500000 ? 0 : 25000;
-    const grandTotal = subtotal + shippingFee;
+    // TODO: Shipping fee will be integrated with Raja Ongkir
+    const grandTotal = subtotal;
 
     const formatPrice = (p: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(p);
 
@@ -381,10 +381,7 @@ export default function CheckoutPage() {
                                 <span>Subtotal ({cart.length} items)</span>
                                 <span className="font-medium text-stone-800">{formatPrice(subtotal)}</span>
                             </div>
-                            <div className="flex justify-between text-stone-600">
-                                <span>Shipping Fee</span>
-                                <span className="font-medium text-stone-800">{shippingFee === 0 ? "Free" : formatPrice(shippingFee)}</span>
-                            </div>
+                            {/* Shipping Fee - will be shown after Raja Ongkir integration */}
                         </div>
 
                         <div className="flex justify-between items-end pt-5 mb-8">

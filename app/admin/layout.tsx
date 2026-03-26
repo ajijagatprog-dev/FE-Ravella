@@ -22,7 +22,6 @@ export default function AdminLayout({
 
       {/* Main area */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <Toaster position="top-center" reverseOrder={false} />
         {/* Header */}
         <Header onMenuClick={() => setIsMobileOpen((v) => !v)} />
 

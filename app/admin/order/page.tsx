@@ -7,6 +7,7 @@ import { OrderTable, Order } from "./components/OrderTable";
 import api from "@/lib/axios";
 import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { downloadFile } from "@/lib/download";
 
 type TabStatus = "all" | "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 
@@ -33,7 +34,12 @@ interface OrderStats {
 }
 
 const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount);
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 
 export default function OrderPage() {
   const [activeTab, setActiveTab] = useState<TabStatus>("all");
@@ -146,9 +152,19 @@ export default function OrderPage() {
             Manage and track all customer orders from here.
           </p>
         </div>
-        <button className="inline-flex w-fit items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-150">
+        <button
+          onClick={async () => {
+            try {
+              await downloadFile('/admin/export/orders', 'orders_report.xlsx');
+              toast.success("Orders exported successfully");
+            } catch (error) {
+              toast.error("Failed to export orders");
+            }
+          }}
+          className="inline-flex w-fit items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-150"
+        >
           <Download size={15} />
-          Export CSV
+          Export Excel
         </button>
       </div>
 

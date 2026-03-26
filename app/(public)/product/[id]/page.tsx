@@ -53,17 +53,26 @@ export default function ProductDetail() {
                         features: Array.isArray(item.features) ? item.features : [],
                         specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
                         inStock: item.stock > 0,
-                        isNew: true,
                         badge: item.badge || (item.is_featured ? "Best Seller" : ""),
                     });
 
-                    // Fetch related products (mock category matching by just fetching all limit 4)
-                    const relRes = await api.get('/products', { params: { limit: 4, category: item.category || undefined } });
+                    // Fetch related products from same category
+                    const relRes = await api.get('/products', { params: { limit: 10, category: item.category || undefined } });
                     if (relRes.data.status === 'success') {
-                        const relMapped = relRes.data.data.data.map((r: any) => ({
-                            id: r.id, name: r.name, price: r.sale_price && r.sale_price > 0 ? r.sale_price : r.price, image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-                            rating: r.rating ? parseFloat(r.rating) : 0, reviews: r.reviews || 0, originalPrice: r.price, discount: r.discount || 0, badge: r.badge || (r.is_featured ? "Best Seller" : ""), isNew: true
-                        }));
+                        const relMapped = relRes.data.data.data
+                            .filter((r: any) => r.id !== item.id) // Exclude current product
+                            .slice(0, 4) // Show only 4
+                            .map((r: any) => ({
+                                id: r.id,
+                                name: r.name,
+                                price: r.sale_price && r.sale_price > 0 ? r.sale_price : r.price,
+                                image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+                                rating: r.rating ? parseFloat(r.rating) : 0,
+                                reviews: r.reviews || 0,
+                                originalPrice: r.price,
+                                discount: r.discount || 0,
+                                badge: r.badge || (r.is_featured ? "Best Seller" : ""),
+                            }));
                         setRelatedProducts(relMapped);
                     }
                 }
@@ -216,13 +225,13 @@ export default function ProductDetail() {
                             className="w-full h-full object-cover"
                         />
                         {/* Badges */}
-                        <div className="absolute top-4 left-4 flex flex-col gap-1.5">
-                            {product.isNew && (
+                        <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
+                            {product.badge && (
                                 <span
-                                    className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-medium border border-neutral-200"
+                                    className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-bold border border-neutral-200 shadow-sm"
                                     style={{ fontFamily: JOST }}
                                 >
-                                    New
+                                    {product.badge}
                                 </span>
                             )}
                             {product.discount > 0 && (
@@ -278,7 +287,7 @@ export default function ProductDetail() {
 
                         {/* Description */}
                         <p
-                            className="text-neutral-500 text-sm font-light leading-relaxed mb-6"
+                            className="text-neutral-500 text-sm font-light leading-relaxed mb-6 whitespace-pre-line"
                             style={{ fontFamily: JOST }}
                         >
                             {product.description}
@@ -313,48 +322,54 @@ export default function ProductDetail() {
                         </div>
 
                         {/* Features */}
-                        <div className="mb-5">
-                            <p
-                                className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
-                                style={{ fontFamily: JOST }}
-                            >
-                                Fitur Utama
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                                {product.features?.map((f: string, i: number) => (
-                                    <span
-                                        key={i}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 border border-neutral-200 text-neutral-600 text-[11px] tracking-[0.1em] uppercase font-medium"
-                                        style={{ fontFamily: JOST }}
-                                    >
-                                        <Check className="w-3 h-3" />
-                                        {f}
-                                    </span>
-                                ))}
+                        {product.features && product.features.length > 0 && (
+                            <div className="mb-8 p-6 bg-neutral-50 border border-neutral-100 rounded-lg">
+                                <p
+                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-900 font-bold mb-4"
+                                    style={{ fontFamily: JOST }}
+                                >
+                                    Fitur Utama
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {product.features.map((f: string, i: number) => (
+                                        <div
+                                            key={i}
+                                            className="flex items-start gap-2.5 text-neutral-600 text-[12px] font-light leading-tight"
+                                            style={{ fontFamily: JOST }}
+                                        >
+                                            <div className="w-4 h-4 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Check className="w-2.5 h-2.5 text-white" />
+                                            </div>
+                                            {f}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Specifications */}
-                        <div className="mb-6">
-                            <p
-                                className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
-                                style={{ fontFamily: JOST }}
-                            >
-                                Spesifikasi
-                            </p>
-                            <div className="space-y-1.5">
-                                {Object.entries(product.specifications || {}).map(([k, v]) => (
-                                    <div
-                                        key={k}
-                                        className="flex justify-between py-2 border-b border-neutral-100 text-sm"
-                                        style={{ fontFamily: JOST }}
-                                    >
-                                        <span className="text-neutral-400 font-light">{k}</span>
-                                        <span className="text-neutral-800 font-medium">{v as string}</span>
-                                    </div>
-                                ))}
+                        {product.specifications && Object.keys(product.specifications).length > 0 && (
+                            <div className="mb-8">
+                                <p
+                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
+                                    style={{ fontFamily: JOST }}
+                                >
+                                    Spesifikasi
+                                </p>
+                                <div className="grid grid-cols-1 gap-2">
+                                    {Object.entries(product.specifications).map(([k, v]) => (
+                                        <div
+                                            key={k}
+                                            className="flex justify-between py-2.5 px-4 bg-white border border-neutral-100 text-sm"
+                                            style={{ fontFamily: JOST }}
+                                        >
+                                            <span className="text-neutral-400 font-light">{k}</span>
+                                            <span className="text-neutral-900 font-medium">{v as string}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Actions */}
                         <div className="flex gap-2 mt-auto">
