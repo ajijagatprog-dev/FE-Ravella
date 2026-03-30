@@ -120,7 +120,7 @@ export default function CheckoutPage() {
                             });
                         setRecommendedProducts(recs);
                     }
-                } catch (_e) { /* non-critical */ }
+                } catch (_e) { }
 
                 // Fetch available vouchers
                 try {
@@ -128,7 +128,7 @@ export default function CheckoutPage() {
                     if (vRes.data.status === 'success') {
                         setAvailableVouchers(vRes.data.data);
                     }
-                } catch (_e) { /* non-critical */ }
+                } catch (_e) { }
 
                 // Auto-apply voucher from Cart page
                 const activeVoucher = localStorage.getItem("ravelle_active_voucher");
