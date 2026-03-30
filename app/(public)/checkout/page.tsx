@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, MapPin, CreditCard, ChevronRight, CheckCircle2, Loader2, Package } from "lucide-react";
+import { ArrowLeft, MapPin, CreditCard, CheckCircle2, Loader2, Package, ShoppingCart, Star, Sparkles } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
 import { Plus, X, Lock } from "lucide-react";
@@ -19,6 +19,8 @@ export default function CheckoutPage() {
     const [submitting, setSubmitting] = useState(false);
     const [hydrated, setHydrated] = useState(false);
     const [authError, setAuthError] = useState(false);
+    const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
+    const [addedToCart, setAddedToCart] = useState<number | null>(null);
 
     // Add Address State
     const [isAddingAddress, setIsAddingAddress] = useState(false);
@@ -58,9 +60,10 @@ export default function CheckoutPage() {
 
                 // Load cart
                 const stored = localStorage.getItem("ravelle_cart");
+                let parsedCart: any[] = [];
                 if (stored) {
-                    const parsed = JSON.parse(stored).filter((i: any) => i.selected);
-                    setCart(parsed);
+                    parsedCart = JSON.parse(stored).filter((i: any) => i.selected);
+                    setCart(parsedCart);
                 }
 
                 // Load addresses
@@ -75,6 +78,29 @@ export default function CheckoutPage() {
                     }
                 };
                 await fetchAddresses();
+
+                // Load recommended products (featured, not in cart)
+                try {
+                    const recRes = await api.get('/products', { params: { is_featured: true, limit: 8 } });
+                    if (recRes.data.status === 'success') {
+                        const cartIds = parsedCart.map((c: any) => c.id);
+                        const recs = recRes.data.data.data
+                            .filter((p: any) => !cartIds.includes(p.id))
+                            .slice(0, 4)
+                            .map((p: any) => ({
+                                id: p.id,
+                                name: p.name,
+                                price: p.sale_price && p.sale_price > 0 ? p.sale_price : p.price,
+                                originalPrice: p.price,
+                                discount: p.discount || 0,
+                                image: p.image || 'https://images.unsplash.com/photo-1558317374-067fb5f30001',
+                                badge: p.badge || '',
+                                category: p.category || '',
+                                stock: p.stock,
+                            }));
+                        setRecommendedProducts(recs);
+                    }
+                } catch (_e) { /* non-critical */ }
             } catch (error) {
                 console.error("Error initializing checkout:", error);
             } finally {
@@ -141,10 +167,34 @@ export default function CheckoutPage() {
     }
 
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // TODO: Shipping fee will be integrated with Raja Ongkir
-    const grandTotal = subtotal;
+    // Voucher state
+    const [voucherCode, setVoucherCode] = useState('');
+    const [voucherResult, setVoucherResult] = useState<any>(null);
+    const [voucherError, setVoucherError] = useState('');
+    const [applyingVoucher, setApplyingVoucher] = useState(false);
+
+    const discountAmount = voucherResult?.discount_amount || 0;
+    const shippingFee = subtotal > 500000 ? 0 : 25000;
+    const grandTotal = Math.max(0, subtotal - discountAmount + shippingFee);
 
     const formatPrice = (p: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(p);
+
+    const handleApplyVoucher = async () => {
+        if (!voucherCode.trim()) return;
+        setApplyingVoucher(true);
+        setVoucherError('');
+        setVoucherResult(null);
+        try {
+            const res = await api.get('/vouchers/validate', { params: { code: voucherCode.trim(), subtotal } });
+            if (res.data.status === 'success') {
+                setVoucherResult(res.data.data);
+            }
+        } catch (err: any) {
+            setVoucherError(err?.response?.data?.message || 'Kode voucher tidak valid.');
+        } finally {
+            setApplyingVoucher(false);
+        }
+    };
 
     const handlePlaceOrder = async () => {
         if (!selectedAddress) {
@@ -154,7 +204,7 @@ export default function CheckoutPage() {
 
         setSubmitting(true);
         try {
-            const payload = {
+            const payload: any = {
                 shipping_address_id: selectedAddress.id,
                 payment_method: paymentMethod,
                 items: cart.map(item => ({
@@ -163,6 +213,10 @@ export default function CheckoutPage() {
                     price: item.price
                 }))
             };
+
+            if (voucherResult?.code) {
+                payload.voucher_code = voucherResult.code;
+            }
 
             const res = await api.post('/customer/orders', payload);
             if (res.data.status === 'success') {
@@ -369,6 +423,67 @@ export default function CheckoutPage() {
                             ))}
                         </div>
                     </div>
+
+                    {/* ── PRODUCT RECOMMENDATIONS ── */}
+                    {recommendedProducts.length > 0 && (
+                        <div className="bg-white p-6 rounded-none border border-stone-200">
+                            <div className="flex items-center gap-3 mb-5 pb-4 border-b border-stone-100">
+                                <Sparkles className="w-5 h-5 text-stone-800" />
+                                <h2 className="text-lg font-bold text-stone-800">Mungkin Kamu Suka</h2>
+                                <span className="ml-auto text-xs text-stone-400 font-light">Tambahkan sebelum checkout</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                {recommendedProducts.map((rec) => (
+                                    <div key={rec.id} className="border border-stone-100 hover:border-stone-300 transition-colors group">
+                                        <Link href={`/product/${rec.id}`} className="block">
+                                            <div className="relative aspect-square overflow-hidden bg-stone-50">
+                                                <img src={rec.image} alt={rec.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                                {rec.discount > 0 && (
+                                                    <span className="absolute top-2 left-2 bg-stone-900 text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                                                        -{rec.discount}%
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </Link>
+                                        <div className="p-3">
+                                            <Link href={`/product/${rec.id}`}>
+                                                <p className="text-xs font-semibold text-stone-800 line-clamp-2 mb-1 hover:text-stone-600 transition-colors">{rec.name}</p>
+                                            </Link>
+                                            <div className="flex items-center gap-1.5 mb-2">
+                                                <span className="text-sm font-bold text-stone-900">{formatPrice(rec.price)}</span>
+                                                {rec.originalPrice > rec.price && (
+                                                    <span className="text-[11px] text-stone-400 line-through">{formatPrice(rec.originalPrice)}</span>
+                                                )}
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const stored = localStorage.getItem("ravelle_cart");
+                                                    let c: any[] = stored ? JSON.parse(stored) : [];
+                                                    const exists = c.find((item: any) => item.id === rec.id);
+                                                    if (exists) {
+                                                        c = c.map((item: any) => item.id === rec.id ? { ...item, quantity: item.quantity + 1 } : item);
+                                                    } else {
+                                                        c = [...c, { ...rec, quantity: 1, selected: true }];
+                                                    }
+                                                    localStorage.setItem("ravelle_cart", JSON.stringify(c));
+                                                    window.dispatchEvent(new Event("ravelle_cart_updated"));
+                                                    setAddedToCart(rec.id);
+                                                    setTimeout(() => setAddedToCart(null), 2000);
+                                                }}
+                                                className={`w-full py-2 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 transition-colors ${addedToCart === rec.id
+                                                    ? 'bg-green-600 text-white'
+                                                    : 'bg-stone-900 hover:bg-black text-white'
+                                                    }`}
+                                            >
+                                                <ShoppingCart className="w-3 h-3" />
+                                                {addedToCart === rec.id ? 'Ditambahkan!' : 'Add to Cart'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* ── RIGHT COLUMN (SUMMARY) ── */}
@@ -376,12 +491,50 @@ export default function CheckoutPage() {
                     <div className="bg-white p-6 border border-stone-200 sticky top-24">
                         <h2 className="text-lg font-bold text-stone-800 mb-5">Order Summary</h2>
 
+                        {/* Voucher Input */}
+                        <div className="mb-5">
+                            <p className="text-[11px] uppercase tracking-wider text-stone-500 font-medium mb-2">Kode Voucher</p>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={voucherCode}
+                                    onChange={(e) => { setVoucherCode(e.target.value.toUpperCase()); setVoucherError(''); setVoucherResult(null); }}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleApplyVoucher()}
+                                    placeholder="Masukkan kode voucher"
+                                    className="flex-1 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 uppercase"
+                                />
+                                <button
+                                    onClick={handleApplyVoucher}
+                                    disabled={applyingVoucher || !voucherCode.trim()}
+                                    className="px-4 py-2 bg-stone-900 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-black disabled:bg-stone-300 transition-colors flex items-center gap-1"
+                                >
+                                    {applyingVoucher ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Pakai'}
+                                </button>
+                            </div>
+                            {voucherError && <p className="text-xs text-red-500 mt-1.5">{voucherError}</p>}
+                            {voucherResult && (
+                                <div className="mt-2 flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-2">
+                                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                                    <p className="text-xs text-green-700 font-medium">{voucherResult.description || `Voucher ${voucherResult.code} berhasil!`}</p>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="space-y-3 pb-5 border-b border-stone-100 text-sm">
                             <div className="flex justify-between text-stone-600">
                                 <span>Subtotal ({cart.length} items)</span>
                                 <span className="font-medium text-stone-800">{formatPrice(subtotal)}</span>
                             </div>
-                            {/* Shipping Fee - will be shown after Raja Ongkir integration */}
+                            {discountAmount > 0 && (
+                                <div className="flex justify-between text-green-600">
+                                    <span>Diskon Voucher ({voucherResult?.code})</span>
+                                    <span className="font-medium">-{formatPrice(discountAmount)}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between text-stone-600">
+                                <span>Ongkos Kirim</span>
+                                <span className="font-medium text-stone-800">{shippingFee === 0 ? 'Gratis' : formatPrice(shippingFee)}</span>
+                            </div>
                         </div>
 
                         <div className="flex justify-between items-end pt-5 mb-8">

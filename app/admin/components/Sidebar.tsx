@@ -16,6 +16,7 @@ import {
   Building2,
   Newspaper,
   FileText,
+  Tag,
 } from "lucide-react";
 
 // ── Menu Config ───────────────────────────────────────────────────────────────
@@ -26,6 +27,7 @@ const menuItems = [
   { label: "Order Management", href: "/admin/order", icon: ShoppingCart },
   { label: "User Management", href: "/admin/users_management", icon: Users },
   { label: "Loyalty System", href: "/admin/loyalty", icon: Award },
+  { label: "Voucher", href: "/admin/vouchers", icon: Tag },
   { label: "Reporting", href: "/admin/reports", icon: BarChart3 },
 ];
 
