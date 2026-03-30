@@ -8,6 +8,7 @@ import {
   CheckCircle, X, Ticket, Lock
 } from "lucide-react";
 import Link from "next/link";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -30,7 +31,10 @@ export default function CartClient() {
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [couponCode, setCouponCode] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponResult, setCouponResult] = useState<any>(null);
+  const [couponError, setCouponError] = useState("");
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [availableVouchers, setAvailableVouchers] = useState<any[]>([]);
   const [selectAll, setSelectAll] = useState(true);
   const [showCheckoutAnim, setShowCheckoutAnim] = useState(false);
   const [showAuthOverlay, setShowAuthOverlay] = useState(false);
@@ -52,6 +56,20 @@ export default function CartClient() {
     } catch (e) {
       console.error("Failed to parse cart:", e);
     }
+
+    // Fetch available vouchers
+    const fetchVouchers = async () => {
+      try {
+        const res = await api.get('/vouchers/active');
+        if (res.data.status === 'success') {
+          setAvailableVouchers(res.data.data);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    fetchVouchers();
+
     setHydrated(true);
   }, []);
 
@@ -97,8 +115,22 @@ export default function CartClient() {
     setCart((prev) => prev.map((item) => ({ ...item, selected: newVal })));
   };
 
-  const applyCoupon = () => {
-    if (couponCode.trim().toLowerCase() === "ravelle10") setCouponApplied(true);
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setValidatingCoupon(true);
+    setCouponError("");
+    setCouponResult(null);
+    try {
+      // NOTE: Here we must use 'api' from our axiot instance
+      const res = await api.get(`/vouchers/validate?code=${couponCode.toUpperCase()}&subtotal=${subtotal}`);
+      if (res.data.status === 'success') {
+        setCouponResult(res.data.data);
+      }
+    } catch (err: any) {
+      setCouponError(err?.response?.data?.message || "Voucher tidak valid atau kadaluarsa");
+    } finally {
+      setValidatingCoupon(false);
+    }
   };
 
   const handleCheckout = () => {
@@ -120,6 +152,11 @@ export default function CartClient() {
     }
 
     setShowCheckoutAnim(true);
+    if (couponResult?.code) {
+      localStorage.setItem("ravelle_active_voucher", couponResult.code);
+    } else {
+      localStorage.removeItem("ravelle_active_voucher");
+    }
     setTimeout(() => router.push("/checkout"), 1200);
   };
 
@@ -128,9 +165,9 @@ export default function CartClient() {
   const subtotal = selectedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const originalTotal = selectedItems.reduce((sum, i) => sum + (i.originalPrice || i.price) * i.quantity, 0);
   const totalDiscount = originalTotal - subtotal;
-  const couponDiscount = couponApplied ? Math.floor(subtotal * 0.1) : 0;
+  const couponDiscount = couponResult?.discount_amount || 0;
   // TODO: Shipping fee will be integrated with Raja Ongkir
-  const grandTotal = subtotal - couponDiscount;
+  const grandTotal = Math.max(0, subtotal - couponDiscount);
 
   const stores = Array.from(new Set(cart.map((item) => item.category || "Ravelle Official")));
 
@@ -346,46 +383,68 @@ export default function CartClient() {
                   </span>
                 </div>
 
-                {couponApplied ? (
+                {couponResult ? (
                   <div className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200">
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-neutral-600" />
+                      <CheckCircle className="w-4 h-4 text-green-600" />
                       <span className="font-medium text-neutral-900 text-[11px] tracking-wide" style={{ fontFamily: JOST }}>
-                        RAVELLE10 — Diskon 10% diterapkan
+                        {couponResult.code} — Diskon Rp {couponDiscount.toLocaleString('id-ID')}
                       </span>
                     </div>
                     <button
-                      onClick={() => { setCouponApplied(false); setCouponCode(""); }}
+                      onClick={() => { setCouponResult(null); setCouponCode(""); }}
                       className="text-neutral-400 hover:text-neutral-900 transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ) : (
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-300" />
-                      <input
-                        type="text"
-                        placeholder="Masukkan kode promo..."
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        className="w-full pl-9 pr-4 py-3 border border-neutral-200 text-sm text-neutral-700 font-light focus:border-neutral-800 focus:outline-none transition-colors placeholder:text-neutral-400"
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-300" />
+                        <input
+                          type="text"
+                          placeholder="Masukkan kode promo..."
+                          value={couponCode}
+                          onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(""); }}
+                          onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+                          className="w-full pl-9 pr-4 py-3 border border-neutral-200 text-sm text-neutral-900 uppercase font-bold focus:border-neutral-800 focus:outline-none transition-colors placeholder:text-neutral-400 placeholder:font-light"
+                          style={{ fontFamily: JOST }}
+                        />
+                      </div>
+                      <button
+                        onClick={applyCoupon}
+                        disabled={validatingCoupon || !couponCode.trim()}
+                        className="px-5 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors disabled:bg-neutral-300"
                         style={{ fontFamily: JOST }}
-                      />
+                      >
+                        {validatingCoupon ? "Cek..." : "Pakai"}
+                      </button>
                     </div>
-                    <button
-                      onClick={applyCoupon}
-                      className="px-5 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors"
-                      style={{ fontFamily: JOST }}
-                    >
-                      Pakai
-                    </button>
+                    {couponError && <p className="text-[11px] text-red-500 font-medium">{couponError}</p>}
                   </div>
                 )}
-                <p className="text-[10px] text-neutral-400 mt-2 font-light tracking-wide" style={{ fontFamily: JOST }}>
-                  Coba kode: RAVELLE10 untuk diskon 10%
-                </p>
+
+                {availableVouchers.length > 0 && !couponResult && (
+                  <div className="mt-4 pt-4 border-t border-neutral-100">
+                    <p className="text-[10px] text-neutral-500 mb-2 font-medium tracking-wide uppercase" style={{ fontFamily: JOST }}>
+                      Voucher Tersedia:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableVouchers.map(v => (
+                        <button
+                          key={v.id}
+                          onClick={() => { setCouponCode(v.code); setCouponError(""); }}
+                          className="px-2.5 py-1.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-800 text-left transition-colors flex flex-col gap-0.5"
+                        >
+                          <span className="text-[10px] font-bold text-neutral-900 tracking-wide">{v.code}</span>
+                          <span className="text-[9px] text-neutral-500">{v.type === 'percent' ? `Diskon ${parseFloat(v.value)}%` : `Diskon Rp ${parseInt(v.value).toLocaleString('id-ID')}`}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -414,9 +473,9 @@ export default function CartClient() {
                       <span className="font-medium text-neutral-700">-{formatPrice(totalDiscount)}</span>
                     </div>
                   )}
-                  {couponApplied && (
+                  {couponResult && (
                     <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                      <span className="text-neutral-500 font-light">Diskon Promo</span>
+                      <span className="text-neutral-500 font-light">Diskon Promo ({couponResult.code})</span>
                       <span className="font-medium text-neutral-700">-{formatPrice(couponDiscount)}</span>
                     </div>
                   )}
@@ -431,8 +490,8 @@ export default function CartClient() {
                         {formatPrice(grandTotal)}
                       </span>
                     </div>
-                    {(totalDiscount > 0 || couponApplied) && (
-                      <p className="text-right text-[11px] text-neutral-500 font-light mt-1 tracking-wide" style={{ fontFamily: JOST }}>
+                    {(totalDiscount > 0 || couponResult) && (
+                      <p className="text-right text-[11px] text-green-600 font-medium mt-1 tracking-wide" style={{ fontFamily: JOST }}>
                         Hemat {formatPrice(totalDiscount + couponDiscount)}
                       </p>
                     )}

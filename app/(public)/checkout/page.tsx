@@ -22,6 +22,13 @@ export default function CheckoutPage() {
     const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
     const [addedToCart, setAddedToCart] = useState<number | null>(null);
 
+    // Voucher state
+    const [voucherCode, setVoucherCode] = useState('');
+    const [voucherResult, setVoucherResult] = useState<any>(null);
+    const [voucherError, setVoucherError] = useState('');
+    const [applyingVoucher, setApplyingVoucher] = useState(false);
+    const [availableVouchers, setAvailableVouchers] = useState<any[]>([]);
+
     // Add Address State
     const [isAddingAddress, setIsAddingAddress] = useState(false);
     const [newAddress, setNewAddress] = useState({
@@ -79,28 +86,65 @@ export default function CheckoutPage() {
                 };
                 await fetchAddresses();
 
-                // Load recommended products (featured, not in cart)
+                // Load recommended products
                 try {
-                    const recRes = await api.get('/products', { params: { is_featured: true, limit: 8 } });
-                    if (recRes.data.status === 'success') {
+                    let recRes = await api.get('/products', { params: { on_sale: true, limit: 12 } });
+                    if (recRes.data.status !== 'success' || !recRes.data.data.data || recRes.data.data.data.length === 0) {
+                        recRes = await api.get('/products', { params: { limit: 12 } });
+                    }
+                    if (recRes.data.status === 'success' && recRes.data.data.data) {
                         const cartIds = parsedCart.map((c: any) => c.id);
                         const recs = recRes.data.data.data
                             .filter((p: any) => !cartIds.includes(p.id))
                             .slice(0, 4)
-                            .map((p: any) => ({
-                                id: p.id,
-                                name: p.name,
-                                price: p.sale_price && p.sale_price > 0 ? p.sale_price : p.price,
-                                originalPrice: p.price,
-                                discount: p.discount || 0,
-                                image: p.image || 'https://images.unsplash.com/photo-1558317374-067fb5f30001',
-                                badge: p.badge || '',
-                                category: p.category || '',
-                                stock: p.stock,
-                            }));
+                            .map((p: any) => {
+                                let currPrice = p.price;
+                                let origPrice = p.price;
+                                if (p.sale_price && p.sale_price > 0) {
+                                    currPrice = Math.min(p.price, p.sale_price);
+                                    origPrice = Math.max(p.price, p.sale_price);
+                                } else if (p.discount && p.discount > 0) {
+                                    currPrice = p.price - (p.price * p.discount / 100);
+                                }
+                                return {
+                                    id: p.id,
+                                    name: p.name,
+                                    price: currPrice,
+                                    originalPrice: origPrice,
+                                    discount: p.discount || Math.round((1 - currPrice / origPrice) * 100),
+                                    image: p.image || 'https://images.unsplash.com/photo-1558317374-067fb5f30001',
+                                    badge: p.badge || '',
+                                    category: p.category || '',
+                                    stock: p.stock,
+                                };
+                            });
                         setRecommendedProducts(recs);
                     }
                 } catch (_e) { /* non-critical */ }
+
+                // Fetch available vouchers
+                try {
+                    const vRes = await api.get('/vouchers/active');
+                    if (vRes.data.status === 'success') {
+                        setAvailableVouchers(vRes.data.data);
+                    }
+                } catch (_e) { /* non-critical */ }
+
+                // Auto-apply voucher from Cart page
+                const activeVoucher = localStorage.getItem("ravelle_active_voucher");
+                const currentSubtotal = parsedCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                if (activeVoucher && currentSubtotal > 0) {
+                    try {
+                        setVoucherCode(activeVoucher);
+                        const res = await api.get(`/vouchers/validate?code=${activeVoucher}&subtotal=${currentSubtotal}`);
+                        if (res.data.status === 'success') {
+                            setVoucherResult(res.data.data);
+                        }
+                    } catch (e: any) {
+                        localStorage.removeItem("ravelle_active_voucher");
+                    }
+                }
+
             } catch (error) {
                 console.error("Error initializing checkout:", error);
             } finally {
@@ -167,11 +211,6 @@ export default function CheckoutPage() {
     }
 
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // Voucher state
-    const [voucherCode, setVoucherCode] = useState('');
-    const [voucherResult, setVoucherResult] = useState<any>(null);
-    const [voucherError, setVoucherError] = useState('');
-    const [applyingVoucher, setApplyingVoucher] = useState(false);
 
     const discountAmount = voucherResult?.discount_amount || 0;
     const shippingFee = subtotal > 500000 ? 0 : 25000;
@@ -516,6 +555,26 @@ export default function CheckoutPage() {
                                 <div className="mt-2 flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-2">
                                     <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
                                     <p className="text-xs text-green-700 font-medium">{voucherResult.description || `Voucher ${voucherResult.code} berhasil!`}</p>
+                                </div>
+                            )}
+
+                            {availableVouchers.length > 0 && !voucherResult && (
+                                <div className="mt-3 pt-3 border-t border-stone-100">
+                                    <p className="text-[10px] text-stone-500 mb-2 font-medium tracking-wide uppercase">Voucher Tersedia:</p>
+                                    <div className="flex flex-col gap-1.5">
+                                        {availableVouchers.map(v => (
+                                            <button
+                                                key={v.id}
+                                                onClick={() => { setVoucherCode(v.code); setVoucherError(""); }}
+                                                className="px-2.5 py-1.5 bg-stone-50 border border-stone-200 hover:border-stone-800 text-left transition-colors flex flex-col gap-0.5 w-full"
+                                            >
+                                                <span className="text-[10px] font-bold text-stone-900 tracking-wide">{v.code}</span>
+                                                <span className="text-[9px] text-stone-500">
+                                                    {v.type === 'percent' ? `Diskon ${parseFloat(v.value)}%` : `Diskon Rp ${parseInt(v.value).toLocaleString('id-ID')}`}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>

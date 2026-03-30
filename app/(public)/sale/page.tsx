@@ -25,18 +25,30 @@ export default function SalePage() {
                 if (res.data.status === "success") {
                     const allProducts = res.data.data.data || res.data.data;
                     const saleProducts = allProducts
-                        .filter((p: any) => p.discount > 0 || (p.sale_price && p.sale_price < p.price))
-                        .map((p: any) => ({
-                            id: p.id,
-                            name: p.name,
-                            price: p.sale_price && p.sale_price > 0 ? p.sale_price : p.price,
-                            originalPrice: p.price,
-                            discount: p.discount || (p.sale_price ? Math.round((1 - p.sale_price / p.price) * 100) : 0),
-                            image: p.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
-                            badge: p.badge || "",
-                            category: p.category || "",
-                            stock: p.stock,
-                        }));
+                        .filter((p: any) => p.discount > 0 || (p.sale_price && p.sale_price !== p.price))
+                        .map((p: any) => {
+                            let currPrice = p.price;
+                            let origPrice = p.price;
+
+                            if (p.sale_price && p.sale_price > 0) {
+                                currPrice = Math.min(p.price, p.sale_price);
+                                origPrice = Math.max(p.price, p.sale_price);
+                            } else if (p.discount && p.discount > 0) {
+                                currPrice = p.price - (p.price * p.discount / 100);
+                            }
+
+                            return {
+                                id: p.id,
+                                name: p.name,
+                                price: currPrice,
+                                originalPrice: origPrice,
+                                discount: p.discount || Math.round((1 - currPrice / origPrice) * 100),
+                                image: p.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+                                badge: p.badge || "",
+                                category: p.category || "",
+                                stock: p.stock,
+                            };
+                        });
                     setProducts(saleProducts);
                 }
             } catch (e) {

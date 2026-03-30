@@ -187,7 +187,7 @@ export default function VouchersPage() {
                                         </td>
                                         <td className="px-5 py-4 text-stone-600">{v.description || <span className="text-stone-300">—</span>}</td>
                                         <td className="px-5 py-4 font-medium text-stone-800">
-                                            {v.type === 'percent' ? `${v.value}%` : formatPrice(v.value)}
+                                            {v.type === 'percent' ? `${parseFloat(v.value)}%` : formatPrice(v.value)}
                                             {v.max_discount && v.type === 'percent' && (
                                                 <span className="text-[11px] text-stone-400 block">maks. {formatPrice(v.max_discount)}</span>
                                             )}
@@ -255,17 +255,17 @@ export default function VouchersPage() {
                                 <div className="col-span-2">
                                     <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-medium mb-1">Kode Voucher *</label>
                                     <input required value={form.code} onChange={e => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                                        placeholder="WELCOMERAVELLA" className="w-full border border-stone-200 px-3 py-2 text-sm font-mono uppercase focus:outline-none focus:border-stone-900" />
+                                        placeholder="WELCOMERAVELLA" className="w-full border border-stone-200 px-3 py-2 text-sm font-mono uppercase bg-white text-stone-900 focus:outline-none focus:border-stone-900" />
                                 </div>
                                 <div className="col-span-2">
                                     <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-medium mb-1">Deskripsi</label>
                                     <input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                                        placeholder="Diskon 10% untuk pelanggan baru" className="w-full border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:border-stone-900" />
+                                        placeholder="Diskon 10% untuk pelanggan baru" className="w-full border border-stone-200 px-3 py-2 text-sm bg-white text-stone-900 focus:outline-none focus:border-stone-900" />
                                 </div>
                                 <div>
                                     <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-medium mb-1">Tipe *</label>
                                     <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as any })}
-                                        className="w-full border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:border-stone-900 bg-white">
+                                        className="w-full border border-stone-200 px-3 py-2 text-sm bg-white text-stone-900 focus:outline-none focus:border-stone-900">
                                         <option value="percent">Persen (%)</option>
                                         <option value="fixed">Nominal (Rp)</option>
                                     </select>
@@ -275,29 +275,29 @@ export default function VouchersPage() {
                                         Nilai * {form.type === 'percent' ? '(%)' : '(Rp)'}
                                     </label>
                                     <input required type="number" min="0" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })}
-                                        placeholder={form.type === 'percent' ? "10" : "50000"} className="w-full border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:border-stone-900" />
+                                        placeholder={form.type === 'percent' ? "10" : "50000"} className="w-full border border-stone-200 px-3 py-2 text-sm bg-white text-stone-900 focus:outline-none focus:border-stone-900" />
                                 </div>
                                 <div>
                                     <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-medium mb-1">Min. Belanja (Rp)</label>
                                     <input type="number" min="0" value={form.min_purchase} onChange={e => setForm({ ...form, min_purchase: e.target.value })}
-                                        placeholder="100000" className="w-full border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:border-stone-900" />
+                                        placeholder="100000" className="w-full border border-stone-200 px-3 py-2 text-sm bg-white text-stone-900 focus:outline-none focus:border-stone-900" />
                                 </div>
                                 {form.type === 'percent' && (
                                     <div>
                                         <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-medium mb-1">Maks. Diskon (Rp)</label>
                                         <input type="number" min="0" value={form.max_discount} onChange={e => setForm({ ...form, max_discount: e.target.value })}
-                                            placeholder="50000" className="w-full border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:border-stone-900" />
+                                            placeholder="50000" className="w-full border border-stone-200 px-3 py-2 text-sm bg-white text-stone-900 focus:outline-none focus:border-stone-900" />
                                     </div>
                                 )}
                                 <div>
                                     <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-medium mb-1">Maks. Penggunaan</label>
                                     <input type="number" min="1" value={form.max_uses} onChange={e => setForm({ ...form, max_uses: e.target.value })}
-                                        placeholder="Kosong = tidak terbatas" className="w-full border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:border-stone-900" />
+                                        placeholder="Kosong = tidak terbatas" className="w-full border border-stone-200 px-3 py-2 text-sm bg-white text-stone-900 focus:outline-none focus:border-stone-900" />
                                 </div>
                                 <div>
                                     <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-medium mb-1">Kedaluwarsa</label>
                                     <input type="date" value={form.expires_at} onChange={e => setForm({ ...form, expires_at: e.target.value })}
-                                        className="w-full border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:border-stone-900" />
+                                        className="w-full border border-stone-200 px-3 py-2 text-sm bg-white text-stone-900 focus:outline-none focus:border-stone-900" />
                                 </div>
                                 <div className="col-span-2 flex items-center gap-3">
                                     <input type="checkbox" id="is_active" checked={form.is_active} onChange={e => setForm({ ...form, is_active: e.target.checked })}
