@@ -3,37 +3,61 @@
 import { useEffect, useState } from "react";
 import { X, Tag, Copy, Check, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
-// ── Configurable promo settings ──
-const PROMO_CODE = "WELCOMERAVELLA";
-const PROMO_DESCRIPTION = "Diskon 10% untuk pembelian pertama Anda";
-const POPUP_STORAGE_KEY = "ravella_popup_shown";
+const POPUP_SESSION_KEY = "ravella_popup_dismissed";
 const POPUP_DELAY_MS = 2500;
 
 export default function WelcomePopup() {
     const [visible, setVisible] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [promoCode, setPromoCode] = useState("");
+    const [promoDescription, setPromoDescription] = useState("");
 
     useEffect(() => {
         setMounted(true);
-        const alreadyShown = localStorage.getItem(POPUP_STORAGE_KEY);
-        if (!alreadyShown) {
-            const timer = setTimeout(() => setVisible(true), POPUP_DELAY_MS);
-            return () => clearTimeout(timer);
-        }
+
+        // If user already dismissed in this session, don't show
+        const dismissed = sessionStorage.getItem(POPUP_SESSION_KEY);
+        if (dismissed) return;
+
+        // Fetch active vouchers from backend
+        const fetchVoucher = async () => {
+            try {
+                const res = await api.get("/vouchers/active");
+                if (res.data.status === "success" && res.data.data.length > 0) {
+                    const voucher = res.data.data[0]; // Use the first active voucher
+                    setPromoCode(voucher.code);
+                    const desc = voucher.description
+                        || (voucher.type === "percent"
+                            ? `Diskon ${parseFloat(voucher.value)}% untuk pembelian Anda`
+                            : `Diskon Rp ${parseInt(voucher.value).toLocaleString("id-ID")} untuk pembelian Anda`);
+                    setPromoDescription(desc);
+
+                    // Show popup after delay
+                    const timer = setTimeout(() => setVisible(true), POPUP_DELAY_MS);
+                    return () => clearTimeout(timer);
+                }
+                // No active voucher → don't show popup at all
+            } catch (_e) {
+                // API error → don't show popup
+            }
+        };
+        fetchVoucher();
     }, []);
 
     const handleClose = () => {
-        localStorage.setItem(POPUP_STORAGE_KEY, "1");
+        sessionStorage.setItem(POPUP_SESSION_KEY, "1");
         setVisible(false);
     };
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(PROMO_CODE).then(() => {
+        if (!promoCode) return;
+        navigator.clipboard.writeText(promoCode).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         });
@@ -98,13 +122,13 @@ export default function WelcomePopup() {
                     {/* Content */}
                     <div className="px-8 py-7 text-center">
                         <p className="text-stone-600 text-sm font-light leading-relaxed mb-6">
-                            {PROMO_DESCRIPTION}. Gunakan kode di bawah ini saat checkout.
+                            {promoDescription}. Gunakan kode di bawah ini saat checkout.
                         </p>
 
                         {/* Voucher code display */}
                         <div className="border-2 border-dashed border-stone-200 bg-stone-50 px-5 py-4 mb-6 flex items-center justify-between gap-3">
                             <span className="font-mono font-bold text-stone-900 text-xl tracking-widest flex-1 text-center">
-                                {PROMO_CODE}
+                                {promoCode}
                             </span>
                             <button
                                 onClick={handleCopy}

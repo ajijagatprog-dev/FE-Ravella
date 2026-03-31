@@ -464,19 +464,13 @@ export default function CartClient() {
 
                 <div className="px-5 py-4 space-y-3">
                   <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                    <span className="text-neutral-500 font-light">Total Harga</span>
-                    <span className="font-medium text-neutral-900">{formatPrice(originalTotal)}</span>
+                    <span className="text-neutral-500 font-light">Subtotal</span>
+                    <span className="font-medium text-neutral-900">{formatPrice(subtotal)}</span>
                   </div>
-                  {totalDiscount > 0 && (
-                    <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                      <span className="text-neutral-500 font-light">Diskon Produk</span>
-                      <span className="font-medium text-neutral-700">-{formatPrice(totalDiscount)}</span>
-                    </div>
-                  )}
                   {couponResult && (
                     <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                      <span className="text-neutral-500 font-light">Diskon Promo ({couponResult.code})</span>
-                      <span className="font-medium text-neutral-700">-{formatPrice(couponDiscount)}</span>
+                      <span className="text-neutral-500 font-light">Diskon Voucher ({couponResult.code})</span>
+                      <span className="font-medium text-green-600">-{formatPrice(couponDiscount)}</span>
                     </div>
                   )}
                   {/* Ongkos Kirim - will be shown after Raja Ongkir integration */}
@@ -490,9 +484,9 @@ export default function CartClient() {
                         {formatPrice(grandTotal)}
                       </span>
                     </div>
-                    {(totalDiscount > 0 || couponResult) && (
+                    {couponResult && (
                       <p className="text-right text-[11px] text-green-600 font-medium mt-1 tracking-wide" style={{ fontFamily: JOST }}>
-                        Hemat {formatPrice(totalDiscount + couponDiscount)}
+                        Hemat {formatPrice(couponDiscount)}
                       </p>
                     )}
                   </div>
