@@ -170,12 +170,20 @@ export default function ProductContentPage() {
     const openEdit = (p: any) => {
         setEditData({ ...p, imageFile: null });
         // Load existing media into state
-        const existingMedia: MediaItem[] = (p._media || []).map((m: any) => ({
+        let existingMedia: MediaItem[] = (p._media || []).map((m: any) => ({
             id: m.id,
             type: m.type as 'image' | 'video',
             url: m.url,
             is_primary: m.is_primary,
         }));
+        // Fallback: if no product_media but product has legacy image, show it
+        if (existingMedia.length === 0 && p.image) {
+            existingMedia = [{
+                type: 'image',
+                url: p.image,
+                is_primary: true,
+            }];
+        }
         setMediaItems(existingMedia);
         setDeleteMediaIds([]);
         setModalMode("edit");

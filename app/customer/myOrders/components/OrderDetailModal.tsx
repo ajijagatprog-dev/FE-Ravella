@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
     X,
     Package,
@@ -12,9 +12,12 @@ import {
     XCircle,
     FileText,
     Download,
+    Navigation,
+    Loader2
 } from "lucide-react";
 import OrderStatusBadge, { type OrderStatus } from "./OrderStatusBadge";
 import { cn } from "@/lib/utils";
+import api from "@/lib/axios";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface OrderItem {
@@ -50,6 +53,9 @@ export interface OrderDetail {
     // Payment
     paymentMethod: string;
     paymentStatus: "PAID" | "PENDING" | "FAILED";
+    // Tracking
+    courier?: string | null;
+    trackingNumber?: string | null;
 }
 
 // ── Timeline step config ──────────────────────────────────────────────────────
@@ -84,6 +90,29 @@ export default function OrderDetailModal({ order, onClose }: Props) {
         else document.body.style.overflow = "";
         return () => { document.body.style.overflow = ""; };
     }, [order]);
+
+    // Tracking state
+    const [trackingData, setTrackingData] = useState<any>(null);
+    const [loadingTracking, setLoadingTracking] = useState(false);
+    const [showTracking, setShowTracking] = useState(false);
+
+    useEffect(() => {
+        if (!order || !order.trackingNumber || !showTracking) return;
+        const fetchTracking = async () => {
+            setLoadingTracking(true);
+            try {
+                const res = await api.get(`/customer/orders/${order.orderNumber}/tracking`);
+                if (res.data.status === 'success') {
+                    setTrackingData(res.data.data);
+                }
+            } catch (err) {
+                console.error("Failed to load tracking data", err);
+            } finally {
+                setLoadingTracking(false);
+            }
+        };
+        fetchTracking();
+    }, [order, showTracking]);
 
     if (!order) return null;
 
@@ -258,6 +287,17 @@ export default function OrderDetailModal({ order, onClose }: Props) {
                                     {order.shippingAddress.city}, {order.shippingAddress.province}{" "}
                                     {order.shippingAddress.postalCode}
                                 </p>
+                                {order.trackingNumber && (
+                                    <div className="mt-4 pt-4 border-t border-stone-200">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Truck className="w-3.5 h-3.5 text-stone-400" />
+                                            <p className="text-xs font-bold text-stone-500 uppercase tracking-widest">
+                                                Resi Pengiriman
+                                            </p>
+                                        </div>
+                                        <p className="text-sm font-semibold text-stone-700 uppercase">{order.courier}: {order.trackingNumber}</p>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Payment */}
@@ -301,6 +341,50 @@ export default function OrderDetailModal({ order, onClose }: Props) {
                                 )}
                             </div>
                         </div>
+
+                        {/* Tracking Timeline Component */}
+                        {showTracking && order.trackingNumber && (
+                            <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mt-4 animate-in fade-in slide-in-from-top-2">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Navigation className="w-4 h-4 text-blue-600" />
+                                    <h3 className="font-bold text-blue-900">Perjalanan Paket (Real-time)</h3>
+                                </div>
+                                
+                                {loadingTracking ? (
+                                    <div className="flex items-center justify-center py-6 text-blue-600">
+                                        <Loader2 className="w-6 h-6 animate-spin" />
+                                    </div>
+                                ) : trackingData?.history ? (
+                                    <div className="space-y-4 pl-2 relative before:absolute before:inset-y-0 before:left-[11px] before:w-px before:bg-blue-200">
+                                        {trackingData.history.map((h: any, idx: number) => (
+                                            <div key={idx} className="relative pl-6">
+                                                <div className={cn(
+                                                    "absolute -left-[5px] top-1.5 w-3 h-3 rounded-full border-2 border-white",
+                                                    idx === 0 ? "bg-blue-500 ring-2 ring-blue-200" : "bg-blue-300"
+                                                )} />
+                                                <p className={cn(
+                                                    "text-sm",
+                                                    idx === 0 ? "font-bold text-blue-900" : "font-medium text-stone-600"
+                                                )}>
+                                                    {h.desc}
+                                                </p>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <span className="text-xs text-stone-400">{h.date}</span>
+                                                    {h.location && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-stone-300" />
+                                                            <span className="text-xs font-semibold text-stone-500">{h.location}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-stone-500">Gagal memuat detail pengiriman atau data belum tersedia.</p>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* ── Footer ── */}
@@ -311,9 +395,17 @@ export default function OrderDetailModal({ order, onClose }: Props) {
                         >
                             Close
                         </button>
-                        {!isCancelled && (
-                            <button className="px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm shadow-blue-200">
-                                Lacak Pengiriman
+                        {!isCancelled && order.trackingNumber && (
+                            <button 
+                                onClick={() => setShowTracking(!showTracking)}
+                                className={cn(
+                                    "px-4 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm",
+                                    showTracking 
+                                        ? "bg-stone-100 text-stone-700 hover:bg-stone-200 shadow-none border border-stone-200" 
+                                        : "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200"
+                                )}
+                            >
+                                {showTracking ? "Sembunyikan Lacak" : "Lacak Pengiriman"}
                             </button>
                         )}
                     </div>

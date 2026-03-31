@@ -343,7 +343,14 @@ export function OrderTable({
                   </td>
                   <td className="px-4 py-4 text-gray-500">{order.date}</td>
                   <td className="px-4 py-4">
-                    <OrderStatusBadge status={order.status} />
+                    <div className="flex flex-col gap-1 items-start">
+                        <OrderStatusBadge status={order.status} />
+                        {order.rawOrder?.tracking_number && (
+                            <span className="text-[10px] text-gray-500 flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded border border-gray-100 uppercase tracking-widest mt-1">
+                                {order.rawOrder.courier}: {order.rawOrder.tracking_number}
+                            </span>
+                        )}
+                    </div>
                   </td>
                   <td className="px-4 py-4 font-semibold text-gray-900">{order.total}</td>
                   <td className="px-4 py-4">
@@ -401,6 +408,14 @@ export function OrderTable({
                   <span className="font-semibold text-gray-900">{order.total}</span>
                 </div>
               </div>
+              {order.rawOrder?.tracking_number && (
+                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                    <span className="text-xs text-gray-400 font-medium">Resi Pengiriman</span>
+                    <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                        {order.rawOrder.courier}: {order.rawOrder.tracking_number}
+                    </span>
+                </div>
+              )}
             </div>
           ))
         )}

@@ -101,6 +101,8 @@ export default function MyOrdersPage() {
                     },
                     paymentMethod: o.payment_method || "N/A",
                     paymentStatus: o.payment_token ? "PAID" : "PENDING",
+                    courier: o.courier,
+                    trackingNumber: o.tracking_number,
                 };
 
                 setSelectedOrder(detail);

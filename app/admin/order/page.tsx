@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Download, Search, TrendingUp, TrendingDown, ShoppingBag, Truck } from "lucide-react";
+import { Download, Search, TrendingUp, TrendingDown, ShoppingBag, Truck, X } from "lucide-react";
 import { OrderTable, Order } from "./components/OrderTable";
 
 import api from "@/lib/axios";
@@ -10,6 +10,13 @@ import toast from "react-hot-toast";
 import { downloadFile } from "@/lib/download";
 
 type TabStatus = "all" | "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+
+interface TrackingModalState {
+  isOpen: boolean;
+  orderNumber: string;
+  courier: string;
+  trackingNumber: string;
+}
 
 const TABS: { key: TabStatus; label: string }[] = [
   { key: "all", label: "All Orders" },
@@ -121,13 +128,36 @@ export default function OrderPage() {
     setPage(1);
   };
 
-  const handleUpdateStatus = async (orderNumber: string, status: string) => {
+  const [trackingModal, setTrackingModal] = useState<TrackingModalState>({
+    isOpen: false,
+    orderNumber: "",
+    courier: "J&T",
+    trackingNumber: ""
+  });
+
+  const handleUpdateStatus = async (orderNumber: string, status: string, courier?: string, trackingNumber?: string) => {
+    if (status === "SHIPPED" && !courier && !trackingNumber) {
+        // Open modal instead of sending request directly
+        setTrackingModal({ isOpen: true, orderNumber, courier: "J&T", trackingNumber: "" });
+        return;
+    }
+
     try {
-      const res = await api.put(`/admin/orders/${orderNumber}/status`, { status });
+      const payload: any = { status };
+      if (courier) payload.courier = courier;
+      if (trackingNumber) payload.tracking_number = trackingNumber;
+
+      const res = await api.put(`/admin/orders/${orderNumber}/status`, payload);
       if (res.data.status === 'success') {
-        setOrders(prev => prev.map(o => o.id === orderNumber ? { ...o, status: res.data.data.status as any } : o));
+        const orderData = res.data.data;
+        setOrders(prev => prev.map(o => o.id === orderNumber ? { 
+            ...o, 
+            status: orderData.status as any,
+            rawOrder: orderData
+        } : o));
         fetchStats(); // Refresh stats after status change
         toast.success("Order status updated successfully!");
+        setTrackingModal(prev => ({ ...prev, isOpen: false }));
       }
     } catch (error: any) {
       console.error("Failed to update status", error);
@@ -293,6 +323,70 @@ export default function OrderPage() {
           />
         </div>
       </div>
+
+      {/* Tracking Modal */}
+      {trackingModal.isOpen && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                    <h3 className="font-semibold text-gray-900">Input Resi Pengiriman</h3>
+                    <button 
+                        onClick={() => setTrackingModal(prev => ({ ...prev, isOpen: false }))}
+                        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+                <div className="p-5 flex flex-col gap-4">
+                    <p className="text-sm text-gray-500">
+                        Status pesanan <span className="font-semibold text-blue-600">#{trackingModal.orderNumber}</span> akan berubah menjadi <span className="font-semibold text-purple-600">SHIPPED</span>.
+                    </p>
+                    
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-gray-700">Kurir / Ekspedisi</label>
+                        <select 
+                            value={trackingModal.courier}
+                            onChange={e => setTrackingModal(prev => ({ ...prev, courier: e.target.value }))}
+                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        >
+                            <option value="J&T">J&T Express</option>
+                            <option value="JNE">JNE</option>
+                            <option value="SICEPAT">Sicepat</option>
+                            <option value="ANTERAJA">AnterAja</option>
+                            <option value="GOSEND">GoSend</option>
+                            <option value="GRAB">Grab Express</option>
+                        </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-gray-700">Nomor Resi / AWB</label>
+                        <input 
+                            type="text"
+                            placeholder="Contoh: JP1234567890"
+                            value={trackingModal.trackingNumber}
+                            onChange={e => setTrackingModal(prev => ({ ...prev, trackingNumber: e.target.value }))}
+                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        />
+                    </div>
+                </div>
+                <div className="p-5 border-t border-gray-100 flex gap-3 justify-end items-center bg-gray-50/50">
+                    <button 
+                        onClick={() => setTrackingModal(prev => ({ ...prev, isOpen: false }))}
+                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors"
+                    >
+                        Batal
+                    </button>
+                    <button 
+                        onClick={() => handleUpdateStatus(trackingModal.orderNumber, 'SHIPPED', trackingModal.courier, trackingModal.trackingNumber)}
+                        disabled={!trackingModal.trackingNumber.trim()}
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        Simpan & Kirim
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }
