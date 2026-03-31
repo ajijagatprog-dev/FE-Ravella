@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import api from "@/lib/axios";
 import {
   LayoutDashboard,
   Package,
@@ -32,11 +33,9 @@ const contentMenuItems = [
   { label: "Kelola Berita", href: "/admin/content/news", icon: Newspaper },
 ];
 
-// ── Badge helper ──────────────────────────────────────────────────────────────
+// ── Badge type ────────────────────────────────────────────────────────────────
 
-const menuBadges: Record<string, { count: number; color: string }> = {
-  "/admin/order": { count: 12, color: "bg-blue-500" },
-};
+type BadgeInfo = { count: number; color: string } | undefined;
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -52,15 +51,16 @@ function NavLink({
   pathname,
   collapsed,
   onMobileClose,
+  badge,
 }: {
   item: { label: string; href: string; icon: React.ComponentType<{ size?: number; className?: string }> };
   pathname: string;
   collapsed: boolean;
   onMobileClose: () => void;
+  badge?: BadgeInfo;
 }) {
   const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
   const Icon = item.icon;
-  const badge = menuBadges[item.href];
 
   return (
     <Link
@@ -117,6 +117,31 @@ function NavLink({
 export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [activeOrderCount, setActiveOrderCount] = useState(0);
+
+  // Fetch active order count from API
+  const fetchOrderCount = useCallback(async () => {
+    try {
+      const res = await api.get('/admin/orders/stats');
+      if (res.data?.status === 'success') {
+        setActiveOrderCount(res.data.data.active_orders ?? 0);
+      }
+    } catch (e) {
+      // silent fail
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrderCount();
+    // Poll every 30 seconds for real-time updates
+    const interval = setInterval(fetchOrderCount, 30000);
+    return () => clearInterval(interval);
+  }, [fetchOrderCount]);
+
+  // Build dynamic badge map
+  const menuBadges: Record<string, BadgeInfo> = {
+    "/admin/order": activeOrderCount > 0 ? { count: activeOrderCount, color: "bg-blue-500" } : undefined,
+  };
 
   // Auto-close mobile sidebar on route change
   useEffect(() => {
@@ -200,7 +225,7 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
           </div>
 
           {menuItems.map((item) => (
-            <NavLink key={item.label} item={item} pathname={pathname} collapsed={collapsed} onMobileClose={onMobileClose} />
+            <NavLink key={item.label} item={item} pathname={pathname} collapsed={collapsed} onMobileClose={onMobileClose} badge={menuBadges[item.href]} />
           ))}
 
           {/* ── Divider ── */}
