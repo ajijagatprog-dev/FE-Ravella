@@ -4,7 +4,6 @@ import {
   LogOut,
   User,
   Shield,
-  Settings,
   Menu,
   ChevronDown
 } from "lucide-react";
@@ -60,11 +59,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
   }, []);
 
   const handleLogout = async () => {
-    // Immediate local logout for best UX
     localStorage.removeItem('auth');
     router.push('/');
 
-    // Cleanup session on backend silently
     try {
       await api.post('/auth/logout');
     } catch (error) {
@@ -84,16 +81,22 @@ export default function Header({ onMenuClick }: HeaderProps) {
             {/* Mobile menu button */}
             <button
               onClick={onMenuClick}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 active:scale-95 transition-all shrink-0"
+              aria-label="Toggle menu"
             >
               <Menu size={20} className="text-gray-600" />
             </button>
+
+            {/* Mobile brand name */}
+            <span className="lg:hidden text-sm font-bold text-gray-800 truncate">
+              Ravelle Fashion
+            </span>
           </div>
 
           {/* ── RIGHT: Actions ──────────────────────────────── */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-            {/* Store Status (hidden on mobile) */}
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 mr-1">
+            {/* Store Status */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 mr-1">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -103,18 +106,16 @@ export default function Header({ onMenuClick }: HeaderProps) {
               </span>
             </div>
 
-
-
             {/* ── User Profile ────────────────────────────── */}
             <div className="relative" ref={userRef}>
               <button
                 onClick={() => setUserOpen((v) => !v)}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 transition-colors group"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 active:scale-[0.97] transition-all group"
               >
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow shrink-0">
                   {userInitial}
                 </div>
-                <div className="hidden md:block text-left">
+                <div className="hidden sm:block text-left">
                   <p className="text-sm font-semibold text-gray-900 leading-tight">
                     {displayName}
                   </p>
@@ -124,21 +125,21 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 </div>
                 <ChevronDown
                   size={14}
-                  className={`hidden md:block text-gray-400 transition-transform duration-200 ${userOpen ? "rotate-180" : ""}`}
+                  className={`hidden sm:block text-gray-400 transition-transform duration-200 ${userOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
               {userOpen && (
-                <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden z-50">
+                <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                   {/* Profile preview */}
                   <div className="px-4 py-4 bg-gradient-to-br from-blue-50 to-white border-b border-gray-100">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow">
                         {userInitial}
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-gray-900">{displayName}</p>
-                        <p className="text-xs text-gray-500">
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-gray-900 truncate">{displayName}</p>
+                        <p className="text-xs text-gray-500 truncate">
                           {userData?.email || "Memuat..."}
                         </p>
                         <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-600 text-[10px] font-semibold rounded-full capitalize">
@@ -160,23 +161,13 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
                     <div className="h-px bg-gray-100 my-1.5" />
 
-                    {[
-                      {
-                        icon: User,
-                        label: "Profil Saya",
-                        color: "text-blue-500",
-                        href: "/admin/profile",
-                      },
-                    ].map((item) => (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors text-left"
-                      >
-                        <item.icon size={15} className={item.color} />
-                        {item.label}
-                      </Link>
-                    ))}
+                    <Link
+                      href="/admin/profile"
+                      className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors text-left"
+                    >
+                      <User size={15} className="text-blue-500" />
+                      Profil Saya
+                    </Link>
 
                     <div className="h-px bg-gray-100 my-1.5" />
 
@@ -192,19 +183,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
               )}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Mobile Store Status */}
-      <div className="xl:hidden px-4 pb-2.5">
-        <div className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-          <span className="text-xs font-semibold text-emerald-700">
-            Store Online
-          </span>
         </div>
       </div>
     </header>

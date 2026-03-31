@@ -82,37 +82,38 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
         `}
       >
         {/* ── Logo ─────────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-4 py-5 border-b border-gray-100 shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-blue-200 shrink-0">
-              B2B
-            </div>
-            {!collapsed && (
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-gray-900 truncate">Ravelle Fashion</p>
-                <p className="text-[11px] text-gray-400 truncate">B2B Panel</p>
+        <div className={`border-b border-gray-100 shrink-0 transition-all duration-300 ${collapsed ? "lg:px-2 lg:py-3 px-4 py-5" : "px-4 py-5"}`}>
+          <div className={`flex items-center justify-between ${collapsed ? "lg:flex-col lg:gap-3" : ""}`}>
+            <div className={`flex items-center gap-2.5 min-w-0 ${collapsed ? "lg:flex-col lg:gap-1" : ""}`}>
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-[10px] shadow-md shadow-blue-200 shrink-0">
+                B2B
               </div>
-            )}
-          </div>
+              {/* Text - hidden when collapsed on desktop, always visible on mobile */}
+              <div className={`min-w-0 transition-all duration-300 ${collapsed ? "lg:hidden" : ""}`}>
+                <p className="text-sm font-bold text-gray-900 truncate whitespace-nowrap">Ravelle Fashion</p>
+                <p className="text-[11px] text-gray-400 truncate whitespace-nowrap">B2B Panel</p>
+              </div>
+            </div>
 
-          {/* Close on mobile / collapse toggle on desktop */}
-          <button
-            onClick={() => {
-              if (window.innerWidth < 1024) {
-                onMobileClose();
-              } else {
-                setCollapsed((v) => !v);
-              }
-            }}
-            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors shrink-0"
-          >
-            {/* Mobile: X, Desktop: chevron */}
-            <X size={16} className="lg:hidden" />
-            <ChevronRight
-              size={16}
-              className={`hidden lg:block transition-transform duration-300 ${collapsed ? "" : "rotate-180"}`}
-            />
-          </button>
+            {/* Close on mobile / collapse toggle on desktop */}
+            <button
+              onClick={() => {
+                if (window.innerWidth < 1024) {
+                  onMobileClose();
+                } else {
+                  setCollapsed((v) => !v);
+                }
+              }}
+              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all shrink-0"
+            >
+              {/* Mobile: X, Desktop: chevron */}
+              <X size={16} className="lg:hidden" />
+              <ChevronRight
+                size={16}
+                className={`hidden lg:block transition-transform duration-300 ${collapsed ? "" : "rotate-180"}`}
+              />
+            </button>
+          </div>
         </div>
 
         {/* ── Navigation ───────────────────────────────────── */}
