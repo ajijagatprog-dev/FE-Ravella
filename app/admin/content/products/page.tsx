@@ -331,7 +331,7 @@ export default function ProductContentPage() {
                 const firstErr = Object.values(errs).flat()[0];
                 if (typeof firstErr === 'string') {
                     if (firstErr.includes('failed to upload')) {
-                        msg = "File terlalu besar! Max: gambar 2MB, video 50MB.";
+                        msg = "File terlalu besar! Max: gambar 10MB, video 250MB.";
                     } else {
                         msg = firstErr;
                     }
@@ -695,7 +695,7 @@ export default function ProductContentPage() {
                                         }}
                                     />
                                 </label>
-                                <p className="text-[10px] text-slate-400 mt-1">Format: JPG, PNG, WebP (max 2MB) • MP4, WebM (max 50MB)</p>
+                                <p className="text-[10px] text-slate-400 mt-1">Format: JPG, PNG, WebP (max 10MB) • MP4, WebM (max 250MB)</p>
                             </div>
 
                             {/* Category + Badge */}
