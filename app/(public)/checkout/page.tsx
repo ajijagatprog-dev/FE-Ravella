@@ -268,7 +268,7 @@ export default function CheckoutPage() {
                     window.location.href = res.data.payment_url;
                 } else {
                     // Fallback: go to order detail page
-                    router.push(`/customer/orders`);
+                    router.push(`/customer/myOrders`);
                 }
             }
         } catch (error) {

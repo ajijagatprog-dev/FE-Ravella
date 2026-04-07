@@ -92,7 +92,7 @@ export default function PaymentSuccessPage() {
 
                 <div className="space-y-3">
                     <Link
-                        href="/customer/orders"
+                        href="/customer/myOrders"
                         className="flex items-center justify-center gap-2 w-full bg-stone-900 text-white py-3.5 font-medium text-[11px] uppercase tracking-widest hover:bg-black transition-colors"
                     >
                         <Package className="w-4 h-4" />
