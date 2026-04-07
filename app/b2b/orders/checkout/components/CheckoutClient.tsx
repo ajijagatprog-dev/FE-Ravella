@@ -111,11 +111,18 @@ export default function CheckoutClient() {
             });
 
             if (orderRes.data.status === 'success') {
-                setSuccess(true);
                 clearCart();
-                setTimeout(() => {
-                    router.push('/b2b/orders');
-                }, 2000);
+
+                // Redirect to Xendit payment page if available
+                if (orderRes.data.payment_url) {
+                    window.location.href = orderRes.data.payment_url;
+                } else {
+                    // Fallback: show success and redirect to orders
+                    setSuccess(true);
+                    setTimeout(() => {
+                        router.push('/b2b/orders');
+                    }, 2000);
+                }
             } else {
                 throw new Error("API returned failure status");
             }

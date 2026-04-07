@@ -14,7 +14,7 @@ export default function CheckoutPage() {
     const [cart, setCart] = useState<any[]>([]);
     const [addresses, setAddresses] = useState<any[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<any>(null);
-    const [paymentMethod, setPaymentMethod] = useState("Bank Transfer");
+    const [paymentMethod, setPaymentMethod] = useState("Xendit");
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [hydrated, setHydrated] = useState(false);
@@ -260,8 +260,16 @@ export default function CheckoutPage() {
             const res = await api.post('/customer/orders', payload);
             if (res.data.status === 'success') {
                 localStorage.removeItem("ravelle_cart");
+                localStorage.removeItem("ravelle_active_voucher");
                 window.dispatchEvent(new Event("ravelle_cart_updated"));
-                router.push(`/payment/${res.data.data.order_number}`);
+
+                // Redirect to Xendit payment page if available
+                if (res.data.payment_url) {
+                    window.location.href = res.data.payment_url;
+                } else {
+                    // Fallback: go to order detail page
+                    router.push(`/customer/orders`);
+                }
             }
         } catch (error) {
             console.error("Checkout failed:", error);
@@ -419,22 +427,28 @@ export default function CheckoutPage() {
                     <div className="bg-white p-6 rounded-none border border-stone-200">
                         <div className="flex items-center gap-3 mb-5 pb-4 border-b border-stone-100">
                             <CreditCard className="w-5 h-5 text-stone-800" />
-                            <h2 className="text-lg font-bold text-stone-800">Payment Method</h2>
+                            <h2 className="text-lg font-bold text-stone-800">Metode Pembayaran</h2>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {["Bank Transfer", "Credit Card", "QRIS", "Virtual Account"].map(method => (
-                                <button
-                                    key={method}
-                                    type="button"
-                                    onClick={() => setPaymentMethod(method)}
-                                    className={`flex items-center gap-3 p-4 border transition-colors text-left w-full ${paymentMethod === method ? 'border-stone-900 bg-stone-50' : 'border-stone-200 hover:border-stone-300'}`}
-                                >
-                                    <div className={`w-5 h-5 rounded-full border flex flex-shrink-0 items-center justify-center ${paymentMethod === method ? 'border-stone-900' : 'border-stone-300'}`}>
-                                        {paymentMethod === method && <div className="w-3 h-3 rounded-full bg-stone-900" />}
-                                    </div>
-                                    <span className="font-medium text-stone-700 text-sm">{method}</span>
-                                </button>
-                            ))}
+                        <div className="bg-stone-50 border border-stone-200 p-5">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-10 h-10 bg-stone-900 rounded-lg flex items-center justify-center">
+                                    <CreditCard className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-stone-800 text-sm">Xendit Payment Gateway</p>
+                                    <p className="text-xs text-stone-500">Pembayaran aman & terverifikasi</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                {["Bank Transfer", "Virtual Account", "QRIS", "E-Wallet", "Credit Card", "Retail Outlet"].map(m => (
+                                    <span key={m} className="text-[10px] font-medium text-stone-600 bg-white border border-stone-200 px-2.5 py-1 uppercase tracking-wide">
+                                        {m}
+                                    </span>
+                                ))}
+                            </div>
+                            <p className="text-[11px] text-stone-400 mt-3">
+                                Anda akan diarahkan ke halaman pembayaran Xendit untuk memilih metode pembayaran setelah menekan tombol Place Order.
+                            </p>
                         </div>
                     </div>
 
