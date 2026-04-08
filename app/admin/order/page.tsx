@@ -347,7 +347,7 @@ export default function OrderPage() {
                         <select 
                             value={trackingModal.courier}
                             onChange={e => setTrackingModal(prev => ({ ...prev, courier: e.target.value }))}
-                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                         >
                             <option value="J&T">J&T Express</option>
                             <option value="JNE">JNE</option>
@@ -365,7 +365,7 @@ export default function OrderPage() {
                             placeholder="Contoh: JP1234567890"
                             value={trackingModal.trackingNumber}
                             onChange={e => setTrackingModal(prev => ({ ...prev, trackingNumber: e.target.value }))}
-                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                         />
                     </div>
                 </div>
