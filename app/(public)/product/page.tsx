@@ -20,16 +20,71 @@ import {
   Filter,
   Sparkles,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
-import { products } from "./products";
+import { products as fallbackProducts } from "./products";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ProductPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900"></div>
+      </div>
+    }>
+      <ProductPageContent />
+    </Suspense>
+  );
+}
+
+function ProductPageContent() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [displayLimit, setDisplayLimit] = useState(12);
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category');
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const res = await api.get('/products', { params: { limit: 100 } });
+        if (res.data.status === 'success') {
+          const fetchedData = res.data.data.data;
+          const mapped = fetchedData.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description || "Deskripsi produk",
+            price: item.sale_price && item.sale_price > 0 ? item.sale_price : item.price,
+            originalPrice: item.price,
+            discount: item.discount || 0,
+            rating: item.rating ? parseFloat(item.rating) : 0,
+            reviews: item.reviews || 0,
+            category: item.category || "appliance",
+            image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
+            features: Array.isArray(item.features) ? item.features : [],
+            specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
+            inStock: item.stock > 0,
+            badge: item.badge || (item.is_featured ? "Best Seller" : ""),
+          }));
+          setProducts(mapped);
+        }
+      } catch (err) {
+        console.error("Failed to fetch public products", err);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL PRODUCTS");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -44,17 +99,25 @@ export default function ProductPage() {
     productName: "",
   });
 
+  const categories = useMemo(() => [
+    { id: "all", name: "ALL PRODUCTS", icon: Package, count: products.length },
+    { id: "Home & Kitchen Appliance", name: "HOME & KITCHEN APPLIANCE", icon: Zap, count: products.filter(p => p.category === "Home & Kitchen Appliance").length },
+    { id: "Knife set", name: "KNIFE SET", icon: Award, count: products.filter(p => p.category === "Knife set").length },
+    { id: "ezy series", name: "EZY SERIES", icon: TrendingUp, count: products.filter(p => p.category === "ezy series").length },
+    { id: "home living", name: "HOMELIVING", icon: Shield, count: products.filter(p => p.category === "home living").length },
+    { id: "Kitchen Tools", name: "KITCHEN TOOLS", icon: Sparkles, count: products.filter(p => p.category === "Kitchen Tools").length },
+  ], [products]);
 
-  const categories = [
-    { id: "all", name: "ALL PRODUCTS", icon: Package, count: 48 },
-    { id: "appliance", name: "HOME & KITCHEN APPLIANCE", icon: Zap, count: 24 },
-    { id: "knife", name: "KNIFE SET", icon: Award, count: 8 },
-    { id: "ezy", name: "EZY SERIES", icon: TrendingUp, count: 6 },
-    { id: "homeliving", name: "HOMELIVING", icon: Shield, count: 10 },
-    { id: "keyboard", name: "KEYBOARD", icon: Sparkles, count: 0 },
-  ];
+  useEffect(() => {
+    if (initialCategory) {
+      const match = categories.find(c => c.id.toLowerCase() === initialCategory.toLowerCase());
+      if (match) {
+        setActiveCategory(match.name);
+      }
+    }
+  }, [initialCategory, categories]);
 
-  const handleAddToCart = (product: (typeof products)[number]) => {
+  const handleAddToCart = (product: any) => {
     // Baca cart yang ada
     const stored = localStorage.getItem("ravelle_cart");
     let cart: any[] = stored ? JSON.parse(stored) : [];
@@ -100,10 +163,17 @@ export default function ProductPage() {
       case "price-low": filtered.sort((a, b) => a.price - b.price); break;
       case "price-high": filtered.sort((a, b) => b.price - a.price); break;
       case "rating": filtered.sort((a, b) => b.rating - a.rating); break;
-      case "newest": filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)); break;
       default: filtered.sort((a, b) => b.reviews - a.reviews);
     }
     return filtered;
+  }, [activeCategory, searchQuery, sortBy, priceRange, products]);
+
+  const displayedProducts = useMemo(() => {
+    return filteredProducts.slice(0, displayLimit);
+  }, [filteredProducts, displayLimit]);
+
+  useEffect(() => {
+    setDisplayLimit(12);
   }, [activeCategory, searchQuery, sortBy, priceRange]);
 
   const formatPrice = (price: number) =>
@@ -286,7 +356,7 @@ export default function ProductPage() {
         </div>
 
         {/* Products */}
-        {filteredProducts.length === 0 ? (
+        {filteredProducts.length === 0 && !isLoading ? (
           <div className="text-center py-24">
             <Package className="w-12 h-12 text-neutral-300 mx-auto mb-5" />
             <h3 className="text-4xl font-light text-neutral-900 mb-3" style={{ fontFamily: CORMORANT }}>
@@ -305,7 +375,7 @@ export default function ProductPage() {
           </div>
         ) : (
           <div className={viewMode === "grid" ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "flex flex-col gap-4"}>
-            {filteredProducts.map((product) => (
+            {displayedProducts.map((product) => (
               <div
                 key={product.id}
                 onMouseEnter={() => setHoveredProduct(product.id)}
@@ -313,19 +383,19 @@ export default function ProductPage() {
                 className={`group relative bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-300 ${viewMode === "list" ? "flex flex-row" : ""}`}
               >
                 {/* Image */}
-                <div className={`relative overflow-hidden bg-neutral-50 ${viewMode === "grid" ? "aspect-[3/4]" : "w-56 sm:w-72 flex-shrink-0 aspect-square"}`}>
+                <div className={`relative overflow-hidden bg-neutral-50 flex items-center justify-center p-6 ${viewMode === "grid" ? "aspect-square" : "w-56 sm:w-72 flex-shrink-0 aspect-square"}`}>
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   {/* Badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                    {product.isNew && (
-                      <span className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] font-medium tracking-[0.12em] uppercase border border-neutral-200" style={{ fontFamily: JOST }}>
-                        New
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                    {product.badge && (
+                      <span className="px-3 py-1 bg-white shadow-sm text-neutral-900 text-[10px] font-bold tracking-[0.14em] uppercase border border-neutral-100" style={{ fontFamily: JOST }}>
+                        {product.badge}
                       </span>
                     )}
                     {product.discount > 0 && (
@@ -366,31 +436,17 @@ export default function ProductPage() {
                 </div>
 
                 {/* Info */}
-                <div className={`p-4 sm:p-5 ${viewMode === "list" ? "flex-1 flex flex-col justify-center" : ""}`}>
-                  {/* Rating */}
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                    <span className="text-xs font-medium text-neutral-800" style={{ fontFamily: JOST }}>{product.rating}</span>
-                    <span className="text-[11px] text-neutral-400" style={{ fontFamily: JOST }}>({product.reviews})</span>
-                  </div>
+                {/* Info */}
+                <div className={`p-4 sm:p-5 ${viewMode === "list" ? "flex-1 flex flex-col justify-center" : "flex flex-col items-center text-center"}`}>
 
                   {/* Name */}
-                  <h3 className="text-lg sm:text-xl font-light text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-600 transition-colors leading-snug" style={{ fontFamily: CORMORANT }}>
+                  <h3 className="text-lg sm:text-lg font-medium text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-snug" style={{ fontFamily: CORMORANT }}>
                     {product.name}
                   </h3>
 
-                  {/* Features */}
-                  <div className="flex flex-wrap gap-1.5 mb-3">
-                    {product.features.map((f, i) => (
-                      <span key={i} className="px-2 py-0.5 border border-neutral-200 text-neutral-500 text-[10px] tracking-[0.1em] uppercase font-medium" style={{ fontFamily: JOST }}>
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-
                   {/* Price */}
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-base sm:text-lg font-medium text-neutral-900" style={{ fontFamily: JOST }}>
+                  <div className="flex items-baseline justify-center gap-2 mb-1">
+                    <span className="text-base sm:text-base font-semibold text-neutral-900" style={{ fontFamily: JOST }}>
                       {formatPrice(product.price)}
                     </span>
                     {product.originalPrice > product.price && (
@@ -399,17 +455,12 @@ export default function ProductPage() {
                       </span>
                     )}
                   </div>
-                  {product.originalPrice > product.price && (
-                    <p className="text-[11px] text-neutral-500 font-medium mb-3" style={{ fontFamily: JOST }}>
-                      Hemat {formatPrice(product.originalPrice - product.price)}
-                    </p>
-                  )}
 
                   {/* View Details — grid only */}
                   {viewMode === "grid" && (
                     <Link
                       href={`/product/${product.id}`}
-                      className="w-full py-2.5 border border-neutral-200 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all flex items-center justify-center gap-2 group/btn mt-1"
+                      className="w-full mt-4 py-2.5 border border-neutral-200 bg-white text-neutral-900 text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-neutral-900 hover:text-white transition-all flex items-center justify-center gap-2 group/btn"
                       style={{ fontFamily: JOST }}
                     >
                       View Details
@@ -435,9 +486,13 @@ export default function ProductPage() {
         )}
 
         {/* Load More */}
-        {filteredProducts.length > 0 && (
-          <div className="mt-14 text-center">
-            <button className="px-10 py-3.5 border border-neutral-300 text-neutral-700 text-[11px] tracking-[0.2em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all" style={{ fontFamily: JOST }}>
+        {filteredProducts.length > displayLimit && !isLoading && (
+          <div className="mt-16 text-center">
+            <button
+              onClick={() => setDisplayLimit(prev => prev + 12)}
+              className="px-10 py-3.5 border border-neutral-300 text-neutral-700 text-[11px] tracking-[0.2em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all cursor-pointer"
+              style={{ fontFamily: JOST }}
+            >
               Load More Products
             </button>
           </div>
@@ -459,7 +514,7 @@ export default function ProductPage() {
               <div className="relative aspect-square bg-neutral-50 overflow-hidden">
                 <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
                 <div className="absolute top-4 left-4 flex flex-col gap-1.5">
-                  {selectedProduct.isNew && <span className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase border border-neutral-200" style={{ fontFamily: JOST }}>New</span>}
+                  {selectedProduct.badge && <span className="px-3 py-1 bg-white shadow-sm text-neutral-900 text-[10px] tracking-[0.14em] font-bold uppercase border border-neutral-100" style={{ fontFamily: JOST }}>{selectedProduct.badge}</span>}
                   {selectedProduct.discount > 0 && <span className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase" style={{ fontFamily: JOST }}>-{selectedProduct.discount}%</span>}
                 </div>
               </div>

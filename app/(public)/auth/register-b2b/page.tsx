@@ -14,6 +14,17 @@ export default function RegisterB2BPage() {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [agreeTerms, setAgreeTerms] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [toast, setToast] = useState<{ visible: boolean; message: string; type: "success" | "error" }>({
+        visible: false,
+        message: "",
+        type: "success",
+    });
+
+    const showToast = (message: string, type: "success" | "error" = "error") => {
+        setToast({ visible: true, message, type });
+        setTimeout(() => setToast({ visible: false, message: "", type: "success" }), 3000);
+    };
 
     const [formData, setFormData] = useState({
         fullName: "",
@@ -64,7 +75,7 @@ export default function RegisterB2BPage() {
         setErrors(newErrors);
 
         if (!agreeTerms) {
-            alert("Please agree to Terms & Conditions");
+            showToast("Harap setujui Syarat & Ketentuan");
             return;
         }
 
@@ -83,8 +94,7 @@ export default function RegisterB2BPage() {
             });
 
             if (response.data.status === 'success') {
-                alert("Pendaftaran Mitra B2B berhasil! Akun Anda sedang dalam proses reviu oleh Admin. Informasi lanjutan akan dikirim melalui email.");
-                router.push("/auth/login");
+                setShowSuccessModal(true);
             }
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.errors) {
@@ -97,7 +107,7 @@ export default function RegisterB2BPage() {
 
                 setErrors(formattedErrors);
             } else {
-                alert(error.response?.data?.message || "Terjadi kesalahan saat pendaftaran");
+                showToast(error.response?.data?.message || "Terjadi kesalahan saat pendaftaran");
             }
         }
 
@@ -363,6 +373,69 @@ export default function RegisterB2BPage() {
                     </p>
                 </div>
             </div>
+
+            {/* ── Toast ── */}
+            <div className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${toast.visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}`}>
+                <div className={`flex items-center gap-3 bg-white border shadow-xl px-5 py-4 min-w-[320px] max-w-sm rounded-xl ${toast.type === "error" ? "border-red-100" : "border-green-100"}`} style={{ fontFamily: "'Jost', sans-serif" }}>
+                    {toast.type === "error" ? (
+                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    ) : (
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                        <p className={`font-semibold text-sm ${toast.type === "error" ? "text-red-900" : "text-green-900"}`}>{toast.type === "error" ? "Form Error" : "Success"}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{toast.message}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Success Modal ── */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                    {/* Backdrop */}
+                    <div
+                        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-500"
+                        onClick={() => router.push("/")}
+                    />
+
+                    {/* Modal Content */}
+                    <div className="relative bg-white w-full max-w-md rounded-[2rem] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+                        <div className="p-8 sm:p-10 text-center">
+                            {/* Icon Decoration */}
+                            <div className="mb-6 relative inline-block">
+                                <div className="absolute inset-0 bg-green-100 rounded-full scale-150 blur-xl opacity-50 animate-pulse" />
+                                <div className="relative w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto border border-green-100">
+                                    <Check className="w-10 h-10 text-green-500" strokeWidth={3} />
+                                </div>
+                            </div>
+
+                            <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight" style={{ fontFamily: "'Jost', sans-serif" }}>
+                                Pendaftaran Berhasil!
+                            </h3>
+
+                            <div className="space-y-4 mb-8">
+                                <p className="text-gray-500 text-sm leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
+                                    Terima kasih telah mendaftar sebagai Mitra B2B Ravelle. Tim kami akan segera meninjau aplikasi Anda.
+                                </p>
+                                <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100/50">
+                                    <p className="text-amber-800 text-[11px] font-bold uppercase tracking-[0.1em] mb-1">Status Akun</p>
+                                    <p className="text-amber-700 text-sm font-medium">Sedang dalam proses reviu</p>
+                                </div>
+                                <p className="text-gray-400 text-xs italic">
+                                    Informasi lanjutan akan dikirimkan melalui email yang terdaftar.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => router.push("/")}
+                                className="w-full h-12 bg-[#1a1a1a] hover:bg-black text-white rounded-xl font-bold text-sm transition-all active:scale-[0.98] shadow-lg shadow-black/10"
+                            >
+                                Kembali ke Beranda
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

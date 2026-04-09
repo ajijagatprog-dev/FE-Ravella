@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, MapPin } from "lucide-react";
 import AddressCard, { type Address } from "./components/AddressCard";
 import AddNewCard from "./components/AddNewCard";
 import AddressFormModal from "./components/AddressFormModal";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import AddressFaqBanner from "./components/AddressFaqBanner";
+import api from "@/lib/axios";
+import { Loader2 } from "lucide-react";
 
 // ── Dummy data ────────────────────────────────────────────────────────────────
 const INITIAL_ADDRESSES: Address[] = [
@@ -49,13 +51,43 @@ const MAX_ADDRESSES = 10;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function SavedAddressPage() {
-    const [addresses, setAddresses] = useState<Address[]>(INITIAL_ADDRESSES);
+    const [addresses, setAddresses] = useState<Address[]>([]);
     const [formOpen, setFormOpen] = useState(false);
     const [editData, setEditData] = useState<Address | null>(null);
     const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const deleteTarget = addresses.find((a) => a.id === deleteId);
     const canAddMore = addresses.length < MAX_ADDRESSES;
+
+    const fetchAddresses = async () => {
+        try {
+            const res = await api.get('/customer/addresses');
+            if (res.data.status === 'success') {
+                const mapped = res.data.data.map((a: any) => ({
+                    id: a.id.toString(),
+                    label: a.label,
+                    isPrimary: a.is_primary,
+                    fullName: a.recipient_name,
+                    phone: a.phone_number,
+                    street: a.full_address,
+                    city: a.city,
+                    province: a.province,
+                    postalCode: a.postal_code,
+                }));
+                setAddresses(mapped);
+            }
+        } catch (error) {
+            console.error("Failed to fetch addresses:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch on mount
+    useEffect(() => {
+        fetchAddresses();
+    }, []);
 
     // ── Handlers ──────────────────────────────────────────────────────────────
     const handleOpenAdd = () => {
@@ -68,39 +100,68 @@ export default function SavedAddressPage() {
         setFormOpen(true);
     };
 
-    const handleSave = (data: Omit<Address, "id" | "isPrimary">) => {
-        if (editData) {
-            setAddresses((prev) =>
-                prev.map((a) => (a.id === editData.id ? { ...a, ...data } : a))
-            );
-        } else {
-            const newAddress: Address = {
-                ...data,
-                id: Date.now().toString(),
-                isPrimary: addresses.length === 0,
+    const handleSave = async (data: Omit<Address, "id" | "isPrimary">) => {
+        setLoading(true);
+        try {
+            const payload = {
+                label: data.label,
+                recipient_name: data.fullName,
+                phone_number: data.phone,
+                full_address: data.street,
+                city: data.city,
+                province: data.province,
+                postal_code: data.postalCode,
+                is_primary: addresses.length === 0, // Ensure first is primary
             };
-            setAddresses((prev) => [...prev, newAddress]);
+
+            if (editData) {
+                await api.put(`/customer/addresses/${editData.id}`, payload);
+            } else {
+                await api.post('/customer/addresses', payload);
+            }
+            await fetchAddresses();
+        } catch (error) {
+            console.error("Failed to save address", error);
+        } finally {
+            setLoading(false);
+        }
+        setFormOpen(false);
+    };
+
+    const handleDelete = async () => {
+        if (!deleteId) return;
+        setLoading(true);
+        try {
+            await api.delete(`/customer/addresses/${deleteId}`);
+            await fetchAddresses();
+        } catch (error) {
+            console.error("Failed to delete", error);
+        } finally {
+            setLoading(false);
+            setDeleteId(null);
         }
     };
 
-    const handleDelete = () => {
-        if (!deleteId) return;
-        setAddresses((prev) => {
-            const wasDefault = prev.find((a) => a.id === deleteId)?.isPrimary;
-            const filtered = prev.filter((a) => a.id !== deleteId);
-            if (wasDefault && filtered.length > 0) {
-                filtered[0] = { ...filtered[0], isPrimary: true };
-            }
-            return filtered;
-        });
-        setDeleteId(null);
+    const handleSetPrimary = async (id: string) => {
+        setLoading(true);
+        try {
+            await api.put(`/customer/addresses/${id}/primary`);
+            await fetchAddresses();
+        } catch (error) {
+            console.error("Failed to set primary", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleSetPrimary = (id: string) => {
-        setAddresses((prev) =>
-            prev.map((a) => ({ ...a, isPrimary: a.id === id }))
+    if (loading && addresses.length === 0) {
+        return (
+            <div className="w-full h-[60vh] flex flex-col justify-center items-center gap-4 text-stone-500">
+                <Loader2 className="w-8 h-8 animate-spin text-stone-800" />
+                <p className="text-sm font-medium">Loading Addresses...</p>
+            </div>
         );
-    };
+    }
 
     return (
         <div className="max-w-4xl mx-auto">

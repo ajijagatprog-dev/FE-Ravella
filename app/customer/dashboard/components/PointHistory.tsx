@@ -41,7 +41,7 @@ const history = [
     },
 ];
 
-export default function PointHistory() {
+export default function PointHistory({ profile }: { profile: any }) {
     return (
         <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden h-full flex flex-col">
             {/* Header */}

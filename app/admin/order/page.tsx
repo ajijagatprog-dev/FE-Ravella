@@ -1,63 +1,109 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Download, Search, TrendingUp, TrendingDown, ShoppingBag, Truck } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Download, Search, TrendingUp, TrendingDown, ShoppingBag, Truck, X } from "lucide-react";
 import { OrderTable, Order } from "./components/OrderTable";
 
-// ── Dummy Data ────────────────────────────────────────────────────────────────
+import api from "@/lib/axios";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+import { downloadFile } from "@/lib/download";
 
-const ALL_ORDERS: Order[] = [
-  { id: "RVL-4921", customer: { name: "Sarah Jenkins", initials: "SJ", avatarColor: "#8B5CF6" }, date: "Oct 24, 2023", paymentStatus: "Success", total: "$248.50" },
-  { id: "RVL-4922", customer: { name: "Marcus Thorne", initials: "MT", avatarColor: "#EC4899" }, date: "Oct 24, 2023", paymentStatus: "Pending", total: "$1,120.00" },
-  { id: "RVL-4923", customer: { name: "Emma Laurent", initials: "EL", avatarColor: "#10B981" }, date: "Oct 23, 2023", paymentStatus: "Failed", total: "$84.99" },
-  { id: "RVL-4924", customer: { name: "Brian Kim", initials: "BK", avatarColor: "#3B82F6" }, date: "Oct 23, 2023", paymentStatus: "Success", total: "$312.00" },
-  { id: "RVL-4925", customer: { name: "Chloe Davis", initials: "CD", avatarColor: "#F59E0B" }, date: "Oct 22, 2023", paymentStatus: "Success", total: "$145.20" },
-  { id: "RVL-4926", customer: { name: "Noah Patel", initials: "NP", avatarColor: "#EF4444" }, date: "Oct 22, 2023", paymentStatus: "Pending", total: "$670.00" },
-  { id: "RVL-4927", customer: { name: "Lily Zhang", initials: "LZ", avatarColor: "#06B6D4" }, date: "Oct 21, 2023", paymentStatus: "Success", total: "$390.75" },
-  { id: "RVL-4928", customer: { name: "James Ford", initials: "JF", avatarColor: "#84CC16" }, date: "Oct 21, 2023", paymentStatus: "Failed", total: "$55.00" },
-  { id: "RVL-4929", customer: { name: "Ava Morgan", initials: "AM", avatarColor: "#F97316" }, date: "Oct 20, 2023", paymentStatus: "Success", total: "$820.00" },
-  { id: "RVL-4930", customer: { name: "Ethan Cole", initials: "EC", avatarColor: "#6366F1" }, date: "Oct 20, 2023", paymentStatus: "Success", total: "$199.99" },
-  { id: "RVL-4931", customer: { name: "Mia Turner", initials: "MT", avatarColor: "#D946EF" }, date: "Oct 19, 2023", paymentStatus: "Pending", total: "$445.00" },
-  { id: "RVL-4932", customer: { name: "Oliver Brooks", initials: "OB", avatarColor: "#0EA5E9" }, date: "Oct 19, 2023", paymentStatus: "Success", total: "$230.50" },
-  { id: "RVL-4933", customer: { name: "Isabelle Scott", initials: "IS", avatarColor: "#14B8A6" }, date: "Oct 18, 2023", paymentStatus: "Failed", total: "$92.00" },
-  { id: "RVL-4934", customer: { name: "Liam Harris", initials: "LH", avatarColor: "#A78BFA" }, date: "Oct 18, 2023", paymentStatus: "Success", total: "$560.00" },
-  { id: "RVL-4935", customer: { name: "Sophia Reed", initials: "SR", avatarColor: "#FB7185" }, date: "Oct 17, 2023", paymentStatus: "Success", total: "$310.00" },
-  { id: "RVL-4936", customer: { name: "Lucas Wright", initials: "LW", avatarColor: "#22C55E" }, date: "Oct 17, 2023", paymentStatus: "Pending", total: "$785.00" },
-  { id: "RVL-4937", customer: { name: "Charlotte King", initials: "CK", avatarColor: "#FB923C" }, date: "Oct 16, 2023", paymentStatus: "Success", total: "$140.00" },
-  { id: "RVL-4938", customer: { name: "Benjamin Hall", initials: "BH", avatarColor: "#38BDF8" }, date: "Oct 16, 2023", paymentStatus: "Success", total: "$920.50" },
-  { id: "RVL-4939", customer: { name: "Amelia Young", initials: "AY", avatarColor: "#C084FC" }, date: "Oct 15, 2023", paymentStatus: "Failed", total: "$67.00" },
-  { id: "RVL-4940", customer: { name: "Henry Adams", initials: "HA", avatarColor: "#4ADE80" }, date: "Oct 15, 2023", paymentStatus: "Success", total: "$450.00" },
-  { id: "RVL-4941", customer: { name: "Grace Nelson", initials: "GN", avatarColor: "#F472B6" }, date: "Oct 14, 2023", paymentStatus: "Success", total: "$275.00" },
-  { id: "RVL-4942", customer: { name: "William Carter", initials: "WC", avatarColor: "#60A5FA" }, date: "Oct 14, 2023", paymentStatus: "Pending", total: "$1,050.00" },
-  { id: "RVL-4943", customer: { name: "Hannah Evans", initials: "HE", avatarColor: "#2DD4BF" }, date: "Oct 13, 2023", paymentStatus: "Success", total: "$385.00" },
-  { id: "RVL-4944", customer: { name: "Jack Martinez", initials: "JM", avatarColor: "#FDE047" }, date: "Oct 13, 2023", paymentStatus: "Failed", total: "$110.00" },
-  { id: "RVL-4945", customer: { name: "Ella Thompson", initials: "ET", avatarColor: "#FB7185" }, date: "Oct 12, 2023", paymentStatus: "Success", total: "$599.99" },
-  { id: "RVL-4946", customer: { name: "Mason White", initials: "MW", avatarColor: "#818CF8" }, date: "Oct 12, 2023", paymentStatus: "Success", total: "$230.00" },
-  { id: "RVL-4947", customer: { name: "Victoria Lee", initials: "VL", avatarColor: "#A3E635" }, date: "Oct 11, 2023", paymentStatus: "Pending", total: "$870.00" },
-  { id: "RVL-4948", customer: { name: "Daniel Brown", initials: "DB", avatarColor: "#67E8F9" }, date: "Oct 11, 2023", paymentStatus: "Success", total: "$160.00" },
-];
+type TabStatus = "all" | "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 
-type TabStatus = "all" | "Pending" | "Success" | "Failed";
+interface TrackingModalState {
+  isOpen: boolean;
+  orderNumber: string;
+  courier: string;
+  trackingNumber: string;
+}
 
 const TABS: { key: TabStatus; label: string }[] = [
   { key: "all", label: "All Orders" },
-  { key: "Pending", label: "Pending" },
-  { key: "Success", label: "Success" },
-  { key: "Failed", label: "Failed" },
+  { key: "PENDING", label: "Pending" },
+  { key: "PROCESSING", label: "Processing" },
+  { key: "SHIPPED", label: "Shipped" },
+  { key: "DELIVERED", label: "Delivered" },
+  { key: "CANCELLED", label: "Cancelled" },
 ];
 
 const LIMIT = 5;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+interface OrderStats {
+  total_revenue: number;
+  revenue_trend: number;
+  active_orders: number;
+  active_trend: number;
+  pending_shipments: number;
+  pending_trend: number;
+}
+
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+
 export default function OrderPage() {
   const [activeTab, setActiveTab] = useState<TabStatus>("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<OrderStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  const fetchStats = async () => {
+    try {
+      const res = await api.get('/admin/orders/stats');
+      if (res.data.status === 'success') {
+        setStats(res.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await api.get('/admin/orders');
+        if (res.data.status === 'success') {
+          const formatted: Order[] = res.data.data.map((o: any) => ({
+            id: o.order_number,
+            customer: {
+              name: o.user.name,
+              initials: o.user.name.substring(0, 2).toUpperCase(),
+              avatarColor: "#8B5CF6"
+            },
+            date: new Date(o.created_at).toLocaleDateString("id-ID", {
+              year: "numeric", month: "short", day: "numeric"
+            }),
+            status: o.status,
+            total: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(o.total_amount),
+            rawOrder: o
+          }));
+          setOrders(formatted);
+        }
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+    fetchStats();
+  }, []);
 
   const filtered = useMemo(() => {
-    let result = ALL_ORDERS;
-    if (activeTab !== "all") result = result.filter((o) => o.paymentStatus === activeTab);
+    let result = orders;
+    if (activeTab !== "all") result = result.filter((o) => o.status === activeTab);
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -65,12 +111,12 @@ export default function OrderPage() {
       );
     }
     return result;
-  }, [activeTab, search]);
+  }, [orders, activeTab, search]);
 
   const paginated = filtered.slice((page - 1) * LIMIT, page * LIMIT);
 
   const tabCount = (key: TabStatus) =>
-    key === "all" ? ALL_ORDERS.length : ALL_ORDERS.filter((o) => o.paymentStatus === key).length;
+    key === "all" ? orders.length : orders.filter((o) => o.status === key).length;
 
   const handleTabChange = (key: TabStatus) => {
     setActiveTab(key);
@@ -80,6 +126,43 @@ export default function OrderPage() {
   const handleSearch = (val: string) => {
     setSearch(val);
     setPage(1);
+  };
+
+  const [trackingModal, setTrackingModal] = useState<TrackingModalState>({
+    isOpen: false,
+    orderNumber: "",
+    courier: "J&T",
+    trackingNumber: ""
+  });
+
+  const handleUpdateStatus = async (orderNumber: string, status: string, courier?: string, trackingNumber?: string) => {
+    if (status === "SHIPPED" && !courier && !trackingNumber) {
+        // Open modal instead of sending request directly
+        setTrackingModal({ isOpen: true, orderNumber, courier: "J&T", trackingNumber: "" });
+        return;
+    }
+
+    try {
+      const payload: any = { status };
+      if (courier) payload.courier = courier;
+      if (trackingNumber) payload.tracking_number = trackingNumber;
+
+      const res = await api.put(`/admin/orders/${orderNumber}/status`, payload);
+      if (res.data.status === 'success') {
+        const orderData = res.data.data;
+        setOrders(prev => prev.map(o => o.id === orderNumber ? { 
+            ...o, 
+            status: orderData.status as any,
+            rawOrder: orderData
+        } : o));
+        fetchStats(); // Refresh stats after status change
+        toast.success("Order status updated successfully!");
+        setTrackingModal(prev => ({ ...prev, isOpen: false }));
+      }
+    } catch (error: any) {
+      console.error("Failed to update status", error);
+      toast.error("Failed to update status. Please try again.");
+    }
   };
 
   return (
@@ -99,9 +182,19 @@ export default function OrderPage() {
             Manage and track all customer orders from here.
           </p>
         </div>
-        <button className="inline-flex w-fit items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-150">
+        <button
+          onClick={async () => {
+            try {
+              await downloadFile('/admin/export/orders', 'orders_report.xlsx');
+              toast.success("Orders exported successfully");
+            } catch (error) {
+              toast.error("Failed to export orders");
+            }
+          }}
+          className="inline-flex w-fit items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-150"
+        >
           <Download size={15} />
-          Export CSV
+          Export Excel
         </button>
       </div>
 
@@ -117,10 +210,16 @@ export default function OrderPage() {
               <ShoppingBag size={15} className="text-blue-500" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">Rp.45,280.00</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-emerald-600">
-            <TrendingUp size={12} />
-            +12.5% vs last month
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-36 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">
+              {formatCurrency(stats?.total_revenue ?? 0)}
+            </p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.revenue_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.revenue_trend ?? 0) >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+            {(stats?.revenue_trend ?? 0) >= 0 ? "+" : ""}{stats?.revenue_trend ?? 0}% vs last month
           </div>
         </div>
 
@@ -134,10 +233,14 @@ export default function OrderPage() {
               <ShoppingBag size={15} className="text-emerald-500" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">124</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-emerald-600">
-            <TrendingUp size={12} />
-            +3.2% from yesterday
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-16 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">{stats?.active_orders ?? 0}</p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.active_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.active_trend ?? 0) >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+            {(stats?.active_trend ?? 0) >= 0 ? "+" : ""}{stats?.active_trend ?? 0}% from yesterday
           </div>
         </div>
 
@@ -151,10 +254,14 @@ export default function OrderPage() {
               <Truck size={15} className="text-red-400" />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-bold text-gray-900">18</p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-medium text-red-500">
-            <TrendingDown size={12} />
-            -5.1% since Monday
+          {statsLoading ? (
+            <div className="mt-3 h-8 w-12 animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <p className="mt-3 text-2xl font-bold text-gray-900">{stats?.pending_shipments ?? 0}</p>
+          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.pending_trend ?? 0) <= 0 ? "text-emerald-600" : "text-red-500"}`}>
+            {(stats?.pending_trend ?? 0) <= 0 ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
+            {(stats?.pending_trend ?? 0) >= 0 ? "+" : ""}{stats?.pending_trend ?? 0}% since last week
           </div>
         </div>
       </div>
@@ -169,19 +276,17 @@ export default function OrderPage() {
               <button
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
-                className={`relative flex shrink-0 items-center gap-1.5 px-4 pb-3 text-sm font-medium transition-colors ${
-                  activeTab === tab.key
-                    ? "text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-500"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`relative flex shrink-0 items-center gap-1.5 px-4 pb-3 text-sm font-medium transition-colors ${activeTab === tab.key
+                  ? "text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-500"
+                  : "text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 {tab.label}
                 <span
-                  className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold ${
-                    activeTab === tab.key
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100 text-gray-500"
-                  }`}
+                  className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold ${activeTab === tab.key
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-500"
+                    }`}
                 >
                   {tabCount(tab.key)}
                 </span>
@@ -213,9 +318,75 @@ export default function OrderPage() {
             limit={LIMIT}
             total={filtered.length}
             handlePageChange={setPage}
+            isLoading={loading}
+            onUpdateStatus={handleUpdateStatus}
           />
         </div>
       </div>
+
+      {/* Tracking Modal */}
+      {trackingModal.isOpen && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                    <h3 className="font-semibold text-gray-900">Input Resi Pengiriman</h3>
+                    <button 
+                        onClick={() => setTrackingModal(prev => ({ ...prev, isOpen: false }))}
+                        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+                <div className="p-5 flex flex-col gap-4">
+                    <p className="text-sm text-gray-500">
+                        Status pesanan <span className="font-semibold text-blue-600">#{trackingModal.orderNumber}</span> akan berubah menjadi <span className="font-semibold text-purple-600">SHIPPED</span>.
+                    </p>
+                    
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-gray-700">Kurir / Ekspedisi</label>
+                        <select 
+                            value={trackingModal.courier}
+                            onChange={e => setTrackingModal(prev => ({ ...prev, courier: e.target.value }))}
+                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        >
+                            <option value="J&T">J&T Express</option>
+                            <option value="JNE">JNE</option>
+                            <option value="SICEPAT">Sicepat</option>
+                            <option value="ANTERAJA">AnterAja</option>
+                            <option value="GOSEND">GoSend</option>
+                            <option value="GRAB">Grab Express</option>
+                        </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-gray-700">Nomor Resi / AWB</label>
+                        <input 
+                            type="text"
+                            placeholder="Contoh: JP1234567890"
+                            value={trackingModal.trackingNumber}
+                            onChange={e => setTrackingModal(prev => ({ ...prev, trackingNumber: e.target.value }))}
+                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        />
+                    </div>
+                </div>
+                <div className="p-5 border-t border-gray-100 flex gap-3 justify-end items-center bg-gray-50/50">
+                    <button 
+                        onClick={() => setTrackingModal(prev => ({ ...prev, isOpen: false }))}
+                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors"
+                    >
+                        Batal
+                    </button>
+                    <button 
+                        onClick={() => handleUpdateStatus(trackingModal.orderNumber, 'SHIPPED', trackingModal.courier, trackingModal.trackingNumber)}
+                        disabled={!trackingModal.trackingNumber.trim()}
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        Simpan & Kirim
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }

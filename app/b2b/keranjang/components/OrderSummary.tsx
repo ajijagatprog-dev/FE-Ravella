@@ -3,11 +3,13 @@
 import { ArrowRight, FileText, ShieldCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const formatIDR = (n: number) => "Rp " + n.toLocaleString("id-ID");
 
-const SHIPPING = 450000;
-const TAX_RATE = 0.08;
+const SHIPPING_THRESHOLD = 500000;
+const SHIPPING_FREE = 0;
+const SHIPPING_FLAT = 25000;
 const BULK_DISCOUNT_THRESHOLD = 2000000;
 const BULK_DISCOUNT_RATE = 0.10;
 
@@ -24,8 +26,8 @@ export default function OrderSummary({ subtotal, totalItems }: Props) {
     const bulkDiscount =
         subtotal >= BULK_DISCOUNT_THRESHOLD ? subtotal * BULK_DISCOUNT_RATE : 0;
     const afterDiscount = subtotal - bulkDiscount;
-    const tax = afterDiscount * TAX_RATE;
-    const total = afterDiscount + SHIPPING + tax;
+    const shippingFee = subtotal > SHIPPING_THRESHOLD ? SHIPPING_FREE : SHIPPING_FLAT;
+    const total = afterDiscount + shippingFee;
     const saving = bulkDiscount;
 
     const handleCheckout = async () => {
@@ -60,13 +62,10 @@ export default function OrderSummary({ subtotal, totalItems }: Props) {
                 )}
 
                 <div className="flex justify-between text-stone-600">
-                    <span>Estimated Shipping</span>
-                    <span className="font-semibold text-stone-800">{formatIDR(SHIPPING)}</span>
-                </div>
-
-                <div className="flex justify-between text-stone-600">
-                    <span>Tax (VAT 8%)</span>
-                    <span className="font-semibold text-stone-800">{formatIDR(tax)}</span>
+                    <span>Shipping</span>
+                    <span className={cn("font-semibold", shippingFee === 0 ? "text-emerald-600" : "text-stone-800")}>
+                        {shippingFee === 0 ? "FREE" : formatIDR(shippingFee)}
+                    </span>
                 </div>
             </div>
 

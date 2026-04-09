@@ -62,7 +62,7 @@ export default function AdminLoginPage() {
         if (userRole === "admin") {
           router.push("/admin/dashboard");
         } else if (userRole === "customer") {
-          router.push("/customer/dashboard");
+          router.push("/");
         } else if (userRole === "b2b") {
           router.push("/b2b/dashboard");
         } else {

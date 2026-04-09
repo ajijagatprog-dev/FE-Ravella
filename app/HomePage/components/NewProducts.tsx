@@ -1,56 +1,122 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import { ArrowRight, ShoppingBag, Check, ShoppingCart } from "lucide-react";
+import { useState, useEffect } from "react";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 interface Product {
+  id: number;
   title: string;
   category: string;
   price: string;
+  rawPrice: number;
   image: string;
   badge: string;
+  rating: number;
 }
 
 export default function NewProducts() {
-  const products: Product[] = [
-    {
-      title: "Panci Set Premium",
-      category: "Peralatan Masak",
-      price: "Rp 450.000",
-      image: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-      badge: "Best Seller",
-    },
-    {
-      title: "Knife Set Professional",
-      category: "Pisau Dapur",
-      price: "Rp 380.000",
-      image: "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=800&q=80",
-      badge: "New",
-    },
-    {
-      title: "Blender Multifungsi",
-      category: "Elektronik",
-      price: "Rp 595.000",
-      image: "https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=800&q=80",
-      badge: "Hot",
-    },
-    {
-      title: "Food Container Set",
-      category: "Penyimpanan",
-      price: "Rp 220.000",
-      image: "https://down-id.img.susercontent.com/file/d3ebf96f72eb08a71fd762fe6b6cd666_tn.webp",
-      badge: "Sale",
-    },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
+    { visible: false, productName: "" }
+  );
+
+  useEffect(() => {
+    const fetchNewProducts = async () => {
+      try {
+        const res = await api.get('/products', { params: { limit: 4, sort: 'latest' } });
+        if (res.data.status === 'success') {
+          const mapped = res.data.data.data.map((item: any) => {
+            const displayPrice = item.sale_price && item.sale_price > 0 ? item.sale_price : item.price;
+            return {
+              id: item.id,
+              title: item.name,
+              category: item.category || 'Peralatan Masak',
+              price: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(displayPrice),
+              rawPrice: displayPrice,
+              image: item.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+              badge: item.badge || (item.is_featured ? "Best Seller" : "New"),
+              rating: item.rating ? parseFloat(item.rating) : 0,
+            };
+          });
+          setProducts(mapped);
+        }
+      } catch (error) {
+        console.error("Failed to fetch new products", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNewProducts();
+  }, []);
+
+  const handleAddToCart = (p: Product) => {
+    const stored = localStorage.getItem("ravelle_cart");
+    let cart: any[] = stored ? JSON.parse(stored) : [];
+    const exists = cart.find((item) => item.id === p.id);
+    if (exists) {
+      cart = cart.map((item) =>
+        item.id === p.id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    } else {
+      cart = [
+        ...cart,
+        {
+          id: p.id,
+          name: p.title,
+          price: p.rawPrice,
+          originalPrice: p.rawPrice,
+          image: p.image,
+          badge: p.badge,
+          category: p.category,
+          quantity: 1,
+          selected: true,
+        },
+      ];
+    }
+    localStorage.setItem("ravelle_cart", JSON.stringify(cart));
+    // Trigger header update
+    window.dispatchEvent(new Event("ravelle_cart_updated"));
+
+    // Show Toast
+    setToast({ visible: true, productName: p.title });
+    setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
+  };
 
   return (
     <section
       className="bg-white px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16 md:py-20"
       style={{ fontFamily: JOST }}
     >
+      {/* Toast */}
+      <div
+        className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${toast.visible
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 -translate-y-4 pointer-events-none"
+          }`}
+      >
+        <div
+          className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm"
+          style={{ fontFamily: JOST }}
+        >
+          <ShoppingCart className="w-4 h-4 text-neutral-600 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-neutral-900 text-sm">
+              Ditambahkan ke Keranjang
+            </p>
+            <p className="text-xs text-neutral-400 truncate mt-0.5">
+              {toast.productName}
+            </p>
+          </div>
+          <Check className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+        </div>
+      </div>
+
       <div className="max-w-[1600px] mx-auto">
 
         {/* ── Header ── */}
@@ -105,14 +171,14 @@ export default function NewProducts() {
           {/* Mobile: Horizontal Scroll */}
           <div className="flex lg:hidden overflow-x-auto gap-4 sm:gap-6 pb-6 snap-x snap-mandatory scrollbar-hide">
             {products.map((item, i) => (
-              <ProductCard key={i} product={item} index={i} />
+              <ProductCard key={i} product={item} index={i} onAddToCart={handleAddToCart} />
             ))}
           </div>
 
           {/* Desktop: Grid */}
           <div className="hidden lg:grid lg:grid-cols-4 gap-6">
             {products.map((item, i) => (
-              <ProductCard key={i} product={item} index={i} />
+              <ProductCard key={i} product={item} index={i} onAddToCart={handleAddToCart} />
             ))}
           </div>
 
@@ -141,14 +207,14 @@ const badgeStyle: Record<string, string> = {
   "Sale": "bg-neutral-100 text-neutral-700 border border-neutral-200",
 };
 
-function ProductCard({ product }: { product: Product; index: number }) {
+function ProductCard({ product, onAddToCart }: { product: Product; index: number, onAddToCart: (p: Product) => void }) {
   return (
     <div
       className="min-w-[260px] sm:min-w-[300px] lg:min-w-0 snap-start group"
       style={{ fontFamily: JOST }}
     >
       {/* Image Container */}
-      <div className="relative aspect-[3/4] overflow-hidden mb-4 bg-neutral-100">
+      <div className="relative aspect-square overflow-hidden mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-6 flex items-center justify-center">
 
         {/* Badge */}
         <div className="absolute top-3 left-3 z-10">
@@ -162,9 +228,10 @@ function ProductCard({ product }: { product: Product; index: number }) {
         </div>
 
         {/* Product Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-          style={{ backgroundImage: `url(${product.image})` }}
+        <img
+          src={product.image}
+          alt={product.title}
+          className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
         />
 
         {/* Hover overlay */}
@@ -172,6 +239,10 @@ function ProductCard({ product }: { product: Product; index: number }) {
 
         {/* Quick Add */}
         <button
+          onClick={(e) => {
+            e.preventDefault();
+            onAddToCart(product);
+          }}
           className="absolute bottom-4 left-4 right-4 bg-white py-3 font-medium text-neutral-900 text-[11px] tracking-[0.2em] uppercase translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 hover:bg-neutral-100"
           style={{ fontFamily: JOST }}
         >
@@ -214,7 +285,7 @@ function ProductCard({ product }: { product: Product; index: number }) {
               className="text-xs font-medium text-neutral-500 tracking-wide"
               style={{ fontFamily: JOST }}
             >
-              4.9
+              {product.rating}
             </span>
           </div>
         </div>

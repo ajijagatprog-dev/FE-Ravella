@@ -3,7 +3,7 @@
 import { Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type LoyaltyTier = "SILVER" | "GOLD" | "PLATINUM";
+export type LoyaltyTier = "BASIC" | "GOLD" | "PLATINUM";
 
 interface Benefit {
     label: string;
@@ -19,10 +19,10 @@ interface Props {
 }
 
 const tierStyle: Record<LoyaltyTier, { gradient: string; ring: string; label: string }> = {
-    SILVER: {
-        gradient: "from-slate-300 to-slate-400",
+    BASIC: {
+        gradient: "from-slate-400 to-slate-500",
         ring: "ring-slate-200",
-        label: "text-slate-500",
+        label: "text-slate-600",
     },
     GOLD: {
         gradient: "from-amber-400 to-orange-500",
@@ -37,7 +37,7 @@ const tierStyle: Record<LoyaltyTier, { gradient: string; ring: string; label: st
 };
 
 const tierBg: Record<LoyaltyTier, string> = {
-    SILVER: "from-slate-50 to-stone-50 border-slate-200",
+    BASIC: "from-slate-50 to-stone-50 border-slate-200",
     GOLD: "from-amber-50 to-orange-50 border-amber-200",
     PLATINUM: "from-sky-50 to-indigo-50 border-sky-200",
 };

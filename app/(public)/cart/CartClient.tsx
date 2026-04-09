@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import {
   ShoppingCart, Trash2, ArrowLeft, Plus, Minus,
   Tag, Truck, Shield, ChevronRight, Store, Package,
-  CheckCircle, X, Ticket,
+  CheckCircle, X, Ticket, Lock
 } from "lucide-react";
 import Link from "next/link";
+import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -30,9 +31,13 @@ export default function CartClient() {
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [couponCode, setCouponCode] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponResult, setCouponResult] = useState<any>(null);
+  const [couponError, setCouponError] = useState("");
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [availableVouchers, setAvailableVouchers] = useState<any[]>([]);
   const [selectAll, setSelectAll] = useState(true);
   const [showCheckoutAnim, setShowCheckoutAnim] = useState(false);
+  const [showAuthOverlay, setShowAuthOverlay] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   // ── LOAD cart dari localStorage sekali saat mount ──
@@ -51,6 +56,20 @@ export default function CartClient() {
     } catch (e) {
       console.error("Failed to parse cart:", e);
     }
+
+    // Fetch available vouchers
+    const fetchVouchers = async () => {
+      try {
+        const res = await api.get('/vouchers/active');
+        if (res.data.status === 'success') {
+          setAvailableVouchers(res.data.data);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    fetchVouchers();
+
     setHydrated(true);
   }, []);
 
@@ -96,12 +115,48 @@ export default function CartClient() {
     setCart((prev) => prev.map((item) => ({ ...item, selected: newVal })));
   };
 
-  const applyCoupon = () => {
-    if (couponCode.trim().toLowerCase() === "ravelle10") setCouponApplied(true);
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setValidatingCoupon(true);
+    setCouponError("");
+    setCouponResult(null);
+    try {
+      // NOTE: Here we must use 'api' from our axiot instance
+      const res = await api.get(`/vouchers/validate?code=${couponCode.toUpperCase()}&subtotal=${subtotal}`);
+      if (res.data.status === 'success') {
+        setCouponResult(res.data.data);
+      }
+    } catch (err: any) {
+      setCouponError(err?.response?.data?.message || "Voucher tidak valid atau kadaluarsa");
+    } finally {
+      setValidatingCoupon(false);
+    }
   };
 
   const handleCheckout = () => {
+    try {
+      const authStored = localStorage.getItem("auth");
+      if (!authStored) {
+        setShowAuthOverlay(true);
+        return;
+      }
+      const auth = JSON.parse(authStored);
+      if (!auth.loggedIn || !auth.token) {
+        setShowAuthOverlay(true);
+        return;
+      }
+    } catch (e) {
+      console.error("Auth check failed:", e);
+      setShowAuthOverlay(true);
+      return;
+    }
+
     setShowCheckoutAnim(true);
+    if (couponResult?.code) {
+      localStorage.setItem("ravelle_active_voucher", couponResult.code);
+    } else {
+      localStorage.removeItem("ravelle_active_voucher");
+    }
     setTimeout(() => router.push("/checkout"), 1200);
   };
 
@@ -110,9 +165,9 @@ export default function CartClient() {
   const subtotal = selectedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const originalTotal = selectedItems.reduce((sum, i) => sum + (i.originalPrice || i.price) * i.quantity, 0);
   const totalDiscount = originalTotal - subtotal;
-  const couponDiscount = couponApplied ? Math.floor(subtotal * 0.1) : 0;
-  const shippingFee = subtotal > 500000 ? 0 : 25000;
-  const grandTotal = subtotal - couponDiscount + shippingFee;
+  const couponDiscount = couponResult?.discount_amount || 0;
+  // TODO: Shipping fee will be integrated with Raja Ongkir
+  const grandTotal = Math.max(0, subtotal - couponDiscount);
 
   const stores = Array.from(new Set(cart.map((item) => item.category || "Ravelle Official")));
 
@@ -314,15 +369,7 @@ export default function CartClient() {
                       ))}
                     </div>
 
-                    {/* Shipping info */}
-                    <div className="px-5 py-3 bg-neutral-50 border-t border-neutral-100 flex items-center gap-2">
-                      <Truck className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
-                      <span className="text-[11px] text-neutral-500 font-light tracking-wide" style={{ fontFamily: JOST }}>
-                        {subtotal > 500000
-                          ? "Gratis ongkir untuk pesanan ini"
-                          : "Tambah belanja untuk gratis ongkir"}
-                      </span>
-                    </div>
+                    {/* Shipping info - will be shown after Raja Ongkir integration */}
                   </div>
                 );
               })}
@@ -336,46 +383,68 @@ export default function CartClient() {
                   </span>
                 </div>
 
-                {couponApplied ? (
+                {couponResult ? (
                   <div className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200">
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-neutral-600" />
+                      <CheckCircle className="w-4 h-4 text-green-600" />
                       <span className="font-medium text-neutral-900 text-[11px] tracking-wide" style={{ fontFamily: JOST }}>
-                        RAVELLE10 — Diskon 10% diterapkan
+                        {couponResult.code} — Diskon Rp {couponDiscount.toLocaleString('id-ID')}
                       </span>
                     </div>
                     <button
-                      onClick={() => { setCouponApplied(false); setCouponCode(""); }}
+                      onClick={() => { setCouponResult(null); setCouponCode(""); }}
                       className="text-neutral-400 hover:text-neutral-900 transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ) : (
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-300" />
-                      <input
-                        type="text"
-                        placeholder="Masukkan kode promo..."
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        className="w-full pl-9 pr-4 py-3 border border-neutral-200 text-sm text-neutral-700 font-light focus:border-neutral-800 focus:outline-none transition-colors placeholder:text-neutral-400"
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-300" />
+                        <input
+                          type="text"
+                          placeholder="Masukkan kode promo..."
+                          value={couponCode}
+                          onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(""); }}
+                          onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+                          className="w-full pl-9 pr-4 py-3 border border-neutral-200 text-sm text-neutral-900 uppercase font-bold focus:border-neutral-800 focus:outline-none transition-colors placeholder:text-neutral-400 placeholder:font-light"
+                          style={{ fontFamily: JOST }}
+                        />
+                      </div>
+                      <button
+                        onClick={applyCoupon}
+                        disabled={validatingCoupon || !couponCode.trim()}
+                        className="px-5 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors disabled:bg-neutral-300"
                         style={{ fontFamily: JOST }}
-                      />
+                      >
+                        {validatingCoupon ? "Cek..." : "Pakai"}
+                      </button>
                     </div>
-                    <button
-                      onClick={applyCoupon}
-                      className="px-5 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors"
-                      style={{ fontFamily: JOST }}
-                    >
-                      Pakai
-                    </button>
+                    {couponError && <p className="text-[11px] text-red-500 font-medium">{couponError}</p>}
                   </div>
                 )}
-                <p className="text-[10px] text-neutral-400 mt-2 font-light tracking-wide" style={{ fontFamily: JOST }}>
-                  Coba kode: RAVELLE10 untuk diskon 10%
-                </p>
+
+                {availableVouchers.length > 0 && !couponResult && (
+                  <div className="mt-4 pt-4 border-t border-neutral-100">
+                    <p className="text-[10px] text-neutral-500 mb-2 font-medium tracking-wide uppercase" style={{ fontFamily: JOST }}>
+                      Voucher Tersedia:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableVouchers.map(v => (
+                        <button
+                          key={v.id}
+                          onClick={() => { setCouponCode(v.code); setCouponError(""); }}
+                          className="px-2.5 py-1.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-800 text-left transition-colors flex flex-col gap-0.5"
+                        >
+                          <span className="text-[10px] font-bold text-neutral-900 tracking-wide">{v.code}</span>
+                          <span className="text-[9px] text-neutral-500">{v.type === 'percent' ? `Diskon ${parseFloat(v.value)}%` : `Diskon Rp ${parseInt(v.value).toLocaleString('id-ID')}`}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -395,27 +464,16 @@ export default function CartClient() {
 
                 <div className="px-5 py-4 space-y-3">
                   <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                    <span className="text-neutral-500 font-light">Total Harga</span>
-                    <span className="font-medium text-neutral-900">{formatPrice(originalTotal)}</span>
+                    <span className="text-neutral-500 font-light">Subtotal</span>
+                    <span className="font-medium text-neutral-900">{formatPrice(subtotal)}</span>
                   </div>
-                  {totalDiscount > 0 && (
+                  {couponResult && (
                     <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                      <span className="text-neutral-500 font-light">Diskon Produk</span>
-                      <span className="font-medium text-neutral-700">-{formatPrice(totalDiscount)}</span>
+                      <span className="text-neutral-500 font-light">Diskon Voucher ({couponResult.code})</span>
+                      <span className="font-medium text-green-600">-{formatPrice(couponDiscount)}</span>
                     </div>
                   )}
-                  {couponApplied && (
-                    <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                      <span className="text-neutral-500 font-light">Diskon Promo</span>
-                      <span className="font-medium text-neutral-700">-{formatPrice(couponDiscount)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                    <span className="text-neutral-500 font-light">Ongkos Kirim</span>
-                    <span className={`font-medium ${shippingFee === 0 ? "text-neutral-700" : "text-neutral-900"}`}>
-                      {shippingFee === 0 ? "Gratis" : formatPrice(shippingFee)}
-                    </span>
-                  </div>
+                  {/* Ongkos Kirim - will be shown after Raja Ongkir integration */}
 
                   <div className="pt-3 border-t border-neutral-100">
                     <div className="flex justify-between items-center">
@@ -426,9 +484,9 @@ export default function CartClient() {
                         {formatPrice(grandTotal)}
                       </span>
                     </div>
-                    {(totalDiscount > 0 || couponApplied) && (
-                      <p className="text-right text-[11px] text-neutral-500 font-light mt-1 tracking-wide" style={{ fontFamily: JOST }}>
-                        Hemat {formatPrice(totalDiscount + couponDiscount)}
+                    {couponResult && (
+                      <p className="text-right text-[11px] text-green-600 font-medium mt-1 tracking-wide" style={{ fontFamily: JOST }}>
+                        Hemat {formatPrice(couponDiscount)}
                       </p>
                     )}
                   </div>
@@ -439,8 +497,8 @@ export default function CartClient() {
                     onClick={handleCheckout}
                     disabled={selectedItems.length === 0 || showCheckoutAnim}
                     className={`w-full py-4 text-[11px] tracking-[0.22em] uppercase font-medium transition-all flex items-center justify-center gap-2 ${selectedItems.length === 0
-                        ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
-                        : "bg-neutral-900 text-white hover:bg-black"
+                      ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+                      : "bg-neutral-900 text-white hover:bg-black"
                       }`}
                     style={{ fontFamily: JOST }}
                   >
@@ -479,6 +537,40 @@ export default function CartClient() {
           </div>
         )}
       </div>
+
+      {/* ── AUTH REQUIRED MODAL ── */}
+      {showAuthOverlay && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4 transition-all animate-in fade-in duration-300" style={{ fontFamily: JOST }}>
+          <div className="bg-white w-full max-w-sm rounded-none border border-neutral-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-8 text-center flex flex-col items-center">
+              <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
+                <Lock className="w-8 h-8 text-neutral-800" />
+              </div>
+              <h3 className="text-xl font-light text-neutral-900 mb-3" style={{ fontFamily: CORMORANT }}>
+                Login Diperlukan
+              </h3>
+              <p className="text-sm text-neutral-500 font-light mb-8 leading-relaxed">
+                Silakan masuk ke akun Anda terlebih dahulu untuk dapat melanjutkan ke proses pembayaran dengan aman.
+              </p>
+
+              <div className="w-full flex flex-col gap-3">
+                <button
+                  onClick={() => router.push("/auth/login")}
+                  className="w-full py-3.5 bg-neutral-900 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-black transition-colors"
+                >
+                  Login Sekarang
+                </button>
+                <button
+                  onClick={() => setShowAuthOverlay(false)}
+                  className="w-full py-3.5 bg-white border border-neutral-200 text-neutral-600 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-50 hover:text-neutral-900 transition-colors"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

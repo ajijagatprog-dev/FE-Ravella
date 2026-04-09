@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import api from "@/lib/axios";
+import { Loader2 } from "lucide-react";
 
 import StatsCards from "./StatsCards";
 import PaymentMethodsSection from "./PaymentMethodsSection";
@@ -15,16 +17,54 @@ import {
   PaymentMethod,
   FilterStatus,
   FilterMethod,
-  INIT_TRANSACTIONS,
   INIT_PAYMENT_METHODS,
   ITEMS_PER_PAGE,
 } from "../types";
 
 export default function PaymentClient() {
   // ─── State ──────────────────────────────────────────────────────────────────
-  const [transactions, setTransactions] = useState<Transaction[]>(INIT_TRANSACTIONS);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [payMethods, setPayMethods] = useState<PaymentMethod[]>(INIT_PAYMENT_METHODS);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const profileRes = await api.get('/customer/profile');
+        let currentProfile = null;
+        if (profileRes.data?.status === 'success') {
+          currentProfile = profileRes.data.data;
+          setProfile(currentProfile);
+        }
+
+        const ordersRes = await api.get('/customer/orders');
+        if (ordersRes.data?.status === 'success') {
+          const formatted = ordersRes.data.data.map((o: any) => {
+            const date = new Date(o.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            return {
+              id: o.order_number,
+              date: date,
+              method: o.payment_method === 'VA' ? 'VA' : 'QRIS',
+              amount: parseFloat(o.total_amount) || 0,
+              status: (o.status !== 'PENDING' || o.payment_token) ? "Paid" : "Pending",
+              description: `Wholesale Order ${o.order_number}`,
+              customerName: currentProfile?.name || "Retail Partner",
+              companyName: currentProfile?.company_name || "B2B Account"
+            };
+          });
+          setTransactions(formatted);
+        }
+      } catch (err) {
+        console.error("Failed to fetch payments data", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Modals
   const [payTarget, setPayTarget] = useState<Transaction | null>(null);
@@ -64,7 +104,6 @@ export default function PaymentClient() {
   );
   const pendingCount = transactions.filter((t) => t.status === "Pending").length;
 
-  // ─── Handlers ───────────────────────────────────────────────────────────────
   function handlePaySuccess(id: string) {
     setTransactions((prev) =>
       prev.map((t) => (t.id === id ? { ...t, status: "Paid", isNew: false } : t))
@@ -98,6 +137,15 @@ export default function PaymentClient() {
   }
 
   // ─── Render ─────────────────────────────────────────────────────────────────
+  if (isLoading) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center p-12 text-gray-400 gap-3 min-h-[50vh]">
+        <Loader2 size={24} className="animate-spin text-blue-500" />
+        <p>Loading Payments...</p>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Header with "Add Payment Method" button */}

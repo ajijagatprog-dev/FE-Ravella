@@ -15,23 +15,107 @@ import {
     TrendingUp,
     Share2,
     Package,
+    Play,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
 import Header from "../../../HomePage/components/Header";
 import Footer from "../../../HomePage/components/Footer";
 import { products, type Product } from "../products";
+import api from "@/lib/axios";
+import { useEffect, useState } from "react";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ProductDetail() {
     const { id } = useParams<{ id: string }>();
-    const productId = parseInt(id, 10);
-    const product = products.find((p) => p.id === productId);
+    const productId = id; // use string id or slug
+    const [product, setProduct] = useState<any | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchProductDetail = async () => {
+            try {
+                setIsLoading(true);
+                const res = await api.get(`/products/${productId}`);
+                if (res.data.status === 'success') {
+                    const item = res.data.data;
+                    setProduct({
+                        id: item.id,
+                        name: item.name,
+                        description: item.description || "Deskripsi produk",
+                        price: item.sale_price && item.sale_price > 0 ? item.sale_price : item.price,
+                        originalPrice: item.price,
+                        discount: item.discount || 0,
+                        rating: item.rating ? parseFloat(item.rating) : 0,
+                        reviews: item.reviews || 0,
+                        category: item.category || "appliance",
+                        image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+                        videoUrl: item.video_url || null,
+                        features: Array.isArray(item.features) ? item.features : [],
+                        specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
+                        inStock: item.stock > 0,
+                        badge: item.badge || (item.is_featured ? "Best Seller" : ""),
+                        media: item.media || [],
+                    });
+
+                    // Fetch related products from same category
+                    const relRes = await api.get('/products', { params: { limit: 10, category: item.category || undefined } });
+                    if (relRes.data.status === 'success') {
+                        const relMapped = relRes.data.data.data
+                            .filter((r: any) => r.id !== item.id) // Exclude current product
+                            .slice(0, 4) // Show only 4
+                            .map((r: any) => ({
+                                id: r.id,
+                                name: r.name,
+                                price: r.sale_price && r.sale_price > 0 ? r.sale_price : r.price,
+                                image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+                                rating: r.rating ? parseFloat(r.rating) : 0,
+                                reviews: r.reviews || 0,
+                                originalPrice: r.price,
+                                discount: r.discount || 0,
+                                badge: r.badge || (r.is_featured ? "Best Seller" : ""),
+                            }));
+                        setRelatedProducts(relMapped);
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchProductDetail();
+    }, [productId]);
+
     const [isFavorite, setIsFavorite] = useState(false);
+    const [activeMediaIndex, setActiveMediaIndex] = useState(0);
     const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
         { visible: false, productName: "" }
     );
+
+    // Build gallery items: from media array (if available), fallback to legacy image + videoUrl
+    const galleryItems = (() => {
+        if (!product) return [];
+        const items: { type: 'image' | 'video'; url: string }[] = [];
+        if (product.media && product.media.length > 0) {
+            product.media.forEach((m: any) => {
+                items.push({ type: m.type, url: m.url });
+            });
+        } else {
+            // Legacy fallback
+            if (product.image) items.push({ type: 'image', url: product.image });
+            if (product.videoUrl) {
+                let embedUrl = product.videoUrl;
+                const ytMatch = product.videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+                if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+                items.push({ type: 'video', url: embedUrl });
+            }
+        }
+        return items;
+    })();
 
     const formatPrice = (price: number) =>
         new Intl.NumberFormat("id-ID", {
@@ -71,32 +155,17 @@ export default function ProductDetail() {
         setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
     };
 
-    /* Related products: same category, excluding current */
-    const relatedProducts = product
-        ? products
-            .filter((p) => p.category === product.category && p.id !== product.id)
-            .slice(0, 4)
-        : [];
-    const suggestions =
-        relatedProducts.length >= 4
-            ? relatedProducts
-            : [
-                ...relatedProducts,
-                ...products
-                    .filter(
-                        (p) =>
-                            p.id !== productId &&
-                            !relatedProducts.some((r) => r.id === p.id)
-                    )
-                    .slice(0, 4 - relatedProducts.length),
-            ];
-
     const badgeStyle: Record<string, string> = {
         "Best Seller": "bg-neutral-900 text-white",
         Premium: "bg-neutral-700 text-white",
         Popular: "bg-neutral-100 text-neutral-700 border border-neutral-200",
         New: "bg-white text-neutral-900 border border-neutral-200",
     };
+
+    /* Loading state */
+    if (isLoading) {
+        return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-800 rounded-full animate-spin"></div></div>;
+    }
 
     /* 404 */
     if (!product) {
@@ -139,8 +208,8 @@ export default function ProductDetail() {
             {/* Toast */}
             <div
                 className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${toast.visible
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 -translate-y-4 pointer-events-none"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-4 pointer-events-none"
                     }`}
             >
                 <div
@@ -175,32 +244,105 @@ export default function ProductDetail() {
             {/* ── PRODUCT DETAIL ── */}
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 py-8 sm:py-12">
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-14">
-                    {/* Image */}
-                    <div className="relative aspect-square bg-neutral-50 overflow-hidden">
-                        <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                        />
-                        {/* Badges */}
-                        <div className="absolute top-4 left-4 flex flex-col gap-1.5">
-                            {product.isNew && (
-                                <span
-                                    className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-medium border border-neutral-200"
-                                    style={{ fontFamily: JOST }}
-                                >
-                                    New
-                                </span>
+                    {/* Gallery */}
+                    <div>
+                        {/* Main Display */}
+                        <div className="relative aspect-square bg-neutral-50 overflow-hidden">
+                            {galleryItems.length > 0 && galleryItems[activeMediaIndex]?.type === 'video' ? (
+                                (() => {
+                                    const videoUrl = galleryItems[activeMediaIndex].url;
+                                    // Check if it's a YouTube embed or uploaded video file
+                                    const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
+                                    let embedUrl = videoUrl;
+                                    if (isYouTube) {
+                                        const ytMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+                                        if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+                                    }
+                                    return isYouTube ? (
+                                        <iframe
+                                            src={embedUrl}
+                                            title={`Video ${product.name}`}
+                                            className="w-full h-full"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                        />
+                                    ) : (
+                                        <video
+                                            src={videoUrl}
+                                            controls
+                                            className="w-full h-full object-contain bg-black"
+                                        />
+                                    );
+                                })()
+                            ) : (
+                                <img
+                                    src={galleryItems[activeMediaIndex]?.url || product.image}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                />
                             )}
-                            {product.discount > 0 && (
-                                <span
-                                    className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase font-medium"
-                                    style={{ fontFamily: JOST }}
-                                >
-                                    -{product.discount}%
-                                </span>
+                            {/* Badges */}
+                            <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
+                                {product.badge && (
+                                    <span
+                                        className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-bold border border-neutral-200 shadow-sm"
+                                        style={{ fontFamily: JOST }}
+                                    >
+                                        {product.badge}
+                                    </span>
+                                )}
+                                {product.discount > 0 && (
+                                    <span
+                                        className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase font-medium"
+                                        style={{ fontFamily: JOST }}
+                                    >
+                                        -{product.discount}%
+                                    </span>
+                                )}
+                            </div>
+                            {/* Navigation Arrows */}
+                            {galleryItems.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => setActiveMediaIndex(i => i > 0 ? i - 1 : galleryItems.length - 1)}
+                                        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10"
+                                    >
+                                        <ChevronLeft className="w-4 h-4 text-neutral-700" />
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveMediaIndex(i => i < galleryItems.length - 1 ? i + 1 : 0)}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10"
+                                    >
+                                        <ChevronRight className="w-4 h-4 text-neutral-700" />
+                                    </button>
+                                </>
                             )}
                         </div>
+
+                        {/* Thumbnail Strip */}
+                        {galleryItems.length > 1 && (
+                            <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                                {galleryItems.map((item, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setActiveMediaIndex(idx)}
+                                        className={`relative flex-shrink-0 w-16 h-16 overflow-hidden border-2 transition-all ${
+                                            idx === activeMediaIndex
+                                                ? 'border-neutral-900'
+                                                : 'border-neutral-200 hover:border-neutral-400'
+                                        }`}
+                                    >
+                                        {item.type === 'image' ? (
+                                            <img src={item.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
+                                                <Play className="w-5 h-5 text-white/80 fill-white/80" />
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Details */}
@@ -220,8 +362,8 @@ export default function ProductDetail() {
                                 <Star
                                     key={i}
                                     className={`w-4 h-4 ${i < Math.floor(product.rating)
-                                            ? "fill-yellow-400 text-yellow-400"
-                                            : "text-neutral-200"
+                                        ? "fill-yellow-400 text-yellow-400"
+                                        : "text-neutral-200"
                                         }`}
                                 />
                             ))}
@@ -245,7 +387,7 @@ export default function ProductDetail() {
 
                         {/* Description */}
                         <p
-                            className="text-neutral-500 text-sm font-light leading-relaxed mb-6"
+                            className="text-neutral-500 text-sm font-light leading-relaxed mb-6 whitespace-pre-line"
                             style={{ fontFamily: JOST }}
                         >
                             {product.description}
@@ -280,56 +422,62 @@ export default function ProductDetail() {
                         </div>
 
                         {/* Features */}
-                        <div className="mb-5">
-                            <p
-                                className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
-                                style={{ fontFamily: JOST }}
-                            >
-                                Fitur Utama
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                                {product.features.map((f, i) => (
-                                    <span
-                                        key={i}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 border border-neutral-200 text-neutral-600 text-[11px] tracking-[0.1em] uppercase font-medium"
-                                        style={{ fontFamily: JOST }}
-                                    >
-                                        <Check className="w-3 h-3" />
-                                        {f}
-                                    </span>
-                                ))}
+                        {product.features && product.features.length > 0 && (
+                            <div className="mb-8 p-6 bg-neutral-50 border border-neutral-100 rounded-lg">
+                                <p
+                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-900 font-bold mb-4"
+                                    style={{ fontFamily: JOST }}
+                                >
+                                    Fitur Utama
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {product.features.map((f: string, i: number) => (
+                                        <div
+                                            key={i}
+                                            className="flex items-start gap-2.5 text-neutral-600 text-[12px] font-light leading-tight"
+                                            style={{ fontFamily: JOST }}
+                                        >
+                                            <div className="w-4 h-4 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Check className="w-2.5 h-2.5 text-white" />
+                                            </div>
+                                            {f}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Specifications */}
-                        <div className="mb-6">
-                            <p
-                                className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
-                                style={{ fontFamily: JOST }}
-                            >
-                                Spesifikasi
-                            </p>
-                            <div className="space-y-1.5">
-                                {Object.entries(product.specifications).map(([k, v]) => (
-                                    <div
-                                        key={k}
-                                        className="flex justify-between py-2 border-b border-neutral-100 text-sm"
-                                        style={{ fontFamily: JOST }}
-                                    >
-                                        <span className="text-neutral-400 font-light">{k}</span>
-                                        <span className="text-neutral-800 font-medium">{v}</span>
-                                    </div>
-                                ))}
+                        {product.specifications && Object.keys(product.specifications).length > 0 && (
+                            <div className="mb-8">
+                                <p
+                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
+                                    style={{ fontFamily: JOST }}
+                                >
+                                    Spesifikasi
+                                </p>
+                                <div className="grid grid-cols-1 gap-2">
+                                    {Object.entries(product.specifications).map(([k, v]) => (
+                                        <div
+                                            key={k}
+                                            className="flex justify-between py-2.5 px-4 bg-white border border-neutral-100 text-sm"
+                                            style={{ fontFamily: JOST }}
+                                        >
+                                            <span className="text-neutral-400 font-light">{k}</span>
+                                            <span className="text-neutral-900 font-medium">{v as string}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Actions */}
                         <div className="flex gap-2 mt-auto">
                             <button
                                 onClick={() => setIsFavorite(!isFavorite)}
                                 className={`w-12 h-12 flex items-center justify-center border transition-all ${isFavorite
-                                        ? "bg-neutral-900 border-neutral-900 text-white"
-                                        : "border-neutral-200 text-neutral-500 hover:border-neutral-800"
+                                    ? "bg-neutral-900 border-neutral-900 text-white"
+                                    : "border-neutral-200 text-neutral-500 hover:border-neutral-800"
                                     }`}
                             >
                                 <Heart
@@ -370,7 +518,7 @@ export default function ProductDetail() {
             </div>
 
             {/* ── RELATED PRODUCTS ── */}
-            {suggestions.length > 0 && (
+            {relatedProducts.length > 0 && (
                 <section className="bg-neutral-50 py-14 sm:py-20">
                     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
                         <div className="inline-flex items-center gap-2.5 mb-8">
@@ -385,7 +533,7 @@ export default function ProductDetail() {
                         </div>
 
                         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-                            {suggestions.map((related) => (
+                            {relatedProducts.map((related) => (
                                 <Link
                                     key={related.id}
                                     href={`/product/${related.id}`}

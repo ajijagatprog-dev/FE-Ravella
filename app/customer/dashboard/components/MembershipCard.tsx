@@ -1,8 +1,30 @@
 import { Crown } from "lucide-react";
 
-export default function MembershipCard() {
-    const progress = 75;
-    const spendMore = 250;
+export default function MembershipCard({ profile }: { profile: any }) {
+    const points = profile?.loyalty_points || 0;
+
+    // Simple tier calculation logic for now
+    let tier = "Basic Status";
+    let progress = 0;
+    let spendMore = 1000 - points;
+    let nextTier = "Gold";
+
+    if (points >= 5000) {
+        tier = "Platinum Status";
+        progress = 100;
+        spendMore = 0;
+        nextTier = "Max";
+    } else if (points >= 1000) {
+        tier = "Gold Status";
+        progress = (points / 5000) * 100;
+        spendMore = 5000 - points;
+        nextTier = "Platinum";
+    } else {
+        tier = "Basic Status";
+        progress = (points / 1000) * 100;
+        spendMore = 1000 - points;
+        nextTier = "Gold";
+    }
 
     return (
         <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
@@ -19,7 +41,7 @@ export default function MembershipCard() {
                             <Crown className="w-8 h-8 text-white" />
                         </div>
                         <span className="text-xs font-black text-amber-700 bg-amber-100 border border-amber-200 px-3 py-1 rounded-full uppercase tracking-widest">
-                            Gold Status
+                            {tier}
                         </span>
                     </div>
                 </div>
@@ -40,15 +62,15 @@ export default function MembershipCard() {
                             <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-0.5">
                                 Points Balance
                             </p>
-                            <p className="text-3xl font-black text-blue-600 leading-none">2,450</p>
+                            <p className="text-3xl font-black text-blue-600 leading-none">{points.toLocaleString()}</p>
                         </div>
                     </div>
 
                     {/* Progress */}
                     <div className="mt-5">
                         <div className="flex items-center justify-between mb-2">
-                            <p className="text-xs font-semibold text-stone-600">Platinum Tier Progress</p>
-                            <p className="text-xs font-black text-emerald-600">{progress}% Complete</p>
+                            <p className="text-xs font-semibold text-stone-600">{nextTier} Tier Progress</p>
+                            <p className="text-xs font-black text-emerald-600">{progress.toFixed(0)}% Complete</p>
                         </div>
                         <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
                             <div
@@ -57,7 +79,7 @@ export default function MembershipCard() {
                             />
                         </div>
                         <p className="text-[11px] text-stone-400 mt-1.5">
-                            Spend <span className="font-bold text-stone-600">${spendMore} more</span> to unlock Platinum perks and 2x point multipliers
+                            Spend <span className="font-bold text-stone-600">${spendMore.toLocaleString()} more</span> to unlock {nextTier} perks and 2x point multipliers
                         </p>
                     </div>
                 </div>
