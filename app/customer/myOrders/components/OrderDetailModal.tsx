@@ -18,6 +18,7 @@ import {
 import OrderStatusBadge, { type OrderStatus } from "./OrderStatusBadge";
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
+import InvoiceModal from "./InvoiceModal";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface OrderItem {
@@ -95,6 +96,7 @@ export default function OrderDetailModal({ order, onClose }: Props) {
     const [trackingData, setTrackingData] = useState<any>(null);
     const [loadingTracking, setLoadingTracking] = useState(false);
     const [showTracking, setShowTracking] = useState(false);
+    const [showInvoice, setShowInvoice] = useState(false);
 
     useEffect(() => {
         if (!order || !order.trackingNumber || !showTracking) return;
@@ -146,7 +148,10 @@ export default function OrderDetailModal({ order, onClose }: Props) {
                             <p className="text-xs text-stone-400">Placed on {order.placedAt}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <button className="flex items-center gap-1.5 text-xs font-medium text-stone-500 hover:text-stone-700 border border-stone-200 px-3 py-1.5 rounded-lg hover:bg-stone-50 transition-colors">
+                            <button
+                                onClick={() => setShowInvoice(true)}
+                                className="flex items-center gap-1.5 text-xs font-medium text-stone-500 hover:text-stone-700 border border-stone-200 px-3 py-1.5 rounded-lg hover:bg-stone-50 transition-colors"
+                            >
                                 <Download className="w-3.5 h-3.5" />
                                 Invoice
                             </button>
@@ -411,6 +416,14 @@ export default function OrderDetailModal({ order, onClose }: Props) {
                     </div>
                 </div>
             </div>
+
+            {/* Sub-Modal: Invoice */}
+            {showInvoice && (
+                <InvoiceModal
+                    order={order}
+                    onClose={() => setShowInvoice(false)}
+                />
+            )}
         </>
     );
 }

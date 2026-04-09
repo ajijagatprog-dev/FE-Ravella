@@ -6,6 +6,7 @@ import OrderCard, { type Order } from "./components/OrderCard";
 import OrderFilters from "./components/OrderFilters";
 import OrderPagination from "./components/OrderPagination";
 import OrderDetailModal, { type OrderDetail } from "./components/OrderDetailModal";
+import InvoiceModal from "./components/InvoiceModal";
 import api from "@/lib/axios";
 
 const PAGE_SIZE = 5;
@@ -18,6 +19,7 @@ export default function MyOrdersPage() {
     const [dateRange, setDateRange] = useState("3m");
     const [page, setPage] = useState(1);
     const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
+    const [invoiceOrder, setInvoiceOrder] = useState<OrderDetail | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -100,7 +102,7 @@ export default function MyOrdersPage() {
                         postalCode: addressData.postal_code || "",
                     },
                     paymentMethod: o.payment_method || "N/A",
-                    paymentStatus: o.payment_token ? "PAID" : "PENDING",
+                    paymentStatus: (o.payment_token || ["PROCESSING", "SHIPPED", "DELIVERED"].includes(o.status?.toUpperCase())) ? "PAID" : "PENDING",
                     courier: o.courier,
                     trackingNumber: o.tracking_number,
                 };
@@ -109,6 +111,55 @@ export default function MyOrdersPage() {
             }
         } catch (error) {
             console.error("Failed to fetch order details:", error);
+        }
+    };
+
+    const handleViewInvoice = async (orderId: string) => {
+        const orderSummary = orders.find(o => o.id === orderId);
+        if (!orderSummary) return;
+
+        try {
+            const res = await api.get(`/customer/orders/${orderSummary.orderNumber}`);
+            if (res.data.status === 'success') {
+                const o = res.data.data;
+                const d = new Date(o.created_at);
+                const formattedDate = d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+                const addressData = o.shipping_address ? JSON.parse(o.shipping_address) : {};
+
+                const detail: OrderDetail = {
+                    id: o.id.toString(),
+                    orderNumber: o.order_number,
+                    placedAt: formattedDate,
+                    status: o.status ? o.status.toUpperCase() : "PENDING",
+                    totalAmount: parseFloat(o.total_amount),
+                    shippingCost: 0,
+                    tax: 0,
+                    items: (o.items || []).map((i: any) => ({
+                        id: i.id.toString(),
+                        name: i.product?.name || "Unknown Product",
+                        variant: "-",
+                        qty: i.quantity,
+                        price: parseFloat(i.price),
+                    })),
+                    shippingAddress: {
+                        fullName: addressData.recipient_name || "",
+                        phone: addressData.phone_number || "",
+                        street: addressData.full_address || "",
+                        city: addressData.city || "",
+                        province: addressData.province || "",
+                        postalCode: addressData.postal_code || "",
+                    },
+                    paymentMethod: o.payment_method || "N/A",
+                    paymentStatus: (o.payment_token || ["PROCESSING", "SHIPPED", "DELIVERED"].includes(o.status?.toUpperCase())) ? "PAID" : "PENDING",
+                    courier: o.courier,
+                    trackingNumber: o.tracking_number,
+                };
+
+                setInvoiceOrder(detail);
+            }
+        } catch (error) {
+            console.error("Failed to fetch order details for invoice:", error);
         }
     };
 
@@ -157,6 +208,7 @@ export default function MyOrdersPage() {
                             key={order.id}
                             order={order}
                             onOrderDetail={handleOrderDetail}
+                            onViewInvoice={handleViewInvoice}
                         />
                     ))}
                 </div>
@@ -171,11 +223,19 @@ export default function MyOrdersPage() {
                 onPageChange={setPage}
             />
 
-            {/* Modal */}
+            {/* Detail Modal */}
             <OrderDetailModal
                 order={selectedOrder}
                 onClose={() => setSelectedOrder(null)}
             />
+
+            {/* Standalone Invoice Modal (when triggered from list) */}
+            {invoiceOrder && (
+                <InvoiceModal
+                    order={invoiceOrder}
+                    onClose={() => setInvoiceOrder(null)}
+                />
+            )}
         </div>
     );
 }

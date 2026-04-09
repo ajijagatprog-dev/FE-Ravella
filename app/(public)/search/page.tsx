@@ -176,29 +176,37 @@ function SearchContent() {
                                         <Link
                                             key={product.id}
                                             href={`/product/${product.id}`}
-                                            className="group flex flex-col"
+                                            className="group relative bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-300 flex flex-col"
                                         >
-                                            <div className="relative aspect-square bg-neutral-50 overflow-hidden mb-5">
+                                            <div className="relative overflow-hidden bg-neutral-50 flex items-center justify-center p-6 aspect-square">
                                                 <img
                                                     src={product.image}
                                                     alt={product.name}
-                                                    className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105 p-6"
+                                                    className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
                                                 />
                                                 {product.badge && (
-                                                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-white shadow-sm border border-neutral-100 text-[10px] font-bold tracking-[0.1em] uppercase">
+                                                    <span className="absolute top-3 left-3 px-3 py-1 bg-white shadow-sm border border-neutral-100 text-[10px] font-bold tracking-[0.14em] uppercase text-neutral-900" style={{ fontFamily: JOST }}>
                                                         {product.badge}
                                                     </span>
                                                 )}
-                                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </div>
-                                            <h3 className="text-lg font-light text-neutral-900 mb-2 group-hover:text-neutral-500 transition-colors line-clamp-1" style={{ fontFamily: CORMORANT }}>
-                                                {product.name}
-                                            </h3>
-                                            <div className="flex items-center gap-3">
-                                                <span className="font-medium text-neutral-900">{formatPrice(product.price)}</span>
-                                                {product.originalPrice > product.price && (
-                                                    <span className="text-xs text-neutral-400 line-through">{formatPrice(product.originalPrice)}</span>
+                                                {product.discount > 0 && (
+                                                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-neutral-900 text-white text-[10px] font-medium tracking-[0.12em] uppercase" style={{ fontFamily: JOST, marginTop: product.badge ? '28px' : '0' }}>
+                                                        -{product.discount}%
+                                                    </span>
                                                 )}
+                                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                            </div>
+
+                                            <div className="p-4 sm:p-5 flex flex-col items-center text-center flex-1">
+                                                <h3 className="text-lg sm:text-lg font-medium text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-snug" style={{ fontFamily: CORMORANT }}>
+                                                    {product.name}
+                                                </h3>
+                                                <div className="flex items-baseline justify-center gap-2 mt-auto">
+                                                    <span className="text-base sm:text-base font-semibold text-neutral-900" style={{ fontFamily: JOST }}>{formatPrice(product.price)}</span>
+                                                    {product.originalPrice > product.price && (
+                                                        <span className="text-xs text-neutral-400 line-through" style={{ fontFamily: JOST }}>{formatPrice(product.originalPrice)}</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </Link>
                                     ))}
