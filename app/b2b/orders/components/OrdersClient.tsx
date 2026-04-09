@@ -16,9 +16,9 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type PaymentStatus = "Paid" | "Pending" | "Failed";
-type OrderStatus = "Completed" | "Processing" | "On Hold";
-type TabType = "All Orders" | "Pending" | "Completed";
+export type PaymentStatus = "Paid" | "Pending" | "Failed";
+export type OrderStatus = "Completed" | "Processing" | "On Hold";
+export type TabType = "All Orders" | "Pending" | "Completed";
 
 interface OrderItem {
   name: string;
@@ -27,7 +27,7 @@ interface OrderItem {
   image?: string;
 }
 
-interface Order {
+export interface Order {
   id: string;
   customer: string;
   location: string;
@@ -85,7 +85,7 @@ interface LaravelOrder {
 }
 
 // Transform Laravel order to UI order
-function transformOrder(lo: LaravelOrder, profile?: any): Order {
+export function transformOrder(lo: LaravelOrder, profile?: any): Order {
   let addr: AddressSnapshot | null = null;
   try {
     addr = JSON.parse(lo.shipping_address);
@@ -162,7 +162,7 @@ const orderBadge: Record<OrderStatus, string> = {
 
 // ─── Order Detail Modal ───────────────────────────────────────────────────────
 
-function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
+export function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}

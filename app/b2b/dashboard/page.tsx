@@ -6,6 +6,7 @@ import WelcomeSection from "./components/WelcomeSection";
 import StatsGrid from "./components/StatsGrid";
 import RecentOrders from "./components/RecentOrders";
 import api from "@/lib/axios";
+import { transformOrder, Order } from "../orders/components/OrdersClient";
 
 export default function B2BDashboardPage() {
     const [orders, setOrders] = useState<any[]>([]);
@@ -96,28 +97,7 @@ export default function B2BDashboardPage() {
         ];
 
         // Format recent 5 orders
-        const recent = orders.slice(0, 5).map(o => {
-            const date = new Date(o.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-            const pStatusMap: any = {
-                PENDING: "Pending",
-                PAID: "Paid",
-                FAILED: "Failed",
-            };
-            const oStatusMap: any = {
-                PENDING: "Processing",
-                PROCESSING: "Processing",
-                SHIPPED: "Shipped",
-                DELIVERED: "Delivered",
-                CANCELLED: "On Hold",
-            };
-
-            return {
-                id: o.order_number,
-                date: date,
-                amount: fmtPrice(parseFloat(o.total_amount) || 0),
-                status: oStatusMap[o.status] || "Processing",
-            };
-        });
+        const recent = orders.slice(0, 5).map(o => transformOrder(o, user));
 
         return { stats: currentStats, recentOrders: recent };
     }, [orders]);

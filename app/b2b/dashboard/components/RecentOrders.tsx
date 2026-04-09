@@ -1,19 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { Eye } from "lucide-react";
-
-interface Order {
-    id: string;
-    date: string;
-    amount: string;
-    status: string;
-}
+import { Order, OrderModal } from "../../orders/components/OrdersClient";
 
 interface RecentOrdersProps {
     orders: Order[];
 }
 
 export default function RecentOrders({ orders }: RecentOrdersProps) {
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
     return (
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between">
@@ -36,17 +33,20 @@ export default function RecentOrders({ orders }: RecentOrdersProps) {
                             <tr key={i} className="hover:bg-gray-50/50 transition-colors group">
                                 <td className="px-6 py-4 text-sm font-bold text-gray-900">{order.id}</td>
                                 <td className="px-6 py-4 text-sm text-gray-500 font-medium">{order.date}</td>
-                                <td className="px-6 py-4 text-sm font-bold text-gray-900">{order.amount}</td>
+                                <td className="px-6 py-4 text-sm font-bold text-gray-900">{order.totalAmount}</td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest ${order.status === "Processing" ? "bg-blue-100 text-blue-600" :
-                                            order.status === "Shipped" ? "bg-emerald-100 text-emerald-600" :
+                                    <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest ${order.orderStatus === "Processing" ? "bg-blue-100 text-blue-600" :
+                                            order.orderStatus === "Completed" ? "bg-emerald-100 text-emerald-600" :
                                                 "bg-gray-100 text-gray-600"
                                         }`}>
-                                        {order.status}
+                                        {order.orderStatus}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 text-center">
-                                    <button className="p-2 rounded-lg hover:bg-blue-50 text-gray-300 hover:text-blue-600 transition-all">
+                                    <button 
+                                      onClick={() => setSelectedOrder(order)}
+                                      className="p-2 rounded-lg hover:bg-blue-50 text-gray-300 hover:text-blue-600 transition-all"
+                                    >
                                         <Eye size={18} />
                                     </button>
                                 </td>
@@ -55,6 +55,13 @@ export default function RecentOrders({ orders }: RecentOrdersProps) {
                     </tbody>
                 </table>
             </div>
+
+            {selectedOrder && (
+                <OrderModal 
+                    order={selectedOrder} 
+                    onClose={() => setSelectedOrder(null)} 
+                />
+            )}
         </div>
     );
 }
