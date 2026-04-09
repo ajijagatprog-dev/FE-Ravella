@@ -13,7 +13,7 @@ export interface Product {
     image: string;
     inStock: boolean;
     features: string[];
-    specifications: Record<string, string>;
+    specifications?: Record<string, string>;
     description: string;
 }
 

@@ -391,22 +391,22 @@ export default function CheckoutPage() {
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                                             <div className="sm:col-span-2">
                                                 <input required type="text" placeholder="Label Alamat (contoh: Rumah, Kantor)"
-                                                    className="w-full border border-stone-300 bg-white py-2 px-3 text-sm outline-none focus:border-stone-900"
+                                                    className="w-full border border-stone-300 bg-white py-2.5 px-3.5 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:border-stone-600 focus:ring-1 focus:ring-stone-600 transition-all"
                                                     value={newAddress.label} onChange={e => setNewAddress(p => ({ ...p, label: e.target.value }))} />
                                             </div>
                                             <div>
                                                 <input required type="text" placeholder="Nama Penerima"
-                                                    className="w-full border border-stone-300 bg-white py-2 px-3 text-sm outline-none focus:border-stone-900"
+                                                    className="w-full border border-stone-300 bg-white py-2.5 px-3.5 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:border-stone-600 focus:ring-1 focus:ring-stone-600 transition-all"
                                                     value={newAddress.recipient_name} onChange={e => setNewAddress(p => ({ ...p, recipient_name: e.target.value }))} />
                                             </div>
                                             <div>
                                                 <input required type="tel" placeholder="Nomor Telepon"
-                                                    className="w-full border border-stone-300 bg-white py-2 px-3 text-sm outline-none focus:border-stone-900"
+                                                    className="w-full border border-stone-300 bg-white py-2.5 px-3.5 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:border-stone-600 focus:ring-1 focus:ring-stone-600 transition-all"
                                                     value={newAddress.phone_number} onChange={e => setNewAddress(p => ({ ...p, phone_number: e.target.value }))} />
                                             </div>
                                             <div className="sm:col-span-2">
                                                 <textarea required rows={2} placeholder="Alamat Lengkap (nama jalan, nomor rumah, RT/RW)"
-                                                    className="w-full border border-stone-300 bg-white py-2 px-3 text-sm outline-none focus:border-stone-900 resize-none"
+                                                    className="w-full border border-stone-300 bg-white py-2.5 px-3.5 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:border-stone-600 focus:ring-1 focus:ring-stone-600 transition-all resize-none"
                                                     value={newAddress.full_address} onChange={e => setNewAddress(p => ({ ...p, full_address: e.target.value }))} />
                                             </div>
 
@@ -416,17 +416,17 @@ export default function CheckoutPage() {
                                                     Kecamatan / Kota <span className="text-red-400">*</span>
                                                 </label>
                                                 <div className="relative">
-                                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                                                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                                                     <input
                                                         type="text"
                                                         placeholder="Ketik nama kecamatan atau kota... (min. 3 huruf)"
-                                                        className="w-full border border-stone-300 bg-white py-2.5 pl-9 pr-10 text-sm outline-none focus:border-stone-900"
+                                                        className="w-full border border-stone-300 bg-white py-2.5 pl-10 pr-10 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:border-stone-600 focus:ring-1 focus:ring-stone-600 transition-all"
                                                         value={destSearch}
                                                         onChange={e => handleDestSearch(e.target.value)}
                                                     />
                                                     {destSearch && (
                                                         <button type="button" onClick={() => { setDestSearch(''); setDestResults([]); setSelectedDest(null); setNewAddress(p => ({ ...p, subdistrict_id: 0, subdistrict_name: '', city: '', province: '' })); }}
-                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
+                                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
                                                             <XIcon className="w-4 h-4" />
                                                         </button>
                                                     )}
@@ -434,18 +434,18 @@ export default function CheckoutPage() {
 
                                                 {/* Hasil pencarian */}
                                                 {loadingDest && (
-                                                    <div className="mt-1 flex items-center gap-2 text-xs text-stone-400 py-1">
-                                                        <Loader2 className="w-3 h-3 animate-spin" /> Mencari...
+                                                    <div className="mt-1.5 flex items-center gap-2 text-xs text-stone-500 py-1">
+                                                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Sedang mencari...
                                                     </div>
                                                 )}
                                                 {destResults.length > 0 && !selectedDest && (
-                                                    <div className="mt-1 border border-stone-200 bg-white shadow-lg z-10 max-h-48 overflow-y-auto">
+                                                    <div className="mt-1.5 border border-stone-200 bg-white shadow-lg z-10 max-h-48 overflow-y-auto rounded-md">
                                                         {destResults.map(d => (
                                                             <button key={d.id} type="button"
                                                                 onClick={() => handleSelectDest(d)}
-                                                                className="w-full text-left px-3 py-2.5 text-xs hover:bg-stone-50 border-b border-stone-100 last:border-0 transition-colors">
+                                                                className="w-full text-left px-3.5 py-3 text-xs hover:bg-stone-50 border-b border-stone-100 last:border-0 transition-colors">
                                                                 <span className="font-semibold text-stone-800 block">{d.subdistrict_name}, {d.district_name}</span>
-                                                                <span className="text-stone-400">{d.city_name}, {d.province_name} {d.zip_code}</span>
+                                                                <span className="text-stone-500 mt-0.5 block">{d.city_name}, {d.province_name} {d.zip_code}</span>
                                                             </button>
                                                         ))}
                                                     </div>
@@ -453,19 +453,19 @@ export default function CheckoutPage() {
 
                                                 {/* Terpilih */}
                                                 {selectedDest && (
-                                                    <div className="mt-1.5 flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-2 text-xs text-green-700">
-                                                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
-                                                        <span><strong>{selectedDest.subdistrict_name}</strong>, {selectedDest.district_name}, {selectedDest.city_name} · {selectedDest.zip_code}</span>
+                                                    <div className="mt-2 flex items-center gap-2.5 bg-green-50 border border-green-200 px-3.5 py-2.5 text-xs text-green-800 rounded-md">
+                                                        <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                                                        <span className="leading-relaxed"><strong>{selectedDest.subdistrict_name}</strong>, {selectedDest.district_name}, {selectedDest.city_name} · {selectedDest.zip_code}</span>
                                                     </div>
                                                 )}
                                                 {!selectedDest && !destSearch && (
-                                                    <p className="text-[11px] text-stone-400 mt-1">Wajib dipilih agar ongkir dihitung otomatis oleh RajaOngkir.</p>
+                                                    <p className="text-[11px] text-stone-400 mt-1.5 italic">Ketikan minimal 3 huruf untuk mencari kecamatan.</p>
                                                 )}
                                             </div>
 
-                                            <div className="sm:col-span-1">
-                                                <input type="text" placeholder="Kode Pos"
-                                                    className="w-full border border-stone-300 bg-white py-2 px-3 text-sm outline-none focus:border-stone-900"
+                                            <div className="sm:col-span-1 border-t border-stone-200 pt-3 mt-1 sm:pt-0 sm:mt-0 sm:border-0">
+                                                <input type="text" placeholder="Kode Pos (Opsional)"
+                                                    className="w-full border border-stone-300 bg-white py-2.5 px-3.5 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:border-stone-600 focus:ring-1 focus:ring-stone-600 transition-all"
                                                     value={newAddress.postal_code} onChange={e => setNewAddress(p => ({ ...p, postal_code: e.target.value }))} />
                                             </div>
                                         </div>

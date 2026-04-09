@@ -264,7 +264,7 @@ export default function B2BProductDetailPage() {
                                         {Object.entries(product.specifications).map(([key, value], idx) => (
                                             <div
                                                 key={key}
-                                                className={`flex justify-between px-5 py-3.5 text-sm ${idx !== Object.keys(product.specifications).length - 1 ? "border-b border-stone-200" : ""
+                                                className={`flex justify-between px-5 py-3.5 text-sm ${idx !== Object.keys(product.specifications!).length - 1 ? "border-b border-stone-200" : ""
                                                     }`}
                                             >
                                                 <span className="text-stone-500 font-medium">{key}</span>

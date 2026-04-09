@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Loader2, Package, ArrowRight } from "lucide-react";
@@ -8,7 +8,7 @@ import api from "@/lib/axios";
 
 const JOST = "'Jost', system-ui, sans-serif";
 
-export default function PaymentSuccessPage() {
+function SuccessContent() {
     const searchParams = useSearchParams();
     const orderNumber = searchParams.get("order");
     const [orderData, setOrderData] = useState<any>(null);
@@ -108,5 +108,17 @@ export default function PaymentSuccessPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function PaymentSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center" style={{ fontFamily: JOST }}>
+                <Loader2 className="w-8 h-8 animate-spin text-stone-400" />
+            </div>
+        }>
+            <SuccessContent />
+        </Suspense>
     );
 }

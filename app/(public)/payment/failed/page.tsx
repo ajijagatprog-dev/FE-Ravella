@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { XCircle, RefreshCw, ArrowRight } from "lucide-react";
+import { XCircle, RefreshCw, ArrowRight, Loader2 } from "lucide-react";
 
 const JOST = "'Jost', system-ui, sans-serif";
 
-export default function PaymentFailedPage() {
+function FailedContent() {
     const searchParams = useSearchParams();
     const orderNumber = searchParams.get("order");
 
@@ -53,5 +54,17 @@ export default function PaymentFailedPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function PaymentFailedPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center" style={{ fontFamily: JOST }}>
+                <Loader2 className="w-8 h-8 animate-spin text-stone-400" />
+            </div>
+        }>
+            <FailedContent />
+        </Suspense>
     );
 }
