@@ -20,6 +20,8 @@ export interface Order {
     initials: string;
     avatarColor: string;
   };
+  products: string;
+  paymentMethod: string;
   date: string;
   status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
   total: string;
@@ -267,7 +269,7 @@ function RowMenu({
 function SkeletonRow() {
   return (
     <tr className="border-b border-gray-100 animate-pulse">
-      {[60, 140, 80, 80, 70, 24].map((w, i) => (
+      {[60, 140, 140, 80, 80, 80, 70, 24].map((w, i) => (
         <td key={i} className="px-4 py-4">
           <div className="h-4 rounded bg-gray-200" style={{ width: w }} />
         </td>
@@ -308,7 +310,7 @@ export function OrderTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200">
-              {["Order ID", "Customer", "Date", "Payment Status", "Total", ""].map((h) => (
+              {["Order ID", "Customer", "Product(s)", "Payment", "Date", "Status", "Total", ""].map((h) => (
                 <th
                   key={h}
                   className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400"
@@ -323,7 +325,7 @@ export function OrderTable({
               Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-12 text-center text-sm text-gray-400">
+                <td colSpan={8} className="py-12 text-center text-sm text-gray-400">
                   No orders found.
                 </td>
               </tr>
@@ -341,7 +343,17 @@ export function OrderTable({
                       <span className="font-medium text-gray-800">{order.customer.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-gray-500">{order.date}</td>
+                  <td className="px-4 py-4">
+                    <p className="text-xs text-gray-600 line-clamp-2 max-w-[180px]" title={order.products}>
+                      {order.products}
+                    </p>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 text-[10px] font-bold uppercase rounded border border-gray-200">
+                      {order.paymentMethod}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-gray-500 whitespace-nowrap">{order.date}</td>
                   <td className="px-4 py-4">
                     <div className="flex flex-col gap-1 items-start">
                         <OrderStatusBadge status={order.status} />

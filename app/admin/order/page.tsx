@@ -75,20 +75,25 @@ export default function OrderPage() {
       try {
         const res = await api.get('/admin/orders');
         if (res.data.status === 'success') {
-          const formatted: Order[] = res.data.data.map((o: any) => ({
-            id: o.order_number,
-            customer: {
-              name: o.user.name,
-              initials: o.user.name.substring(0, 2).toUpperCase(),
-              avatarColor: "#8B5CF6"
-            },
-            date: new Date(o.created_at).toLocaleDateString("id-ID", {
-              year: "numeric", month: "short", day: "numeric"
-            }),
-            status: o.status,
-            total: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(o.total_amount),
-            rawOrder: o
-          }));
+          const formatted: Order[] = res.data.data.map((o: any) => {
+            const products = o.items ? o.items.map((item: any) => `${item.quantity}x ${item.product?.name || 'Unknown'}`).join(", ") : "-";
+            return {
+              id: o.order_number,
+              customer: {
+                name: o.user.name,
+                initials: o.user.name.substring(0, 2).toUpperCase(),
+                avatarColor: "#8B5CF6"
+              },
+              products: products,
+              paymentMethod: o.payment_channel || o.payment_method || '-',
+              date: new Date(o.created_at).toLocaleDateString("id-ID", {
+                year: "numeric", month: "short", day: "numeric"
+              }),
+              status: o.status,
+              total: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(o.total_amount),
+              rawOrder: o
+            };
+          });
           setOrders(formatted);
         }
       } catch (error) {

@@ -17,8 +17,8 @@ import {
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type PaymentStatus = "Paid" | "Pending" | "Failed";
-export type OrderStatus = "Completed" | "Processing" | "On Hold";
-export type TabType = "All Orders" | "Pending" | "Completed";
+export type OrderStatus = "Completed" | "Processing" | "On Hold" | "Cancelled" | "Pending Payment";
+export type TabType = "All Orders" | "Pending" | "Completed" | "Cancelled";
 
 interface OrderItem {
   name: string;
@@ -100,11 +100,11 @@ export function transformOrder(lo: LaravelOrder, profile?: any): Order {
   };
 
   const orderStatusMap: Record<string, OrderStatus> = {
-    PENDING: "Processing",
+    PENDING: "Pending Payment",
     PROCESSING: "Processing",
     SHIPPED: "Processing",
     DELIVERED: "Completed",
-    CANCELLED: "On Hold"
+    CANCELLED: "Cancelled"
   };
 
   const fmtPrice = (p: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(p);
@@ -158,6 +158,8 @@ const orderBadge: Record<OrderStatus, string> = {
   Completed: "bg-blue-50 text-blue-600",
   Processing: "bg-purple-50 text-purple-600",
   "On Hold": "bg-gray-100 text-gray-600",
+  Cancelled: "bg-red-50 text-red-600",
+  "Pending Payment": "bg-yellow-50 text-yellow-600",
 };
 
 // ─── Order Detail Modal ───────────────────────────────────────────────────────
@@ -299,7 +301,7 @@ export default function OrdersClient() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [profile, setProfile] = useState<any>(null);
 
-  const tabs: TabType[] = ["All Orders", "Pending", "Completed"];
+  const tabs: TabType[] = ["All Orders", "Pending", "Completed", "Cancelled"];
 
   // Fetch profile then orders
   useEffect(() => {
@@ -331,10 +333,12 @@ export default function OrdersClient() {
   const filteredOrders = useMemo(() => {
     if (activeTab === "Pending")
       return ALL_ORDERS.filter(
-        (o) => o.paymentStatus === "Pending" || o.orderStatus === "Processing" || o.orderStatus === "On Hold"
+        (o) => o.paymentStatus === "Pending" || o.orderStatus === "Processing" || o.orderStatus === "On Hold" || o.orderStatus === "Pending Payment"
       );
     if (activeTab === "Completed")
       return ALL_ORDERS.filter((o) => o.orderStatus === "Completed");
+    if (activeTab === "Cancelled")
+      return ALL_ORDERS.filter((o) => o.orderStatus === "Cancelled");
     return ALL_ORDERS;
   }, [activeTab, ALL_ORDERS]);
 

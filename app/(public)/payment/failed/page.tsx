@@ -10,6 +10,7 @@ const JOST = "'Jost', system-ui, sans-serif";
 function FailedContent() {
     const searchParams = useSearchParams();
     const orderNumber = searchParams.get("order");
+    const source = searchParams.get("source") || "retail";
 
     return (
         <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" style={{ fontFamily: JOST }}>
@@ -38,14 +39,14 @@ function FailedContent() {
 
                 <div className="space-y-3">
                     <Link
-                        href="/customer/myOrders"
+                        href={source === "b2b" ? "/b2b/orders" : "/customer/myOrders"}
                         className="flex items-center justify-center gap-2 w-full bg-stone-900 text-white py-3.5 font-medium text-[11px] uppercase tracking-widest hover:bg-black transition-colors"
                     >
                         <RefreshCw className="w-4 h-4" />
                         Coba Bayar Ulang
                     </Link>
                     <Link
-                        href="/"
+                        href={source === "b2b" ? "/b2b/products" : "/"}
                         className="flex items-center justify-center gap-2 w-full border border-stone-200 text-stone-600 py-3.5 font-medium text-[11px] uppercase tracking-widest hover:bg-stone-50 transition-colors"
                     >
                         Kembali ke Beranda

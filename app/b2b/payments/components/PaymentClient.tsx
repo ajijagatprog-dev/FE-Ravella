@@ -5,11 +5,9 @@ import api from "@/lib/axios";
 import { Loader2 } from "lucide-react";
 
 import StatsCards from "./StatsCards";
-import PaymentMethodsSection from "./PaymentMethodsSection";
 import TransactionTable from "./TransactionTable";
 import PayNowModal from "./PayNowModal";
 import FilterDrawer from "./FilterDrawer";
-import AddPaymentMethodModal from "./AddPaymentMethodModal";
 import PaymentHeader from "./PaymentHeader";
 
 import {
@@ -24,7 +22,6 @@ import {
 export default function PaymentClient() {
   // ─── State ──────────────────────────────────────────────────────────────────
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [payMethods, setPayMethods] = useState<PaymentMethod[]>(INIT_PAYMENT_METHODS);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
@@ -47,12 +44,13 @@ export default function PaymentClient() {
             return {
               id: o.order_number,
               date: date,
-              method: o.payment_method === 'VA' ? 'VA' : 'QRIS',
+              method: o.payment_channel || o.payment_method || '-',
               amount: parseFloat(o.total_amount) || 0,
               status: (o.status !== 'PENDING' || o.payment_token) ? "Paid" : "Pending",
               description: `Wholesale Order ${o.order_number}`,
               customerName: currentProfile?.name || "Retail Partner",
-              companyName: currentProfile?.company_name || "B2B Account"
+              companyName: currentProfile?.company_name || "B2B Account",
+              payment_url: o.payment_url
             };
           });
           setTransactions(formatted);
@@ -69,7 +67,6 @@ export default function PaymentClient() {
   // Modals
   const [payTarget, setPayTarget] = useState<Transaction | null>(null);
   const [showFilter, setShowFilter] = useState(false);
-  const [showAddMethod, setShowAddMethod] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("All");
@@ -148,24 +145,14 @@ export default function PaymentClient() {
 
   return (
     <>
-      {/* Header with "Add Payment Method" button */}
-      <PaymentHeader onAddPaymentMethod={() => setShowAddMethod(true)} />
+      {/* Header */}
+      <PaymentHeader />
 
       {/* Stats summary cards */}
       <StatsCards
         totalPaid={totalPaid}
         totalPending={totalPending}
         pendingCount={pendingCount}
-      />
-
-      {/* Saved payment methods list */}
-      <PaymentMethodsSection
-        methods={payMethods}
-        onAdd={() => setShowAddMethod(true)}
-        onDelete={(id) => setPayMethods((p) => p.filter((m) => m.id !== id))}
-        onSetPrimary={(id) =>
-          setPayMethods((p) => p.map((m) => ({ ...m, isPrimary: m.id === id })))
-        }
       />
 
       {/* Transaction history table with search, filter chips, pagination */}
@@ -208,13 +195,6 @@ export default function PaymentClient() {
           setMethodFilter={handleMethodFilter}
           onClose={() => setShowFilter(false)}
           onReset={handleResetFilters}
-        />
-      )}
-
-      {showAddMethod && (
-        <AddPaymentMethodModal
-          onClose={() => setShowAddMethod(false)}
-          onAdd={(pm) => setPayMethods((p) => [...p, pm])}
         />
       )}
     </>
