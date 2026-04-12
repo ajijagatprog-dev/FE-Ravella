@@ -12,12 +12,13 @@ import {
   Hash,
   User,
   Clock,
+  Truck,
 } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type PaymentStatus = "Paid" | "Pending" | "Failed";
-export type OrderStatus = "Completed" | "Processing" | "On Hold" | "Cancelled" | "Pending Payment";
+export type OrderStatus = "Completed" | "Processing" | "On Hold" | "Cancelled" | "Pending Payment" | "Shipped" | "Delivered";
 export type TabType = "All Orders" | "Pending" | "Completed" | "Cancelled";
 
 interface OrderItem {
@@ -39,6 +40,8 @@ export interface Order {
   phone: string;
   items: OrderItem[];
   notes?: string;
+  courier?: string;
+  trackingNumber?: string;
 }
 
 import api from "@/lib/axios";
@@ -82,6 +85,8 @@ interface LaravelOrder {
   created_at: string;
   updated_at: string;
   items: LaravelOrderItem[];
+  courier?: string;
+  tracking_number?: string;
 }
 
 // Transform Laravel order to UI order
@@ -103,8 +108,9 @@ export function transformOrder(lo: LaravelOrder, profile?: any): Order {
   const orderStatusMap: Record<string, OrderStatus> = {
     PENDING: "Pending Payment",
     PROCESSING: "Processing",
-    SHIPPED: "Processing",
+    SHIPPED: "Shipped",
     PAID: "Processing",
+    DELIVERED: "Delivered",
     COMPLETED: "Completed",
     CANCELLED: "Cancelled"
   };
@@ -132,6 +138,8 @@ export function transformOrder(lo: LaravelOrder, profile?: any): Order {
     totalAmount: fmtPrice(lo.total_amount),
     email: profile?.email || "N/A",
     phone: phone,
+    courier: lo.courier,
+    trackingNumber: lo.tracking_number,
     items: lo.items.map(i => ({
       name: i.product?.name || "Unknown Product",
       qty: i.quantity,
@@ -162,6 +170,8 @@ const orderBadge: Record<OrderStatus, string> = {
   "On Hold": "bg-gray-100 text-gray-600",
   Cancelled: "bg-red-50 text-red-600",
   "Pending Payment": "bg-yellow-50 text-yellow-600",
+  Shipped: "bg-blue-50 text-blue-600",
+  Delivered: "bg-emerald-50 text-emerald-600",
 };
 
 // ─── Order Detail Modal ───────────────────────────────────────────────────────
@@ -270,13 +280,30 @@ export function OrderModal({ order, onClose }: { order: Order; onClose: () => vo
             </div>
           </div>
 
-          {/* Notes */}
           {order.notes && (
             <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 text-sm text-yellow-800">
               <p className="font-semibold text-xs text-yellow-600 uppercase tracking-wider mb-1">
                 Notes
               </p>
               {order.notes}
+            </div>
+          )}
+
+          {/* Shipping Info */}
+          {(order.courier || order.trackingNumber) && (
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-blue-800 font-bold text-xs uppercase tracking-wider">
+                <Truck size={14} />
+                Shipping Info
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-blue-600 font-medium">Courier</span>
+                <span className="text-sm font-bold text-blue-900">{order.courier || "-"}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-blue-600 font-medium">Tracking Number</span>
+                <span className="text-sm font-mono font-bold text-blue-900 select-all">{order.trackingNumber || "Pending"}</span>
+              </div>
             </div>
           )}
         </div>
