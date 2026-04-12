@@ -94,7 +94,8 @@ export function transformOrder(lo: LaravelOrder, profile?: any): Order {
   const paymentStatusMap: Record<string, PaymentStatus> = {
     PENDING: "Pending",
     PROCESSING: "Paid",
-    SHIPPED: "Paid",
+    PAID: "Paid",
+    COMPLETED: "Paid",
     DELIVERED: "Paid",
     CANCELLED: "Failed"
   };
@@ -103,7 +104,8 @@ export function transformOrder(lo: LaravelOrder, profile?: any): Order {
     PENDING: "Pending Payment",
     PROCESSING: "Processing",
     SHIPPED: "Processing",
-    DELIVERED: "Completed",
+    PAID: "Processing",
+    COMPLETED: "Completed",
     CANCELLED: "Cancelled"
   };
 

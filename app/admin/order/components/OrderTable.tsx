@@ -23,7 +23,7 @@ export interface Order {
   products: string;
   paymentMethod: string;
   date: string;
-  status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+  status: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
   total: string;
   rawOrder: any;
 }
@@ -43,6 +43,7 @@ interface OrderTableProps {
 export function OrderStatusBadge({ status }: { status: Order["status"] }) {
   const styles = {
     PENDING: "bg-amber-50 text-amber-600 border border-amber-200",
+    PAID: "bg-emerald-50 text-emerald-600 border border-emerald-200",
     PROCESSING: "bg-blue-50 text-blue-600 border border-blue-200",
     SHIPPED: "bg-purple-50 text-purple-600 border border-purple-200",
     DELIVERED: "bg-emerald-50 text-emerald-600 border border-emerald-200",
@@ -50,6 +51,7 @@ export function OrderStatusBadge({ status }: { status: Order["status"] }) {
   };
   const dotColors = {
     PENDING: "bg-amber-400",
+    PAID: "bg-emerald-500",
     PROCESSING: "bg-blue-500",
     SHIPPED: "bg-purple-500",
     DELIVERED: "bg-emerald-500",
@@ -80,6 +82,7 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   PENDING: <Clock size={14} />,
+  PAID: <CheckCircle size={14} />,
   PROCESSING: <RefreshCw size={14} />,
   SHIPPED: <Truck size={14} />,
   DELIVERED: <CheckCircle size={14} />,
@@ -88,6 +91,7 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING: "Pending",
+  PAID: "Paid",
   PROCESSING: "Processing",
   SHIPPED: "Shipped",
   DELIVERED: "Delivered",
@@ -100,6 +104,12 @@ const STATUS_MENU_STYLES: Record<string, { iconBg: string; iconText: string; hov
     iconText: "text-amber-500",
     hover: "hover:bg-amber-50",
     hoverText: "hover:text-amber-700",
+  },
+  PAID: {
+    iconBg: "bg-emerald-50",
+    iconText: "text-emerald-500",
+    hover: "hover:bg-emerald-50",
+    hoverText: "hover:text-emerald-700",
   },
   PROCESSING: {
     iconBg: "bg-blue-50",
@@ -230,7 +240,7 @@ function RowMenu({
             Update Status
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mx-2 mb-1" />
-          {(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] as const).map(
+          {(["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] as const).map(
             (st) =>
               st !== currentStatus && (
                 <button

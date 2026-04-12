@@ -112,7 +112,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     {userData?.name || "Loading..."}
                   </p>
                   <p className="text-xs text-gray-500 leading-tight">
-                    {userData?.role === "b2b" ? "B2B Partner" : userData?.role === "admin" ? "Administrator" : "Customer"}
+                    {!userData ? "Memuat..." : (userData.role === "b2b" ? "B2B Partner" : userData.role === "admin" ? "Administrator" : "Customer")}
                   </p>
                 </div>
                 <ChevronDown

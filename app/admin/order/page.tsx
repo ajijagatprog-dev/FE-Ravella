@@ -5,11 +5,10 @@ import { Download, Search, TrendingUp, TrendingDown, ShoppingBag, Truck, X } fro
 import { OrderTable, Order } from "./components/OrderTable";
 
 import api from "@/lib/axios";
-import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { downloadFile } from "@/lib/download";
 
-type TabStatus = "all" | "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+type TabStatus = "all" | "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 
 interface TrackingModalState {
   isOpen: boolean;
@@ -21,6 +20,7 @@ interface TrackingModalState {
 const TABS: { key: TabStatus; label: string }[] = [
   { key: "all", label: "All Orders" },
   { key: "PENDING", label: "Pending" },
+  { key: "PAID", label: "Paid" },
   { key: "PROCESSING", label: "Processing" },
   { key: "SHIPPED", label: "Shipped" },
   { key: "DELIVERED", label: "Delivered" },
@@ -80,8 +80,8 @@ export default function OrderPage() {
             return {
               id: o.order_number,
               customer: {
-                name: o.user.name,
-                initials: o.user.name.substring(0, 2).toUpperCase(),
+                name: o.user?.name || 'Guest',
+                initials: (o.user?.name || 'G').substring(0, 2).toUpperCase(),
                 avatarColor: "#8B5CF6"
               },
               products: products,
@@ -142,7 +142,6 @@ export default function OrderPage() {
 
   const handleUpdateStatus = async (orderNumber: string, status: string, courier?: string, trackingNumber?: string) => {
     if (status === "SHIPPED" && !courier && !trackingNumber) {
-        // Open modal instead of sending request directly
         setTrackingModal({ isOpen: true, orderNumber, courier: "J&T", trackingNumber: "" });
         return;
     }
@@ -160,7 +159,7 @@ export default function OrderPage() {
             status: orderData.status as any,
             rawOrder: orderData
         } : o));
-        fetchStats(); // Refresh stats after status change
+        fetchStats();
         toast.success("Order status updated successfully!");
         setTrackingModal(prev => ({ ...prev, isOpen: false }));
       }

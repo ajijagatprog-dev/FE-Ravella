@@ -25,6 +25,11 @@ function SuccessContent() {
                 const res = await api.get(`/payments/status/${orderNumber}`);
                 if (res.data.status === "success") {
                     setOrderData(res.data.data);
+                    
+                    // CLEAR CART HERE
+                    localStorage.removeItem("ravelle_cart");
+                    localStorage.removeItem("ravelle_active_voucher");
+                    window.dispatchEvent(new Event("ravelle_cart_updated"));
                 }
             } catch (err) {
                 console.error("Failed to fetch order status", err);
