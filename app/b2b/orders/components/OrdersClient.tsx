@@ -12,13 +12,14 @@ import {
   Hash,
   User,
   Clock,
+  Truck,
 } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type PaymentStatus = "Paid" | "Pending" | "Failed";
-type OrderStatus = "Completed" | "Processing" | "On Hold";
-type TabType = "All Orders" | "Pending" | "Completed";
+export type PaymentStatus = "Paid" | "Pending" | "Failed";
+export type OrderStatus = "Completed" | "Processing" | "On Hold" | "Cancelled" | "Pending Payment" | "Shipped" | "Delivered";
+export type TabType = "All Orders" | "Pending" | "Completed" | "Cancelled";
 
 interface OrderItem {
   name: string;
@@ -27,7 +28,7 @@ interface OrderItem {
   image?: string;
 }
 
-interface Order {
+export interface Order {
   id: string;
   customer: string;
   location: string;
@@ -39,6 +40,8 @@ interface Order {
   phone: string;
   items: OrderItem[];
   notes?: string;
+  courier?: string;
+  trackingNumber?: string;
 }
 
 import api from "@/lib/axios";
@@ -82,10 +85,12 @@ interface LaravelOrder {
   created_at: string;
   updated_at: string;
   items: LaravelOrderItem[];
+  courier?: string;
+  tracking_number?: string;
 }
 
 // Transform Laravel order to UI order
-function transformOrder(lo: LaravelOrder, profile?: any): Order {
+export function transformOrder(lo: LaravelOrder, profile?: any): Order {
   let addr: AddressSnapshot | null = null;
   try {
     addr = JSON.parse(lo.shipping_address);
@@ -94,17 +99,20 @@ function transformOrder(lo: LaravelOrder, profile?: any): Order {
   const paymentStatusMap: Record<string, PaymentStatus> = {
     PENDING: "Pending",
     PROCESSING: "Paid",
-    SHIPPED: "Paid",
+    PAID: "Paid",
+    COMPLETED: "Paid",
     DELIVERED: "Paid",
     CANCELLED: "Failed"
   };
 
   const orderStatusMap: Record<string, OrderStatus> = {
-    PENDING: "Processing",
+    PENDING: "Pending Payment",
     PROCESSING: "Processing",
-    SHIPPED: "Processing",
-    DELIVERED: "Completed",
-    CANCELLED: "On Hold"
+    SHIPPED: "Shipped",
+    PAID: "Processing",
+    DELIVERED: "Delivered",
+    COMPLETED: "Completed",
+    CANCELLED: "Cancelled"
   };
 
   const fmtPrice = (p: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(p);
@@ -130,6 +138,8 @@ function transformOrder(lo: LaravelOrder, profile?: any): Order {
     totalAmount: fmtPrice(lo.total_amount),
     email: profile?.email || "N/A",
     phone: phone,
+    courier: lo.courier,
+    trackingNumber: lo.tracking_number,
     items: lo.items.map(i => ({
       name: i.product?.name || "Unknown Product",
       qty: i.quantity,
@@ -158,11 +168,15 @@ const orderBadge: Record<OrderStatus, string> = {
   Completed: "bg-blue-50 text-blue-600",
   Processing: "bg-purple-50 text-purple-600",
   "On Hold": "bg-gray-100 text-gray-600",
+  Cancelled: "bg-red-50 text-red-600",
+  "Pending Payment": "bg-yellow-50 text-yellow-600",
+  Shipped: "bg-blue-50 text-blue-600",
+  Delivered: "bg-emerald-50 text-emerald-600",
 };
 
 // ─── Order Detail Modal ───────────────────────────────────────────────────────
 
-function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
+export function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -266,13 +280,30 @@ function OrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
             </div>
           </div>
 
-          {/* Notes */}
           {order.notes && (
             <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 text-sm text-yellow-800">
               <p className="font-semibold text-xs text-yellow-600 uppercase tracking-wider mb-1">
                 Notes
               </p>
               {order.notes}
+            </div>
+          )}
+
+          {/* Shipping Info */}
+          {(order.courier || order.trackingNumber) && (
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-blue-800 font-bold text-xs uppercase tracking-wider">
+                <Truck size={14} />
+                Shipping Info
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-blue-600 font-medium">Courier</span>
+                <span className="text-sm font-bold text-blue-900">{order.courier || "-"}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-blue-600 font-medium">Tracking Number</span>
+                <span className="text-sm font-mono font-bold text-blue-900 select-all">{order.trackingNumber || "Pending"}</span>
+              </div>
             </div>
           )}
         </div>
@@ -299,7 +330,7 @@ export default function OrdersClient() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [profile, setProfile] = useState<any>(null);
 
-  const tabs: TabType[] = ["All Orders", "Pending", "Completed"];
+  const tabs: TabType[] = ["All Orders", "Pending", "Completed", "Cancelled"];
 
   // Fetch profile then orders
   useEffect(() => {
@@ -331,10 +362,12 @@ export default function OrdersClient() {
   const filteredOrders = useMemo(() => {
     if (activeTab === "Pending")
       return ALL_ORDERS.filter(
-        (o) => o.paymentStatus === "Pending" || o.orderStatus === "Processing" || o.orderStatus === "On Hold"
+        (o) => o.paymentStatus === "Pending" || o.orderStatus === "Processing" || o.orderStatus === "On Hold" || o.orderStatus === "Pending Payment"
       );
     if (activeTab === "Completed")
       return ALL_ORDERS.filter((o) => o.orderStatus === "Completed");
+    if (activeTab === "Cancelled")
+      return ALL_ORDERS.filter((o) => o.orderStatus === "Cancelled");
     return ALL_ORDERS;
   }, [activeTab, ALL_ORDERS]);
 

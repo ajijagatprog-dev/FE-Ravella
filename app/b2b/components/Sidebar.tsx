@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Boxes,
@@ -13,6 +13,7 @@ import {
   X,
   ChevronRight,
 } from "lucide-react";
+import api from "@/lib/axios";
 
 const menuItems = [
   {
@@ -59,6 +60,24 @@ interface SidebarProps {
 export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [activeOrderCount, setActiveOrderCount] = useState(0);
+
+  useEffect(() => {
+    const fetchOrderCount = async () => {
+      try {
+        const res = await api.get('/customer/orders');
+        if (res.data.status === 'success') {
+          const active = res.data.data.filter((o: any) =>
+            !["DELIVERED", "CANCELLED", "COMPLETED"].includes(o.status?.toUpperCase())
+          ).length;
+          setActiveOrderCount(active);
+        }
+      } catch (e) {
+        console.error("Failed to fetch B2B badge count", e);
+      }
+    };
+    fetchOrderCount();
+  }, [pathname]);
 
   return (
     <>
@@ -82,37 +101,38 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
         `}
       >
         {/* ── Logo ─────────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-4 py-5 border-b border-gray-100 shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-blue-200 shrink-0">
-              B2B
-            </div>
-            {!collapsed && (
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-gray-900 truncate">Ravelle Fashion</p>
-                <p className="text-[11px] text-gray-400 truncate">B2B Panel</p>
+        <div className={`border-b border-gray-100 shrink-0 transition-all duration-300 ${collapsed ? "lg:px-2 lg:py-3 px-4 py-5" : "px-4 py-5"}`}>
+          <div className={`flex items-center justify-between ${collapsed ? "lg:flex-col lg:gap-3" : ""}`}>
+            <div className={`flex items-center gap-2.5 min-w-0 ${collapsed ? "lg:flex-col lg:gap-1" : ""}`}>
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-[10px] shadow-md shadow-blue-200 shrink-0">
+                B2B
               </div>
-            )}
-          </div>
+              {/* Text - hidden when collapsed on desktop, always visible on mobile */}
+              <div className={`min-w-0 transition-all duration-300 ${collapsed ? "lg:hidden" : ""}`}>
+                <p className="text-sm font-bold text-gray-900 truncate whitespace-nowrap">Ravelle Fashion</p>
+                <p className="text-[11px] text-gray-400 truncate whitespace-nowrap">B2B Panel</p>
+              </div>
+            </div>
 
-          {/* Close on mobile / collapse toggle on desktop */}
-          <button
-            onClick={() => {
-              if (window.innerWidth < 1024) {
-                onMobileClose();
-              } else {
-                setCollapsed((v) => !v);
-              }
-            }}
-            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors shrink-0"
-          >
-            {/* Mobile: X, Desktop: chevron */}
-            <X size={16} className="lg:hidden" />
-            <ChevronRight
-              size={16}
-              className={`hidden lg:block transition-transform duration-300 ${collapsed ? "" : "rotate-180"}`}
-            />
-          </button>
+            {/* Close on mobile / collapse toggle on desktop */}
+            <button
+              onClick={() => {
+                if (window.innerWidth < 1024) {
+                  onMobileClose();
+                } else {
+                  setCollapsed((v) => !v);
+                }
+              }}
+              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all shrink-0"
+            >
+              {/* Mobile: X, Desktop: chevron */}
+              <X size={16} className="lg:hidden" />
+              <ChevronRight
+                size={16}
+                className={`hidden lg:block transition-transform duration-300 ${collapsed ? "" : "rotate-180"}`}
+              />
+            </button>
+          </div>
         </div>
 
         {/* ── Navigation ───────────────────────────────────── */}
@@ -127,6 +147,12 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
+            
+            // Dynamic Badge
+            let badgeCount = 0;
+            if (item.href === "/b2b/orders") {
+              badgeCount = activeOrderCount;
+            }
 
             return (
               <Link
@@ -156,6 +182,15 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
 
                 {!collapsed && (
                   <span className="flex-1 truncate">{item.label}</span>
+                )}
+
+                {!collapsed && badgeCount > 0 && (
+                  <span
+                    className={`min-w-[20px] h-5 flex items-center justify-center px-1.5 text-[10px] font-bold text-white rounded-full ${isActive ? "bg-white/30" : "bg-blue-500"
+                      }`}
+                  >
+                    {badgeCount}
+                  </span>
                 )}
               </Link>
             );

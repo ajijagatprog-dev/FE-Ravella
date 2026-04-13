@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   ReceiptText,
@@ -11,6 +11,7 @@ import {
   ChevronRight,
   MapPin,
 } from "lucide-react";
+import api from "@/lib/axios";
 
 // ── Menu Config ───────────────────────────────────────────────────────────────
 
@@ -20,12 +21,6 @@ const menuItems = [
   { label: "Loyalty & Membership", href: "/customer/loyaltyMembership", icon: BadgePercent },
   { label: "Saved Addresses", href: "/customer/savedAddress", icon: MapPin },
 ];
-
-// ── Badge helper ──────────────────────────────────────────────────────────────
-
-const menuBadges: Record<string, { count: number; color: string }> = {
-  "/customer/myOrders": { count: 2, color: "bg-blue-500" },
-};
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -39,13 +34,36 @@ interface SidebarProps {
 export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [activeOrderCount, setActiveOrderCount] = useState(0);
+
+  useEffect(() => {
+    const fetchOrderCount = async () => {
+      try {
+        const res = await api.get('/customer/orders');
+        if (res.data.status === 'success') {
+          const active = res.data.data.filter((o: any) => 
+            !["DELIVERED", "CANCELLED", "COMPLETED"].includes(o.status?.toUpperCase())
+          ).length;
+          setActiveOrderCount(active);
+        }
+      } catch (e) {
+        console.error("Failed to fetch badge count", e);
+      }
+    };
+    fetchOrderCount();
+  }, [pathname]);
 
   const renderMenu = (items: typeof menuItems) =>
     items.map((item) => {
       const isActive =
         pathname === item.href || pathname.startsWith(item.href + "/");
       const Icon = item.icon;
-      const badge = menuBadges[item.href];
+      
+      // Dynamic Badge logic
+      let badgeCount = 0;
+      if (item.href === "/customer/myOrders") {
+        badgeCount = activeOrderCount;
+      }
 
       return (
         <Link
@@ -67,12 +85,12 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
 
           {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
 
-          {!collapsed && badge && (
+          {!collapsed && badgeCount > 0 && (
             <span
-              className={`min-w-[20px] h-5 flex items-center justify-center px-1.5 text-[10px] font-bold text-white rounded-full ${isActive ? "bg-white/30" : badge.color
+              className={`min-w-[20px] h-5 flex items-center justify-center px-1.5 text-[10px] font-bold text-white rounded-full ${isActive ? "bg-white/30" : "bg-blue-500"
                 }`}
             >
-              {badge.count}
+              {badgeCount}
             </span>
           )}
         </Link>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
     ArrowLeft, ShoppingCart, ShieldCheck, Truck, Package,
-    ChevronRight, Info, Check
+    ChevronRight, ChevronLeft, Play, Info, Check
 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
@@ -23,6 +23,7 @@ export default function B2BProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [toastProduct, setToastProduct] = useState<string | null>(null);
+    const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
     useEffect(() => {
         if (!id) return;
@@ -50,6 +51,7 @@ export default function B2BProductDetailPage() {
                         features: Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features || "[]") : []),
                         specifications: typeof p.specifications === 'object' && p.specifications !== null ? p.specifications : (typeof p.specifications === 'string' ? JSON.parse(p.specifications || "{}") : {}),
                         description: p.description || "",
+                        media: Array.isArray(p.media) ? p.media : [],
                     };
 
                     setProduct(formattedProduct);
@@ -105,6 +107,19 @@ export default function B2BProductDetailPage() {
 
     const discount = Math.round(((product.msrp - product.price) / product.msrp) * 100);
 
+    const galleryItems = (() => {
+        if (!product) return [];
+        const items: { type: 'image' | 'video'; url: string }[] = [];
+        if (product.media && product.media.length > 0) {
+            product.media.forEach((m: any) => {
+                items.push({ type: m.type, url: m.url });
+            });
+        } else {
+            if (product.image) items.push({ type: 'image', url: product.image });
+        }
+        return items;
+    })();
+
     return (
         <div className="min-h-screen bg-stone-50">
             {/* Breadcrumb Header */}
@@ -128,16 +143,43 @@ export default function B2BProductDetailPage() {
                 <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm flex flex-col lg:flex-row">
 
                     {/* Image Section */}
-                    <div className="w-full lg:w-1/2 p-6 lg:border-r border-stone-200 bg-stone-50/50 flex flex-col items-center justify-center min-h-[400px]">
-                        <div className="relative w-full max-w-md aspect-square rounded-2xl bg-white border border-stone-100 shadow-sm overflow-hidden flex items-center justify-center p-4">
-                            <img
-                                src={product.image || "https://placehold.co/600x600/f5f5f0/a8a29e?text=No+Image"}
-                                alt={product.name}
-                                className="w-full h-full object-contain"
-                                onError={(e) => {
-                                    (e.target as HTMLImageElement).src = "https://placehold.co/600x600/f5f5f0/a8a29e?text=No+Image";
-                                }}
-                            />
+                    <div className="w-full lg:w-[45%] p-6 lg:border-r border-stone-200 bg-stone-50/50 flex flex-col items-center">
+                        <div className="sticky top-28 flex flex-col items-center w-full">
+                            <div className="relative w-full max-w-md aspect-square rounded-2xl bg-white border border-stone-100 shadow-sm overflow-hidden flex items-center justify-center p-4 group">
+                                {galleryItems.length > 0 && galleryItems[activeMediaIndex]?.type === 'video' ? (
+                                    <video
+                                        src={galleryItems[activeMediaIndex].url}
+                                        controls
+                                        className="w-full h-full object-contain bg-black rounded-lg"
+                                    />
+                                ) : (
+                                    <img
+                                        src={galleryItems[activeMediaIndex]?.url || product.image || "https://placehold.co/600x600/f5f5f0/a8a29e?text=No+Image"}
+                                        alt={product.name}
+                                        className="w-full h-full object-contain transition-transform duration-500"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = "https://placehold.co/600x600/f5f5f0/a8a29e?text=No+Image";
+                                        }}
+                                    />
+                                )}
+
+                            {/* Navigation Arrows for Gallery */}
+                            {galleryItems.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => setActiveMediaIndex(i => i > 0 ? i - 1 : galleryItems.length - 1)}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm border border-stone-200 shadow-sm flex items-center justify-center hover:bg-white transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-0 z-20"
+                                    >
+                                        <ChevronLeft className="w-4 h-4 text-stone-700" />
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveMediaIndex(i => i < galleryItems.length - 1 ? i + 1 : 0)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm border border-stone-200 shadow-sm flex items-center justify-center hover:bg-white transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-0 z-20"
+                                    >
+                                        <ChevronRight className="w-4 h-4 text-stone-700" />
+                                    </button>
+                                </>
+                            )}
 
                             {/* Badges on image */}
                             <div className="absolute top-4 left-4 flex flex-col gap-2 items-start z-10">
@@ -156,10 +198,36 @@ export default function B2BProductDetailPage() {
                                 )}
                             </div>
                         </div>
+
+                        {/* Thumbnail Strip */}
+                        {galleryItems.length > 1 && (
+                            <div className="flex gap-2 mt-4 w-full max-w-md overflow-x-auto pb-2 scrollbar-hide py-1">
+                                {galleryItems.map((item, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setActiveMediaIndex(idx)}
+                                        className={`relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
+                                            idx === activeMediaIndex
+                                                ? 'border-blue-600 ring-2 ring-blue-600/20 shadow-sm scale-105'
+                                                : 'border-white border-opacity-0 bg-white hover:border-stone-200'
+                                        }`}
+                                    >
+                                        {item.type === 'image' ? (
+                                            <img src={item.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-contain p-1" />
+                                        ) : (
+                                            <div className="w-full h-full bg-stone-900 flex items-center justify-center">
+                                                <Play className="w-6 h-6 text-white/90 fill-white border border-white" />
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                        </div>
                     </div>
 
                     {/* Details Section */}
-                    <div className="w-full lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center bg-white relative z-10">
+                    <div className="w-full lg:w-[55%] p-8 lg:p-12 flex flex-col justify-center bg-white relative z-10">
                         <div className="flex flex-wrap items-center gap-3 mb-5">
                             <span className="text-[11px] font-mono font-bold text-blue-600 uppercase tracking-widest bg-blue-50/80 px-3 py-1.5 rounded-md border border-blue-100/50">
                                 SKU: {product.sku}
@@ -264,7 +332,7 @@ export default function B2BProductDetailPage() {
                                         {Object.entries(product.specifications).map(([key, value], idx) => (
                                             <div
                                                 key={key}
-                                                className={`flex justify-between px-5 py-3.5 text-sm ${idx !== Object.keys(product.specifications).length - 1 ? "border-b border-stone-200" : ""
+                                                className={`flex justify-between px-5 py-3.5 text-sm ${idx !== Object.keys(product.specifications!).length - 1 ? "border-b border-stone-200" : ""
                                                     }`}
                                             >
                                                 <span className="text-stone-500 font-medium">{key}</span>

@@ -163,12 +163,12 @@ export default function TransactionTable({
                   <td className="px-5 py-4 text-gray-500 whitespace-nowrap">{trx.date}</td>
                   <td className="px-5 py-4">
                     <span className="flex items-center gap-1.5 text-gray-600">
-                      {trx.method === "QRIS" ? (
+                      {["QRIS", "OVO", "DANA", "SHOPEEPAY"].some(m => trx.method?.toUpperCase().includes(m)) ? (
                         <QrCode size={14} className="text-gray-400" />
                       ) : (
                         <Building2 size={14} className="text-gray-400" />
                       )}
-                      {trx.method}
+                      <span className="uppercase">{trx.method}</span>
                     </span>
                   </td>
                   <td className="px-5 py-4 font-semibold text-gray-800 whitespace-nowrap">

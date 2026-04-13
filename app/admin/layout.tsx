@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Toaster } from "react-hot-toast";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 

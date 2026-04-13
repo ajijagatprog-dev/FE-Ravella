@@ -17,25 +17,12 @@ interface PayNowModalProps {
 export default function PayNowModal({ transaction, onClose, onSuccess }: PayNowModalProps) {
   const [step, setStep] = useState<PayStep>("confirm");
 
-  async function handlePay() {
-    setStep("processing");
-    try {
-      const res = await api.post('/payments/webhook', {
-        order_number: transaction.id,
-        status: 'success'
-      });
-      if (res.data?.status === 'success') {
-        setTimeout(() => {
-          setStep("success");
-          onSuccess(transaction.id);
-        }, 800);
-      } else {
-        toast.error("Gagal memproses pembayaran");
-        setStep("confirm");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Terjadi kesalahan sistem");
+  function handlePay() {
+    if (transaction.payment_url) {
+      setStep("processing");
+      window.location.href = transaction.payment_url;
+    } else {
+      toast.error("Link pembayaran Xendit belum tersedia untuk pesanan ini.");
       setStep("confirm");
     }
   }
@@ -110,7 +97,7 @@ export default function PayNowModal({ transaction, onClose, onSuccess }: PayNowM
                   onClick={handlePay}
                   className="flex-1 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 active:scale-[0.98] transition-all"
                 >
-                  Bayar Sekarang
+                  Lanjutkan Pembayaran
                 </button>
               </div>
             </div>

@@ -106,16 +106,17 @@ export default function CheckoutClient() {
             // 3. Post to /api/customer/orders
             const orderRes = await api.post('/customer/orders', {
                 shipping_address_id: addressId,
-                payment_method: "B2B Credit Term (Net 30)",
-                items: orderItems
+                payment_method: "B2B Invoice Payment",
+                items: orderItems,
+                source: "b2b"
             });
 
             if (orderRes.data.status === 'success') {
-                setSuccess(true);
                 clearCart();
+                setSuccess(true);
                 setTimeout(() => {
-                    router.push('/b2b/orders');
-                }, 2000);
+                    router.push('/b2b/payments');
+                }, 3000);
             } else {
                 throw new Error("API returned failure status");
             }
@@ -135,9 +136,9 @@ export default function CheckoutClient() {
                 </div>
                 <h1 className="text-2xl font-black text-stone-800 mb-2">Order Placed Successfully!</h1>
                 <p className="text-stone-500 mb-8 leading-relaxed">
-                    Your simulated B2B order has been generated and recorded in the database. Redirecting you to your order history...
+                    Your B2B order has been generated and recorded. Please head to the Payments Hub to settle your invoice...
                 </p>
-                <div className="h-6 w-6 border-3 border-stone-200 border-t-green-600 rounded-full animate-spin" />
+                <div className="h-6 w-6 border-3 border-stone-200 border-t-blue-600 rounded-full animate-spin" />
             </div>
         );
     }
@@ -145,8 +146,8 @@ export default function CheckoutClient() {
     return (
         <div className="px-6 py-10 max-w-5xl mx-auto">
             <div className="mb-8">
-                <h1 className="text-3xl font-black text-stone-800 tracking-tight">Checkout Request</h1>
-                <p className="text-stone-500 mt-1">Review your corporate purchase order details.</p>
+                <h1 className="text-3xl font-black text-stone-800 tracking-tight">Secure Checkout</h1>
+                <p className="text-stone-500 mt-1">Review your corporate purchase order details before proceeding to payment.</p>
             </div>
 
             {error && (
@@ -184,19 +185,19 @@ export default function CheckoutClient() {
                         </div>
                     </div>
 
-                    {/* Payment Info Mock */}
+                    {/* Payment Info */}
                     <div className="bg-white p-6 rounded-2xl border border-stone-200">
                         <div className="flex items-center gap-3 mb-4">
                             <CreditCard className="w-5 h-5 text-blue-600" />
-                            <h2 className="text-lg font-bold text-stone-800">Payment Term</h2>
+                            <h2 className="text-lg font-bold text-stone-800">Payment Method</h2>
                         </div>
                         <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-center justify-between">
                             <div>
-                                <p className="font-bold text-blue-900 text-sm">B2B Credit Line (Net 30)</p>
-                                <p className="text-xs text-blue-700 mt-1">Payment is expected 30 days from invoice date.</p>
+                                <p className="font-bold text-blue-900 text-sm">B2B Invoice Payment</p>
+                                <p className="text-xs text-blue-700 mt-1">Order will be generated as a Pending Invoice. Pay securely via Xendit in the Payments Hub later.</p>
                             </div>
-                            <span className="px-3 py-1 bg-white text-blue-700 font-bold text-xs rounded-full shadow-sm">
-                                APPROVED
+                            <span className="px-3 py-1 bg-white text-blue-700 font-bold text-xs rounded-full shadow-sm flex items-center gap-1">
+                                SECURE
                             </span>
                         </div>
                     </div>
@@ -260,14 +261,14 @@ export default function CheckoutClient() {
                             className="w-full py-4 bg-stone-900 hover:bg-black text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70"
                         >
                             {isProcessing ? (
-                                <><Loader2 className="w-5 h-5 animate-spin" /> Contacting Server...</>
+                                <><Loader2 className="w-5 h-5 animate-spin" /> Processing Order...</>
                             ) : (
-                                "Simulate Order Placement"
+                                "Generate B2B Invoice"
                             )}
                         </button>
 
                         <p className="text-xs text-center text-stone-400 mt-4 leading-relaxed">
-                            By clicking place order, you authorize the generation of a real database transaction. No real funds will be deducted.
+                            By clicking proceed, your B2B order will be safely placed. You can settle the payment at your earliest convenience via the Payments Hub.
                         </p>
                     </div>
                 </div>

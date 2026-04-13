@@ -15,6 +15,9 @@ import {
     TrendingUp,
     Share2,
     Package,
+    Play,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import Header from "../../../HomePage/components/Header";
 import Footer from "../../../HomePage/components/Footer";
@@ -50,10 +53,12 @@ export default function ProductDetail() {
                         reviews: item.reviews || 0,
                         category: item.category || "appliance",
                         image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+                        videoUrl: item.video_url || null,
                         features: Array.isArray(item.features) ? item.features : [],
                         specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
                         inStock: item.stock > 0,
                         badge: item.badge || (item.is_featured ? "Best Seller" : ""),
+                        media: item.media || [],
                     });
 
                     // Fetch related products from same category
@@ -86,9 +91,31 @@ export default function ProductDetail() {
     }, [productId]);
 
     const [isFavorite, setIsFavorite] = useState(false);
+    const [activeMediaIndex, setActiveMediaIndex] = useState(0);
     const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
         { visible: false, productName: "" }
     );
+
+    // Build gallery items: from media array (if available), fallback to legacy image + videoUrl
+    const galleryItems = (() => {
+        if (!product) return [];
+        const items: { type: 'image' | 'video'; url: string }[] = [];
+        if (product.media && product.media.length > 0) {
+            product.media.forEach((m: any) => {
+                items.push({ type: m.type, url: m.url });
+            });
+        } else {
+            // Legacy fallback
+            if (product.image) items.push({ type: 'image', url: product.image });
+            if (product.videoUrl) {
+                let embedUrl = product.videoUrl;
+                const ytMatch = product.videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+                if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+                items.push({ type: 'video', url: embedUrl });
+            }
+        }
+        return items;
+    })();
 
     const formatPrice = (price: number) =>
         new Intl.NumberFormat("id-ID", {
@@ -217,32 +244,105 @@ export default function ProductDetail() {
             {/* ── PRODUCT DETAIL ── */}
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 py-8 sm:py-12">
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-14">
-                    {/* Image */}
-                    <div className="relative aspect-square bg-neutral-50 overflow-hidden">
-                        <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                        />
-                        {/* Badges */}
-                        <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
-                            {product.badge && (
-                                <span
-                                    className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-bold border border-neutral-200 shadow-sm"
-                                    style={{ fontFamily: JOST }}
-                                >
-                                    {product.badge}
-                                </span>
+                    {/* Gallery */}
+                    <div>
+                        {/* Main Display */}
+                        <div className="relative aspect-square bg-neutral-50 overflow-hidden">
+                            {galleryItems.length > 0 && galleryItems[activeMediaIndex]?.type === 'video' ? (
+                                (() => {
+                                    const videoUrl = galleryItems[activeMediaIndex].url;
+                                    // Check if it's a YouTube embed or uploaded video file
+                                    const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
+                                    let embedUrl = videoUrl;
+                                    if (isYouTube) {
+                                        const ytMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+                                        if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+                                    }
+                                    return isYouTube ? (
+                                        <iframe
+                                            src={embedUrl}
+                                            title={`Video ${product.name}`}
+                                            className="w-full h-full"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                        />
+                                    ) : (
+                                        <video
+                                            src={videoUrl}
+                                            controls
+                                            className="w-full h-full object-contain bg-black"
+                                        />
+                                    );
+                                })()
+                            ) : (
+                                <img
+                                    src={galleryItems[activeMediaIndex]?.url || product.image}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                />
                             )}
-                            {product.discount > 0 && (
-                                <span
-                                    className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase font-medium"
-                                    style={{ fontFamily: JOST }}
-                                >
-                                    -{product.discount}%
-                                </span>
+                            {/* Badges */}
+                            <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
+                                {product.badge && (
+                                    <span
+                                        className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-bold border border-neutral-200 shadow-sm"
+                                        style={{ fontFamily: JOST }}
+                                    >
+                                        {product.badge}
+                                    </span>
+                                )}
+                                {product.discount > 0 && (
+                                    <span
+                                        className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase font-medium"
+                                        style={{ fontFamily: JOST }}
+                                    >
+                                        -{product.discount}%
+                                    </span>
+                                )}
+                            </div>
+                            {/* Navigation Arrows */}
+                            {galleryItems.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => setActiveMediaIndex(i => i > 0 ? i - 1 : galleryItems.length - 1)}
+                                        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10"
+                                    >
+                                        <ChevronLeft className="w-4 h-4 text-neutral-700" />
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveMediaIndex(i => i < galleryItems.length - 1 ? i + 1 : 0)}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10"
+                                    >
+                                        <ChevronRight className="w-4 h-4 text-neutral-700" />
+                                    </button>
+                                </>
                             )}
                         </div>
+
+                        {/* Thumbnail Strip */}
+                        {galleryItems.length > 1 && (
+                            <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                                {galleryItems.map((item, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setActiveMediaIndex(idx)}
+                                        className={`relative flex-shrink-0 w-16 h-16 overflow-hidden border-2 transition-all ${
+                                            idx === activeMediaIndex
+                                                ? 'border-neutral-900'
+                                                : 'border-neutral-200 hover:border-neutral-400'
+                                        }`}
+                                    >
+                                        {item.type === 'image' ? (
+                                            <img src={item.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
+                                                <Play className="w-5 h-5 text-white/80 fill-white/80" />
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Details */}

@@ -43,9 +43,11 @@ const deliveryLabel: Record<OrderStatus, string> = {
 export default function OrderCard({
     order,
     onOrderDetail,
+    onViewInvoice,
 }: {
     order: Order;
     onOrderDetail?: (id: string) => void;
+    onViewInvoice?: (id: string) => void;
 }) {
     const isCancelled = order.status === "CANCELLED";
     const deliveryValue = order.estimatedDelivery ?? order.deliveryDate ?? "—";
@@ -103,7 +105,14 @@ export default function OrderCard({
 
             {/* Actions */}
             <div className="flex items-center gap-2 flex-shrink-0 sm:ml-2">
-                <button className="flex items-center gap-1.5 text-xs text-stone-400 hover:text-stone-600 transition-colors">
+                <button 
+                    onClick={() => !isCancelled && onViewInvoice?.(order.id)}
+                    disabled={isCancelled}
+                    className={cn(
+                        "flex items-center gap-1.5 text-xs transition-colors",
+                         isCancelled ? "text-stone-300 cursor-not-allowed" : "text-stone-500 hover:text-stone-700 font-medium"
+                    )}
+                >
                     <FileText className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">View Invoice</span>
                 </button>

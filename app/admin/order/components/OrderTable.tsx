@@ -20,8 +20,10 @@ export interface Order {
     initials: string;
     avatarColor: string;
   };
+  products: string;
+  paymentMethod: string;
   date: string;
-  status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+  status: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
   total: string;
   rawOrder: any;
 }
@@ -41,6 +43,7 @@ interface OrderTableProps {
 export function OrderStatusBadge({ status }: { status: Order["status"] }) {
   const styles = {
     PENDING: "bg-amber-50 text-amber-600 border border-amber-200",
+    PAID: "bg-emerald-50 text-emerald-600 border border-emerald-200",
     PROCESSING: "bg-blue-50 text-blue-600 border border-blue-200",
     SHIPPED: "bg-purple-50 text-purple-600 border border-purple-200",
     DELIVERED: "bg-emerald-50 text-emerald-600 border border-emerald-200",
@@ -48,6 +51,7 @@ export function OrderStatusBadge({ status }: { status: Order["status"] }) {
   };
   const dotColors = {
     PENDING: "bg-amber-400",
+    PAID: "bg-emerald-500",
     PROCESSING: "bg-blue-500",
     SHIPPED: "bg-purple-500",
     DELIVERED: "bg-emerald-500",
@@ -78,6 +82,7 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   PENDING: <Clock size={14} />,
+  PAID: <CheckCircle size={14} />,
   PROCESSING: <RefreshCw size={14} />,
   SHIPPED: <Truck size={14} />,
   DELIVERED: <CheckCircle size={14} />,
@@ -86,6 +91,7 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING: "Pending",
+  PAID: "Paid",
   PROCESSING: "Processing",
   SHIPPED: "Shipped",
   DELIVERED: "Delivered",
@@ -98,6 +104,12 @@ const STATUS_MENU_STYLES: Record<string, { iconBg: string; iconText: string; hov
     iconText: "text-amber-500",
     hover: "hover:bg-amber-50",
     hoverText: "hover:text-amber-700",
+  },
+  PAID: {
+    iconBg: "bg-emerald-50",
+    iconText: "text-emerald-500",
+    hover: "hover:bg-emerald-50",
+    hoverText: "hover:text-emerald-700",
   },
   PROCESSING: {
     iconBg: "bg-blue-50",
@@ -228,7 +240,7 @@ function RowMenu({
             Update Status
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mx-2 mb-1" />
-          {(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] as const).map(
+          {(["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] as const).map(
             (st) =>
               st !== currentStatus && (
                 <button
@@ -267,7 +279,7 @@ function RowMenu({
 function SkeletonRow() {
   return (
     <tr className="border-b border-gray-100 animate-pulse">
-      {[60, 140, 80, 80, 70, 24].map((w, i) => (
+      {[60, 140, 140, 80, 80, 80, 70, 24].map((w, i) => (
         <td key={i} className="px-4 py-4">
           <div className="h-4 rounded bg-gray-200" style={{ width: w }} />
         </td>
@@ -308,7 +320,7 @@ export function OrderTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200">
-              {["Order ID", "Customer", "Date", "Payment Status", "Total", ""].map((h) => (
+              {["Order ID", "Customer", "Product(s)", "Payment", "Date", "Status", "Total", ""].map((h) => (
                 <th
                   key={h}
                   className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400"
@@ -323,7 +335,7 @@ export function OrderTable({
               Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-12 text-center text-sm text-gray-400">
+                <td colSpan={8} className="py-12 text-center text-sm text-gray-400">
                   No orders found.
                 </td>
               </tr>
@@ -341,9 +353,26 @@ export function OrderTable({
                       <span className="font-medium text-gray-800">{order.customer.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-gray-500">{order.date}</td>
                   <td className="px-4 py-4">
-                    <OrderStatusBadge status={order.status} />
+                    <p className="text-xs text-gray-600 line-clamp-2 max-w-[180px]" title={order.products}>
+                      {order.products}
+                    </p>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 text-[10px] font-bold uppercase rounded border border-gray-200">
+                      {order.paymentMethod}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-gray-500 whitespace-nowrap">{order.date}</td>
+                  <td className="px-4 py-4">
+                    <div className="flex flex-col gap-1 items-start">
+                        <OrderStatusBadge status={order.status} />
+                        {order.rawOrder?.tracking_number && (
+                            <span className="text-[10px] text-gray-500 flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded border border-gray-100 uppercase tracking-widest mt-1">
+                                {order.rawOrder.courier}: {order.rawOrder.tracking_number}
+                            </span>
+                        )}
+                    </div>
                   </td>
                   <td className="px-4 py-4 font-semibold text-gray-900">{order.total}</td>
                   <td className="px-4 py-4">
@@ -401,6 +430,14 @@ export function OrderTable({
                   <span className="font-semibold text-gray-900">{order.total}</span>
                 </div>
               </div>
+              {order.rawOrder?.tracking_number && (
+                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                    <span className="text-xs text-gray-400 font-medium">Resi Pengiriman</span>
+                    <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                        {order.rawOrder.courier}: {order.rawOrder.tracking_number}
+                    </span>
+                </div>
+              )}
             </div>
           ))
         )}

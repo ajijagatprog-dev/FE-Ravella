@@ -95,6 +95,8 @@ export default function Header({
     { label: "CONTACT", href: "/contact" },
   ];
 
+  const saleMenu = { label: "SALE", href: "/sale" };
+
   return (
     <>
       <header
@@ -128,6 +130,14 @@ export default function Header({
                     <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full" />
                   </Link>
                 ))}
+                {/* SALE - highlighted */}
+                <Link
+                  href={saleMenu.href}
+                  className="group relative text-[13px] tracking-[0.18em] font-bold text-rose-600 hover:text-rose-700 transition-colors duration-300 animate-pulse"
+                >
+                  {saleMenu.label}
+                  <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-rose-600 transition-all duration-300 group-hover:w-full" />
+                </Link>
               </nav>
             </div>
 
@@ -325,6 +335,15 @@ export default function Header({
                 <span className="w-0 h-[1px] bg-black group-hover:w-4 transition-all duration-300" />
               </Link>
             ))}
+            {/* SALE */}
+            <Link
+              href={saleMenu.href}
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-between py-4 border-b border-neutral-100 text-[13px] tracking-[0.2em] font-bold text-rose-600 hover:text-rose-700 transition-colors duration-200 group"
+            >
+              <span>🔥 {saleMenu.label}</span>
+              <span className="w-0 h-[1px] bg-rose-500 group-hover:w-4 transition-all duration-300" />
+            </Link>
           </div>
 
           {/* CTA Buttons */}
