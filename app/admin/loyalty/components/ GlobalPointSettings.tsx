@@ -95,7 +95,7 @@ export default function GlobalPointSettings() {
               </svg>
             </div>
             <p className="text-sm font-medium text-gray-700">
-              Earning Multiplier
+              Perolehan Poin
             </p>
           </div>
           <div className="relative">
@@ -126,7 +126,7 @@ export default function GlobalPointSettings() {
               </svg>
             </div>
             <p className="text-sm font-medium text-gray-700">
-              Redemption Value
+              Nilai Tukar Poin
             </p>
           </div>
           <div className="relative">
@@ -157,7 +157,7 @@ export default function GlobalPointSettings() {
               </svg>
             </div>
             <p className="text-sm font-medium text-gray-700">
-              Point Expiration
+              Masa Berlaku Poin
             </p>
           </div>
           <div className="relative">

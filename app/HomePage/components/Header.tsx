@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Search, ShoppingCart, User, Menu, X, Instagram, Phone, Facebook } from "lucide-react";
 
 const JOST = "'Jost', system-ui, sans-serif";
@@ -34,7 +35,9 @@ export default function Header({
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
+  const router = useRouter();
   const [authObj, setAuthObj] = useState<{ role: string; email: string } | null>(null);
 
   // Scroll listener
@@ -151,6 +154,12 @@ export default function Header({
                       onChange={(e) => {
                         setSearchQuery(e.target.value);
                         onSearch(e.target.value);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && searchQuery.trim()) {
+                          router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                          setSearchOpen(false);
+                        }
                       }}
                       autoFocus
                       className="w-40 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
@@ -285,6 +294,14 @@ export default function Header({
             <input
               type="text"
               placeholder="Cari produk..."
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && mobileSearchQuery.trim()) {
+                  router.push(`/search?q=${encodeURIComponent(mobileSearchQuery.trim())}`);
+                  setMobileOpen(false);
+                }
+              }}
               className="flex-1 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
               style={{ fontFamily: JOST }}
             />

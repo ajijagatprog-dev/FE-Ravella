@@ -129,8 +129,8 @@ export default function CartClient() {
   const originalTotal = selectedItems.reduce((sum, i) => sum + (i.originalPrice || i.price) * i.quantity, 0);
   const totalDiscount = originalTotal - subtotal;
   const couponDiscount = couponApplied ? Math.floor(subtotal * 0.1) : 0;
-  const shippingFee = subtotal > 500000 ? 0 : 25000;
-  const grandTotal = subtotal - couponDiscount + shippingFee;
+  // TODO: Shipping fee will be integrated with Raja Ongkir
+  const grandTotal = subtotal - couponDiscount;
 
   const stores = Array.from(new Set(cart.map((item) => item.category || "Ravelle Official")));
 
@@ -332,15 +332,7 @@ export default function CartClient() {
                       ))}
                     </div>
 
-                    {/* Shipping info */}
-                    <div className="px-5 py-3 bg-neutral-50 border-t border-neutral-100 flex items-center gap-2">
-                      <Truck className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
-                      <span className="text-[11px] text-neutral-500 font-light tracking-wide" style={{ fontFamily: JOST }}>
-                        {subtotal > 500000
-                          ? "Gratis ongkir untuk pesanan ini"
-                          : "Tambah belanja untuk gratis ongkir"}
-                      </span>
-                    </div>
+                    {/* Shipping info - will be shown after Raja Ongkir integration */}
                   </div>
                 );
               })}
@@ -428,12 +420,7 @@ export default function CartClient() {
                       <span className="font-medium text-neutral-700">-{formatPrice(couponDiscount)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
-                    <span className="text-neutral-500 font-light">Ongkos Kirim</span>
-                    <span className={`font-medium ${shippingFee === 0 ? "text-neutral-700" : "text-neutral-900"}`}>
-                      {shippingFee === 0 ? "Gratis" : formatPrice(shippingFee)}
-                    </span>
-                  </div>
+                  {/* Ongkos Kirim - will be shown after Raja Ongkir integration */}
 
                   <div className="pt-3 border-t border-neutral-100">
                     <div className="flex justify-between items-center">

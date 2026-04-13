@@ -2,6 +2,8 @@
 
 import { Download, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { downloadFile } from "@/lib/download";
+import toast from "react-hot-toast";
 
 interface WelcomeSectionProps {
     userName: string;
@@ -24,7 +26,17 @@ export default function WelcomeSection({ userName, partnerId }: WelcomeSectionPr
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                <button
+                    onClick={async () => {
+                        try {
+                            await downloadFile('/customer/export/orders', 'my_orders_report.xlsx');
+                            toast.success("Report downloaded successfully");
+                        } catch (error) {
+                            toast.error("Failed to download report");
+                        }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+                >
                     <Download size={18} />
                     Download Report
                 </button>

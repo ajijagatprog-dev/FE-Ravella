@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
     ArrowLeft, ShoppingCart, ShieldCheck, Truck, Package,
-    ChevronRight, Info
+    ChevronRight, Info, Check
 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
@@ -48,6 +48,7 @@ export default function B2BProductDetailPage() {
                         image: p.image || "https://placehold.co/600x600/f5f5f0/a8a29e?text=No+Image",
                         inStock: p.stock > 0,
                         features: Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features || "[]") : []),
+                        specifications: typeof p.specifications === 'object' && p.specifications !== null ? p.specifications : (typeof p.specifications === 'string' ? JSON.parse(p.specifications || "{}") : {}),
                         description: p.description || "",
                     };
 
@@ -139,7 +140,15 @@ export default function B2BProductDetailPage() {
                             />
 
                             {/* Badges on image */}
-                            <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+                            <div className="absolute top-4 left-4 flex flex-col gap-2 items-start z-10">
+                                {product.badge && (
+                                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-sm bg-stone-900 text-white border border-white/10">
+                                        {product.badge}
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="absolute top-4 right-4 flex flex-col gap-2 items-end z-10">
                                 {discount > 0 && (
                                     <span className="text-xs font-bold text-white bg-rose-500 px-3 py-1.5 rounded-xl shadow-sm">
                                         Save {discount}%
@@ -235,14 +244,34 @@ export default function B2BProductDetailPage() {
                             {product.features && product.features.length > 0 && (
                                 <div>
                                     <h3 className="text-sm font-bold text-stone-900 uppercase tracking-widest mb-3">Key Features</h3>
-                                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {product.features.map((feature, idx) => (
-                                            <li key={idx} className="flex items-center gap-2 text-sm text-stone-600">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-stone-400"></div>
-                                                {feature}
+                                            <li key={idx} className="flex items-start gap-3 text-sm text-stone-600 bg-stone-50 p-3 rounded-xl border border-stone-100">
+                                                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                                                    <Check size={12} className="text-blue-600" />
+                                                </div>
+                                                <span className="leading-snug">{feature}</span>
                                             </li>
                                         ))}
                                     </ul>
+                                </div>
+                            )}
+
+                            {product.specifications && Object.keys(product.specifications).length > 0 && (
+                                <div>
+                                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-widest mb-3">Product Specifications</h3>
+                                    <div className="bg-stone-50 border border-stone-200 rounded-2xl overflow-hidden">
+                                        {Object.entries(product.specifications).map(([key, value], idx) => (
+                                            <div
+                                                key={key}
+                                                className={`flex justify-between px-5 py-3.5 text-sm ${idx !== Object.keys(product.specifications).length - 1 ? "border-b border-stone-200" : ""
+                                                    }`}
+                                            >
+                                                <span className="text-stone-500 font-medium">{key}</span>
+                                                <span className="text-stone-900 font-bold">{value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 

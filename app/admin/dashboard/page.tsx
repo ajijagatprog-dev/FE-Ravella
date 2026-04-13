@@ -6,6 +6,8 @@ import StatCard from "./components/Statcard";
 import RecentOrders from "./components/RecentOrders";
 import PendapatanChart from "./components/PendapatanChart";
 import api from "@/lib/axios";
+import { downloadFile } from "@/lib/download";
+import toast from "react-hot-toast";
 
 interface DashboardData {
   stats: {
@@ -47,7 +49,13 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const formatRp = (val: number) => `Rp ${val.toLocaleString('id-ID')}`;
+  const formatRp = (val: number) =>
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(val);
 
   if (loading) {
     return (
@@ -92,7 +100,17 @@ export default function DashboardPage() {
             <span className="text-gray-400 text-xs">📅</span>
             {today}
           </div>
-          <button className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition-all duration-150">
+          <button
+            onClick={async () => {
+              try {
+                await downloadFile('/admin/export/orders', 'dashboard_report.xlsx');
+                toast.success("Report exported successfully");
+              } catch (error) {
+                toast.error("Failed to export report");
+              }
+            }}
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition-all duration-150"
+          >
             <Download size={14} />
             Export Report
           </button>

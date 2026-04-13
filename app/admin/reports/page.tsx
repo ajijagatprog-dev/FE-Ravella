@@ -20,6 +20,8 @@ import {
   Column,
 } from "./components/ReportingTable";
 import api from "@/lib/axios";
+import { downloadFile } from "@/lib/download";
+import toast from "react-hot-toast";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type TabKey = "sales" | "customer" | "stock" | "transaction";
@@ -33,7 +35,12 @@ interface SummaryCard {
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 function formatRp(val: number) {
-  return `Rp ${val.toLocaleString('id-ID')}`;
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(val);
 }
 
 // ── Column Configs ────────────────────────────────────────────────────────────
@@ -316,7 +323,31 @@ export default function ReportsPage() {
             Detailed insights and performance tracking across your e-commerce platform.
           </p>
         </div>
-        <button className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-600 active:scale-95 transition-all duration-150 w-fit">
+        <button
+          onClick={async () => {
+            try {
+              let endpoint = '/admin/export/orders';
+              let filename = 'sales_report.xlsx';
+
+              if (activeTab === 'stock') {
+                endpoint = '/admin/export/products';
+                filename = 'stock_report.xlsx';
+              } else if (activeTab === 'customer') {
+                endpoint = '/admin/export/users';
+                filename = 'customer_report.xlsx';
+              } else if (activeTab === 'transaction') {
+                endpoint = '/admin/export/orders';
+                filename = 'transaction_report.xlsx';
+              }
+
+              await downloadFile(endpoint, filename);
+              toast.success("Report exported successfully");
+            } catch (error) {
+              toast.error("Failed to export report");
+            }
+          }}
+          className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-600 active:scale-95 transition-all duration-150 w-fit"
+        >
           <Download size={15} />
           Export to Excel
         </button>
@@ -361,8 +392,8 @@ export default function ReportsPage() {
                 setPage(1);
               }}
               className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 ${activeTab === tab.key
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
                 }`}
             >
               <Icon size={14} />
