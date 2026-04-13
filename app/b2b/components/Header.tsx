@@ -112,7 +112,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     {userData?.name || "Loading..."}
                   </p>
                   <p className="text-xs text-gray-500 leading-tight">
-                    {userData?.role === "b2b" ? "B2B Partner" : "Customer"}
+                    {!userData ? "Memuat..." : (userData.role === "b2b" ? "B2B Partner" : userData.role === "admin" ? "Administrator" : "Customer")}
                   </p>
                 </div>
                 <ChevronDown
@@ -135,7 +135,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                           {userData?.email || "Memuat..."}
                         </p>
                         <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-600 text-[10px] font-semibold rounded-full uppercase">
-                          {userData?.role || "b2b"}
+                          {userData?.role === "admin" ? "Administrator" : userData?.role || "b2b"}
                         </span>
                       </div>
                     </div>

@@ -4,11 +4,11 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
     ArrowLeft, MapPin, CreditCard, CheckCircle2, Loader2, Package,
-    ShoppingCart, Sparkles, Truck, RefreshCw, Search, X as XIcon
+    ShoppingCart, Sparkles, Truck, RefreshCw, Search, X as XIcon, Trash2, Plus, X, Lock, AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
-import { Plus, X, Lock } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
 
 const JOST = "'Jost', system-ui, sans-serif";
 
@@ -56,8 +56,11 @@ export default function CheckoutPage() {
     // ── RajaOngkir: Destination Search Autocomplete ───────────────
     const [destSearch, setDestSearch] = useState('');
     const [destResults, setDestResults] = useState<any[]>([]);
-    const [selectedDest, setSelectedDest] = useState<any>(null);
     const [loadingDest, setLoadingDest] = useState(false);
+    const [selectedDest, setSelectedDest] = useState<any>(null);
+
+    // Modern Modal States
+    const [addrToDelete, setAddrToDelete] = useState<number | null>(null);
     const destDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Add Address State
@@ -270,8 +273,8 @@ export default function CheckoutPage() {
     };
 
     const handlePlaceOrder = async () => {
-        if (!selectedAddress)    { alert("Pilih alamat pengiriman."); return; }
-        if (shippingFee === null) { alert("Pilih layanan pengiriman."); return; }
+        if (!selectedAddress)    { toast.error("Pilih alamat pengiriman."); return; }
+        if (shippingFee === null) { toast.error("Pilih layanan pengiriman."); return; }
         setSubmitting(true);
         try {
             const payload: any = {
@@ -281,11 +284,14 @@ export default function CheckoutPage() {
                 courier_service:     selectedShipping?.service,
                 shipping_cost:       shippingFee,
                 items: cart.map(i => ({ product_id: i.id, quantity: i.quantity, price: i.price })),
+                utm_source: sessionStorage.getItem("ravella_utm_source"),
+                utm_medium: sessionStorage.getItem("ravella_utm_medium"),
+                utm_campaign: sessionStorage.getItem("ravella_utm_campaign"),
             };
             if (voucherResult?.code) payload.voucher_code = voucherResult.code;
             const r = await api.post('/customer/orders', payload);
             if (r.data.status === 'success') {
-                localStorage.removeItem("ravelle_cart");
+                // DON'T remove cart here - let it be removed on success page
                 localStorage.removeItem("ravelle_active_voucher");
                 window.dispatchEvent(new Event("ravelle_cart_updated"));
                 if (r.data.payment_url) window.location.href = r.data.payment_url;
@@ -293,14 +299,14 @@ export default function CheckoutPage() {
             }
         } catch (e) {
             console.error(e);
-            alert("Gagal membuat pesanan. Coba lagi.");
+            toast.error("Gagal membuat pesanan. Coba lagi.");
         } finally { setSubmitting(false); }
     };
 
     const handleSaveNewAddress = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newAddress.subdistrict_id) {
-            alert("Pilih kecamatan tujuan via kolom pencarian agar ongkir bisa dihitung otomatis.");
+            toast.error("Pilih kecamatan tujuan via kolom pencarian agar ongkir bisa dihitung otomatis.");
             return;
         }
         setSavingAddress(true);
@@ -316,12 +322,31 @@ export default function CheckoutPage() {
                 setNewAddress({ label: "", recipient_name: "", phone_number: "", full_address: "", postal_code: "", city: "", province: "", subdistrict_name: "", province_id: 0, city_id: 0, subdistrict_id: 0 });
                 setDestSearch(''); setSelectedDest(null); setDestResults([]);
             }
-        } catch { alert("Gagal menyimpan alamat."); }
+        } catch { toast.error("Gagal menyimpan alamat."); }
         finally { setSavingAddress(false); }
+    };
+
+    const handleDeleteAddress = async (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setAddrToDelete(id);
+    };
+
+    const confirmDeleteAddress = async () => {
+        if (!addrToDelete) return;
+        try {
+            const r = await api.delete(`/customer/addresses/${addrToDelete}`);
+            if (r.data.status === 'success') {
+                toast.success("Alamat berhasil dihapus.");
+                setAddresses(prev => prev.filter(a => a.id !== addrToDelete));
+                if (selectedAddress?.id === addrToDelete) setSelectedAddress(null);
+            }
+        } catch { toast.error("Gagal menghapus alamat."); }
+        finally { setAddrToDelete(null); }
     };
 
     return (
         <div className="min-h-screen bg-stone-50 py-10" style={{ fontFamily: JOST }}>
+            <Toaster position="top-center" />
             <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col lg:flex-row gap-8">
 
                 {/* ── LEFT COLUMN ── */}
@@ -350,8 +375,8 @@ export default function CheckoutPage() {
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {!isAddingAddress && addresses.map((addr) => (
-                                    <label key={addr.id}
+                                 {!isAddingAddress && addresses.map((addr) => (
+                                    <div key={addr.id}
                                         className={`flex items-start gap-4 p-4 border cursor-pointer transition-colors ${selectedAddress?.id === addr.id ? 'border-stone-900 bg-stone-50' : 'border-stone-200 hover:border-stone-300'}`}
                                         onClick={() => setSelectedAddress(addr)}>
                                         <div className="pt-1">
@@ -360,17 +385,26 @@ export default function CheckoutPage() {
                                             </div>
                                         </div>
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="font-bold text-stone-800">{addr.label}</span>
-                                                {addr.is_primary && <span className="text-[10px] uppercase font-bold text-stone-500 bg-stone-200 px-2 py-0.5">Default</span>}
-                                                {!addr.subdistrict_id && <span className="text-[10px] text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5">Ongkir manual</span>}
+                                            <div className="flex items-center justify-between gap-2 mb-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-stone-800">{addr.label}</span>
+                                                    {addr.is_primary && <span className="text-[10px] uppercase font-bold text-stone-500 bg-stone-200 px-2 py-0.5">Default</span>}
+                                                    {!addr.subdistrict_id && <span className="text-[10px] text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5">Ongkir manual</span>}
+                                                </div>
+                                                <button 
+                                                    onClick={(e) => handleDeleteAddress(addr.id, e)}
+                                                    className="p-1 text-stone-300 hover:text-red-500 transition-colors"
+                                                    title="Hapus alamat"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
                                             </div>
                                             <p className="text-sm text-stone-600 font-medium">{addr.recipient_name} · {addr.phone_number}</p>
                                             <p className="text-sm text-stone-500 mt-1">
                                                 {addr.full_address},{addr.subdistrict_name ? ` Kec. ${addr.subdistrict_name},` : ''} {addr.city}, {addr.province} {addr.postal_code}
                                             </p>
                                         </div>
-                                    </label>
+                                    </div>
                                 ))}
 
                                 {!isAddingAddress && (
@@ -623,18 +657,27 @@ export default function CheckoutPage() {
                                             </div>
                                             <button onClick={() => {
                                                 const s = localStorage.getItem("ravelle_cart");
-                                                let c: any[] = s ? JSON.parse(s) : [];
-                                                const ex = c.find((i: any) => i.id === rec.id);
-                                                if (ex) c = c.map((i: any) => i.id === rec.id ? { ...i, quantity: i.quantity + 1 } : i);
-                                                else c = [...c, { ...rec, quantity: 1, selected: true }];
-                                                localStorage.setItem("ravelle_cart", JSON.stringify(c));
+                                                let currentCart: any[] = s ? JSON.parse(s) : [];
+                                                const existing = currentCart.find((i: any) => i.id === rec.id);
+                                                
+                                                let newCart;
+                                                if (existing) {
+                                                    newCart = currentCart.map((i: any) => i.id === rec.id ? { ...i, quantity: i.quantity + 1 } : i);
+                                                } else {
+                                                    newCart = [...currentCart, { ...rec, quantity: 1, selected: true }];
+                                                }
+                                                
+                                                localStorage.setItem("ravelle_cart", JSON.stringify(newCart));
+                                                // Update local state to trigger rerender and recalculate totals
+                                                setCart(newCart.filter((i: any) => i.selected));
+                                                
                                                 window.dispatchEvent(new Event("ravelle_cart_updated"));
                                                 setAddedToCart(rec.id);
                                                 setTimeout(() => setAddedToCart(null), 2000);
                                             }}
                                                 className={`w-full py-2 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 transition-colors ${addedToCart === rec.id ? 'bg-green-600 text-white' : 'bg-stone-900 hover:bg-black text-white'}`}>
                                                 <ShoppingCart className="w-3 h-3" />
-                                                {addedToCart === rec.id ? 'Ditambahkan!' : 'Add to Cart'}
+                                                {addedToCart === rec.id ? 'Ditambahkan!' : 'Tambah ke Keranjang'}
                                             </button>
                                         </div>
                                     </div>
@@ -657,7 +700,7 @@ export default function CheckoutPage() {
                                     onChange={e => { setVoucherCode(e.target.value.toUpperCase()); setVoucherError(''); setVoucherResult(null); }}
                                     onKeyDown={e => e.key === 'Enter' && handleApplyVoucher()}
                                     placeholder="Masukkan kode voucher"
-                                    className="flex-1 border border-stone-200 px-3 py-2 text-sm outline-none focus:border-stone-900 uppercase" />
+                                    className="flex-1 border border-stone-200 px-3 py-2 text-sm text-stone-900 outline-none focus:border-stone-900 uppercase" />
                                 <button onClick={handleApplyVoucher} disabled={applyingVoucher || !voucherCode.trim()}
                                     className="px-4 py-2 bg-stone-900 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-black disabled:bg-stone-300 flex items-center gap-1">
                                     {applyingVoucher ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Pakai'}

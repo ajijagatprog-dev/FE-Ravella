@@ -30,7 +30,7 @@ export default function WelcomePopup() {
             try {
                 const res = await api.get("/vouchers/active");
                 if (res.data.status === "success" && res.data.data.length > 0) {
-                    const voucher = res.data.data[0]; // Use the first active voucher
+                    const voucher = res.data.data[0];
                     setPromoCode(voucher.code);
                     const desc = voucher.description
                         || (voucher.type === "percent"

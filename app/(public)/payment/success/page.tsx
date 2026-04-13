@@ -11,6 +11,7 @@ const JOST = "'Jost', system-ui, sans-serif";
 function SuccessContent() {
     const searchParams = useSearchParams();
     const orderNumber = searchParams.get("order");
+    const source = searchParams.get("source") || "retail";
     const [orderData, setOrderData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -24,6 +25,11 @@ function SuccessContent() {
                 const res = await api.get(`/payments/status/${orderNumber}`);
                 if (res.data.status === "success") {
                     setOrderData(res.data.data);
+                    
+                    // CLEAR CART HERE
+                    localStorage.removeItem("ravelle_cart");
+                    localStorage.removeItem("ravelle_active_voucher");
+                    window.dispatchEvent(new Event("ravelle_cart_updated"));
                 }
             } catch (err) {
                 console.error("Failed to fetch order status", err);
@@ -92,14 +98,14 @@ function SuccessContent() {
 
                 <div className="space-y-3">
                     <Link
-                        href="/customer/myOrders"
+                        href={source === "b2b" ? "/b2b/orders" : "/customer/myOrders"}
                         className="flex items-center justify-center gap-2 w-full bg-stone-900 text-white py-3.5 font-medium text-[11px] uppercase tracking-widest hover:bg-black transition-colors"
                     >
                         <Package className="w-4 h-4" />
                         Lihat Pesanan Saya
                     </Link>
                     <Link
-                        href="/"
+                        href={source === "b2b" ? "/b2b/products" : "/"}
                         className="flex items-center justify-center gap-2 w-full border border-stone-200 text-stone-600 py-3.5 font-medium text-[11px] uppercase tracking-widest hover:bg-stone-50 transition-colors"
                     >
                         Lanjut Belanja

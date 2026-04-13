@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export type OrderStatus = "SHIPPED" | "DELIVERED" | "PROCESSING" | "CANCELLED" | "PENDING";
+export type OrderStatus = "SHIPPED" | "DELIVERED" | "PROCESSING" | "CANCELLED" | "PENDING" | "PAID";
 
 const config: Record<OrderStatus, { label: string; dot: string; pill: string }> = {
     PENDING: {
@@ -20,8 +20,13 @@ const config: Record<OrderStatus, { label: string; dot: string; pill: string }> 
     },
     PROCESSING: {
         label: "Processing",
-        dot: "bg-amber-400",
-        pill: "bg-amber-50 text-amber-700 border-amber-200",
+        dot: "bg-blue-500",
+        pill: "bg-blue-50 text-blue-700 border-blue-200",
+    },
+    PAID: {
+        label: "Paid",
+        dot: "bg-emerald-500",
+        pill: "bg-emerald-50 text-emerald-700 border-emerald-200",
     },
     CANCELLED: {
         label: "Cancelled",

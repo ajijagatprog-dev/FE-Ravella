@@ -15,6 +15,7 @@ export interface Transaction {
   description: string;
   customerName?: string;
   companyName?: string;
+  payment_url?: string;
 }
 
 export interface PaymentMethod {
