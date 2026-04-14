@@ -13,6 +13,9 @@ import {
   ShoppingCart,
   DollarSign,
   Loader2,
+  Eye,
+  Activity,
+  UserPlus,
 } from "lucide-react";
 import {
   ReportingTable,
@@ -24,7 +27,7 @@ import { downloadFile } from "@/lib/download";
 import toast from "react-hot-toast";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-type TabKey = "sales" | "customer" | "stock" | "transaction";
+type TabKey = "sales" | "customer" | "stock" | "transaction" | "traffic";
 
 interface SummaryCard {
   label: string;
@@ -218,12 +221,46 @@ const transactionColumns: Column<Record<string, unknown>>[] = [
   },
 ];
 
+const trafficColumns: Column<Record<string, unknown>>[] = [
+  {
+    key: "page_path",
+    label: "Page Path",
+    sortable: true,
+    render: (v) => <span className="font-medium text-gray-800">{String(v)}</span>,
+  },
+  {
+    key: "views",
+    label: "Pageviews",
+    sortable: true,
+    render: (v) => <span className="font-semibold text-gray-800">{Number(v).toLocaleString()}</span>,
+  },
+  {
+    key: "active_users",
+    label: "Active Users",
+    sortable: true,
+    render: (v) => <span className="text-gray-700">{Number(v).toLocaleString()}</span>,
+  },
+  {
+    key: "new_users",
+    label: "New Users",
+    sortable: true,
+    render: (v) => <span className="text-gray-700">{Number(v).toLocaleString()}</span>,
+  },
+  {
+    key: "sessions",
+    label: "Sessions",
+    sortable: true,
+    render: (v) => <span className="text-gray-700">{Number(v).toLocaleString()}</span>,
+  },
+];
+
 // ── Tab Config ────────────────────────────────────────────────────────────────
 const tabs: { key: TabKey; label: string; icon: React.ElementType }[] = [
   { key: "sales", label: "Sales Report", icon: BarChart2 },
   { key: "customer", label: "Customer Report", icon: Users },
   { key: "stock", label: "Stock Report", icon: Package },
   { key: "transaction", label: "Transaction History", icon: Clock },
+  { key: "traffic", label: "Traffic Data", icon: Activity },
 ];
 
 const columnsMap: Record<TabKey, Column<Record<string, unknown>>[]> = {
@@ -231,6 +268,7 @@ const columnsMap: Record<TabKey, Column<Record<string, unknown>>[]> = {
   customer: customerColumns,
   stock: stockColumns,
   transaction: transactionColumns,
+  traffic: trafficColumns,
 };
 
 const summaryIcons: Record<string, React.ElementType> = {
@@ -249,6 +287,9 @@ const summaryIcons: Record<string, React.ElementType> = {
   "Completed": Clock,
   "Pending / Processing": Clock,
   "Cancelled": Clock,
+  "Total Pageviews": Eye,
+  "Total Sessions": Clock,
+  "New Users": UserPlus,
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -267,6 +308,7 @@ export default function ReportsPage() {
     customer: '/admin/reports/customers',
     stock: '/admin/reports/stock',
     transaction: '/admin/reports/transactions',
+    traffic: '/admin/reports/traffic',
   };
 
   const dataKeys: Record<TabKey, string> = {
@@ -274,6 +316,7 @@ export default function ReportsPage() {
     customer: 'customers',
     stock: 'products',
     transaction: 'transactions',
+    traffic: 'traffic',
   };
 
   const fetchData = useCallback(async () => {
