@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import B2bTable from "./B2bTable";
 import UserManagementStats from "./UserManagementStats";
 import UserDetailModal from "./UserDetailModal";
@@ -26,7 +27,10 @@ const TAB_KEYS = [
 ] as const;
 
 export default function UserManagementClient() {
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const searchParams = useSearchParams();
+  const initialRole = searchParams.get('role');
+  
+  const [activeTab, setActiveTab] = useState<string>(initialRole === 'b2b' ? 'b2b' : 'all');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 

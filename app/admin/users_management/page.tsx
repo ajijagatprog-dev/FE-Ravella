@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { Users, Download, ShieldCheck } from "lucide-react";
 import UserManagementClient from "./components/UserManagementClient";
 import { downloadFile } from "@/lib/download";
@@ -58,7 +59,9 @@ export default function UsersManagementPage() {
 
       {/* ── Client Component: Stats + Tabs + Table ── */}
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <UserManagementClient />
+        <Suspense fallback={<div className="p-8 text-center text-slate-500">Loading configuration...</div>}>
+          <UserManagementClient />
+        </Suspense>
       </div>
 
     </div>
