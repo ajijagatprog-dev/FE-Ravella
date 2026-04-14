@@ -20,6 +20,7 @@ const iconBg: Record<OrderStatus, string> = {
     PENDING: "bg-gray-100",
     SHIPPED: "bg-blue-100",
     DELIVERED: "bg-emerald-100",
+    PAID: "bg-emerald-100",
     PROCESSING: "bg-amber-100",
     CANCELLED: "bg-stone-100",
 };
@@ -28,6 +29,7 @@ const iconColor: Record<OrderStatus, string> = {
     PENDING: "text-gray-500",
     SHIPPED: "text-blue-500",
     DELIVERED: "text-emerald-500",
+    PAID: "text-emerald-500",
     PROCESSING: "text-amber-500",
     CANCELLED: "text-stone-400",
 };
@@ -36,6 +38,7 @@ const deliveryLabel: Record<OrderStatus, string> = {
     PENDING: "Est. Shipping",
     SHIPPED: "Est. Delivery",
     DELIVERED: "Delivered On",
+    PAID: "Est. Shipping",
     PROCESSING: "Est. Shipping",
     CANCELLED: "Status Date",
 };

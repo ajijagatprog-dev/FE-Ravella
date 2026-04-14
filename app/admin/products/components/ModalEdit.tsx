@@ -37,7 +37,7 @@ export default function ModalEdit({
 }: Props) {
   const [form, setForm] = useState<FormDataState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+ 
   useEffect(() => {
     if (product) {
       setForm({

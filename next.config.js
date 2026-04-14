@@ -34,6 +34,26 @@ const nextConfig = {
         hostname: "localhost",
         pathname: "/storage/**",
       },
+      {
+        protocol: "https",
+        hostname: "api.ravelle.exaapk.com",
+        pathname: "/storage/**",
+      },
+      {
+        protocol: "https",
+        hostname: "api.ravelle.exaapk.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "ravelle.sikema.web.id",
+        pathname: "/storage/**",
+      },
+      {
+        protocol: "http",
+        hostname: "ravelle.sikema.web.id",
+        pathname: "/storage/**",
+      },
     ],
   },
 };

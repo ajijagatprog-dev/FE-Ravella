@@ -62,6 +62,7 @@ export interface OrderDetail {
 // ── Timeline step config ──────────────────────────────────────────────────────
 const timelineSteps: Record<OrderStatus, string[]> = {
     PENDING: ["Order Placed", "Pending"],
+    PAID: ["Order Placed", "Paid"],
     PROCESSING: ["Order Placed", "Processing"],
     SHIPPED: ["Order Placed", "Processing", "Shipped"],
     DELIVERED: ["Order Placed", "Processing", "Shipped", "Delivered"],
