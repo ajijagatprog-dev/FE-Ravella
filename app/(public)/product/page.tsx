@@ -72,6 +72,7 @@ function ProductPageContent() {
             specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
             inStock: item.stock > 0,
             badge: item.badge || (item.is_featured ? "Best Seller" : ""),
+            _variants: item.variants || [],
           }));
           setProducts(mapped);
         }
@@ -91,6 +92,7 @@ function ProductPageContent() {
   const [sortBy, setSortBy] = useState("featured");
   const [priceRange, setPriceRange] = useState([0, 5000000]);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const [hoveredVariantImage, setHoveredVariantImage] = useState<Record<number, string>>({});  // productId -> hovered variant image
   const [favorites, setFavorites] = useState<number[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -385,7 +387,7 @@ function ProductPageContent() {
                 {/* Image */}
                 <div className={`relative overflow-hidden bg-neutral-50 flex items-center justify-center p-6 ${viewMode === "grid" ? "aspect-square" : "w-56 sm:w-72 flex-shrink-0 aspect-square"}`}>
                   <img
-                    src={product.image}
+                    src={hoveredVariantImage[product.id] || product.image}
                     alt={product.name}
                     className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
                   />
@@ -438,6 +440,43 @@ function ProductPageContent() {
                 {/* Info */}
                 {/* Info */}
                 <div className={`p-4 sm:p-5 ${viewMode === "list" ? "flex-1 flex flex-col justify-center" : "flex flex-col items-center text-center"}`}>
+
+                  {/* Variant Preview Dots (Grid only) */}
+                  {viewMode === "grid" && product._variants && product._variants.length > 0 && (
+                    <div className="flex items-center justify-center gap-1.5 mb-2">
+                      {product._variants.slice(0, 5).map((v: any) => {
+                        const varThumb = v.media?.[0]?.url;
+                        return (
+                          <button
+                            key={v.id}
+                            onMouseEnter={() => {
+                              if (varThumb) {
+                                setHoveredVariantImage(prev => ({ ...prev, [product.id]: varThumb }));
+                              }
+                            }}
+                            onMouseLeave={() => {
+                              setHoveredVariantImage(prev => {
+                                const next = { ...prev };
+                                delete next[product.id];
+                                return next;
+                              });
+                            }}
+                            className="w-5 h-5 rounded-full overflow-hidden border-2 border-neutral-200 hover:border-neutral-900 transition-all hover:scale-110"
+                            title={v.variant_value}
+                          >
+                            {varThumb ? (
+                              <img src={varThumb} alt={v.variant_value} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-neutral-300" />
+                            )}
+                          </button>
+                        );
+                      })}
+                      {product._variants.length > 5 && (
+                        <span className="text-[9px] text-neutral-400 font-medium">+{product._variants.length - 5}</span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Name */}
                   <h3 className="text-lg sm:text-lg font-medium text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-snug" style={{ fontFamily: CORMORANT }}>

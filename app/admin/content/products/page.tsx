@@ -19,6 +19,8 @@ import {
     Film,
     Upload,
     Crown,
+    Palette,
+    GripVertical,
 } from "lucide-react";
 import { type Product } from "../../../(public)/product/products";
 import api from "@/lib/axios";
@@ -42,15 +44,29 @@ const fmt = (n: number) =>
         minimumFractionDigits: 0,
     }).format(n);
 
-// ── Empty product template ────────────────────────────────────────────────────
+// ── Interfaces ────────────────────────────────────────────────────────────────
 interface MediaItem {
-    id?: number; // existing media from DB
+    id?: number;
     type: 'image' | 'video';
-    url: string; // preview URL or server URL
-    file?: File; // new file to upload
+    url: string;
+    file?: File;
     is_primary: boolean;
+    variant_id?: number | null;
 }
 
+interface VariantItem {
+    id?: number; // existing variant from DB
+    variant_type: string;
+    variant_value: string;
+    price: number | '';
+    stock: number;
+    sku_suffix: string;
+    is_default: boolean;
+    media: MediaItem[];
+    deleteMediaIds: number[];
+}
+
+// ── Empty product template ────────────────────────────────────────────────────
 function emptyProduct(): Omit<Product, "id"> & { b2bPrice?: number; videoUrl?: string } {
     return {
         name: "",
@@ -72,6 +88,19 @@ function emptyProduct(): Omit<Product, "id"> & { b2bPrice?: number; videoUrl?: s
     };
 }
 
+function emptyVariant(): VariantItem {
+    return {
+        variant_type: "Warna",
+        variant_value: "",
+        price: '',
+        stock: 0,
+        sku_suffix: "",
+        is_default: false,
+        media: [],
+        deleteMediaIds: [],
+    };
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════════
@@ -89,6 +118,8 @@ export default function ProductContentPage() {
     const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [deleteMediaIds, setDeleteMediaIds] = useState<number[]>([]);
+    const [variants, setVariants] = useState<VariantItem[]>([]);
+    const [deleteVariantIds, setDeleteVariantIds] = useState<number[]>([]);
 
     // Toast
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({
@@ -108,7 +139,6 @@ export default function ProductContentPage() {
             if (res.data.status === 'success') {
                 const fetchedData = res.data.data.data;
                 const mapped = fetchedData.map((item: any) => {
-                    // Get primary image from media, fallback to legacy image field
                     const primaryMedia = item.media?.find((m: any) => m.is_primary) || item.media?.[0];
                     const thumbnail = primaryMedia?.url || item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80";
                     return {
@@ -130,6 +160,7 @@ export default function ProductContentPage() {
                         b2bPrice: item.b2b_price || 0,
                         videoUrl: item.video_url || "",
                         _media: item.media || [],
+                        _variants: item.variants || [],
                     };
                 });
                 setProducts(mapped);
@@ -141,7 +172,6 @@ export default function ProductContentPage() {
         }
     };
 
-    // Load from backend
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -164,31 +194,58 @@ export default function ProductContentPage() {
         setEditData({ ...emptyProduct(), imageFile: null });
         setMediaItems([]);
         setDeleteMediaIds([]);
+        setVariants([]);
+        setDeleteVariantIds([]);
         setModalMode("add");
     };
 
     const openEdit = (p: any) => {
         setEditData({ ...p, imageFile: null });
-        // Load existing media into state
-        let existingMedia: MediaItem[] = (p._media || []).map((m: any) => ({
-            id: m.id,
-            type: m.type as 'image' | 'video',
-            url: m.url,
-            is_primary: m.is_primary,
-        }));
-        // Fallback: if no product_media but product has legacy image, show it
+        // Load existing main media (no variant_id) into state
+        let existingMedia: MediaItem[] = (p._media || [])
+            .filter((m: any) => !m.variant_id)
+            .map((m: any) => ({
+                id: m.id,
+                type: m.type as 'image' | 'video',
+                url: m.url,
+                is_primary: m.is_primary,
+                variant_id: null,
+            }));
         if (existingMedia.length === 0 && p.image) {
             existingMedia = [{
                 type: 'image',
                 url: p.image,
                 is_primary: true,
+                variant_id: null,
             }];
         }
         setMediaItems(existingMedia);
         setDeleteMediaIds([]);
+
+        // Load existing variants
+        const existingVariants: VariantItem[] = (p._variants || []).map((v: any) => ({
+            id: v.id,
+            variant_type: v.variant_type || 'Warna',
+            variant_value: v.variant_value || '',
+            price: v.price !== null && v.price !== undefined ? v.price : '',
+            stock: v.stock || 0,
+            sku_suffix: v.sku_suffix || '',
+            is_default: v.is_default || false,
+            media: (v.media || []).map((m: any) => ({
+                id: m.id,
+                type: m.type as 'image' | 'video',
+                url: m.url,
+                is_primary: m.is_primary,
+                variant_id: v.id,
+            })),
+            deleteMediaIds: [],
+        }));
+        setVariants(existingVariants);
+        setDeleteVariantIds([]);
         setModalMode("edit");
     };
 
+    // ── Main Media Handlers ───────────────────────────────────────────────────
     const handleAddMediaFiles = (files: FileList) => {
         const newItems: MediaItem[] = Array.from(files).map((file) => {
             const isVideo = file.type.startsWith('video/');
@@ -197,11 +254,11 @@ export default function ProductContentPage() {
                 url: URL.createObjectURL(file),
                 file,
                 is_primary: false,
+                variant_id: null,
             };
         });
         setMediaItems(prev => {
-            const combined = [...prev, ...newItems].slice(0, 10); // Max 10 total
-            // If no primary set, auto-set first image
+            const combined = [...prev, ...newItems].slice(0, 8); // Max 8 total
             if (!combined.some(m => m.is_primary)) {
                 const firstImg = combined.find(m => m.type === 'image');
                 if (firstImg) firstImg.is_primary = true;
@@ -215,7 +272,6 @@ export default function ProductContentPage() {
             const item = prev[index];
             if (item.id) setDeleteMediaIds(ids => [...ids, item.id!]);
             const next = prev.filter((_, i) => i !== index);
-            // Re-assign primary if removed
             if (item.is_primary && next.length > 0) {
                 const firstImg = next.find(m => m.type === 'image');
                 if (firstImg) firstImg.is_primary = true;
@@ -228,6 +284,58 @@ export default function ProductContentPage() {
         setMediaItems(prev => prev.map((m, i) => ({ ...m, is_primary: i === index })));
     };
 
+    // ── Variant Handlers ──────────────────────────────────────────────────────
+    const addVariant = () => {
+        setVariants(prev => [...prev, emptyVariant()]);
+    };
+
+    const removeVariant = (index: number) => {
+        setVariants(prev => {
+            const v = prev[index];
+            if (v.id) setDeleteVariantIds(ids => [...ids, v.id!]);
+            return prev.filter((_, i) => i !== index);
+        });
+    };
+
+    const updateVariant = (index: number, fields: Partial<VariantItem>) => {
+        setVariants(prev => prev.map((v, i) => i === index ? { ...v, ...fields } : v));
+    };
+
+    const setDefaultVariant = (index: number) => {
+        setVariants(prev => prev.map((v, i) => ({ ...v, is_default: i === index })));
+    };
+
+    const handleAddVariantMedia = (variantIndex: number, files: FileList) => {
+        const newItems: MediaItem[] = Array.from(files).map((file) => ({
+            type: 'image' as const,
+            url: URL.createObjectURL(file),
+            file,
+            is_primary: false,
+        }));
+        setVariants(prev => prev.map((v, i) => {
+            if (i !== variantIndex) return v;
+            const combined = [...v.media, ...newItems].slice(0, 5); // Max 5 per variant
+            if (!combined.some(m => m.is_primary) && combined.length > 0) {
+                combined[0].is_primary = true;
+            }
+            return { ...v, media: combined };
+        }));
+    };
+
+    const handleRemoveVariantMedia = (variantIndex: number, mediaIndex: number) => {
+        setVariants(prev => prev.map((v, i) => {
+            if (i !== variantIndex) return v;
+            const item = v.media[mediaIndex];
+            const newDeleteIds = item.id ? [...v.deleteMediaIds, item.id] : v.deleteMediaIds;
+            const newMedia = v.media.filter((_, mi) => mi !== mediaIndex);
+            if (item.is_primary && newMedia.length > 0) {
+                newMedia[0].is_primary = true;
+            }
+            return { ...v, media: newMedia, deleteMediaIds: newDeleteIds };
+        }));
+    };
+
+    // ── Save Handler ──────────────────────────────────────────────────────────
     const handleSave = async () => {
         if (!editData.name.trim()) return;
 
@@ -269,13 +377,13 @@ export default function ProductContentPage() {
                 formData.append('specifications', JSON.stringify(cleanSpecs));
             }
 
-            // Append new media files
+            // Append new main media files
             const newMediaFiles = mediaItems.filter(m => m.file);
             newMediaFiles.forEach(m => {
                 formData.append('media_files[]', m.file!);
             });
 
-            // Append media to delete (for edit mode)
+            // Append media to delete
             if (deleteMediaIds.length > 0) {
                 formData.append('delete_media_ids', JSON.stringify(deleteMediaIds));
             }
@@ -289,6 +397,37 @@ export default function ProductContentPage() {
             // Legacy: if no media items but has imageFile
             if (editData.imageFile) {
                 formData.append('image', editData.imageFile);
+            }
+
+            // ── Variants ──
+            if (variants.length > 0) {
+                const variantsJson = variants.map((v, idx) => ({
+                    id: v.id || undefined,
+                    variant_type: v.variant_type,
+                    variant_value: v.variant_value,
+                    price: v.price !== '' ? v.price : null,
+                    stock: v.stock,
+                    sku_suffix: v.sku_suffix,
+                    is_default: v.is_default,
+                }));
+                formData.append('variants_json', JSON.stringify(variantsJson));
+
+                // Append variant media files
+                variants.forEach((v, idx) => {
+                    const newVarMedia = v.media.filter(m => m.file);
+                    newVarMedia.forEach(m => {
+                        formData.append(`variant_media_${idx}[]`, m.file!);
+                    });
+                    // Variant media deletions
+                    if (v.deleteMediaIds.length > 0) {
+                        formData.append(`delete_variant_media_ids_${idx}`, JSON.stringify(v.deleteMediaIds));
+                    }
+                });
+            }
+
+            // Delete variants
+            if (deleteVariantIds.length > 0) {
+                formData.append('delete_variant_ids', JSON.stringify(deleteVariantIds));
             }
 
             let token = "";
@@ -322,6 +461,8 @@ export default function ProductContentPage() {
             setModalMode(null);
             setMediaItems([]);
             setDeleteMediaIds([]);
+            setVariants([]);
+            setDeleteVariantIds([]);
             fetchProducts();
         } catch (error: any) {
             console.error("Error saving product:", error);
@@ -331,7 +472,7 @@ export default function ProductContentPage() {
                 const firstErr = Object.values(errs).flat()[0];
                 if (typeof firstErr === 'string') {
                     if (firstErr.includes('failed to upload')) {
-                        msg = "File terlalu besar! Max: gambar 10MB, video 250MB.";
+                        msg = "File terlalu besar! Max: gambar 10MB, video 50MB.";
                     } else {
                         msg = firstErr;
                     }
@@ -474,6 +615,7 @@ export default function ProductContentPage() {
                                 <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-6 py-4">Produk</th>
                                 <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4 py-4">Kategori</th>
                                 <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4 py-4">Harga</th>
+                                <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4 py-4">Varian</th>
                                 <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4 py-4">Badge</th>
                                 <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4 py-4">Status</th>
                                 <th className="text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4 py-4">Aksi</th>
@@ -482,17 +624,18 @@ export default function ProductContentPage() {
                         <tbody className="divide-y divide-slate-100">
                             {paginated.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="text-center py-16">
+                                    <td colSpan={7} className="text-center py-16">
                                         <Package className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                                         <p className="text-slate-400 text-sm font-medium">Tidak ada produk ditemukan</p>
                                     </td>
                                 </tr>
                             ) : (
-                                paginated.map((p) => (
-                                    <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                                paginated.map((p: any) => (
+                                    <tr key={p.id} className="hover:bg-slate-50/50 transition-colors group/row">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200/60">
+                                                {/* Product image with variant hover preview */}
+                                                <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200/60">
                                                     <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                                                 </div>
                                                 <div className="min-w-0">
@@ -516,6 +659,18 @@ export default function ProductContentPage() {
                                             )}
                                         </td>
                                         <td className="px-4 py-4">
+                                            {p._variants && p._variants.length > 0 ? (
+                                                <div className="flex items-center gap-1.5">
+                                                    <Palette size={14} className="text-violet-500" />
+                                                    <span className="text-xs font-semibold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full">
+                                                        {p._variants.length} varian
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-slate-400">—</span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-4">
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${p.badge === "Best Seller" ? "bg-amber-100 text-amber-700" :
                                                 p.badge === "Premium" ? "bg-purple-100 text-purple-700" :
                                                     p.badge === "Popular" ? "bg-blue-100 text-blue-700" :
@@ -528,7 +683,7 @@ export default function ProductContentPage() {
                                             <div className="flex items-center gap-1.5">
                                                 <div className={`w-2 h-2 rounded-full ${p.inStock ? "bg-blue-500" : "bg-red-400"}`} />
                                                 <span className="text-xs font-medium text-slate-600">
-                                                    {p.inStock ? "In Stock" : "Out of Stock"}
+                                                    {p.inStock ? "Stok Tersedia" : "Stok Habis"}
                                                 </span>
                                             </div>
                                         </td>
@@ -630,12 +785,14 @@ export default function ProductContentPage() {
                                 />
                             </div>
 
-                            {/* Multi-Media Gallery Upload */}
+                            {/* ══════════════════════════════ */}
+                            {/* ── GAMBAR UTAMA PRODUK ────── */}
+                            {/* ══════════════════════════════ */}
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                                    <ImageIcon size={12} className="inline mr-1" /> Gambar & Video Produk
+                                    <ImageIcon size={12} className="inline mr-1" /> Gambar & Video Utama Produk
                                 </label>
-                                <p className="text-[10px] text-slate-400 mb-2">Max 8 gambar + 2 video. Klik ⭐ untuk set gambar utama.</p>
+                                <p className="text-[10px] text-slate-400 mb-2">Maks 8 file (gambar + video). Klik ⭐ untuk set gambar utama. Video maks 50MB.</p>
 
                                 {/* Media Preview Grid */}
                                 {mediaItems.length > 0 && (
@@ -650,7 +807,6 @@ export default function ProductContentPage() {
                                                         <span className="absolute bottom-1 left-1 text-[9px] text-white bg-black/60 px-1.5 py-0.5 rounded">VIDEO</span>
                                                     </div>
                                                 )}
-                                                {/* Overlay actions */}
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
                                                     {item.type === 'image' && (
                                                         <button
@@ -679,23 +835,189 @@ export default function ProductContentPage() {
                                 )}
 
                                 {/* Upload Button */}
-                                <label className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                                    <Upload size={16} />
-                                    <span>Klik untuk upload gambar / video</span>
-                                    <input
-                                        type="file"
-                                        accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
-                                        multiple
-                                        className="hidden"
-                                        onChange={(e) => {
-                                            if (e.target.files && e.target.files.length > 0) {
-                                                handleAddMediaFiles(e.target.files);
-                                            }
-                                            e.target.value = ''; // Reset input
-                                        }}
-                                    />
-                                </label>
-                                <p className="text-[10px] text-slate-400 mt-1">Format: JPG, PNG, WebP (max 10MB) • MP4, WebM (max 250MB)</p>
+                                {mediaItems.length < 8 && (
+                                    <label className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                        <Upload size={16} />
+                                        <span>Klik untuk upload gambar / video ({mediaItems.length}/8)</span>
+                                        <input
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+                                            multiple
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                if (e.target.files && e.target.files.length > 0) {
+                                                    handleAddMediaFiles(e.target.files);
+                                                }
+                                                e.target.value = '';
+                                            }}
+                                        />
+                                    </label>
+                                )}
+                                <p className="text-[10px] text-slate-400 mt-1">Format: JPG, PNG, WebP (max 10MB) · MP4, WebM (max 50MB)</p>
+                            </div>
+
+                            {/* ══════════════════════════════ */}
+                            {/* ── VARIAN PRODUK ──────────── */}
+                            {/* ══════════════════════════════ */}
+                            <div className="border-t border-slate-100 pt-5">
+                                <div className="flex items-center justify-between mb-3">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                        <Palette size={12} /> Varian Produk
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={addVariant}
+                                        className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                                    >
+                                        <Plus size={14} /> Tambah Varian
+                                    </button>
+                                </div>
+                                <p className="text-[10px] text-slate-400 mb-3">
+                                    Tambahkan varian produk (misal: warna berbeda) dengan foto, harga, dan stok terpisah.
+                                </p>
+
+                                {variants.length === 0 ? (
+                                    <div className="text-center py-6 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50">
+                                        <Palette className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                                        <p className="text-xs text-slate-400">Belum ada varian. Klik &quot;Tambah Varian&quot; untuk menambahkan.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {variants.map((variant, vIdx) => (
+                                            <div key={vIdx} className={`rounded-2xl border-2 p-4 space-y-3 transition-all ${variant.is_default ? 'border-blue-300 bg-blue-50/30' : 'border-slate-200 bg-white'}`}>
+                                                {/* Variant Header */}
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <GripVertical size={14} className="text-slate-300" />
+                                                        <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Varian #{vIdx + 1}</span>
+                                                        {variant.is_default && (
+                                                            <span className="text-[9px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded">DEFAULT</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setDefaultVariant(vIdx)}
+                                                            title="Set sebagai varian default"
+                                                            className={`p-1.5 rounded-lg text-xs transition-colors ${variant.is_default ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600'}`}
+                                                        >
+                                                            <Crown className="w-3.5 h-3.5" />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeVariant(vIdx)}
+                                                            className="p-1.5 rounded-lg bg-slate-100 text-red-500 hover:bg-red-50 transition-colors"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Variant Fields */}
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Jenis Varian</label>
+                                                        <input
+                                                            type="text"
+                                                            value={variant.variant_type}
+                                                            onChange={(e) => updateVariant(vIdx, { variant_type: e.target.value })}
+                                                            placeholder="Warna"
+                                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nilai Varian *</label>
+                                                        <input
+                                                            type="text"
+                                                            value={variant.variant_value}
+                                                            onChange={(e) => updateVariant(vIdx, { variant_value: e.target.value })}
+                                                            placeholder="Hitam, Pink, dll."
+                                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Harga (Rp)</label>
+                                                        <input
+                                                            type="number"
+                                                            value={variant.price}
+                                                            onChange={(e) => updateVariant(vIdx, { price: e.target.value === '' ? '' : Number(e.target.value) })}
+                                                            placeholder="Kosong = harga produk"
+                                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                                        />
+                                                        <p className="text-[9px] text-slate-400 mt-0.5">Kosong = ikut harga utama</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Stok</label>
+                                                        <input
+                                                            type="number"
+                                                            value={variant.stock}
+                                                            onChange={(e) => updateVariant(vIdx, { stock: Number(e.target.value) })}
+                                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Suffix SKU</label>
+                                                        <input
+                                                            type="text"
+                                                            value={variant.sku_suffix}
+                                                            onChange={(e) => updateVariant(vIdx, { sku_suffix: e.target.value })}
+                                                            placeholder="-BLK"
+                                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Variant Media */}
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                                                        Foto Varian (maks 5)
+                                                    </label>
+                                                    {variant.media.length > 0 && (
+                                                        <div className="flex gap-2 mb-2 flex-wrap">
+                                                            {variant.media.map((m, mIdx) => (
+                                                                <div key={mIdx} className={`relative group w-16 h-16 rounded-lg overflow-hidden border-2 ${m.is_primary ? 'border-blue-500' : 'border-slate-200'}`}>
+                                                                    <img src={m.url} alt={`Variant ${vIdx} img ${mIdx}`} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => handleRemoveVariantMedia(vIdx, mIdx)}
+                                                                            className="p-1 rounded bg-white/90 text-red-500"
+                                                                        >
+                                                                            <Trash2 className="w-3 h-3" />
+                                                                        </button>
+                                                                    </div>
+                                                                    {m.is_primary && (
+                                                                        <span className="absolute top-0.5 left-0.5 text-[7px] font-bold bg-blue-500 text-white px-1 py-0.5 rounded">★</span>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {variant.media.length < 5 && (
+                                                        <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-[11px] text-slate-500 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                                            <Upload size={12} />
+                                                            Upload Foto ({variant.media.length}/5)
+                                                            <input
+                                                                type="file"
+                                                                accept="image/jpeg,image/png,image/webp,image/gif"
+                                                                multiple
+                                                                className="hidden"
+                                                                onChange={(e) => {
+                                                                    if (e.target.files && e.target.files.length > 0) {
+                                                                        handleAddVariantMedia(vIdx, e.target.files);
+                                                                    }
+                                                                    e.target.value = '';
+                                                                }}
+                                                            />
+                                                        </label>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Category + Badge */}
@@ -831,7 +1153,7 @@ export default function ProductContentPage() {
                                         onChange={(e) => setEditData((d) => ({ ...d, inStock: e.target.checked }))}
                                         className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                                     />
-                                    <span className="text-sm text-slate-700 font-medium">In Stock</span>
+                                    <span className="text-sm text-slate-700 font-medium">Stok Tersedia</span>
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
