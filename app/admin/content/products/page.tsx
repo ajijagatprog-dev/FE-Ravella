@@ -798,21 +798,26 @@ export default function ProductContentPage() {
                                 {mediaItems.length > 0 && (
                                     <div className="grid grid-cols-4 gap-2 mb-3">
                                         {mediaItems.map((item, idx) => (
-                                            <div key={idx} className={`relative group rounded-lg overflow-hidden border-2 aspect-square ${item.is_primary ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-200'}`}>
+                                            <div
+                                                key={idx}
+                                                className={`relative group rounded-lg overflow-hidden border-2 aspect-square ${item.is_primary ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-200'}`}
+                                                onMouseEnter={(e) => {
+                                                    if (item.type === 'video') {
+                                                        const vid = e.currentTarget.querySelector('video');
+                                                        if (vid) { vid.play().catch(() => {}); }
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (item.type === 'video') {
+                                                        const vid = e.currentTarget.querySelector('video');
+                                                        if (vid) { vid.pause(); vid.currentTime = 1; }
+                                                    }
+                                                }}
+                                            >
                                                 {item.type === 'image' ? (
                                                     <img src={item.url} alt={`Media ${idx}`} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <div
-                                                        className="w-full h-full bg-slate-900 flex items-center justify-center relative"
-                                                        onMouseEnter={(e) => {
-                                                            const vid = e.currentTarget.querySelector('video');
-                                                            if (vid) { vid.play().catch(() => {}); }
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            const vid = e.currentTarget.querySelector('video');
-                                                            if (vid) { vid.pause(); vid.currentTime = 1; }
-                                                        }}
-                                                    >
+                                                    <div className="w-full h-full bg-slate-900 relative">
                                                         <video
                                                             src={item.url}
                                                             muted
@@ -824,14 +829,15 @@ export default function ProductContentPage() {
                                                                 vid.currentTime = 1;
                                                             }}
                                                         />
-                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:opacity-0 transition-opacity">
+                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-300">
                                                             <Film className="w-6 h-6 text-white/80 drop-shadow" />
                                                         </div>
-                                                        <span className="absolute bottom-1 left-1 text-[9px] text-white bg-black/60 px-1.5 py-0.5 rounded font-bold">VIDEO</span>
+                                                        <span className="absolute bottom-1 left-1 text-[9px] text-white bg-black/60 px-1.5 py-0.5 rounded font-bold pointer-events-none">VIDEO</span>
                                                     </div>
                                                 )}
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                                                    {item.type === 'image' && (
+                                                {/* Hover overlay — for images: full overlay; for videos: just delete button */}
+                                                {item.type === 'image' ? (
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
                                                         <button
                                                             type="button"
                                                             onClick={() => handleSetPrimary(idx)}
@@ -840,15 +846,23 @@ export default function ProductContentPage() {
                                                         >
                                                             <Crown className="w-3.5 h-3.5" />
                                                         </button>
-                                                    )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveMedia(idx)}
+                                                            className="p-1.5 rounded-lg bg-white/90 text-red-500 hover:bg-red-50 transition-colors"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
                                                     <button
                                                         type="button"
                                                         onClick={() => handleRemoveMedia(idx)}
-                                                        className="p-1.5 rounded-lg bg-white/90 text-red-500 hover:bg-red-50 transition-colors"
+                                                        className="absolute top-1 right-1 p-1.5 rounded-lg bg-white/90 text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100 z-10"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
                                                     </button>
-                                                </div>
+                                                )}
                                                 {item.is_primary && (
                                                     <span className="absolute top-1 left-1 text-[8px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded">UTAMA</span>
                                                 )}
