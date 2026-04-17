@@ -312,11 +312,20 @@ export default function ProductDetail() {
                                             allowFullScreen
                                         />
                                     ) : (
-                                        <video
-                                            src={videoUrl}
-                                            controls
-                                            className="w-full h-full object-contain bg-black"
-                                        />
+                                        <div className="w-full h-full relative bg-neutral-100">
+                                            <video
+                                                src={videoUrl}
+                                                controls
+                                                muted
+                                                playsInline
+                                                preload="metadata"
+                                                className="w-full h-full object-contain"
+                                                onLoadedData={(e) => {
+                                                    const vid = e.target as HTMLVideoElement;
+                                                    vid.currentTime = 1;
+                                                }}
+                                            />
+                                        </div>
                                     );
                                 })()
                             ) : (
@@ -380,8 +389,21 @@ export default function ProductDetail() {
                                         {item.type === 'image' ? (
                                             <img src={item.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
-                                                <Play className="w-5 h-5 text-white/80 fill-white/80" />
+                                            <div className="w-full h-full bg-neutral-100 relative">
+                                                <video
+                                                    src={item.url}
+                                                    muted
+                                                    playsInline
+                                                    preload="metadata"
+                                                    className="w-full h-full object-cover"
+                                                    onLoadedData={(e) => {
+                                                        const vid = e.target as HTMLVideoElement;
+                                                        vid.currentTime = 1;
+                                                    }}
+                                                />
+                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                    <Play className="w-4 h-4 text-white drop-shadow-lg fill-white/80" />
+                                                </div>
                                             </div>
                                         )}
                                     </button>

@@ -802,20 +802,29 @@ export default function ProductContentPage() {
                                                 {item.type === 'image' ? (
                                                     <img src={item.url} alt={`Media ${idx}`} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                                                    <div
+                                                        className="w-full h-full bg-slate-900 flex items-center justify-center relative"
+                                                        onMouseEnter={(e) => {
+                                                            const vid = e.currentTarget.querySelector('video');
+                                                            if (vid) { vid.play().catch(() => {}); }
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            const vid = e.currentTarget.querySelector('video');
+                                                            if (vid) { vid.pause(); vid.currentTime = 1; }
+                                                        }}
+                                                    >
                                                         <video
                                                             src={item.url}
                                                             muted
                                                             playsInline
                                                             preload="metadata"
-                                                            className="w-full h-full object-cover opacity-70"
+                                                            className="w-full h-full object-cover"
                                                             onLoadedData={(e) => {
-                                                                // Seek to 1s to show a real frame instead of black
                                                                 const vid = e.target as HTMLVideoElement;
                                                                 vid.currentTime = 1;
                                                             }}
                                                         />
-                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:opacity-0 transition-opacity">
                                                             <Film className="w-6 h-6 text-white/80 drop-shadow" />
                                                         </div>
                                                         <span className="absolute bottom-1 left-1 text-[9px] text-white bg-black/60 px-1.5 py-0.5 rounded font-bold">VIDEO</span>
