@@ -13,7 +13,7 @@ interface Tier {
   perks: string[];
 }
 
-export default function MembershipTiers() {
+export default function MembershipTiers({ isEditing }: { isEditing: boolean }) {
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -115,6 +115,7 @@ export default function MembershipTiers() {
             key={`${tier.name}-${index}`}
             tier={tier}
             index={index}
+            isEditing={isEditing}
             onEdit={() => handleEdit(index)}
             onDelete={() => handleDelete(index)}
           />

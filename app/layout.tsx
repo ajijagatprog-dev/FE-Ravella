@@ -1,9 +1,27 @@
 import type { Metadata } from "next";
+import { Quicksand, Poppins } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
 import { Suspense } from "react";
 import UtmTracker from "./components/UtmTracker";
 import "./globals.css";
+
+// Fonts
+// Quicksand → Headlines, judul, navigasi
+// Poppins   → Body copy, teks deskripsi, paragraf
+const quicksand = Quicksand({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Ravella",
@@ -16,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="id" className={`${quicksand.variable} ${poppins.variable}`}>
       <head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-T4PF6ZDVQQ"
@@ -31,7 +49,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body>
+      <body className={poppins.className}>
         <Suspense fallback={null}>
           <UtmTracker />
         </Suspense>

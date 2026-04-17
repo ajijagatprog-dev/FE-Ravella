@@ -17,6 +17,8 @@ interface DashboardData {
     pending_orders: number;
     processing_orders: number;
     delivered_orders: number;
+    cancelled_orders: number;
+    success_rate: number;
     low_stock: number;
     out_of_stock: number;
   };
@@ -117,8 +119,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ── Stat Cards Row 1 ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
           title="Total Penjualan"
           value={formatRp(data.stats.total_revenue)}
@@ -143,13 +145,33 @@ export default function DashboardPage() {
           icon={<Users size={18} className="text-amber-600" />}
           iconBg="bg-amber-50"
         />
+      </div>
+
+      {/* ── Stat Cards Row 2 ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          title="Success Order"
+          value={String(data.stats.delivered_orders)}
+          change={`${data.stats.success_rate}% success rate`}
+          trend="up"
+          icon={<Package size={18} className="text-emerald-600" />}
+          iconBg="bg-emerald-50"
+        />
+        <StatCard
+          title="Cancel Order"
+          value={String(data.stats.cancelled_orders)}
+          change={data.stats.cancelled_orders > 0 ? `Perlu ditinjau` : `Tidak ada cancel`}
+          trend={data.stats.cancelled_orders > 0 ? "down" : "up"}
+          icon={<AlertTriangle size={18} className="text-red-500" />}
+          iconBg="bg-red-50"
+        />
         <StatCard
           title="Stock Alert"
           value={String(data.stats.low_stock + data.stats.out_of_stock)}
           change={`${data.stats.out_of_stock} out of stock`}
           trend={data.stats.out_of_stock > 0 ? "down" : "up"}
-          icon={<AlertTriangle size={18} className="text-red-500" />}
-          iconBg="bg-red-50"
+          icon={<AlertTriangle size={18} className="text-orange-500" />}
+          iconBg="bg-orange-50"
         />
       </div>
 

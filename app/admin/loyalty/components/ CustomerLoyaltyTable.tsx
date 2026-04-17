@@ -21,15 +21,21 @@ const TIER_CONFIG: Record<string, { pill: string; dot: string }> = {
 };
 
 // ─── Avatar initials ──────────────────────────────────────────────────────────
-function Avatar({ name, tier }: { name: string; tier: string }) {
-  const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+function Avatar({ name = "", tier }: { name: string; tier: string }) {
+  const initials = (name || "??")
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
   const color =
     tier === "PLATINUM" ? "bg-blue-100 text-blue-700" :
       tier === "GOLD" ? "bg-amber-100 text-amber-700" :
         "bg-slate-100 text-slate-600";
   return (
     <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${color}`}>
-      {initials}
+      {initials || "??"}
     </div>
   );
 }
@@ -164,7 +170,7 @@ export default function CustomerLoyaltyTable() {
                     {/* Points */}
                     <td className="px-3 py-3">
                       <span className="font-semibold text-gray-900 tabular-nums">
-                        {customer.points.toLocaleString()}
+                        {Number(customer.points || 0).toLocaleString()}
                         <span className="text-xs font-normal text-slate-400 ml-1">pts</span>
                       </span>
                     </td>
@@ -172,7 +178,7 @@ export default function CustomerLoyaltyTable() {
                     {/* Total Spent */}
                     <td className="px-3 py-3">
                       <span className="text-sm font-medium text-gray-800">
-                        Rp {customer.total_spent.toLocaleString('id-ID')}
+                        Rp {Number(customer.total_spent || 0).toLocaleString('id-ID')}
                       </span>
                     </td>
 

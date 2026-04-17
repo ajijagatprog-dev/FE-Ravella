@@ -49,7 +49,7 @@ export default function UsersManagementPage() {
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 active:scale-95 transition-all shadow-sm"
           >
             <Download size={18} className="text-slate-400" />
-            Export Database
+            Export Data
           </button>
         </div>
       </div>
