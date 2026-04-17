@@ -97,9 +97,8 @@ export default function HeroSection() {
       className="relative w-full overflow-hidden bg-neutral-900"
       style={{ fontFamily: JOST }}
     >
-      <div className="relative max-w-[1600px] mx-auto">
-
-        {/* ── HERO IMAGE & CONTENT ── */}
+      {/* ── HERO IMAGE & CONTENT — full width ── */}
+      <div className="relative">
         <div className="relative h-[480px] sm:h-[540px] md:h-[600px] lg:h-[680px] xl:h-[720px] w-full">
           <HeroBackground active={active} />
 
@@ -121,8 +120,10 @@ export default function HeroSection() {
 
           <HeroContent active={active} isLoaded={isLoaded} />
         </div>
+      </div>
 
         {/* ── CONTROLS ── */}
+      <div className="max-w-[1600px] mx-auto">
         <div className="relative px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 border-t border-white/10">
 
           {/* Dots & Progress */}
