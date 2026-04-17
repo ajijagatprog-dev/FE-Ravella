@@ -85,6 +85,11 @@ export default function B2BProductDetailPage() {
     const activePrice = selectedVariant?.price ?? product?.price ?? 0;
     const activeStock = selectedVariant ? selectedVariant.stock : (product?.stock ?? 0);
 
+    // Reset active media index when variant changes  
+    useEffect(() => {
+        setActiveMediaIndex(0);
+    }, [selectedVariantId]);
+
     const handleIncrement = () => setQuantity(prev => prev + 1);
     const handleDecrement = () => setQuantity(prev => (prev > (product?.minOrder || 1) ? prev - 1 : prev));
 
@@ -156,10 +161,7 @@ export default function B2BProductDetailPage() {
         return items;
     })();
 
-    // Reset active media index when variant changes  
-    useEffect(() => {
-        setActiveMediaIndex(0);
-    }, [selectedVariantId]);
+
 
     return (
         <div className="min-h-screen bg-stone-50">
@@ -188,11 +190,20 @@ export default function B2BProductDetailPage() {
                         <div className="sticky top-28 flex flex-col items-center w-full">
                             <div className="relative w-full max-w-md aspect-square rounded-2xl bg-white border border-stone-100 shadow-sm overflow-hidden flex items-center justify-center p-4 group">
                                 {galleryItems.length > 0 && galleryItems[activeMediaIndex]?.type === 'video' ? (
-                                    <video
-                                        src={galleryItems[activeMediaIndex].url}
-                                        controls
-                                        className="w-full h-full object-contain bg-black rounded-lg"
-                                    />
+                                    <div className="w-full h-full relative bg-stone-100 rounded-lg overflow-hidden">
+                                        <video
+                                            src={galleryItems[activeMediaIndex].url}
+                                            controls
+                                            muted
+                                            playsInline
+                                            preload="metadata"
+                                            className="w-full h-full object-contain"
+                                            onLoadedData={(e) => {
+                                                const vid = e.target as HTMLVideoElement;
+                                                vid.currentTime = 1;
+                                            }}
+                                        />
+                                    </div>
                                 ) : (
                                     <img
                                         src={galleryItems[activeMediaIndex]?.url || product.image || "https://placehold.co/600x600/f5f5f0/a8a29e?text=No+Image"}
@@ -256,8 +267,21 @@ export default function B2BProductDetailPage() {
                                         {item.type === 'image' ? (
                                             <img src={item.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-contain p-1" />
                                         ) : (
-                                            <div className="w-full h-full bg-stone-900 flex items-center justify-center">
-                                                <Play className="w-6 h-6 text-white/90 fill-white border border-white" />
+                                            <div className="w-full h-full bg-stone-100 relative rounded-lg overflow-hidden">
+                                                <video
+                                                    src={item.url}
+                                                    muted
+                                                    playsInline
+                                                    preload="metadata"
+                                                    className="w-full h-full object-cover"
+                                                    onLoadedData={(e) => {
+                                                        const vid = e.target as HTMLVideoElement;
+                                                        vid.currentTime = 1;
+                                                    }}
+                                                />
+                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                    <Play className="w-4 h-4 text-white drop-shadow-lg fill-white/80" />
+                                                </div>
                                             </div>
                                         )}
                                     </button>
