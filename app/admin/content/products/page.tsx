@@ -802,9 +802,23 @@ export default function ProductContentPage() {
                                                 {item.type === 'image' ? (
                                                     <img src={item.url} alt={`Media ${idx}`} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <div className="w-full h-full bg-slate-900 flex items-center justify-center">
-                                                        <Film className="w-8 h-8 text-white/60" />
-                                                        <span className="absolute bottom-1 left-1 text-[9px] text-white bg-black/60 px-1.5 py-0.5 rounded">VIDEO</span>
+                                                    <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                                                        <video
+                                                            src={item.url}
+                                                            muted
+                                                            playsInline
+                                                            preload="metadata"
+                                                            className="w-full h-full object-cover opacity-70"
+                                                            onLoadedData={(e) => {
+                                                                // Seek to 1s to show a real frame instead of black
+                                                                const vid = e.target as HTMLVideoElement;
+                                                                vid.currentTime = 1;
+                                                            }}
+                                                        />
+                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                            <Film className="w-6 h-6 text-white/80 drop-shadow" />
+                                                        </div>
+                                                        <span className="absolute bottom-1 left-1 text-[9px] text-white bg-black/60 px-1.5 py-0.5 rounded font-bold">VIDEO</span>
                                                     </div>
                                                 )}
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
