@@ -99,7 +99,7 @@ export default function HeroSection() {
     >
       {/* ── HERO IMAGE & CONTENT — full width ── */}
       <div className="relative">
-        <div className="relative h-[480px] sm:h-[540px] md:h-[600px] lg:h-[680px] xl:h-[720px] w-full">
+        <div className="relative min-h-[480px] sm:min-h-[500px] md:min-h-[580px] lg:min-h-[650px] aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9] xl:aspect-[25/9] w-full">
           <HeroBackground active={active} />
 
           {/* Nav Arrows */}

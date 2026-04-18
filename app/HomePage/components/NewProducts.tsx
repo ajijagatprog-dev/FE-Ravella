@@ -56,36 +56,46 @@ export default function NewProducts() {
   }, []);
 
   const handleAddToCart = (p: Product) => {
-    const stored = localStorage.getItem("ravelle_cart");
-    let cart: any[] = stored ? JSON.parse(stored) : [];
-    const exists = cart.find((item) => item.id === p.id);
-    if (exists) {
-      cart = cart.map((item) =>
-        item.id === p.id ? { ...item, quantity: item.quantity + 1 } : item
-      );
-    } else {
-      cart = [
-        ...cart,
-        {
-          id: p.id,
-          name: p.title,
-          price: p.rawPrice,
-          originalPrice: p.rawPrice,
-          image: p.image,
-          badge: p.badge,
-          category: p.category,
-          quantity: 1,
-          selected: true,
-        },
-      ];
-    }
-    localStorage.setItem("ravelle_cart", JSON.stringify(cart));
-    // Trigger header update
-    window.dispatchEvent(new Event("ravelle_cart_updated"));
+    try {
+      const stored = localStorage.getItem("ravelle_cart");
+      let cart: any[] = [];
+      try {
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          cart = Array.isArray(parsed) ? parsed : [];
+        }
+      } catch (e) {
+        cart = [];
+      }
 
-    // Show Toast
-    setToast({ visible: true, productName: p.title });
-    setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
+      const exists = cart.find((item) => item.id === p.id);
+      if (exists) {
+        cart = cart.map((item) =>
+          item.id === p.id ? { ...item, quantity: (item.quantity || 0) + 1 } : item
+        );
+      } else {
+        cart = [
+          ...cart,
+          {
+            id: p.id,
+            name: p.title,
+            price: p.rawPrice,
+            originalPrice: p.rawPrice,
+            image: p.image,
+            badge: p.badge,
+            category: p.category,
+            quantity: 1,
+            selected: true,
+          },
+        ];
+      }
+      localStorage.setItem("ravelle_cart", JSON.stringify(cart));
+      window.dispatchEvent(new Event("ravelle_cart_updated"));
+      setToast({ visible: true, productName: p.title });
+      setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
+    } catch (error) {
+      console.error("Cart action failed:", error);
+    }
   };
 
   return (

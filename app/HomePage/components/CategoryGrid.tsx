@@ -8,6 +8,7 @@ const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function CategoryGrid() {
   const router = useRouter();
+
   const categories = [
     {
       id: "Home & Kitchen Appliance",
@@ -159,7 +160,7 @@ function CategoryCard({ category, index, onClick }: { category: any; index: numb
           className="flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm"
           style={{ fontFamily: JOST }}
         >
-          <Icon className="w-3.5 h-3.5 text-neutral-700" />
+          {Icon ? <Icon className="w-3.5 h-3.5 text-neutral-700" /> : <div className="w-3.5 h-3.5" />}
           <span className="text-[10px] font-medium text-neutral-800 tracking-[0.12em] uppercase">
             {category.count}
           </span>

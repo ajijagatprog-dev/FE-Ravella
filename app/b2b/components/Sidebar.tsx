@@ -175,10 +175,14 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-white/50 rounded-r-full" />
                 )}
 
-                <Icon
-                  size={18}
-                  className={`shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-white" : ""}`}
-                />
+                {Icon ? (
+                  <Icon
+                    size={18}
+                    className={`shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-white" : ""}`}
+                  />
+                ) : (
+                  <div className="w-[18px] h-[18px]" />
+                )}
 
                 {!collapsed && (
                   <span className="flex-1 truncate">{item.label}</span>

@@ -120,23 +120,31 @@ export default function ProductDetail() {
         if (!product) return [];
         const items: { type: 'image' | 'video'; url: string }[] = [];
 
-        // Collect main product videos (always visible regardless of variant)
+        // Collect main videos and secondary images (lifestyle/specs/branding)
         const mainVideos: { type: 'image' | 'video'; url: string }[] = [];
+        const secondaryMainImages: { type: 'image' | 'video'; url: string }[] = [];
+
         if (product.media && product.media.length > 0) {
             product.media.forEach((m: any) => {
                 if (m.type === 'video') {
                     mainVideos.push({ type: 'video', url: m.url });
+                } else if (m.type === 'image' && !m.is_primary) {
+                    // Secondary images (lifestyle/spec charts/logos)
+                    secondaryMainImages.push({ type: 'image', url: m.url });
                 }
             });
         }
 
-        // If a variant is selected and it has media, show variant images + main videos
+        // If a variant is selected, mix: Variant Media + Main Videos + Secondary Main Images
         if (selectedVariant && selectedVariant.media && selectedVariant.media.length > 0) {
+            // First: Specific Variant Media
             selectedVariant.media.forEach((m: any) => {
                 items.push({ type: m.type || 'image', url: m.url });
             });
-            // Append main product videos so they're always accessible
+            // Second: Demo Videos
             items.push(...mainVideos);
+            // Third: Contextual/Lifestyle info from main media
+            items.push(...secondaryMainImages);
             return items;
         }
 
@@ -170,34 +178,49 @@ export default function ProductDetail() {
         }).format(price);
 
     const handleAddToCart = (p: Product) => {
-        const stored = localStorage.getItem("ravelle_cart");
-        let cart: any[] = stored ? JSON.parse(stored) : [];
-        const exists = cart.find((item) => item.id === p.id);
-        if (exists) {
-            cart = cart.map((item) =>
-                item.id === p.id ? { ...item, quantity: item.quantity + 1 } : item
-            );
-        } else {
-            cart = [
-                ...cart,
-                {
-                    id: p.id,
-                    name: p.name,
-                    price: p.price,
-                    originalPrice: p.originalPrice,
-                    image: p.image,
-                    badge: p.badge,
-                    discount: p.discount,
-                    category: p.category,
-                    quantity: 1,
-                    selected: true,
-                },
-            ];
+        try {
+            const stored = localStorage.getItem("ravelle_cart");
+            let cart: any[] = [];
+            try {
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    cart = Array.isArray(parsed) ? parsed : [];
+                }
+            } catch (e) {
+                cart = [];
+            }
+
+            const exists = cart.find((item) => item.id === p.id);
+            if (exists) {
+                cart = cart.map((item) =>
+                    item.id === p.id
+                        ? { ...item, quantity: (item.quantity || 0) + 1 }
+                        : item
+                );
+            } else {
+                cart = [
+                    ...cart,
+                    {
+                        id: p.id,
+                        name: p.name,
+                        price: p.price,
+                        originalPrice: p.originalPrice,
+                        image: p.image,
+                        badge: p.badge,
+                        discount: p.discount,
+                        category: p.category,
+                        quantity: 1,
+                        selected: true,
+                    },
+                ];
+            }
+            localStorage.setItem("ravelle_cart", JSON.stringify(cart));
+            window.dispatchEvent(new Event("ravelle_cart_updated"));
+            setToast({ visible: true, productName: p.name });
+            setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
+        } catch (error) {
+            console.error("Cart action failed:", error);
         }
-        localStorage.setItem("ravelle_cart", JSON.stringify(cart));
-        window.dispatchEvent(new Event("ravelle_cart_updated"));
-        setToast({ visible: true, productName: p.name });
-        setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
     };
 
     const badgeStyle: Record<string, string> = {

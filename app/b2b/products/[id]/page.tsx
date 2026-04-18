@@ -132,22 +132,28 @@ export default function B2BProductDetailPage() {
         if (!product) return [];
         const items: { type: 'image' | 'video'; url: string }[] = [];
 
-        // Collect main product videos (always visible regardless of variant)
+        // Collect main videos and secondary images (lifestyle/specs/branding)
         const mainVideos: { type: 'image' | 'video'; url: string }[] = [];
+        const secondaryMainImages: { type: 'image' | 'video'; url: string }[] = [];
+
         if (product.media && product.media.length > 0) {
             product.media.forEach((m: any) => {
                 if (m.type === 'video') {
                     mainVideos.push({ type: 'video', url: m.url });
+                } else if (m.type === 'image' && !m.is_primary) {
+                    // Secondary images
+                    secondaryMainImages.push({ type: 'image', url: m.url });
                 }
             });
         }
 
-        // Show variant media if variant selected, plus main videos
+        // Show variant media if variant selected, plus main videos and secondary main images
         if (selectedVariant && selectedVariant.media && selectedVariant.media.length > 0) {
             selectedVariant.media.forEach((m: any) => {
                 items.push({ type: m.type || 'image', url: m.url });
             });
             items.push(...mainVideos);
+            items.push(...secondaryMainImages);
             return items;
         }
 

@@ -158,7 +158,7 @@ export default function GlobalPointSettings({
       )}
 
       {/* ── Setting Cards ── */}
-      <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 transition-opacity duration-300 ${!loyaltyEnabled ? "opacity-40 pointer-events-none" : ""}`}>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 transition-all duration-300 ${!loyaltyEnabled ? "opacity-40 pointer-events-none" : ""}`}>
 
         {/* Earning Multiplier */}
         <div className={`group border border-slate-200 rounded-xl p-4 space-y-3 transition-all bg-slate-50/50 ${isEditing ? "hover:border-blue-300 hover:shadow-sm" : ""}`}>
