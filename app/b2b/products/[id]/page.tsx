@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
     ArrowLeft, ShoppingCart, ShieldCheck, Truck, Package,
-    ChevronRight, ChevronLeft, Play, Info, Check
+    ChevronRight, ChevronLeft, Play, Info, Check, Flame
 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
@@ -36,13 +36,17 @@ export default function B2BProductDetailPage() {
                     const p = res.data.data;
 
                     // Same formatting logic as grid
+                    const basePrice = p.active_promotion && p.promoted_price ? p.promoted_price : (p.b2b_price && p.b2b_price > 0 ? p.b2b_price : p.price);
+                    
                     const formattedProduct: Product = {
                         id: String(p.id),
                         name: p.name,
                         sku: p.slug || `SKU-${p.id}`,
-                        price: p.b2b_price && p.b2b_price > 0 ? p.b2b_price : p.price,
+                        price: basePrice,
                         msrp: p.price,
                         badge: p.badge || null,
+                        active_promotion: p.active_promotion,
+                        promoted_price: p.promoted_price,
                         minOrder: p.b2b_min_order && p.b2b_min_order > 0 ? p.b2b_min_order : 1,
                         stock: p.stock || 0,
                         category: p.category || "All Products",
@@ -82,7 +86,7 @@ export default function B2BProductDetailPage() {
     }, [product]);
 
     const selectedVariant = product ? ((product as any).variants || []).find((v: any) => v.id === selectedVariantId) : null;
-    const activePrice = selectedVariant?.price ?? product?.price ?? 0;
+    const activePrice = product?.price ?? (selectedVariant?.price ?? 0);
     const activeStock = selectedVariant ? selectedVariant.stock : (product?.stock ?? 0);
 
     // Reset active media index when variant changes  
@@ -241,11 +245,16 @@ export default function B2BProductDetailPage() {
 
                             {/* Badges on image */}
                             <div className="absolute top-4 left-4 flex flex-col gap-2 items-start z-10">
-                                {product.badge && (
+                                {product.active_promotion && product.active_promotion.type === 'flash_sale' ? (
+                                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-sm border border-black/5 bg-stone-900 text-amber-400 flex items-center gap-1 w-fit">
+                                        <Flame className="w-3 h-3 fill-amber-400" />
+                                        Flash Sale
+                                    </span>
+                                ) : product.badge ? (
                                     <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-sm bg-stone-900 text-white border border-white/10">
                                         {product.badge}
                                     </span>
-                                )}
+                                ) : null}
                             </div>
 
                             <div className="absolute top-4 right-4 flex flex-col gap-2 items-end z-10">

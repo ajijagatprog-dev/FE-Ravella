@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingCart, Package } from "lucide-react";
+import { ShoppingCart, Package, Flame } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { Product } from "../types";
@@ -26,27 +26,34 @@ export default function ProductCard({ product, onAddToOrder }: Props) {
     return (
         <div className="group bg-white rounded-2xl border border-stone-200 overflow-hidden hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50/60 transition-all duration-300 flex flex-col h-full">
             {/* Image */}
-            <Link href={`/b2b/products/${product.id}`} className="relative aspect-square bg-stone-50 overflow-hidden flex-shrink-0 block p-6 flex items-center justify-center border-b border-stone-100">
+            <Link href={`/b2b/products/${product.id}`} className="relative aspect-square bg-white overflow-hidden flex-shrink-0 block p-6 flex items-center justify-center border-b border-stone-100 mix-blend-multiply">
                 <img
                     src={product.image}
                     alt={product.name}
-                    className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-700"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 mix-blend-multiply"
                     onError={(e) => {
                         (e.target as HTMLImageElement).src =
                             "https://placehold.co/400x300/f5f5f0/a8a29e?text=No+Image";
                     }}
                 />
-                {/* Badge */}
-                {product.badge && (
-                    <div className="absolute top-4 left-4 z-10">
+                
+                {/* Badges Container */}
+                <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                    {/* Flash Sale Indicator vs Normal Badge */}
+                    {product.active_promotion && product.active_promotion.type === 'flash_sale' ? (
+                        <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-sm border border-black/5 bg-stone-900 text-amber-400 flex items-center gap-1 w-fit">
+                            <Flame className="w-3 h-3 fill-amber-400" />
+                            Flash Sale
+                        </span>
+                    ) : product.badge ? (
                         <span className={cn(
-                            "text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-sm border border-black/5",
+                            "text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-sm border border-black/5 w-fit",
                             badgeConfig[product.badge as keyof typeof badgeConfig]?.className || "bg-stone-900 text-white"
                         )}>
                             {badgeConfig[product.badge as keyof typeof badgeConfig]?.label || product.badge}
                         </span>
-                    </div>
-                )}
+                    ) : null}
+                </div>
                 {/* Discount */}
                 {discount > 0 && (
                     <div className="absolute top-4 right-4 z-10">
