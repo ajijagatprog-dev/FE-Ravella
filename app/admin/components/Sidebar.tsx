@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Newspaper,
   Tag,
+  MessageSquare,
 } from "lucide-react";
 
 // ── Menu Config ───────────────────────────────────────────────────────────────
@@ -33,6 +34,7 @@ const menuItems = [
 const contentMenuItems = [
   { label: "Kelola Produk", href: "/admin/content/products", icon: Package },
   { label: "Kelola Berita", href: "/admin/content/news", icon: Newspaper },
+  { label: "Review Management", href: "/admin/reviews", icon: MessageSquare },
 ];
 
 // ── Badge type ────────────────────────────────────────────────────────────────
@@ -120,13 +122,21 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [activeOrderCount, setActiveOrderCount] = useState(0);
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
 
   // Fetch active order count from API
-  const fetchOrderCount = useCallback(async () => {
+  const fetchCounts = useCallback(async () => {
     try {
-      const res = await api.get('/admin/orders/stats');
-      if (res.data?.status === 'success') {
-        setActiveOrderCount(res.data.data.active_orders ?? 0);
+      // Fetch order stats
+      const orderRes = await api.get('/admin/orders/stats');
+      if (orderRes.data?.status === 'success') {
+        setActiveOrderCount(orderRes.data.data.active_orders ?? 0);
+      }
+
+      // Fetch pending reviews
+      const reviewRes = await api.get('/admin/reviews', { params: { status: 'pending' } });
+      if (reviewRes.data?.status === 'success') {
+        setPendingReviewCount(reviewRes.data.data.total ?? 0);
       }
     } catch (e) {
       // silent fail
@@ -134,15 +144,16 @@ export default function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   }, []);
 
   useEffect(() => {
-    fetchOrderCount();
+    fetchCounts();
     // Poll every 30 seconds for real-time updates
-    const interval = setInterval(fetchOrderCount, 30000);
+    const interval = setInterval(fetchCounts, 30000);
     return () => clearInterval(interval);
-  }, [fetchOrderCount]);
+  }, [fetchCounts]);
 
   // Build dynamic badge map
   const menuBadges: Record<string, BadgeInfo> = {
     "/admin/order": activeOrderCount > 0 ? { count: activeOrderCount, color: "bg-blue-500" } : undefined,
+    "/admin/reviews": pendingReviewCount > 0 ? { count: pendingReviewCount, color: "bg-amber-500" } : undefined,
   };
 
   // Auto-close mobile sidebar on route change

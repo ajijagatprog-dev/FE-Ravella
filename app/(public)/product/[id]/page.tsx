@@ -24,6 +24,7 @@ import Footer from "../../../HomePage/components/Footer";
 import { products, type Product } from "../products";
 import api from "@/lib/axios";
 import { useEffect, useState } from "react";
+import ProductReviewsSection from "./components/ProductReviewsSection";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -51,8 +52,9 @@ export default function ProductDetail() {
                         originalPrice: item.price,
                         discount: activePromo ? (activePromo.discount_type === 'percent' ? activePromo.discount_value : Math.round((item.price - item.promoted_price) / item.price * 100)) : (item.discount || 0),
                         active_promotion: activePromo,
-                        rating: item.rating ? parseFloat(item.rating) : 0,
-                        reviews: item.reviews || 0,
+                        rating: item.calculated_rating || 0,
+                        reviews: item.total_reviews_count || 0,
+                        distribution: item.rating_distribution || {},
                         category: item.category || "appliance",
                         image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
                         videoUrl: item.video_url || null,
@@ -74,8 +76,8 @@ export default function ProductDetail() {
                             .map((r: any) => ({
                                 id: r.id,
                                 name: r.name,
-                                rating: r.rating ? parseFloat(r.rating) : 0,
-                                reviews: r.reviews || 0,
+                                rating: r.calculated_rating || 0,
+                                reviews: r.total_reviews_count || 0,
                                 originalPrice: r.price,
                                 price: r.promoted_price || r.price,
                                 discount: r.active_promotion ? (r.active_promotion.discount_type === 'percent' ? r.active_promotion.discount_value : Math.round((r.price - r.promoted_price) / r.price * 100)) : (r.discount || 0),
@@ -667,6 +669,14 @@ export default function ProductDetail() {
                     </div>
                 </div>
             </div>
+
+            {/* ── REVIEWS SECTION ── */}
+            <ProductReviewsSection 
+                productId={productId}
+                calculatedRating={product.rating}
+                totalReviews={product.reviews}
+                distribution={product.distribution || {}}
+            />
 
             {/* ── RELATED PRODUCTS ── */}
             {relatedProducts.length > 0 && (

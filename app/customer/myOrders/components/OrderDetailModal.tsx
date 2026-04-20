@@ -19,15 +19,19 @@ import OrderStatusBadge, { type OrderStatus } from "./OrderStatusBadge";
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import InvoiceModal from "./InvoiceModal";
+import ReviewFormModal from "./ReviewFormModal";
+import { Star } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface OrderItem {
     id: string;
+    productId: string;
     name: string;
     variant?: string;
     qty: number;
     price: number;
     image?: string;
+    hasReview?: boolean;
 }
 
 export interface OrderDetail {
@@ -98,6 +102,9 @@ export default function OrderDetailModal({ order, onClose }: Props) {
     const [loadingTracking, setLoadingTracking] = useState(false);
     const [showTracking, setShowTracking] = useState(false);
     const [showInvoice, setShowInvoice] = useState(false);
+
+    // Review state
+    const [reviewProduct, setReviewProduct] = useState<any>(null);
 
     useEffect(() => {
         if (!order || !order.trackingNumber || !showTracking) return;
@@ -239,6 +246,24 @@ export default function OrderDetailModal({ order, onClose }: Props) {
                                             <p className="text-sm font-semibold text-stone-700 truncate">{item.name}</p>
                                             {item.variant && (
                                                 <p className="text-xs text-stone-400">{item.variant}</p>
+                                            )}
+                                            {order.status === 'DELIVERED' && (
+                                                <div className="mt-2">
+                                                    {item.hasReview ? (
+                                                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 w-fit px-2 py-1 rounded-md">
+                                                            <Star size={10} className="fill-emerald-600" />
+                                                            Sudah Diulas
+                                                        </div>
+                                                    ) : (
+                                                        <button 
+                                                            onClick={() => setReviewProduct(item)}
+                                                            className="flex items-center gap-1.5 text-[10px] font-black text-amber-600 uppercase tracking-widest hover:text-amber-700 hover:underline transition-all"
+                                                        >
+                                                            <Star size={12} className="fill-amber-600" />
+                                                            Beri Ulasan
+                                                        </button>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                         <div className="text-right flex-shrink-0">
@@ -423,6 +448,23 @@ export default function OrderDetailModal({ order, onClose }: Props) {
                 <InvoiceModal
                     order={order}
                     onClose={() => setShowInvoice(false)}
+                />
+            )}
+            {/* Review Form Modal */}
+            {reviewProduct && (
+                <ReviewFormModal
+                    isOpen={!!reviewProduct}
+                    onClose={() => setReviewProduct(null)}
+                    onSuccess={() => {
+                        // Optimistic update or refetch
+                        onClose(); // Just close for now
+                    }}
+                    product={{
+                        id: reviewProduct.productId,
+                        name: reviewProduct.name,
+                        image: reviewProduct.image
+                    }}
+                    orderId={order.id}
                 />
             )}
         </>
