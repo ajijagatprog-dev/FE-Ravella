@@ -59,32 +59,33 @@ function ProductPageContent() {
         const res = await api.get("/products", { params: { limit: 100 } });
         if (res.data.status === "success") {
           const fetchedData = res.data.data.data;
-          const mapped = fetchedData.map((item: any) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description || "Deskripsi produk",
-            price:
-              item.sale_price && item.sale_price > 0
-                ? item.sale_price
-                : item.price,
-            originalPrice: item.price,
-            discount: item.discount || 0,
-            rating: item.rating ? parseFloat(item.rating) : 0,
-            reviews: item.reviews || 0,
-            category: item.category || "appliance",
-            image:
-              item.image ||
-              "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
-            features: Array.isArray(item.features) ? item.features : [],
-            specifications:
-              typeof item.specifications === "object" &&
-              item.specifications !== null
-                ? item.specifications
-                : {},
-            inStock: item.stock > 0,
-            badge: item.badge || (item.is_featured ? "Best Seller" : ""),
-            _variants: item.variants || [],
-          }));
+          const mapped = fetchedData.map((item: any) => {
+            const activePromo = item.active_promotion;
+            return {
+              id: item.id,
+              name: item.name,
+              description: item.description || "Deskripsi produk",
+              price: item.promoted_price || item.price,
+              originalPrice: item.price,
+              discount: activePromo ? (activePromo.discount_type === 'percent' ? activePromo.discount_value : Math.round((item.price - item.promoted_price) / item.price * 100)) : (item.discount || 0),
+              active_promotion: activePromo,
+              rating: item.rating ? parseFloat(item.rating) : 0,
+              reviews: item.reviews || 0,
+              category: item.category || "appliance",
+              image:
+                item.image ||
+                "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
+              features: Array.isArray(item.features) ? item.features : [],
+              specifications:
+                typeof item.specifications === "object" &&
+                item.specifications !== null
+                  ? item.specifications
+                  : {},
+              inStock: item.stock > 0,
+              badge: item.badge || (item.is_featured ? "Best Seller" : ""),
+              _variants: item.variants || [],
+            };
+          });
           setProducts(mapped);
         }
       } catch (err) {
@@ -556,12 +557,20 @@ function ProductPageContent() {
                         {product.badge}
                       </span>
                     )}
+                    {product.active_promotion?.type === 'flash_sale' && (
+                      <span
+                        className="px-2.5 py-1 bg-amber-500 text-white text-[10px] tracking-[0.12em] uppercase font-bold shadow-sm flex items-center gap-1"
+                        style={{ fontFamily: JOST }}
+                      >
+                        <Zap className="w-3 h-3 fill-white" /> Flash Sale
+                      </span>
+                    )}
                     {product.discount > 0 && (
                       <span
                         className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] font-medium tracking-[0.12em] uppercase"
                         style={{ fontFamily: JOST }}
                       >
-                        -{product.discount}%
+                        -{Math.round(product.discount)}%
                       </span>
                     )}
                   </div>
@@ -765,12 +774,20 @@ function ProductPageContent() {
                       {selectedProduct.badge}
                     </span>
                   )}
+                  {selectedProduct.active_promotion?.type === 'flash_sale' && (
+                    <span
+                      className="px-2.5 py-1 bg-amber-500 text-white text-[10px] tracking-[0.12em] uppercase font-bold shadow-sm flex items-center gap-1"
+                      style={{ fontFamily: JOST }}
+                    >
+                      <Zap className="w-3 h-3 fill-white" /> Flash Sale
+                    </span>
+                  )}
                   {selectedProduct.discount > 0 && (
                     <span
                       className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase"
                       style={{ fontFamily: JOST }}
                     >
-                      -{selectedProduct.discount}%
+                      -{Math.round(selectedProduct.discount)}%
                     </span>
                   )}
                 </div>

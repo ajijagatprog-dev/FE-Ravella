@@ -6,6 +6,7 @@ import NewProducts from "./HomePage/components/NewProducts";
 import Newsletter from "./HomePage/components/Newsletter";
 import Footer from "./HomePage/components/Footer";
 import WelcomePopup from "./HomePage/components/WelcomePopup";
+import LoyaltyShowcase from "./HomePage/components/LoyaltyShowcase";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
         <NewProducts />
         <CategoryGrid />
         <BrandStory />
+        <LoyaltyShowcase />
         <Newsletter />
       </main>
       <Footer />

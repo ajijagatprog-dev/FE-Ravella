@@ -47,11 +47,15 @@ export default function MembershipTiers({ isEditing }: { isEditing: boolean }) {
       if (res.data.status === 'success') {
         setTiers(res.data.data);
         setEditTier(null);
-        setToast({ type: "success", msg: `Tier "${updatedTier.name}" updated!` });
+        setEditIndex(-1);
+        setToast({ type: "success", msg: `Tier "${updatedTier.name}" berhasil diperbarui!` });
         setTimeout(() => setToast(null), 3000);
+      } else {
+        setToast({ type: "error", msg: "Server response unexpected" });
       }
-    } catch {
-      setToast({ type: "error", msg: "Failed to update tier" });
+    } catch (err) {
+      console.error("Failed to save tier:", err);
+      setToast({ type: "error", msg: "Gagal menyimpan tier. Coba lagi." });
     } finally {
       setSaving(false);
     }
@@ -112,7 +116,7 @@ export default function MembershipTiers({ isEditing }: { isEditing: boolean }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {tiers.map((tier, index) => (
           <TierCard
-            key={`${tier.name}-${index}`}
+            key={`${tier.name}-${index}-${tier.perks?.length ?? 0}-${tier.perks?.join(',')}`}
             tier={tier}
             index={index}
             isEditing={isEditing}

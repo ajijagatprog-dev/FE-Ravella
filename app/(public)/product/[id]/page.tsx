@@ -42,13 +42,15 @@ export default function ProductDetail() {
                 const res = await api.get(`/products/${productId}`);
                 if (res.data.status === 'success') {
                     const item = res.data.data;
+                    const activePromo = item.active_promotion;
                     setProduct({
                         id: item.id,
                         name: item.name,
                         description: item.description || "Deskripsi produk",
-                        price: item.sale_price && item.sale_price > 0 ? item.sale_price : item.price,
+                        price: item.promoted_price || item.price,
                         originalPrice: item.price,
-                        discount: item.discount || 0,
+                        discount: activePromo ? (activePromo.discount_type === 'percent' ? activePromo.discount_value : Math.round((item.price - item.promoted_price) / item.price * 100)) : (item.discount || 0),
+                        active_promotion: activePromo,
                         rating: item.rating ? parseFloat(item.rating) : 0,
                         reviews: item.reviews || 0,
                         category: item.category || "appliance",
@@ -72,12 +74,12 @@ export default function ProductDetail() {
                             .map((r: any) => ({
                                 id: r.id,
                                 name: r.name,
-                                price: r.sale_price && r.sale_price > 0 ? r.sale_price : r.price,
-                                image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
                                 rating: r.rating ? parseFloat(r.rating) : 0,
                                 reviews: r.reviews || 0,
                                 originalPrice: r.price,
-                                discount: r.discount || 0,
+                                price: r.promoted_price || r.price,
+                                discount: r.active_promotion ? (r.active_promotion.discount_type === 'percent' ? r.active_promotion.discount_value : Math.round((r.price - r.promoted_price) / r.price * 100)) : (r.discount || 0),
+                                active_promotion: r.active_promotion,
                                 badge: r.badge || (r.is_featured ? "Best Seller" : ""),
                             }));
                         setRelatedProducts(relMapped);
@@ -368,12 +370,20 @@ export default function ProductDetail() {
                                         {product.badge}
                                     </span>
                                 )}
+                                {product.active_promotion?.type === 'flash_sale' && (
+                                    <span
+                                        className="px-2.5 py-1 bg-amber-500 text-white text-[10px] tracking-[0.12em] uppercase font-bold shadow-sm flex items-center gap-1"
+                                        style={{ fontFamily: JOST }}
+                                    >
+                                        <Zap className="w-3 h-3 fill-white" /> Flash Sale
+                                    </span>
+                                )}
                                 {product.discount > 0 && (
                                     <span
                                         className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase font-medium"
                                         style={{ fontFamily: JOST }}
                                     >
-                                        -{product.discount}%
+                                        -{Math.round(product.discount)}%
                                     </span>
                                 )}
                             </div>

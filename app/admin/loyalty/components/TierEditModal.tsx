@@ -44,16 +44,29 @@ export default function TierEditModal({ tier, isOpen, onClose, onSave, saving }:
         }
     };
 
+    const handleEditPerk = (index: number, value: string) => {
+        const updated = [...perks];
+        updated[index] = value;
+        setPerks(updated);
+    };
+
     const handleRemovePerk = (index: number) => {
         setPerks(perks.filter((_, i) => i !== index));
     };
 
     const handleSubmit = () => {
+        // Include pending newPerk if user forgot to press +
+        let allPerks = [...perks];
+        if (newPerk.trim()) {
+            allPerks.push(newPerk.trim());
+        }
+        // Filter out empty perks before saving
+        const cleanedPerks = allPerks.filter((p) => p.trim() !== "");
         onSave({
             name,
             min: parseInt(min) || 0,
             max: max ? parseInt(max) : null,
-            perks,
+            perks: cleanedPerks,
         });
     };
 
@@ -132,12 +145,30 @@ export default function TierEditModal({ tier, isOpen, onClose, onSave, saving }:
                             {perks.map((perk, index) => (
                                 <div
                                     key={index}
-                                    className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2"
+                                    className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50/30 transition-colors group"
                                 >
-                                    <span className="flex-1 text-sm text-gray-700">{perk}</span>
+                                    {/* Drag handle visual */}
+                                    <div className="pl-3 py-2 text-gray-300 group-hover:text-gray-400">
+                                        <svg width="8" height="14" viewBox="0 0 8 14" fill="currentColor">
+                                            <circle cx="2" cy="2" r="1.5" />
+                                            <circle cx="6" cy="2" r="1.5" />
+                                            <circle cx="2" cy="7" r="1.5" />
+                                            <circle cx="6" cy="7" r="1.5" />
+                                            <circle cx="2" cy="12" r="1.5" />
+                                            <circle cx="6" cy="12" r="1.5" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={perk}
+                                        onChange={(e) => handleEditPerk(index, e.target.value)}
+                                        className="flex-1 text-sm text-gray-700 bg-transparent py-2 focus:outline-none focus:text-gray-900 placeholder-gray-400"
+                                        placeholder="Enter benefit..."
+                                    />
                                     <button
                                         onClick={() => handleRemovePerk(index)}
-                                        className="p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                                        className="p-1.5 mr-1.5 rounded hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors"
+                                        title="Remove perk"
                                     >
                                         <Trash2 size={14} />
                                     </button>
