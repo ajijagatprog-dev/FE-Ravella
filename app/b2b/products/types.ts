@@ -15,6 +15,8 @@ export interface Product {
     features: string[];
     specifications?: Record<string, string>;
     description: string;
+    active_promotion?: any;
+    promoted_price?: number;
     media?: { type: 'image' | 'video'; url: string }[];
     variants?: {
         id: number;

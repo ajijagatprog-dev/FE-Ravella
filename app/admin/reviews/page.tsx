@@ -228,7 +228,7 @@ export default function ReviewManagementPage() {
                                                 value={replyText}
                                                 onChange={(e) => setReplyText(e.target.value)}
                                                 placeholder="Tulis balasan..."
-                                                className="w-full px-4 py-3 bg-white border border-blue-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none min-h-[100px] resize-none"
+                                                className="w-full px-4 py-3 bg-white border border-blue-200 rounded-2xl text-gray-900 text-sm placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none min-h-[100px] resize-none"
                                             />
                                             <div className="flex justify-end gap-2">
                                                 <button onClick={() => setReplyingTo(null)} className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">Batal</button>
