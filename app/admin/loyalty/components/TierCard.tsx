@@ -2,6 +2,7 @@
 
 interface Tier {
   name: string;
+  label?: string;
   min: number;
   max: number | null;
   perks: string[];
@@ -10,6 +11,7 @@ interface Tier {
 interface TierCardProps {
   tier: Tier;
   index?: number;
+  isEditing: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -88,7 +90,7 @@ function CheckIcon({ className }: { className: string }) {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function TierCard({ tier, index = 0, onEdit, onDelete }: TierCardProps) {
+export default function TierCard({ tier, index = 0, isEditing, onEdit, onDelete }: TierCardProps) {
   const cfg = TIER_CONFIG[tier.name] ?? TIER_CONFIG["Basic"];
   const isGold = tier.name === "Gold";
 
@@ -119,13 +121,13 @@ export default function TierCard({ tier, index = 0, onEdit, onDelete }: TierCard
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-base font-bold text-slate-800">{tier.name}</h3>
               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cfg.badge}`}>
-                {cfg.label}
+                {tier.label || cfg.label}
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
               {tier.max
-                ? `Rp ${tier.min.toLocaleString('id-ID')} – Rp ${tier.max.toLocaleString('id-ID')}`
-                : `Rp ${tier.min.toLocaleString('id-ID')}+`}
+                ? `Rp ${Number(tier.min).toLocaleString('id-ID')} – Rp ${Number(tier.max).toLocaleString('id-ID')}`
+                : `Rp ${Number(tier.min).toLocaleString('id-ID')}+`}
             </p>
           </div>
         </div>
@@ -145,7 +147,7 @@ export default function TierCard({ tier, index = 0, onEdit, onDelete }: TierCard
           Perks & Benefits
         </p>
         <ul className="space-y-2">
-          {tier.perks.map((perk) => (
+          {Array.isArray(tier.perks) ? tier.perks.map((perk) => (
             <li key={perk} className="flex items-center gap-2.5 text-sm text-slate-700">
               <CheckIcon className={
                 tier.name === "Gold" ? "text-amber-500" :
@@ -154,7 +156,9 @@ export default function TierCard({ tier, index = 0, onEdit, onDelete }: TierCard
               } />
               {perk}
             </li>
-          ))}
+          )) : (
+            <li className="text-xs text-slate-400 italic">No perks defined</li>
+          )}
         </ul>
       </div>
 
@@ -162,12 +166,15 @@ export default function TierCard({ tier, index = 0, onEdit, onDelete }: TierCard
       <div className="px-5 pb-4 flex gap-2">
         <button
           onClick={onEdit}
-          className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-colors
-          ${isGold
-              ? "bg-amber-400 text-white hover:bg-amber-500 border-amber-400"
-              : tier.name === "Platinum"
-                ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
-                : "bg-white text-slate-600 hover:bg-slate-50 border-slate-200"
+          disabled={!isEditing}
+          className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-all
+          ${!isEditing
+              ? "bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed"
+              : isGold
+                ? "bg-amber-400 text-white hover:bg-amber-500 border-amber-400"
+                : tier.name === "Platinum"
+                  ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
+                  : "bg-white text-slate-600 hover:bg-slate-50 border-slate-200"
             }`
           }>
           Edit Tier
@@ -175,8 +182,14 @@ export default function TierCard({ tier, index = 0, onEdit, onDelete }: TierCard
         {onDelete && (
           <button
             onClick={onDelete}
-            className="px-3 py-2 text-xs font-semibold rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
-            title="Delete Tier"
+            disabled={!isEditing}
+            className={`px-3 py-2 text-xs font-semibold rounded-xl border transition-all
+              ${!isEditing
+                ? "border-slate-100 text-slate-300 cursor-not-allowed"
+                : "border-red-200 text-red-500 hover:bg-red-50"
+              }
+            `}
+            title={isEditing ? "Delete Tier" : "Enable Edit Mode to delete"}
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

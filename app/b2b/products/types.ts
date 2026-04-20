@@ -16,6 +16,15 @@ export interface Product {
     specifications?: Record<string, string>;
     description: string;
     media?: { type: 'image' | 'video'; url: string }[];
+    variants?: {
+        id: number;
+        variant_type: string;
+        variant_value: string;
+        price: number | null;
+        stock: number;
+        is_default: boolean;
+        media: { id: number; type: 'image' | 'video'; url: string }[];
+    }[];
 }
 
 export type Category = "All Products" | "Home & Kitchen Appliance" | "Knife set" | "ezy series" | "home living" | "keyboard";

@@ -89,10 +89,13 @@ export default function MyOrdersPage() {
                     tax: 0,
                     items: (o.items || []).map((i: any) => ({
                         id: i.id.toString(),
+                        productId: i.product_id?.toString(),
                         name: i.product?.name || "Unknown Product",
                         variant: "-",
                         qty: i.quantity,
                         price: parseFloat(i.price),
+                        image: i.product?.image || null,
+                        hasReview: i.has_review || false,
                     })),
                     shippingAddress: {
                         fullName: addressData.recipient_name || "",
@@ -134,10 +137,13 @@ export default function MyOrdersPage() {
             tax: 0,
             items: (o.items || []).map((i: any) => ({
                 id: i.id.toString(),
+                productId: i.product_id?.toString(),
                 name: i.product?.name || "Unknown Product",
                 variant: "-",
                 qty: i.quantity,
                 price: parseFloat(i.price),
+                image: i.product?.image || null,
+                hasReview: i.has_review || false,
             })),
             shippingAddress: {
                 fullName: addressData.recipient_name || "",

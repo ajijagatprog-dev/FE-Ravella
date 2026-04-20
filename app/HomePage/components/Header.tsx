@@ -2,8 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Search, ShoppingCart, User, Menu, X, Instagram, Phone, Facebook } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Search,
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  Instagram,
+  Phone,
+  Facebook,
+} from "lucide-react";
 
 const JOST = "'Jost', system-ui, sans-serif";
 
@@ -13,9 +22,14 @@ function readCartCount(): number {
   try {
     const stored = localStorage.getItem("ravelle_cart");
     if (!stored) return 0;
-    const cart: { quantity: number }[] = JSON.parse(stored);
+    const cart = JSON.parse(stored);
+
+    // Safety check: Ensure it's an array before reducing
+    if (!Array.isArray(cart)) return 0;
+
     return cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-  } catch {
+  } catch (error) {
+    console.error("Error reading cart count:", error);
     return 0;
   }
 }
@@ -29,7 +43,7 @@ interface HeaderProps {
 export default function Header({
   userName = "User",
   avatarUrl = "",
-  onSearch = () => { },
+  onSearch = () => {},
 }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -37,20 +51,33 @@ export default function Header({
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
+  const [authObj, setAuthObj] = useState<{
+    role: string;
+    email: string;
+  } | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
   const router = useRouter();
-  const [authObj, setAuthObj] = useState<{ role: string; email: string } | null>(null);
 
   // Scroll listener
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Auto-close mobile menu on navigation
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
   // Body scroll lock
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileOpen]);
 
   // Baca cart dari localStorage saat mount + listen event update
@@ -60,11 +87,22 @@ export default function Header({
     const handleCartUpdate = () => setCartCount(readCartCount());
 
     const checkAuth = () => {
-      const stored = localStorage.getItem("auth");
-      if (stored) {
-        setAuthObj(JSON.parse(stored));
-      } else {
+      try {
+        const stored = localStorage.getItem("auth");
+        if (stored && stored !== "undefined") {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed === "object") {
+            setAuthObj(parsed);
+          } else {
+            setAuthObj(null);
+          }
+        } else {
+          setAuthObj(null);
+        }
+      } catch (error) {
+        console.error("Error parsing auth data:", error);
         setAuthObj(null);
+        localStorage.removeItem("auth"); // Clear corrupted data
       }
     };
     checkAuth();
@@ -93,6 +131,7 @@ export default function Header({
     { label: "PRODUCT", href: "/product" },
     { label: "NEWS", href: "/news" },
     { label: "CONTACT", href: "/contact" },
+    { label: "TESTIMONIAL", href: "/testimonial" },
   ];
 
   const saleMenu = { label: "SALE", href: "/sale" };
@@ -100,15 +139,15 @@ export default function Header({
   return (
     <>
       <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled
-          ? "bg-white/90 backdrop-blur-md border-b border-neutral-200"
-          : "bg-white border-b border-neutral-200"
-          }`}
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+          scrolled
+            ? "bg-white/90 backdrop-blur-md border-b border-neutral-200"
+            : "bg-white border-b border-neutral-200"
+        }`}
         style={{ fontFamily: JOST }}
       >
         <div className="mx-auto max-w-[1320px] px-6 md:px-12 py-3">
           <div className="flex items-center justify-between">
-
             {/* LEFT */}
             <div className="flex items-center gap-14">
               <Link href="/" className="group flex items-center">
@@ -143,7 +182,6 @@ export default function Header({
 
             {/* RIGHT */}
             <div className="flex items-center gap-5">
-
               {/* SEARCH */}
               <div className="hidden md:block relative">
                 {!searchOpen ? (
@@ -167,7 +205,9 @@ export default function Header({
                       }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && searchQuery.trim()) {
-                          router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                          router.push(
+                            `/search?q=${encodeURIComponent(searchQuery.trim())}`,
+                          );
                           setSearchOpen(false);
                         }
                       }}
@@ -204,7 +244,13 @@ export default function Header({
                 {authObj ? (
                   <>
                     <Link
-                      href={authObj.role === "admin" ? "/admin/dashboard" : authObj.role === "b2b" ? "/b2b/dashboard" : "/customer/dashboard"}
+                      href={
+                        authObj.role === "admin"
+                          ? "/admin/dashboard"
+                          : authObj.role === "b2b"
+                            ? "/b2b/dashboard"
+                            : "/customer/dashboard"
+                      }
                       className="flex items-center gap-2 px-5 py-2 text-[12px] tracking-[0.15em] font-medium border border-black text-black hover:bg-black hover:text-white transition-all duration-300"
                     >
                       <User className="w-4 h-4" />
@@ -212,7 +258,13 @@ export default function Header({
                     </Link>
                     <div className="absolute right-0 mt-2 w-48 bg-white border border-neutral-100 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top translate-y-2 group-hover:translate-y-0">
                       <Link
-                        href={authObj.role === "admin" ? "/admin/dashboard" : authObj.role === "b2b" ? "/b2b/dashboard" : "/customer/dashboard"}
+                        href={
+                          authObj.role === "admin"
+                            ? "/admin/dashboard"
+                            : authObj.role === "b2b"
+                              ? "/b2b/dashboard"
+                              : "/customer/dashboard"
+                        }
                         className="block px-4 py-3 text-[11px] tracking-[0.1em] text-neutral-800 hover:bg-neutral-50 hover:text-black border-b border-neutral-50"
                       >
                         MY ACCOUNT
@@ -273,158 +325,189 @@ export default function Header({
         </div>
       </header>
 
-      {/* ── MOBILE PANEL ── */}
-      <div
-        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
-        onClick={() => setMobileOpen(false)}
-      />
-
-      <div
-        className={`fixed right-0 top-0 h-full z-50 w-[85%] max-w-[340px] bg-white flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        style={{ fontFamily: JOST }}
-      >
-        {/* Panel Header */}
-        <div className="flex items-center justify-between px-7 py-5 border-b border-neutral-100">
-          <img src="/lg-ravella-gold.png" alt="Ravelle Logo" className="h-5 w-auto" />
-          <button
+      {/* ── MOBILE PANEL (Hydration Safe) ── */}
+      {mounted && (
+        <>
+          <div
+            className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+              mobileOpen
+                ? "opacity-100 pointer-events-auto"
+                : "opacity-0 pointer-events-none"
+            }`}
             onClick={() => setMobileOpen(false)}
-            className="w-8 h-8 flex items-center justify-center border border-neutral-200 hover:border-black hover:bg-black hover:text-white transition-all duration-200"
-            aria-label="Close menu"
+          />
+
+          <div
+            className={`fixed right-0 top-0 h-full z-50 w-[85%] max-w-[340px] bg-white flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${
+              mobileOpen ? "translate-x-0" : "translate-x-full"
+            }`}
+            style={{ fontFamily: JOST }}
           >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Mobile Search */}
-        <div className="px-7 py-4 border-b border-neutral-100">
-          <div className="flex items-center gap-2 px-3 py-2 border border-neutral-200">
-            <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
-            <input
-              type="text"
-              placeholder="Cari produk..."
-              value={mobileSearchQuery}
-              onChange={(e) => setMobileSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && mobileSearchQuery.trim()) {
-                  router.push(`/search?q=${encodeURIComponent(mobileSearchQuery.trim())}`);
-                  setMobileOpen(false);
-                }
-              }}
-              className="flex-1 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
-              style={{ fontFamily: JOST }}
-            />
-          </div>
-        </div>
-
-        {/* Nav Links */}
-        <nav className="flex-1 overflow-y-auto px-7 py-6">
-          <p className="text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-4">
-            Menu
-          </p>
-          <div className="flex flex-col">
-            {menus.map((menu) => (
-              <Link
-                key={menu.label}
-                href={menu.href}
+            {/* Panel Header */}
+            <div className="flex items-center justify-between px-7 py-5 border-b border-neutral-100">
+              <img
+                src="/lg-ravella-gold.png"
+                alt="Ravelle Logo"
+                className="h-5 w-auto"
+              />
+              <button
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-between py-4 border-b border-neutral-100 text-[13px] tracking-[0.2em] font-medium text-neutral-800 hover:text-black transition-colors duration-200 group"
+                className="w-8 h-8 flex items-center justify-center border border-neutral-200 hover:border-black hover:bg-black hover:text-white transition-all duration-200"
+                aria-label="Close menu"
               >
-                <span>{menu.label}</span>
-                <span className="w-0 h-[1px] bg-black group-hover:w-4 transition-all duration-300" />
-              </Link>
-            ))}
-            {/* SALE */}
-            <Link
-              href={saleMenu.href}
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-between py-4 border-b border-neutral-100 text-[13px] tracking-[0.2em] font-bold text-rose-600 hover:text-rose-700 transition-colors duration-200 group"
-            >
-              <span>🔥 {saleMenu.label}</span>
-              <span className="w-0 h-[1px] bg-rose-500 group-hover:w-4 transition-all duration-300" />
-            </Link>
-          </div>
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-          {/* CTA Buttons */}
-          <div className="mt-8 flex flex-col gap-3">
-            {authObj ? (
-              <>
-                <Link
-                  href={authObj.role === "admin" ? "/admin/dashboard" : authObj.role === "b2b" ? "/b2b/dashboard" : "/customer/dashboard"}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-800 transition-colors"
-                >
-                  <User className="w-4 h-4" />
-                  My Account
-                </Link>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileOpen(false);
+            {/* Mobile Search */}
+            <div className="px-7 py-4 border-b border-neutral-100">
+              <div className="flex items-center gap-2 px-3 py-2 border border-neutral-200">
+                <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Cari produk..."
+                  value={mobileSearchQuery}
+                  onChange={(e) => setMobileSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && mobileSearchQuery.trim()) {
+                      router.push(
+                        `/search?q=${encodeURIComponent(mobileSearchQuery.trim())}`,
+                      );
+                      setMobileOpen(false);
+                    }
                   }}
-                  className="flex items-center justify-center gap-2 w-full py-3 border border-red-500 text-red-600 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-red-50 transition-colors"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/auth/login"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-800 transition-colors"
-              >
-                <User className="w-4 h-4" />
-                Login / Daftar
-              </Link>
-            )}
-            <Link
-              href="/cart"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-center gap-2 w-full py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-100 transition-colors"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              Keranjang
-              {cartCount > 0 && (
-                <span
-                  className="ml-1 min-w-[20px] h-5 px-1 bg-black text-white text-[10px] flex items-center justify-center rounded-full"
+                  className="flex-1 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
                   style={{ fontFamily: JOST }}
-                >
-                  {cartCount > 99 ? "99+" : cartCount}
-                </span>
-              )}
-            </Link>
-          </div>
-        </nav>
+                />
+              </div>
+            </div>
 
-        {/* Panel Footer */}
-        <div className="px-7 py-5 border-t border-neutral-100">
-          <p className="text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-3">
-            Ikuti Kami
-          </p>
-          <div className="flex gap-2.5 mb-4">
-            {[
-              { icon: Instagram, href: "https://instagram.com/ravelle", label: "Instagram" },
-              { icon: Facebook, href: "https://facebook.com/ravelle", label: "Facebook" },
-              { icon: Phone, href: "https://wa.me/628123456789", label: "WhatsApp" },
-            ].map(({ icon: Icon, href, label }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="w-8 h-8 flex items-center justify-center border border-neutral-200 text-neutral-600 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
-              >
-                <Icon className="w-3.5 h-3.5" />
-              </a>
-            ))}
+            {/* Nav Links */}
+            <nav className="flex-1 overflow-y-auto px-7 py-6">
+              <p className="text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-4">
+                Menu
+              </p>
+              <div className="flex flex-col">
+                {menus.map((menu) => (
+                  <Link
+                    key={menu.label}
+                    href={menu.href}
+                    className="flex items-center justify-between py-4 border-b border-neutral-100 text-[13px] tracking-[0.2em] font-medium text-neutral-800 hover:text-black transition-colors duration-200 group"
+                  >
+                    <span>{menu.label}</span>
+                    <span className="w-0 h-[1px] bg-black group-hover:w-4 transition-all duration-300" />
+                  </Link>
+                ))}
+                {/* SALE */}
+                <Link
+                  href={saleMenu.href}
+                  className="flex items-center justify-between py-4 border-b border-neutral-100 text-[13px] tracking-[0.2em] font-bold text-rose-600 hover:text-rose-700 transition-colors duration-200 group"
+                >
+                  <span>🔥 {saleMenu.label}</span>
+                  <span className="w-0 h-[1px] bg-rose-500 group-hover:w-4 transition-all duration-300" />
+                </Link>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="mt-8 flex flex-col gap-3">
+                {authObj ? (
+                  <>
+                    <Link
+                      href={
+                        authObj.role === "admin"
+                          ? "/admin/dashboard"
+                          : authObj.role === "b2b"
+                            ? "/b2b/dashboard"
+                            : "/customer/dashboard"
+                      }
+                      className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-800 transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      My Account
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                      }}
+                      className="flex items-center justify-center gap-2 w-full py-3 border border-red-500 text-red-600 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-red-50 transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-800 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    Login / Daftar
+                  </Link>
+                )}
+                <Link
+                  href="/cart"
+                  className="flex items-center justify-center gap-2 w-full py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-100 transition-colors"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  Keranjang
+                  {cartCount > 0 && (
+                    <span
+                      className="ml-1 min-w-[20px] h-5 px-1 bg-black text-white text-[10px] flex items-center justify-center rounded-full"
+                      style={{ fontFamily: JOST }}
+                    >
+                      {cartCount > 99 ? "99+" : cartCount}
+                    </span>
+                  )}
+                </Link>
+              </div>
+            </nav>
+
+            {/* Panel Footer */}
+            <div className="px-7 py-5 border-t border-neutral-100">
+              <p className="text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-3">
+                Ikuti Kami
+              </p>
+              <div className="flex gap-2.5 mb-4">
+                {[
+                  {
+                    icon: Instagram,
+                    href: "https://instagram.com/ravelle",
+                    label: "Instagram",
+                  },
+                  {
+                    icon: Facebook,
+                    href: "https://facebook.com/ravelle",
+                    label: "Facebook",
+                  },
+                  {
+                    icon: Phone,
+                    href: "https://wa.me/628123456789",
+                    label: "WhatsApp",
+                  },
+                ].map(({ icon: Icon, href, label }) => {
+                  // Safety: Ensure Icon is a valid component
+                  if (!Icon) return null;
+
+                  return (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="w-8 h-8 flex items-center justify-center border border-neutral-200 text-neutral-600 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                    </a>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-neutral-400 font-light tracking-wide">
+                © 2026 Ravelle. All rights reserved.
+              </p>
+            </div>
           </div>
-          <p className="text-[10px] text-neutral-400 font-light tracking-wide">
-            © 2026 Ravelle. All rights reserved.
-          </p>
-        </div>
-      </div>
+        </>
+      )}
     </>
   );
 }

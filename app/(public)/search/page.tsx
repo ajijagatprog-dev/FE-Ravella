@@ -49,15 +49,22 @@ function SearchContent() {
                 ]);
 
                 if (productRes.data.status === "success") {
-                    setProducts(productRes.data.data.data.map((item: any) => ({
-                        id: item.id,
-                        name: item.name,
-                        price: item.sale_price > 0 ? item.sale_price : item.price,
-                        originalPrice: item.price,
-                        image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
-                        discount: item.discount,
-                        badge: item.badge
-                    })));
+                    setProducts(productRes.data.data.data.map((item: any) => {
+                        const activePromo = item.active_promotion;
+                        const finalPrice = item.promoted_price || item.price;
+                        const discPercent = activePromo ? (activePromo.discount_type === 'percent' ? activePromo.discount_value : Math.round((item.price - finalPrice) / item.price * 100)) : (item.discount || 0);
+                        
+                        return {
+                            id: item.id,
+                            name: item.name,
+                            price: finalPrice,
+                            originalPrice: item.price,
+                            image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
+                            discount: discPercent,
+                            badge: item.badge,
+                            active_promotion: activePromo
+                        };
+                    }));
                 }
 
                 if (newsRes.data.status === "success") {

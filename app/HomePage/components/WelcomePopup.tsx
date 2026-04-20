@@ -22,8 +22,12 @@ export default function WelcomePopup() {
         setMounted(true);
 
         // If user already dismissed in this session, don't show
-        const dismissed = sessionStorage.getItem(POPUP_SESSION_KEY);
-        if (dismissed) return;
+        try {
+            const dismissed = sessionStorage.getItem(POPUP_SESSION_KEY);
+            if (dismissed) return;
+        } catch (e) {
+            console.warn("sessionStorage access denied:", e);
+        }
 
         // Fetch active vouchers from backend
         const fetchVoucher = async () => {
@@ -51,7 +55,11 @@ export default function WelcomePopup() {
     }, []);
 
     const handleClose = () => {
-        sessionStorage.setItem(POPUP_SESSION_KEY, "1");
+        try {
+            sessionStorage.setItem(POPUP_SESSION_KEY, "1");
+        } catch (e) {
+            console.warn("Failed to set popup state:", e);
+        }
         setVisible(false);
     };
 

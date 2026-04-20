@@ -51,7 +51,8 @@ export default function B2BProductDetailPage() {
                         features: Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features || "[]") : []),
                         specifications: typeof p.specifications === 'object' && p.specifications !== null ? p.specifications : (typeof p.specifications === 'string' ? JSON.parse(p.specifications || "{}") : {}),
                         description: p.description || "",
-                        media: Array.isArray(p.media) ? p.media : [],
+                        media: Array.isArray(p.media) ? p.media.filter((m: any) => !m.variant_id) : [],
+                        variants: p.variants || [],
                     };
 
                     setProduct(formattedProduct);
@@ -68,6 +69,26 @@ export default function B2BProductDetailPage() {
     }, [id]);
 
     const formatIDR = (n: number) => "Rp " + n.toLocaleString("id-ID");
+
+    // Variant state
+    const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
+
+    // Auto-select default variant
+    useEffect(() => {
+        if (product && (product as any).variants && (product as any).variants.length > 0) {
+            const defaultV = (product as any).variants.find((v: any) => v.is_default);
+            setSelectedVariantId(defaultV ? defaultV.id : (product as any).variants[0].id);
+        }
+    }, [product]);
+
+    const selectedVariant = product ? ((product as any).variants || []).find((v: any) => v.id === selectedVariantId) : null;
+    const activePrice = selectedVariant?.price ?? product?.price ?? 0;
+    const activeStock = selectedVariant ? selectedVariant.stock : (product?.stock ?? 0);
+
+    // Reset active media index when variant changes  
+    useEffect(() => {
+        setActiveMediaIndex(0);
+    }, [selectedVariantId]);
 
     const handleIncrement = () => setQuantity(prev => prev + 1);
     const handleDecrement = () => setQuantity(prev => (prev > (product?.minOrder || 1) ? prev - 1 : prev));
@@ -110,6 +131,32 @@ export default function B2BProductDetailPage() {
     const galleryItems = (() => {
         if (!product) return [];
         const items: { type: 'image' | 'video'; url: string }[] = [];
+
+        // Collect main videos and secondary images (lifestyle/specs/branding)
+        const mainVideos: { type: 'image' | 'video'; url: string }[] = [];
+        const secondaryMainImages: { type: 'image' | 'video'; url: string }[] = [];
+
+        if (product.media && product.media.length > 0) {
+            product.media.forEach((m: any) => {
+                if (m.type === 'video') {
+                    mainVideos.push({ type: 'video', url: m.url });
+                } else if (m.type === 'image' && !m.is_primary) {
+                    // Secondary images
+                    secondaryMainImages.push({ type: 'image', url: m.url });
+                }
+            });
+        }
+
+        // Show variant media if variant selected, plus main videos and secondary main images
+        if (selectedVariant && selectedVariant.media && selectedVariant.media.length > 0) {
+            selectedVariant.media.forEach((m: any) => {
+                items.push({ type: m.type || 'image', url: m.url });
+            });
+            items.push(...mainVideos);
+            items.push(...secondaryMainImages);
+            return items;
+        }
+
         if (product.media && product.media.length > 0) {
             product.media.forEach((m: any) => {
                 items.push({ type: m.type, url: m.url });
@@ -119,6 +166,8 @@ export default function B2BProductDetailPage() {
         }
         return items;
     })();
+
+
 
     return (
         <div className="min-h-screen bg-stone-50">
@@ -147,11 +196,20 @@ export default function B2BProductDetailPage() {
                         <div className="sticky top-28 flex flex-col items-center w-full">
                             <div className="relative w-full max-w-md aspect-square rounded-2xl bg-white border border-stone-100 shadow-sm overflow-hidden flex items-center justify-center p-4 group">
                                 {galleryItems.length > 0 && galleryItems[activeMediaIndex]?.type === 'video' ? (
-                                    <video
-                                        src={galleryItems[activeMediaIndex].url}
-                                        controls
-                                        className="w-full h-full object-contain bg-black rounded-lg"
-                                    />
+                                    <div className="w-full h-full relative bg-stone-100 rounded-lg overflow-hidden">
+                                        <video
+                                            src={galleryItems[activeMediaIndex].url}
+                                            controls
+                                            muted
+                                            playsInline
+                                            preload="metadata"
+                                            className="w-full h-full object-contain"
+                                            onLoadedData={(e) => {
+                                                const vid = e.target as HTMLVideoElement;
+                                                vid.currentTime = 1;
+                                            }}
+                                        />
+                                    </div>
                                 ) : (
                                     <img
                                         src={galleryItems[activeMediaIndex]?.url || product.image || "https://placehold.co/600x600/f5f5f0/a8a29e?text=No+Image"}
@@ -215,8 +273,21 @@ export default function B2BProductDetailPage() {
                                         {item.type === 'image' ? (
                                             <img src={item.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-contain p-1" />
                                         ) : (
-                                            <div className="w-full h-full bg-stone-900 flex items-center justify-center">
-                                                <Play className="w-6 h-6 text-white/90 fill-white border border-white" />
+                                            <div className="w-full h-full bg-stone-100 relative rounded-lg overflow-hidden">
+                                                <video
+                                                    src={item.url}
+                                                    muted
+                                                    playsInline
+                                                    preload="metadata"
+                                                    className="w-full h-full object-cover"
+                                                    onLoadedData={(e) => {
+                                                        const vid = e.target as HTMLVideoElement;
+                                                        vid.currentTime = 1;
+                                                    }}
+                                                />
+                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                    <Play className="w-4 h-4 text-white drop-shadow-lg fill-white/80" />
+                                                </div>
                                             </div>
                                         )}
                                     </button>
@@ -243,15 +314,58 @@ export default function B2BProductDetailPage() {
 
                         <div className="flex items-end gap-3 mb-8">
                             <span className="text-4xl font-black text-blue-600 tracking-tight">
-                                {formatIDR(product.price)}
+                                {formatIDR(activePrice)}
                             </span>
-                            {product.price < product.msrp && (
+                            {activePrice < product.msrp && (
                                 <span className="text-lg text-stone-400 line-through font-semibold pb-1">
                                     {formatIDR(product.msrp)}
                                 </span>
                             )}
                             <span className="text-sm font-medium text-stone-500 pb-1.5 ml-2">/ unit</span>
                         </div>
+
+                        {/* ── Variant Selector ── */}
+                        {(product as any).variants && (product as any).variants.length > 0 && (
+                            <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 mb-6">
+                                <p className="text-[11px] font-bold text-stone-900 uppercase tracking-widest mb-3">
+                                    {(product as any).variants[0]?.variant_type || 'Varian'}
+                                    {selectedVariant && (
+                                        <span className="text-blue-600 ml-2 normal-case tracking-normal text-xs font-bold">
+                                            — {selectedVariant.variant_value}
+                                        </span>
+                                    )}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    {(product as any).variants.map((v: any) => {
+                                        const variantThumb = v.media?.[0]?.url;
+                                        const isSelected = selectedVariantId === v.id;
+                                        return (
+                                            <button
+                                                key={v.id}
+                                                onClick={() => setSelectedVariantId(v.id)}
+                                                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 transition-all ${
+                                                    isSelected
+                                                        ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-600/20'
+                                                        : 'border-stone-200 hover:border-stone-400 bg-white'
+                                                }`}
+                                            >
+                                                {variantThumb && (
+                                                    <img src={variantThumb} alt={v.variant_value} className="w-8 h-8 object-cover rounded-lg" />
+                                                )}
+                                                <span className={`text-xs font-bold ${
+                                                    isSelected ? 'text-blue-700' : 'text-stone-600'
+                                                }`}>
+                                                    {v.variant_value}
+                                                </span>
+                                                {v.stock <= 0 && (
+                                                    <span className="text-[9px] text-red-400 font-bold">Habis</span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Minimum Order Info */}
                         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-8 flex items-start gap-4">
@@ -261,7 +375,7 @@ export default function B2BProductDetailPage() {
                             <div>
                                 <p className="text-sm font-bold text-blue-900">B2B Order Requirements</p>
                                 <p className="text-sm text-blue-700 mt-1 leading-relaxed">
-                                    This product has a minimum order quantity (MOQ) of <strong className="text-blue-900">{product.minOrder} units</strong>. Current inventory stands at <strong>{product.stock} units</strong>.
+                                    This product has a minimum order quantity (MOQ) of <strong className="text-blue-900">{product.minOrder} units</strong>. Current inventory stands at <strong>{activeStock} units</strong>.
                                 </p>
                             </div>
                         </div>
@@ -296,7 +410,7 @@ export default function B2BProductDetailPage() {
                                 className="flex-1 flex items-center justify-center gap-3 bg-stone-900 hover:bg-stone-800 disabled:bg-stone-300 disabled:cursor-not-allowed text-white text-base font-bold rounded-2xl transition-all shadow-lg shadow-stone-900/10 active:scale-[0.98]"
                             >
                                 <ShoppingCart size={20} />
-                                {product.stock < product.minOrder ? "Out of Stock" : "Add to Order"}
+                                {activeStock < product.minOrder ? "Out of Stock" : "Add to Order"}
                             </button>
                         </div>
 

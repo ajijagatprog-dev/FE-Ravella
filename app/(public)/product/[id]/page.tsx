@@ -24,6 +24,7 @@ import Footer from "../../../HomePage/components/Footer";
 import { products, type Product } from "../products";
 import api from "@/lib/axios";
 import { useEffect, useState } from "react";
+import ProductReviewsSection from "./components/ProductReviewsSection";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -42,23 +43,28 @@ export default function ProductDetail() {
                 const res = await api.get(`/products/${productId}`);
                 if (res.data.status === 'success') {
                     const item = res.data.data;
+                    const activePromo = item.active_promotion;
                     setProduct({
                         id: item.id,
                         name: item.name,
                         description: item.description || "Deskripsi produk",
-                        price: item.sale_price && item.sale_price > 0 ? item.sale_price : item.price,
+                        price: item.promoted_price || item.price,
                         originalPrice: item.price,
-                        discount: item.discount || 0,
-                        rating: item.rating ? parseFloat(item.rating) : 0,
-                        reviews: item.reviews || 0,
+                        discount: activePromo ? (activePromo.discount_type === 'percent' ? activePromo.discount_value : Math.round((item.price - item.promoted_price) / item.price * 100)) : (item.discount || 0),
+                        active_promotion: activePromo,
+                        rating: item.calculated_rating || 0,
+                        reviews: item.total_reviews_count || 0,
+                        distribution: item.rating_distribution || {},
                         category: item.category || "appliance",
                         image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
                         videoUrl: item.video_url || null,
                         features: Array.isArray(item.features) ? item.features : [],
                         specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
                         inStock: item.stock > 0,
+                        stock: item.stock || 0,
                         badge: item.badge || (item.is_featured ? "Best Seller" : ""),
-                        media: item.media || [],
+                        media: (item.media || []).filter((m: any) => !m.variant_id),
+                        variants: item.variants || [],
                     });
 
                     // Fetch related products from same category
@@ -70,12 +76,12 @@ export default function ProductDetail() {
                             .map((r: any) => ({
                                 id: r.id,
                                 name: r.name,
-                                price: r.sale_price && r.sale_price > 0 ? r.sale_price : r.price,
-                                image: r.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-                                rating: r.rating ? parseFloat(r.rating) : 0,
-                                reviews: r.reviews || 0,
+                                rating: r.calculated_rating || 0,
+                                reviews: r.total_reviews_count || 0,
                                 originalPrice: r.price,
-                                discount: r.discount || 0,
+                                price: r.promoted_price || r.price,
+                                discount: r.active_promotion ? (r.active_promotion.discount_type === 'percent' ? r.active_promotion.discount_value : Math.round((r.price - r.promoted_price) / r.price * 100)) : (r.discount || 0),
+                                active_promotion: r.active_promotion,
                                 badge: r.badge || (r.is_featured ? "Best Seller" : ""),
                             }));
                         setRelatedProducts(relMapped);
@@ -92,30 +98,81 @@ export default function ProductDetail() {
 
     const [isFavorite, setIsFavorite] = useState(false);
     const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+    const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
     const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
         { visible: false, productName: "" }
     );
 
-    // Build gallery items: from media array (if available), fallback to legacy image + videoUrl
+    // Auto-select default variant on product load
+    useEffect(() => {
+        if (product && product.variants && product.variants.length > 0) {
+            const defaultVariant = product.variants.find((v: any) => v.is_default);
+            setSelectedVariantId(defaultVariant ? defaultVariant.id : product.variants[0].id);
+        }
+    }, [product]);
+
+    // Get selected variant data
+    const selectedVariant = product?.variants?.find((v: any) => v.id === selectedVariantId) || null;
+
+    // Compute active price/stock based on variant selection
+    const activePrice = selectedVariant?.price ?? product?.price ?? 0;
+    const activeStock = selectedVariant ? selectedVariant.stock : (product?.stock ?? 0);
+    const activeInStock = activeStock > 0;
+
+    // Build gallery items: variant images + main videos (always shown)
     const galleryItems = (() => {
         if (!product) return [];
         const items: { type: 'image' | 'video'; url: string }[] = [];
+
+        // Collect main videos and secondary images (lifestyle/specs/branding)
+        const mainVideos: { type: 'image' | 'video'; url: string }[] = [];
+        const secondaryMainImages: { type: 'image' | 'video'; url: string }[] = [];
+
+        if (product.media && product.media.length > 0) {
+            product.media.forEach((m: any) => {
+                if (m.type === 'video') {
+                    mainVideos.push({ type: 'video', url: m.url });
+                } else if (m.type === 'image' && !m.is_primary) {
+                    // Secondary images (lifestyle/spec charts/logos)
+                    secondaryMainImages.push({ type: 'image', url: m.url });
+                }
+            });
+        }
+
+        // If a variant is selected, mix: Variant Media + Main Videos + Secondary Main Images
+        if (selectedVariant && selectedVariant.media && selectedVariant.media.length > 0) {
+            // First: Specific Variant Media
+            selectedVariant.media.forEach((m: any) => {
+                items.push({ type: m.type || 'image', url: m.url });
+            });
+            // Second: Demo Videos
+            items.push(...mainVideos);
+            // Third: Contextual/Lifestyle info from main media
+            items.push(...secondaryMainImages);
+            return items;
+        }
+
+        // Otherwise show all main product media (images + videos)
         if (product.media && product.media.length > 0) {
             product.media.forEach((m: any) => {
                 items.push({ type: m.type, url: m.url });
             });
         } else {
-            // Legacy fallback
             if (product.image) items.push({ type: 'image', url: product.image });
             if (product.videoUrl) {
                 let embedUrl = product.videoUrl;
-                const ytMatch = product.videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+                const ytMatch = product.videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+/);
                 if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
                 items.push({ type: 'video', url: embedUrl });
             }
         }
         return items;
     })();
+
+    // Reset active media index when variant changes
+    useEffect(() => {
+        setActiveMediaIndex(0);
+    }, [selectedVariantId]);
 
     const formatPrice = (price: number) =>
         new Intl.NumberFormat("id-ID", {
@@ -125,34 +182,49 @@ export default function ProductDetail() {
         }).format(price);
 
     const handleAddToCart = (p: Product) => {
-        const stored = localStorage.getItem("ravelle_cart");
-        let cart: any[] = stored ? JSON.parse(stored) : [];
-        const exists = cart.find((item) => item.id === p.id);
-        if (exists) {
-            cart = cart.map((item) =>
-                item.id === p.id ? { ...item, quantity: item.quantity + 1 } : item
-            );
-        } else {
-            cart = [
-                ...cart,
-                {
-                    id: p.id,
-                    name: p.name,
-                    price: p.price,
-                    originalPrice: p.originalPrice,
-                    image: p.image,
-                    badge: p.badge,
-                    discount: p.discount,
-                    category: p.category,
-                    quantity: 1,
-                    selected: true,
-                },
-            ];
+        try {
+            const stored = localStorage.getItem("ravelle_cart");
+            let cart: any[] = [];
+            try {
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    cart = Array.isArray(parsed) ? parsed : [];
+                }
+            } catch (e) {
+                cart = [];
+            }
+
+            const exists = cart.find((item) => item.id === p.id);
+            if (exists) {
+                cart = cart.map((item) =>
+                    item.id === p.id
+                        ? { ...item, quantity: (item.quantity || 0) + 1 }
+                        : item
+                );
+            } else {
+                cart = [
+                    ...cart,
+                    {
+                        id: p.id,
+                        name: p.name,
+                        price: p.price,
+                        originalPrice: p.originalPrice,
+                        image: p.image,
+                        badge: p.badge,
+                        discount: p.discount,
+                        category: p.category,
+                        quantity: 1,
+                        selected: true,
+                    },
+                ];
+            }
+            localStorage.setItem("ravelle_cart", JSON.stringify(cart));
+            window.dispatchEvent(new Event("ravelle_cart_updated"));
+            setToast({ visible: true, productName: p.name });
+            setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
+        } catch (error) {
+            console.error("Cart action failed:", error);
         }
-        localStorage.setItem("ravelle_cart", JSON.stringify(cart));
-        window.dispatchEvent(new Event("ravelle_cart_updated"));
-        setToast({ visible: true, productName: p.name });
-        setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
     };
 
     const badgeStyle: Record<string, string> = {
@@ -267,11 +339,20 @@ export default function ProductDetail() {
                                             allowFullScreen
                                         />
                                     ) : (
-                                        <video
-                                            src={videoUrl}
-                                            controls
-                                            className="w-full h-full object-contain bg-black"
-                                        />
+                                        <div className="w-full h-full relative bg-neutral-100">
+                                            <video
+                                                src={videoUrl}
+                                                controls
+                                                muted
+                                                playsInline
+                                                preload="metadata"
+                                                className="w-full h-full object-contain"
+                                                onLoadedData={(e) => {
+                                                    const vid = e.target as HTMLVideoElement;
+                                                    vid.currentTime = 1;
+                                                }}
+                                            />
+                                        </div>
                                     );
                                 })()
                             ) : (
@@ -291,12 +372,20 @@ export default function ProductDetail() {
                                         {product.badge}
                                     </span>
                                 )}
+                                {product.active_promotion?.type === 'flash_sale' && (
+                                    <span
+                                        className="px-2.5 py-1 bg-amber-500 text-white text-[10px] tracking-[0.12em] uppercase font-bold shadow-sm flex items-center gap-1"
+                                        style={{ fontFamily: JOST }}
+                                    >
+                                        <Zap className="w-3 h-3 fill-white" /> Flash Sale
+                                    </span>
+                                )}
                                 {product.discount > 0 && (
                                     <span
                                         className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase font-medium"
                                         style={{ fontFamily: JOST }}
                                     >
-                                        -{product.discount}%
+                                        -{Math.round(product.discount)}%
                                     </span>
                                 )}
                             </div>
@@ -335,8 +424,21 @@ export default function ProductDetail() {
                                         {item.type === 'image' ? (
                                             <img src={item.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
-                                                <Play className="w-5 h-5 text-white/80 fill-white/80" />
+                                            <div className="w-full h-full bg-neutral-100 relative">
+                                                <video
+                                                    src={item.url}
+                                                    muted
+                                                    playsInline
+                                                    preload="metadata"
+                                                    className="w-full h-full object-cover"
+                                                    onLoadedData={(e) => {
+                                                        const vid = e.target as HTMLVideoElement;
+                                                        vid.currentTime = 1;
+                                                    }}
+                                                />
+                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                    <Play className="w-4 h-4 text-white drop-shadow-lg fill-white/80" />
+                                                </div>
                                             </div>
                                         )}
                                     </button>
@@ -400,9 +502,9 @@ export default function ProductDetail() {
                                     className="text-2xl sm:text-3xl font-medium text-neutral-900"
                                     style={{ fontFamily: JOST }}
                                 >
-                                    {formatPrice(product.price)}
+                                    {formatPrice(activePrice)}
                                 </span>
-                                {product.originalPrice > product.price && (
+                                {product.originalPrice > activePrice && (
                                     <span
                                         className="text-sm text-neutral-400 line-through"
                                         style={{ fontFamily: JOST }}
@@ -411,15 +513,66 @@ export default function ProductDetail() {
                                     </span>
                                 )}
                             </div>
-                            {product.originalPrice > product.price && (
+                            {product.originalPrice > activePrice && (
                                 <p
                                     className="text-[11px] text-neutral-500 mt-1.5 tracking-wide"
                                     style={{ fontFamily: JOST }}
                                 >
-                                    Hemat {formatPrice(product.originalPrice - product.price)}
+                                    Hemat {formatPrice(product.originalPrice - activePrice)}
                                 </p>
                             )}
                         </div>
+
+                        {/* ── Variant Selector ── */}
+                        {product.variants && product.variants.length > 0 && (
+                            <div className="mb-6">
+                                <p
+                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
+                                    style={{ fontFamily: JOST }}
+                                >
+                                    {product.variants[0]?.variant_type || 'Varian'}
+                                    {selectedVariant && (
+                                        <span className="text-neutral-900 font-semibold ml-2 normal-case tracking-normal text-xs">
+                                            — {selectedVariant.variant_value}
+                                        </span>
+                                    )}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    {product.variants.map((v: any) => {
+                                        const variantThumb = v.media?.[0]?.url;
+                                        const isSelected = selectedVariantId === v.id;
+                                        return (
+                                            <button
+                                                key={v.id}
+                                                onClick={() => setSelectedVariantId(v.id)}
+                                                className={`relative flex items-center gap-2.5 px-3 py-2 border-2 transition-all ${
+                                                    isSelected
+                                                        ? 'border-neutral-900 bg-neutral-50'
+                                                        : 'border-neutral-200 hover:border-neutral-400 bg-white'
+                                                }`}
+                                                style={{ fontFamily: JOST }}
+                                            >
+                                                {variantThumb && (
+                                                    <img
+                                                        src={variantThumb}
+                                                        alt={v.variant_value}
+                                                        className="w-8 h-8 object-cover rounded-sm"
+                                                    />
+                                                )}
+                                                <span className={`text-xs font-medium ${
+                                                    isSelected ? 'text-neutral-900' : 'text-neutral-500'
+                                                }`}>
+                                                    {v.variant_value}
+                                                </span>
+                                                {v.stock <= 0 && (
+                                                    <span className="text-[9px] text-red-400 font-medium">Habis</span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Features */}
                         {product.features && product.features.length > 0 && (
@@ -503,19 +656,27 @@ export default function ProductDetail() {
                         {/* Stock */}
                         <div className="mt-3 flex items-center gap-2">
                             <div
-                                className={`w-1.5 h-1.5 rounded-full ${product.inStock ? "bg-green-500" : "bg-red-400"
+                                className={`w-1.5 h-1.5 rounded-full ${activeInStock ? "bg-green-500" : "bg-red-400"
                                     }`}
                             />
                             <span
                                 className="text-[11px] text-neutral-400 tracking-wide"
                                 style={{ fontFamily: JOST }}
                             >
-                                {product.inStock ? "In Stock" : "Out of Stock"}
+                                {activeInStock ? `Stok Tersedia (${activeStock})` : "Stok Habis"}
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* ── REVIEWS SECTION ── */}
+            <ProductReviewsSection 
+                productId={productId}
+                calculatedRating={product.rating}
+                totalReviews={product.reviews}
+                distribution={product.distribution || {}}
+            />
 
             {/* ── RELATED PRODUCTS ── */}
             {relatedProducts.length > 0 && (

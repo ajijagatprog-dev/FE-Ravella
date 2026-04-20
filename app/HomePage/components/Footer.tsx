@@ -72,7 +72,7 @@ export default function Footer() {
                 className="flex items-center gap-3 text-sm text-neutral-600 hover:text-neutral-900 transition-colors group"
               >
                 <div className="w-8 h-8 bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-neutral-900 transition-colors">
-                  <Phone className="w-3.5 h-3.5 group-hover:text-white transition-colors" />
+                  {Phone ? <Phone className="w-3.5 h-3.5 group-hover:text-white transition-colors" /> : <div className="w-3.5 h-3.5" />}
                 </div>
                 <span className="font-medium tracking-wide">+62 812-3456-7890</span>
               </a>
@@ -82,14 +82,14 @@ export default function Footer() {
                 className="flex items-center gap-3 text-sm text-neutral-600 hover:text-neutral-900 transition-colors group"
               >
                 <div className="w-8 h-8 bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-neutral-900 transition-colors">
-                  <Mail className="w-3.5 h-3.5 group-hover:text-white transition-colors" />
+                  {Mail ? <Mail className="w-3.5 h-3.5 group-hover:text-white transition-colors" /> : <div className="w-3.5 h-3.5" />}
                 </div>
                 <span className="font-medium tracking-wide">info@ravelle.com</span>
               </a>
 
               <div className="flex items-start gap-3 text-sm text-neutral-600">
                 <div className="w-8 h-8 bg-white flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-3.5 h-3.5" />
+                  {MapPin ? <MapPin className="w-3.5 h-3.5" /> : <div className="w-3.5 h-3.5" />}
                 </div>
                 <span className="font-light leading-relaxed">
                   Jl. Industri No. 123<br />
@@ -109,6 +109,7 @@ export default function Footer() {
               <div className="flex flex-wrap gap-2.5">
                 {socialMedia.map((social) => {
                   const Icon = social.icon;
+                  if (!Icon) return null;
                   return (
                     <a
                       key={social.name}
