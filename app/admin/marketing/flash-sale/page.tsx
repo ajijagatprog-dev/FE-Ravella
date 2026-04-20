@@ -70,8 +70,22 @@ export default function FlashSalePage() {
     }
   };
 
+  const [availableProducts, setAvailableProducts] = useState<any[]>([]);
+
+  const fetchProductsForDropdown = async () => {
+    try {
+      const res = await api.get("/products", { params: { limit: 100 } });
+      if (res.data.status === "success") {
+        setAvailableProducts(res.data.data.data || res.data.data);
+      }
+    } catch (e) {
+      console.error("Failed to load products for dropdown", e);
+    }
+  };
+
   useEffect(() => {
     fetchPromotions();
+    fetchProductsForDropdown();
   }, []);
 
   const openCreate = () => {
@@ -359,15 +373,30 @@ export default function FlashSalePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-1">
                   <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1">
-                    SKU Produk *
+                    Pilih Produk *
                   </label>
-                  <input
+                  <select
                     required
                     value={form.sku}
-                    onChange={(e) => setForm({ ...form, sku: e.target.value })}
-                    placeholder="ABC-123"
-                    className="w-full border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900 bg-stone-50"
-                  />
+                    onChange={(e) => {
+                       const selectedSku = e.target.value;
+                       const product = availableProducts.find(p => p.sku === selectedSku);
+                       // Auto-fill event name if it's currently empty
+                       setForm({ 
+                          ...form, 
+                          sku: selectedSku,
+                          name: form.name || (product ? `Flash Sale ${product.name.slice(0, 15)}...` : '')
+                       });
+                    }}
+                    className="w-full border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900 bg-white"
+                  >
+                    <option value="" disabled>-- Pilih Produk --</option>
+                    {availableProducts.map(p => (
+                       <option key={p.id} value={p.sku}>
+                          {p.name}
+                       </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="col-span-1">
                   <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1">

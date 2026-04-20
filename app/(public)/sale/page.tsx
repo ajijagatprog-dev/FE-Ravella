@@ -140,64 +140,81 @@ export default function SalePage() {
                         {products.map((product) => (
                             <div
                                 key={product.id}
-                                className="group bg-white border border-neutral-100 hover:border-rose-200 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                                className="group bg-white border border-neutral-100 hover:border-rose-200 hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden flex flex-col"
                             >
                                 {/* Image */}
                                 <Link href={`/product/${product.id}`} className="block">
-                                    <div className="relative aspect-[3/4] overflow-hidden bg-neutral-50">
+                                    <div className="relative aspect-square overflow-hidden bg-neutral-50 p-6 flex items-center justify-center">
                                         <img
                                             src={product.image}
                                             alt={product.name}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105 mix-blend-multiply"
                                         />
-                                        {/* Discount badge */}
-                                        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                                            <span className="px-2.5 py-1 bg-rose-600 text-white text-[11px] font-bold tracking-wide uppercase shadow-sm">
-                                                -{product.discount}%
-                                            </span>
-                                            {product.badge && (
-                                                <span className="px-2.5 py-1 bg-white text-stone-900 text-[10px] font-medium tracking-[0.12em] uppercase border border-neutral-200">
-                                                    {product.badge}
+                                        
+                                        {/* Badges Container */}
+                                        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                                            {/* Discount Percent */}
+                                            {product.discount > 0 && (
+                                                <span className="px-2.5 py-1 bg-red-600 text-white text-[11px] font-bold tracking-wide uppercase shadow-sm shadow-red-600/30 rounded-br-lg rounded-tl-sm w-fit">
+                                                    -{product.discount}%
                                                 </span>
                                             )}
+                                            
+                                            {/* Flash Sale Indicator vs Normal Badge */}
+                                            {product.active_promotion && product.active_promotion.type === 'flash_sale' ? (
+                                                <span className="px-2.5 py-1 bg-stone-900 text-amber-400 text-[10px] font-bold tracking-[0.15em] uppercase shadow-sm flex items-center gap-1 rounded-br-lg rounded-tl-sm w-fit">
+                                                    <Flame className="w-3 h-3 fill-amber-400" />
+                                                    Flash Sale
+                                                </span>
+                                            ) : product.badge ? (
+                                                <span className="px-2.5 py-1 bg-white text-stone-900 text-[10px] font-medium tracking-[0.12em] uppercase border border-neutral-200 shadow-sm rounded-br-lg rounded-tl-sm w-fit">
+                                                    {product.badge}
+                                                </span>
+                                            ) : null}
                                         </div>
                                     </div>
                                 </Link>
 
                                 {/* Info */}
-                                <div className="p-4 sm:p-5">
+                                <div className="p-5 flex flex-col flex-1">
                                     <Link href={`/product/${product.id}`}>
                                         <h3
-                                            className="text-lg font-light text-neutral-900 mb-2 line-clamp-2 group-hover:text-stone-600 transition-colors leading-snug"
+                                            className="text-lg font-light text-neutral-900 mb-2 line-clamp-2 group-hover:text-rose-600 transition-colors leading-snug"
                                             style={{ fontFamily: CORMORANT }}
                                         >
                                             {product.name}
                                         </h3>
                                     </Link>
-                                    <div className="flex items-baseline gap-2 mb-3">
-                                        <span className="text-base font-bold text-rose-600" style={{ fontFamily: JOST }}>
-                                            {formatPrice(product.price)}
-                                        </span>
-                                        <span className="text-sm text-neutral-400 line-through" style={{ fontFamily: JOST }}>
-                                            {formatPrice(product.originalPrice)}
-                                        </span>
+                                    
+                                    <div className="mt-auto">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-sm text-neutral-400 line-through" style={{ fontFamily: JOST }}>
+                                                {formatPrice(product.originalPrice)}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <span className="text-xl font-bold text-rose-600" style={{ fontFamily: JOST }}>
+                                                {formatPrice(product.price)}
+                                            </span>
+                                            <span className="text-[10px] text-green-600 font-bold uppercase tracking-wider bg-green-50 px-2 py-1 rounded">
+                                                Hemat {formatPrice(product.originalPrice - product.price)}
+                                            </span>
+                                        </div>
+                                        
+                                        <button
+                                            onClick={() => handleAddToCart(product)}
+                                            className={`w-full py-3 text-[11px] font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all duration-300 rounded ${addedToCart === product.id
+                                                ? "bg-green-600 text-white"
+                                                : "bg-stone-900 hover:bg-black text-white"
+                                                }`}
+                                        >
+                                            {addedToCart === product.id ? (
+                                                <><Check className="w-4 h-4" /> Ditambahkan!</>
+                                            ) : (
+                                                <><ShoppingCart className="w-4 h-4" /> Add to Cart</>
+                                            )}
+                                        </button>
                                     </div>
-                                    <p className="text-xs text-green-600 font-medium mb-3">
-                                        Hemat {formatPrice(product.originalPrice - product.price)}
-                                    </p>
-                                    <button
-                                        onClick={() => handleAddToCart(product)}
-                                        className={`w-full py-2.5 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-200 ${addedToCart === product.id
-                                            ? "bg-green-600 text-white"
-                                            : "bg-stone-900 hover:bg-black text-white"
-                                            }`}
-                                    >
-                                        {addedToCart === product.id ? (
-                                            <><Check className="w-3.5 h-3.5" /> Ditambahkan!</>
-                                        ) : (
-                                            <><ShoppingCart className="w-3.5 h-3.5" /> Add to Cart</>
-                                        )}
-                                    </button>
                                 </div>
                             </div>
                         ))}

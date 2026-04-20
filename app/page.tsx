@@ -3,6 +3,7 @@ import CategoryGrid from "./HomePage/components/CategoryGrid";
 import Header from "./HomePage/components/Header";
 import HeroSection from "./HomePage/components/HeroSectoin";
 import NewProducts from "./HomePage/components/NewProducts";
+import FlashSale from "./HomePage/components/FlashSale";
 import Newsletter from "./HomePage/components/Newsletter";
 import Footer from "./HomePage/components/Footer";
 import WelcomePopup from "./HomePage/components/WelcomePopup";
@@ -15,6 +16,7 @@ export default function Home() {
       <Header />
       <main>
         <HeroSection />
+        <FlashSale />
         <NewProducts />
         <CategoryGrid />
         <BrandStory />
