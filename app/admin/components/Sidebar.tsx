@@ -26,7 +26,6 @@ const menuItems = [
   { label: "User Management", href: "/admin/users_management", icon: Users },
   { label: "Loyalty System", href: "/admin/loyalty", icon: Award },
   { label: "Voucher", href: "/admin/vouchers", icon: Tag },
-  { label: "Product Discount", href: "/admin/marketing/discounts", icon: Tag },
   { label: "Flash Sale", href: "/admin/marketing/flash-sale", icon: Tag },
   { label: "Reporting", href: "/admin/reports", icon: BarChart3 },
 ];

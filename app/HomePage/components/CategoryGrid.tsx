@@ -2,6 +2,7 @@
 
 import { ArrowRight, Home, Utensils, Package, Sofa, Laptop } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -61,7 +62,13 @@ export default function CategoryGrid() {
       className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20 md:py-24 bg-white relative overflow-hidden"
       style={{ fontFamily: JOST }}
     >
-      <div className="max-w-[1600px] mx-auto relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="max-w-[1600px] mx-auto relative z-10"
+      >
 
         {/* ── Header ── */}
         <div className="text-center mb-12 sm:mb-16 md:mb-20">
@@ -127,7 +134,7 @@ export default function CategoryGrid() {
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -9,7 +12,13 @@ export default function BrandStory() {
       className="relative px-4 md:px-10 lg:px-40 py-20 md:py-28 bg-white overflow-hidden"
       style={{ fontFamily: JOST }}
     >
-      <div className="relative max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <motion.div 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+      >
 
         {/* ── TEXT ── */}
         <div>
@@ -116,7 +125,7 @@ export default function BrandStory() {
           </div>
         </div>
 
-      </div>
+      </motion.div>
     </section>
   );
 }

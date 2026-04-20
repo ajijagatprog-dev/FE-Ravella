@@ -131,7 +131,6 @@ export default function Header({
     { label: "PRODUCT", href: "/product" },
     { label: "NEWS", href: "/news" },
     { label: "CONTACT", href: "/contact" },
-    { label: "TESTIMONIAL", href: "/testimonial" },
   ];
 
   const saleMenu = { label: "SALE", href: "/sale" };

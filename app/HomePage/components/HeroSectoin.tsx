@@ -68,7 +68,6 @@ const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 export default function HeroSection() {
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   const nextSlide = () => {
     setActive((p) => (p + 1) % HERO_IMAGES.length);
@@ -81,7 +80,6 @@ export default function HeroSection() {
   };
 
   useEffect(() => {
-    setIsLoaded(true);
     const slide = setInterval(nextSlide, 6000);
     const bar = setInterval(() => {
       setProgress((p) => (p >= 100 ? 100 : p + 1.7));
@@ -118,35 +116,39 @@ export default function HeroSection() {
             <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
           </button>
 
-          <HeroContent active={active} isLoaded={isLoaded} />
+          <HeroContent active={active} />
         </div>
       </div>
 
-        {/* ── CONTROLS ── */}
+      {/* ── CONTROLS ── */}
       <div className="max-w-[1600px] mx-auto">
         <div className="relative px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 border-t border-white/10">
-
           {/* Dots & Progress */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 py-5 sm:py-6">
             <div className="flex items-center gap-4">
               {HERO_IMAGES.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => { setActive(i); setProgress(0); }}
+                  onClick={() => {
+                    setActive(i);
+                    setProgress(0);
+                  }}
                   className="relative group"
                   aria-label={`Go to slide ${i + 1}`}
                 >
                   <div
-                    className={`h-[1px] transition-all duration-500 ${active === i
-                      ? "w-10 sm:w-12 bg-white"
-                      : "w-4 bg-white/30 hover:bg-white/60 hover:w-7"
-                      }`}
+                    className={`h-[1px] transition-all duration-500 ${
+                      active === i
+                        ? "w-10 sm:w-12 bg-white"
+                        : "w-4 bg-white/30 hover:bg-white/60 hover:w-7"
+                    }`}
                   />
                   <div
-                    className={`absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 bg-neutral-900 border border-white/10 text-white/80 text-[9px] tracking-[0.2em] uppercase pointer-events-none transition-all duration-200 ${active === i
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
-                      }`}
+                    className={`absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 bg-neutral-900 border border-white/10 text-white/80 text-[9px] tracking-[0.2em] uppercase pointer-events-none transition-all duration-200 ${
+                      active === i
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
+                    }`}
                     style={{ fontFamily: JOST }}
                   >
                     {HERO_DATA[i].subtitle}
@@ -174,9 +176,21 @@ export default function HeroSection() {
 
           {/* Feature Badges */}
           <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10 border-t border-white/10 mb-8 sm:mb-10">
-            <FeatureBadge icon={<Truck className="w-4 h-4" />} label="Gratis Ongkir" subtext="Min. Belanja 100k" />
-            <FeatureBadge icon={<ShieldCheck className="w-4 h-4" />} label="Garansi Resmi" subtext="100% Original" />
-            <FeatureBadge icon={<Award className="w-4 h-4" />} label="Kualitas Premium" subtext="Trusted Quality" />
+            <FeatureBadge
+              icon={<Truck className="w-4 h-4" />}
+              label="Gratis Ongkir"
+              subtext="Min. Belanja 100k"
+            />
+            <FeatureBadge
+              icon={<ShieldCheck className="w-4 h-4" />}
+              label="Garansi Resmi"
+              subtext="100% Original"
+            />
+            <FeatureBadge
+              icon={<Award className="w-4 h-4" />}
+              label="Kualitas Premium"
+              subtext="Trusted Quality"
+            />
           </div>
         </div>
       </div>
@@ -191,8 +205,9 @@ function HeroBackground({ active }: { active: number }) {
       {HERO_IMAGES.map((img, i) => (
         <div
           key={i}
-          className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out ${active === i ? "opacity-100" : "opacity-0"
-            }`}
+          className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out ${
+            active === i ? "opacity-100" : "opacity-0"
+          }`}
         >
           <div
             className="absolute inset-0"
@@ -211,20 +226,41 @@ function HeroBackground({ active }: { active: number }) {
   );
 }
 
+import { motion, Variants } from "framer-motion";
+
 /* ── CONTENT ── */
-function HeroContent({ active, isLoaded }: { active: number; isLoaded: boolean }) {
+function HeroContent({ active }: { active: number }) {
   const data = HERO_DATA[active];
-  const anim = (delay: string) =>
-    `transform transition-all duration-700 ${delay} ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
-    }`;
+
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
 
   return (
     <div className="relative z-10 h-full flex items-center">
       <div className="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
-        <div className="max-w-xl lg:max-w-2xl">
-
+        <motion.div
+          key={active}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="max-w-xl lg:max-w-2xl"
+        >
           {/* Badge */}
-          <div className={anim("delay-0")}>
+          <motion.div variants={itemVariants}>
             <div className="inline-flex items-center gap-2.5 mb-4 sm:mb-5">
               <div className="w-5 h-[1px] bg-white/50" />
               <span
@@ -234,20 +270,20 @@ function HeroContent({ active, isLoaded }: { active: number; isLoaded: boolean }
                 {data.badge}
               </span>
             </div>
-          </div>
+          </motion.div>
 
           {/* Subtitle */}
-          <div className={anim("delay-75")}>
+          <motion.div variants={itemVariants}>
             <p
               className="text-white/60 font-light text-[11px] sm:text-xs mb-3 tracking-[0.22em] uppercase"
               style={{ fontFamily: JOST }}
             >
               {data.subtitle}
             </p>
-          </div>
+          </motion.div>
 
-          {/* Title — Cormorant Garamond, brand-matched serif */}
-          <div className={anim("delay-150")}>
+          {/* Title */}
+          <motion.div variants={itemVariants}>
             <h1
               className="text-[42px] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[78px] font-light leading-[1.05] text-white mb-4 sm:mb-5"
               style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
@@ -260,25 +296,28 @@ function HeroContent({ active, isLoaded }: { active: number; isLoaded: boolean }
                 {data.title.split(" ").slice(2).join(" ")}
               </em>
             </h1>
-          </div>
+          </motion.div>
 
           {/* Thin rule */}
-          <div className={anim("delay-[200ms]")}>
+          <motion.div variants={itemVariants}>
             <div className="w-10 h-[1px] bg-white/30 mb-4 sm:mb-5" />
-          </div>
+          </motion.div>
 
           {/* Description */}
-          <div className={anim("delay-[225ms]")}>
+          <motion.div variants={itemVariants}>
             <p
               className="text-white/75 text-sm sm:text-base leading-relaxed max-w-md mb-7 sm:mb-8 font-light"
               style={{ fontFamily: JOST }}
             >
               {data.description}
             </p>
-          </div>
+          </motion.div>
 
           {/* CTA */}
-          <div className={`flex flex-col sm:flex-row gap-3 sm:gap-4 mb-7 ${anim("delay-300")}`}>
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-7"
+          >
             <Link
               href="/product"
               className="group w-full sm:w-auto px-8 py-3.5 bg-white text-neutral-900 font-medium text-[11px] tracking-[0.22em] uppercase hover:bg-neutral-100 transition-all duration-300 flex items-center justify-center gap-3"
@@ -287,13 +326,19 @@ function HeroContent({ active, isLoaded }: { active: number; isLoaded: boolean }
               {data.cta}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-          </div>
+          </motion.div>
 
           {/* Trust */}
-          <div className={`flex flex-wrap items-center gap-5 sm:gap-6 ${anim("delay-[375ms]")}`}>
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-wrap items-center gap-5 sm:gap-6"
+          >
             <div className="flex items-center gap-2">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                <Star
+                  key={i}
+                  className="w-3 h-3 fill-yellow-400 text-yellow-400"
+                />
               ))}
               <span
                 className="text-white font-medium text-xs tracking-[0.1em] ml-1"
@@ -308,12 +353,12 @@ function HeroContent({ active, isLoaded }: { active: number; isLoaded: boolean }
             >
               <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
               <span className="text-white/65 text-xs font-light tracking-[0.08em]">
-                <span className="font-medium text-white">12,500+</span> Pelanggan Puas
+                <span className="font-medium text-white">12,500+</span>{" "}
+                Pelanggan Puas
               </span>
             </div>
-          </div>
-
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );

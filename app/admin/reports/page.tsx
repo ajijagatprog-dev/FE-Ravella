@@ -26,6 +26,15 @@ import {
 import api from "@/lib/axios";
 import { downloadFile } from "@/lib/download";
 import toast from "react-hot-toast";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type TabKey = "sales" | "customer" | "stock" | "transaction" | "traffic";
@@ -244,7 +253,7 @@ const transactionColumns: Column<Record<string, unknown>>[] = [
         Shipped: "bg-cyan-50 text-cyan-700 ring-1 ring-cyan-200",
         Cancelled: "bg-red-50 text-red-600 ring-1 ring-red-200",
       };
-      
+
       const labels: Record<string, string> = {
         Delivered: "Diterima",
         Pending: "Menunggu",
@@ -266,11 +275,21 @@ const transactionColumns: Column<Record<string, unknown>>[] = [
 
 const trafficColumns: Column<Record<string, unknown>>[] = [
   {
-    key: "page_path",
-    label: "Path Halaman",
+    key: "human_readable_path", // Use human_readable_path for key so it can sort by it (or fallback to page_path)
+    label: "Halaman",
     sortable: true,
-    render: (v) => (
-      <span className="font-medium text-gray-800">{String(v)}</span>
+    render: (_, row) => (
+      <div>
+        <p className="font-medium text-gray-800">
+          {String(row.human_readable_path || row.page_path)}
+        </p>
+        <p
+          className="text-[10px] text-gray-400 font-mono mt-0.5"
+          title="URL Asli"
+        >
+          {String(row.page_path)}
+        </p>
+      </div>
     ),
   },
   {
@@ -329,12 +348,14 @@ const columnsMap: Record<TabKey, Column<Record<string, unknown>>[]> = {
 // Note: I'll actually just use the existing icons and map the new Indonesian keys.
 const summaryIcons: Record<string, React.ElementType> = {
   "Total Penjualan": DollarSign,
+  "Penjualan Sukses": TrendingUp,
+  "Penjualan Batal": TrendingDown,
   "Total Pesanan": ShoppingCart,
   "Rata-rata Transaksi": BarChart2,
   "Pesanan Dibatalkan": XCircle,
   "Total Pelanggan": Users,
   "Pelanggan Aktif": Users,
-  "Rata-rata Pesanan / Pelanggan": ShoppingCart,
+  "Rata-rata Frekuensi Belanja": ShoppingCart,
   "LTV Pelanggan": DollarSign,
   "Total SKU": Package,
   "Stok Tersedia": Package,
@@ -407,6 +428,8 @@ export default function ReportsPage() {
   const formatSummaryValue = (card: SummaryCard) => {
     const moneyLabels = [
       "Total Penjualan",
+      "Penjualan Sukses",
+      "Penjualan Batal",
       "Rata-rata Transaksi",
       "LTV Pelanggan",
     ];
@@ -425,7 +448,8 @@ export default function ReportsPage() {
             Pusat Pelaporan &amp; Monitoring Admin
           </h1>
           <p className="mt-0.5 text-sm text-gray-500">
-            Wawasan mendalam dan pelacakan kinerja di seluruh platform e-commerce Anda.
+            Wawasan mendalam dan pelacakan kinerja di seluruh platform
+            e-commerce Anda.
           </p>
         </div>
         <button
@@ -545,6 +569,52 @@ export default function ReportsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Traffic Chart Section */}
+      {activeTab === "traffic" && tableData.length > 0 && !loading && (
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-base font-semibold text-gray-800">Top 10 Halaman Paling Sering Dikunjungi</h2>
+            <p className="mt-0.5 text-xs text-gray-500">Visualisasi 10 halaman teratas berdasarkan Tayangan Halaman (Page Views)</p>
+          </div>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={tableData.slice(0, 10).map((d: any) => ({
+                  name: d.human_readable_path || d.page_path,
+                  views: parseInt(d.views || 0, 10),
+                }))}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 11, fill: '#6B7280' }} 
+                  axisLine={{ stroke: '#E5E7EB' }}
+                  tickLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 11, fill: '#6B7280' }} 
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <RechartsTooltip 
+                  cursor={{ fill: '#F3F4F6' }}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                  labelStyle={{ fontWeight: 600, color: '#374151', marginBottom: '4px' }}
+                />
+                <Bar 
+                  dataKey="views" 
+                  name="Tayangan Halaman" 
+                  fill="#3B82F6" 
+                  radius={[4, 4, 0, 0]} 
+                  barSize={40}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
 

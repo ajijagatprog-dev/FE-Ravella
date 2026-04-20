@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ShoppingBag, Check, ShoppingCart } from "lucide-react";
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
+import { motion } from "framer-motion";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -127,7 +128,13 @@ export default function NewProducts() {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="max-w-[1600px] mx-auto"
+      >
 
         {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 sm:mb-10 md:mb-14 gap-4">
@@ -199,7 +206,7 @@ export default function NewProducts() {
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
