@@ -11,6 +11,7 @@ const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 /* ─── Tier interface (matches backend) ───────────────────────────────────── */
 interface Tier {
   name: string;
+  label?: string;
   min: number;
   max: number | null;
   perks: string[];
@@ -82,7 +83,12 @@ const TIER_PALETTE: Record<
 function TierIcon({ name, className }: { name: string; className?: string }) {
   if (name === "Gold") {
     return (
-      <svg className={`w-6 h-6 ${className}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg
+        className={`w-6 h-6 ${className}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -94,7 +100,12 @@ function TierIcon({ name, className }: { name: string; className?: string }) {
   }
   if (name === "Platinum") {
     return (
-      <svg className={`w-6 h-6 ${className}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg
+        className={`w-6 h-6 ${className}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -106,7 +117,12 @@ function TierIcon({ name, className }: { name: string; className?: string }) {
   }
   // Basic — person/shield icon
   return (
-    <svg className={`w-6 h-6 ${className}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className={`w-6 h-6 ${className}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -119,8 +135,18 @@ function TierIcon({ name, className }: { name: string; className?: string }) {
 
 function CheckIcon({ className }: { className?: string }) {
   return (
-    <svg className={`w-4 h-4 shrink-0 ${className}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+    <svg
+      className={`w-4 h-4 shrink-0 ${className}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2.5}
+        d="M5 13l4 4L19 7"
+      />
     </svg>
   );
 }
@@ -144,7 +170,7 @@ function useInView(threshold = 0.1) {
           observer.disconnect();
         }
       },
-      { threshold }
+      { threshold },
     );
     observer.observe(node);
     return () => observer.disconnect();
@@ -219,7 +245,10 @@ export default function LoyaltyShowcase() {
             style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
           >
             Loyalty{" "}
-            <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
+            <em
+              className="font-semibold not-italic"
+              style={{ fontStyle: "italic" }}
+            >
               Rewards
             </em>
           </h2>
@@ -234,15 +263,21 @@ export default function LoyaltyShowcase() {
             className="text-neutral-500 text-sm sm:text-base font-light max-w-2xl mx-auto leading-relaxed tracking-wide"
             style={{ fontFamily: JOST }}
           >
-            Nikmati benefit eksklusif sebagai member Ravelle. Semakin banyak Anda belanja,
-            semakin besar keuntungan yang didapat — mulai dari gratis ongkir hingga akses VIP.
+            Nikmati benefit eksklusif sebagai member Ravelle. Semakin banyak
+            Anda belanja, semakin besar keuntungan yang didapat — mulai dari
+            gratis ongkir hingga akses VIP.
           </p>
         </div>
 
         {/* ── Tier Cards Grid ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 mb-14 sm:mb-16">
           {tiers.map((tier, i) => (
-            <TierCard key={`${tier.name}-${i}`} tier={tier} index={i} inView={inView} />
+            <TierCard
+              key={`${tier.name}-${i}`}
+              tier={tier}
+              index={i}
+              inView={inView}
+            />
           ))}
         </div>
 
@@ -275,7 +310,15 @@ export default function LoyaltyShowcase() {
 /* ═══════════════════════════════════════════════════════════════════════════ */
 /*  TIER CARD                                                                */
 /* ═══════════════════════════════════════════════════════════════════════════ */
-function TierCard({ tier, index, inView }: { tier: Tier; index: number; inView: boolean }) {
+function TierCard({
+  tier,
+  index,
+  inView,
+}: {
+  tier: Tier;
+  index: number;
+  inView: boolean;
+}) {
   const p = TIER_PALETTE[tier.name] ?? TIER_PALETTE["Basic"];
   const isGold = tier.name === "Gold";
   const isPlatinum = tier.name === "Platinum";
@@ -331,7 +374,7 @@ function TierCard({ tier, index, inView }: { tier: Tier; index: number; inView: 
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide ${p.labelBg} ${p.labelText}`}
                 style={{ fontFamily: JOST }}
               >
-                {p.tagline}
+                {tier.label || p.tagline}
               </span>
             </div>
             <p
@@ -350,7 +393,13 @@ function TierCard({ tier, index, inView }: { tier: Tier; index: number; inView: 
           <div
             className={`h-full rounded-full bg-gradient-to-r ${p.barFrom} ${p.barTo} transition-all duration-1000 ease-out`}
             style={{
-              width: inView ? (index === 0 ? "33%" : index === 1 ? "66%" : "100%") : "0%",
+              width: inView
+                ? index === 0
+                  ? "33%"
+                  : index === 1
+                    ? "66%"
+                    : "100%"
+                : "0%",
               transitionDelay: `${500 + index * 200}ms`,
             }}
           />

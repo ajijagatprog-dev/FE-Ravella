@@ -2,6 +2,7 @@
 
 interface Tier {
   name: string;
+  label?: string;
   min: number;
   max: number | null;
   perks: string[];
@@ -120,7 +121,7 @@ export default function TierCard({ tier, index = 0, isEditing, onEdit, onDelete 
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-base font-bold text-slate-800">{tier.name}</h3>
               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cfg.badge}`}>
-                {cfg.label}
+                {tier.label || cfg.label}
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">

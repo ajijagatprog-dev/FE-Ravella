@@ -5,6 +5,7 @@ import { X, Plus, Trash2, Loader2 } from "lucide-react";
 
 interface Tier {
     name: string;
+    label?: string;
     min: number;
     max: number | null;
     perks: string[];
@@ -16,10 +17,21 @@ interface TierEditModalProps {
     onClose: () => void;
     onSave: (tier: Tier) => void;
     saving: boolean;
+    mode?: "edit" | "add";
 }
 
-export default function TierEditModal({ tier, isOpen, onClose, onSave, saving }: TierEditModalProps) {
+/* ─── Default labels for built-in tiers (fallback saat data lama belum ada label) ── */
+const DEFAULT_LABELS: Record<string, string> = {
+    Basic: "Entry Level",
+    Gold: "Most Popular",
+    Platinum: "Premium",
+};
+
+export default function TierEditModal({ tier, isOpen, onClose, onSave, saving, mode = "edit" }: TierEditModalProps) {
+    const getLabel = (t: Tier) => t.label || DEFAULT_LABELS[t.name] || "";
+
     const [name, setName] = useState(tier.name);
+    const [label, setLabel] = useState(getLabel(tier));
     const [min, setMin] = useState(String(tier.min));
     const [max, setMax] = useState(tier.max !== null ? String(tier.max) : "");
     const [perks, setPerks] = useState<string[]>(tier.perks);
@@ -27,6 +39,7 @@ export default function TierEditModal({ tier, isOpen, onClose, onSave, saving }:
 
     useEffect(() => {
         setName(tier.name);
+        setLabel(getLabel(tier));
         setMin(String(tier.min));
         setMax(tier.max !== null ? String(tier.max) : "");
         setPerks([...tier.perks]);
@@ -64,6 +77,7 @@ export default function TierEditModal({ tier, isOpen, onClose, onSave, saving }:
         const cleanedPerks = allPerks.filter((p) => p.trim() !== "");
         onSave({
             name,
+            label: label.trim() || undefined,
             min: parseInt(min) || 0,
             max: max ? parseInt(max) : null,
             perks: cleanedPerks,
@@ -76,7 +90,9 @@ export default function TierEditModal({ tier, isOpen, onClose, onSave, saving }:
             <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900">Edit Tier: {tier.name}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                        {mode === "add" ? "Add New Tier" : `Edit Tier: ${tier.name}`}
+                    </h3>
                     <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
                         <X size={18} className="text-gray-400" />
                     </button>
@@ -87,15 +103,26 @@ export default function TierEditModal({ tier, isOpen, onClose, onSave, saving }:
                     {/* Name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Tier Name</label>
-                        <select
+                        <input
+                            type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none cursor-pointer"
-                        >
-                            <option value="Basic">Basic</option>
-                            <option value="Gold">Gold</option>
-                            <option value="Platinum">Platinum</option>
-                        </select>
+                            placeholder="e.g. Basic, Silver, Gold, Diamond, Platinum, VIP..."
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+
+                    {/* Label / Class */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Tier Label / Kelas</label>
+                        <input
+                            type="text"
+                            value={label}
+                            onChange={(e) => setLabel(e.target.value)}
+                            placeholder="e.g. Entry Level, Most Popular, Premium, Exclusive..."
+                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Badge yang ditampilkan di samping nama tier</p>
                     </div>
 
                     {/* Min/Max Spend */}
