@@ -99,7 +99,9 @@ export default function FlashSalePage() {
     const parseDate = (d: any) => {
       if (!d) return "";
       try {
-        return new Date(d).toISOString().split("T")[0];
+        const date = new Date(d);
+        const pad = (n: number) => n.toString().padStart(2, "0");
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
       } catch {
         return "";
       }
@@ -309,9 +311,15 @@ export default function FlashSalePage() {
                     <td className="px-5 py-4 text-xs text-stone-500">
                       <div className="flex items-center gap-1">
                         <Calendar size={12} className="text-stone-400" />
-                        {new Date(p.starts_at).toLocaleDateString(
-                          "id-ID",
-                        )} - {new Date(p.ends_at).toLocaleDateString("id-ID")}
+                        {new Date(p.starts_at).toLocaleString("id-ID", {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })}{" "}
+                        -{" "}
+                        {new Date(p.ends_at).toLocaleString("id-ID", {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })}
                       </div>
                     </td>
                     <td className="px-5 py-4">
@@ -379,22 +387,31 @@ export default function FlashSalePage() {
                     required
                     value={form.sku}
                     onChange={(e) => {
-                       const selectedSku = e.target.value;
-                       const product = availableProducts.find(p => p.sku === selectedSku);
-                       // Auto-fill event name if it's currently empty
-                       setForm({ 
-                          ...form, 
-                          sku: selectedSku,
-                          name: form.name || (product ? `Flash Sale ${product.name.slice(0, 15)}...` : '')
-                       });
+                      const selectedSku = e.target.value;
+                      const product = availableProducts.find(
+                        (p) => p.sku === selectedSku,
+                      );
+                      // Auto-fill event name if it's currently empty
+                      setForm({
+                        ...form,
+                        sku: selectedSku,
+                        name:
+                          form.name ||
+                          (product
+                            ? `Flash Sale ${product.name.slice(0, 15)}...`
+                            : ""),
+                      });
                     }}
                     className="w-full border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900 bg-white"
                   >
-                    <option value="" disabled>-- Pilih Produk --</option>
-                    {availableProducts.map(p => (
-                       <option key={p.id} value={p.sku}>
-                          {p.name}
-                       </option>
+                    <option value="" disabled>
+                      -- Pilih Produk --
+                    </option>
+                    {availableProducts.map((p) => (
+                      <option key={p.id} value={p.sku}>
+                        {p.sku ? `[${p.sku}] ` : "(No SKU) "}
+                        {p.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -453,7 +470,7 @@ export default function FlashSalePage() {
                   </label>
                   <input
                     required
-                    type="date"
+                    type="datetime-local"
                     value={form.starts_at}
                     onChange={(e) =>
                       setForm({ ...form, starts_at: e.target.value })
@@ -467,7 +484,7 @@ export default function FlashSalePage() {
                   </label>
                   <input
                     required
-                    type="date"
+                    type="datetime-local"
                     value={form.ends_at}
                     onChange={(e) =>
                       setForm({ ...form, ends_at: e.target.value })
