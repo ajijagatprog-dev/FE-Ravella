@@ -137,7 +137,7 @@ export default function ModalEdit({
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-700 flex items-center gap-2 uppercase tracking-wider">
                 <Barcode size={14} className="text-indigo-500" />
-                Product SKU *
+                Product SKU (Opsional)
               </label>
               <input
                 type="text"
@@ -145,7 +145,7 @@ export default function ModalEdit({
                 value={form.sku}
                 onChange={handleChange}
                 className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-3 text-sm font-medium focus:outline-none focus:border-indigo-500 focus:bg-white transition-all"
-                placeholder="CONTOH: SKU-001"
+                placeholder="Otomatis jika kosong"
               />
             </div>
 
