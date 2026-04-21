@@ -83,6 +83,7 @@ export default function ProductDetail() {
                                 discount: r.active_promotion ? (r.active_promotion.discount_type === 'percent' ? r.active_promotion.discount_value : Math.round((r.price - r.promoted_price) / r.price * 100)) : (r.discount || 0),
                                 active_promotion: r.active_promotion,
                                 badge: r.badge || (r.is_featured ? "Best Seller" : ""),
+                                image: r.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
                             }));
                         setRelatedProducts(relMapped);
                     }

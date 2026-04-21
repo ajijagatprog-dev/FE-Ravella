@@ -1,15 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  X,
-  Package,
-  Tag,
-  Image as ImageIcon,
-  Barcode,
-  Box,
-  DollarSign,
-} from "lucide-react";
+import { X, Package, Tag, Image as ImageIcon, Barcode, Box, DollarSign } from "lucide-react";
 import api from "@/lib/axios";
 
 interface Product {
@@ -54,8 +46,19 @@ export default function ModalTambah({
 
   if (!open) return null;
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value
+    }));
+  };
+
   const handleSubmit = async () => {
-    if (!form.name || !form.sku) return;
+    if (!form.name || !form.sku) {
+        alert("Nama Produk dan SKU wajib diisi!");
+        return;
+    }
 
     try {
       setIsLoading(true);
@@ -70,6 +73,7 @@ export default function ModalTambah({
       formData.append('b2b_min_order', form.b2bMinOrder.toString());
       formData.append('description', form.description || form.name);
       formData.append('weight', form.weight.toString() || "1000");
+      formData.append('sku', form.sku || "");
 
       const res = await api.post('/products', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -78,9 +82,16 @@ export default function ModalTambah({
       if (res.data.status === 'success') {
         const mockProduct: Product = {
           id: res.data.data?.id || Date.now(),
-          name: form.name, category: form.category, image: res.data.data?.image || "", sku: form.sku,
-          stock: form.stock, stockStatus: form.stock <= 10 ? "low" : "high",
-          retailPrice: form.retailPrice, salePrice: form.salePrice, b2bPrice: form.b2bPrice, b2bMinOrder: form.b2bMinOrder
+          name: form.name, 
+          category: form.category, 
+          image: res.data.data?.image || "", 
+          sku: form.sku,
+          stock: form.stock, 
+          stockStatus: form.stock <= 10 ? "low" : "high",
+          retailPrice: form.retailPrice, 
+          salePrice: form.salePrice, 
+          b2bPrice: form.b2bPrice, 
+          b2bMinOrder: form.b2bMinOrder
         };
 
         onAddProduct(mockProduct);
@@ -90,74 +101,77 @@ export default function ModalTambah({
       }
     } catch (error: any) {
       console.error("Error creating product:", error);
-      alert(error.response?.data?.message || "Failed to create product. Check your inputs.");
+      alert(error.response?.data?.message || "Gagal menambah produk. Pastikan SKU unik dan data valid.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-in fade-in duration-200">
-      <div
-        onClick={onClose}
-        className="absolute inset-0 bg-black/50 backdrop-blur-md"
-      />
-
-      <div className="relative bg-gradient-to-br from-white via-white to-gray-50 rounded-3xl shadow-2xl w-full max-w-2xl z-10 border border-gray-200/60 animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40 px-4 animate-in fade-in duration-200">
+      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-200 animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="relative px-8 py-6 border-b border-gray-200/70 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-t-3xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-t-3xl" />
-          <div className="relative flex items-center justify-between">
+        <div className="relative px-8 py-6 border-b border-gray-100 bg-gray-50/50 rounded-t-3xl">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent flex items-center gap-3">
-                <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                  <Package className="text-white" size={20} />
-                </span>
-                Add New Product
-              </h2>
-              <p className="text-sm text-gray-600 mt-1 ml-13">
-                Tambahkan produk baru ke inventory
-              </p>
+              <h2 className="text-xl font-bold text-gray-900">Add New Product</h2>
+              <p className="text-xs text-gray-500 mt-1">Tambah produk baru ke inventory</p>
             </div>
-
             <button
               onClick={onClose}
-              className="p-2.5 rounded-xl hover:bg-white/80 transition-all duration-200 text-gray-500 hover:text-gray-700 hover:shadow-md group"
+              className="p-2 rounded-xl hover:bg-gray-200 transition-all text-gray-400 hover:text-gray-600"
             >
-              <X
-                size={20}
-                className="group-hover:rotate-90 transition-transform duration-300"
-              />
+              <X size={20} />
             </button>
           </div>
         </div>
 
         {/* Body */}
-        <div className="px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Product Name */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <Package size={16} className="text-blue-500" />
-                Product Name
+        <div className="px-8 py-6 space-y-6 overflow-y-auto flex-1">
+          {/* Product Name */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700 flex items-center gap-2 uppercase tracking-wider">
+              <Package size={14} className="text-blue-500" />
+              Product Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-3 text-sm font-medium focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+              placeholder="Masukkan nama produk"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* SKU Field */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 flex items-center gap-2 uppercase tracking-wider">
+                <Barcode size={14} className="text-indigo-500" />
+                Product SKU *
               </label>
               <input
-                placeholder="Masukkan nama produk"
-                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 hover:border-gray-300"
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                type="text"
+                name="sku"
+                value={form.sku}
+                onChange={handleChange}
+                className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-3 text-sm font-medium focus:outline-none focus:border-indigo-500 focus:bg-white transition-all"
+                placeholder="CONTOH: SKU-001"
               />
             </div>
 
             {/* Category */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <Tag size={16} className="text-purple-500" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 flex items-center gap-2 uppercase tracking-wider">
+                <Tag size={14} className="text-purple-500" />
                 Category
               </label>
               <select
-                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200 hover:border-gray-300 appearance-none cursor-pointer"
+                name="category"
                 value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                onChange={handleChange}
+                className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-3 text-sm font-medium focus:outline-none focus:border-purple-500 focus:bg-white transition-all appearance-none cursor-pointer"
               >
                 <option value="" disabled>Pilih Kategori</option>
                 <option value="Home & Kitchen Appliance">Home & Kitchen Appliance</option>
@@ -167,169 +181,131 @@ export default function ModalTambah({
                 <option value="keyboard">keyboard</option>
               </select>
             </div>
+          </div>
 
-            {/* Weight */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <Box size={16} className="text-indigo-500" />
-                Weight (gram)
-              </label>
-              <input
-                type="number"
-                placeholder="1000"
-                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 hover:border-gray-300"
-                onChange={(e) => setForm({ ...form, weight: Number(e.target.value) })}
-              />
-            </div>
-
-            {/* Image URL */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <ImageIcon size={16} className="text-pink-500" />
-                Product Image
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all duration-200 hover:border-gray-300"
-                onChange={(e) => setForm({ ...form, image: e.target.files?.[0] || null })}
-              />
-            </div>
-
-            {/* Description */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <Package size={16} className="text-gray-500" />
-                Description
-              </label>
-              <textarea
-                placeholder="Deskripsi produk"
-                rows={3}
-                className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-gray-500 focus:ring-4 focus:ring-gray-500/10 transition-all duration-200 hover:border-gray-300"
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-              />
-            </div>
-
-
-
-            {/* Stock */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <Box size={16} className="text-orange-500" />
-                Stock
-              </label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Retail Price</label>
               <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rp</span>
                 <input
                   type="number"
-                  placeholder="0"
-                  className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all duration-200 hover:border-gray-300"
-                  onChange={(e) =>
-                    setForm({ ...form, stock: Number(e.target.value) })
-                  }
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium">
-                  units
-                </span>
-              </div>
-            </div>
-
-            {/* Retail Price */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <DollarSign size={16} className="text-green-500" />
-                Retail Price
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
-                  Rp
-                </span>
-                <input
-                  type="number"
-                  placeholder="0"
-                  className="w-full border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all duration-200 hover:border-gray-300"
-                  onChange={(e) =>
-                    setForm({ ...form, retailPrice: Number(e.target.value) })
-                  }
+                  name="retailPrice"
+                  value={form.retailPrice}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 pl-10 pr-4 py-3 text-sm font-medium focus:outline-none focus:border-green-500 focus:bg-white transition-all"
                 />
               </div>
             </div>
-
-            {/* Sale Price */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <DollarSign size={16} className="text-rose-500" />
-                Sale Price
-              </label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Sale Price</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
-                  Rp
-                </span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rp</span>
                 <input
                   type="number"
-                  placeholder="0"
-                  className="w-full border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 transition-all duration-200 hover:border-gray-300"
-                  onChange={(e) =>
-                    setForm({ ...form, salePrice: Number(e.target.value) })
-                  }
-                />
-              </div>
-            </div>
-
-            {/* B2B Price */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <DollarSign size={16} className="text-teal-500" />
-                B2B Price
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
-                  Rp
-                </span>
-                <input
-                  type="number"
-                  placeholder="0"
-                  className="w-full border-2 border-gray-200 bg-white text-gray-900 pl-12 pr-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all duration-200 hover:border-gray-300"
-                  onChange={(e) =>
-                    setForm({ ...form, b2bPrice: Number(e.target.value) })
-                  }
-                />
-              </div>
-            </div>
-
-            {/* B2B Min Order */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <Package size={16} className="text-yellow-500" />
-                B2B Min Order
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  placeholder="1"
-                  className="w-full border-2 border-gray-200 bg-white text-gray-900 px-4 py-3.5 rounded-xl text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all duration-200 hover:border-gray-300"
-                  onChange={(e) =>
-                    setForm({ ...form, b2bMinOrder: Number(e.target.value) })
-                  }
+                  name="salePrice"
+                  value={form.salePrice}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 pl-10 pr-4 py-3 text-sm font-medium focus:outline-none focus:border-rose-500 focus:bg-white transition-all"
                 />
               </div>
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">B2B Price</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs">Rp</span>
+                <input
+                  type="number"
+                  name="b2bPrice"
+                  value={form.b2bPrice}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 pl-10 pr-4 py-3 text-sm font-medium focus:outline-none focus:border-teal-500 focus:bg-white transition-all"
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Stock</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  name="stock"
+                  value={form.stock}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange-500 focus:bg-white transition-all"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] uppercase font-bold">Units</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Weight (g)</label>
+              <input
+                type="number"
+                name="weight"
+                value={form.weight}
+                onChange={handleChange}
+                className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-3 text-sm font-medium focus:outline-none focus:border-indigo-500 focus:bg-white transition-all"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Min B2B</label>
+              <input
+                type="number"
+                name="b2bMinOrder"
+                value={form.b2bMinOrder}
+                onChange={handleChange}
+                className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-3 text-sm font-medium focus:outline-none focus:border-yellow-500 focus:bg-white transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700 flex items-center gap-2 uppercase tracking-wider">
+              <ImageIcon size={14} className="text-pink-500" />
+              Product Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-2.5 text-xs font-medium focus:outline-none focus:border-pink-500 focus:bg-white transition-all file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-pink-100 file:text-pink-700 cursor-pointer"
+              onChange={(e) => setForm({ ...form, image: e.target.files?.[0] || null })}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700 flex items-center gap-2 uppercase tracking-wider">
+              <Package size={14} className="text-gray-400" />
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              rows={3}
+              className="w-full rounded-xl border-2 border-gray-100 bg-gray-50/50 text-gray-900 px-4 py-3 text-sm font-medium focus:outline-none focus:border-gray-500 focus:bg-white transition-all resize-none"
+            />
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-8 py-6 border-t border-gray-200/70 bg-gray-50/50 rounded-b-3xl">
+        <div className="px-8 py-6 border-t border-gray-200 bg-gray-50/50 rounded-b-3xl flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-3 rounded-xl border-2 border-gray-300 text-sm text-gray-700 font-bold hover:bg-gray-100 hover:border-gray-400 transition-all duration-200 hover:shadow-md"
+            className="px-6 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-white transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
+            disabled={isLoading}
+            className="px-8 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow-md transition-all active:scale-95 disabled:opacity-50"
           >
-            <Package size={16} />
-            Add Product
+            {isLoading ? "Adding..." : "Add Product"}
           </button>
         </div>
       </div>
