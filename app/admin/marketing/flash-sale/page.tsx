@@ -204,31 +204,31 @@ export default function FlashSalePage() {
   return (
     <div className="p-6" style={{ fontFamily: JOST }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-stone-900">
+            <h1 className="text-xl md:text-2xl font-bold text-stone-900">
               Manajemen Flash Sale
             </h1>
-            <Zap className="text-amber-500 w-6 h-6 fill-amber-500" />
+            <Zap className="text-amber-500 w-5 h-5 md:w-6 md:h-6 fill-amber-500" />
           </div>
-          <p className="text-stone-500 text-sm mt-1">
+          <p className="text-stone-500 text-xs md:text-sm mt-1">
             Kelola promo terbatas dengan periode waktu tertentu
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <button
             onClick={() => {
               setShowImportModal(true);
               setImportFile(null);
             }}
-            className="flex items-center gap-2 border border-stone-300 text-stone-700 px-4 py-2.5 text-sm font-medium hover:bg-stone-50 transition-colors"
+            className="flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2.5 text-sm font-medium hover:bg-stone-50 transition-colors"
           >
             <Upload className="w-4 h-4" /> Import Excel
           </button>
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 bg-stone-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-black transition-colors"
+            className="flex items-center justify-center gap-2 bg-stone-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-black transition-colors"
           >
             <Plus className="w-4 h-4" /> Buat Flash Sale
           </button>
@@ -277,8 +277,8 @@ export default function FlashSalePage() {
           </button>
         </div>
       ) : (
-        <div className="bg-white border border-stone-100 overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="bg-white border border-stone-100 overflow-x-auto rounded-xl shadow-sm">
+          <table className="w-full text-sm min-w-[800px] md:min-w-full">
             <thead>
               <tr className="border-b border-stone-100 text-[10px] uppercase tracking-wider text-stone-500 font-bold">
                 <th className="px-5 py-4 text-left font-bold">Produk SKU</th>
@@ -378,7 +378,7 @@ export default function FlashSalePage() {
                   {error}
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="col-span-1">
                   <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1">
                     Pilih Produk *
@@ -428,7 +428,7 @@ export default function FlashSalePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1">
                     Tipe Potongan *
@@ -460,7 +460,7 @@ export default function FlashSalePage() {
                 </div>
               </div>
 
-              <div className="bg-amber-50 p-4 border border-amber-200 grid grid-cols-2 gap-4 rounded-lg">
+              <div className="bg-amber-50 p-4 border border-amber-200 grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-lg">
                 <div className="col-span-2 text-[10px] font-bold text-amber-700 uppercase tracking-widest flex items-center gap-1.5 mb-1">
                   <Calendar size={14} /> Periode Flash Sale
                 </div>
@@ -637,26 +637,34 @@ export default function FlashSalePage() {
 
       {/* Confirm Delete */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white p-8 max-w-sm w-full text-center shadow-2xl">
-            <h3 className="text-lg font-bold text-stone-900 uppercase">
-              Hapus Event?
+        <div className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div 
+            className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-stone-100 animate-in zoom-in-95 duration-200"
+            style={{ fontFamily: JOST }}
+          >
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-5">
+              <Trash2 className="w-8 h-8 text-red-500" />
+            </div>
+            
+            <h3 className="text-xl font-bold text-stone-900 tracking-tight">
+              Hapus Event Flash Sale?
             </h3>
-            <p className="text-sm text-stone-500 mt-2">
-              Menghapus flash sale untuk SKU{" "}
-              <span className="font-bold">{showConfirm.sku}</span> bersifat
-              permanen.
+            
+            <p className="text-sm text-stone-500 mt-3 leading-relaxed">
+              Anda akan menghapus promo flash sale untuk SKU <span className="font-bold text-stone-900">{showConfirm.sku}</span>. 
+              Tindakan ini tidak dapat dibatalkan.
             </p>
-            <div className="grid grid-cols-2 gap-3 mt-6">
+            
+            <div className="grid grid-cols-2 gap-3 mt-8">
               <button
                 onClick={() => setShowConfirm(null)}
-                className="px-4 py-3 border border-stone-200 text-xs font-bold uppercase"
+                className="px-4 py-3.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-bold uppercase tracking-wider transition-all active:scale-95"
               >
                 Batal
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-3 bg-red-600 text-white text-xs font-bold uppercase shadow-lg shadow-red-200"
+                className="px-4 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-red-200 transition-all active:scale-95"
               >
                 Hapus Event
               </button>

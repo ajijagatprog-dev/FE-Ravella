@@ -151,7 +151,6 @@ export default function NewsContentPage() {
             formData.append('category', editData.category);
             formData.append('author', editData.author);
             formData.append('read_time', editData.readTime);
-            formData.append('views', editData.views);
             formData.append('is_featured', editData.isFeatured ? '1' : '0');
             formData.append('status', editData.status || 'published');
             formData.append('published_at', editData.date);
@@ -542,8 +541,8 @@ export default function NewsContentPage() {
                                 </div>
                             </div>
 
-                            {/* Date + Read Time + Views */}
-                            <div className="grid grid-cols-3 gap-4">
+                            {/* Date + Read Time */}
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal</label>
                                     <input
@@ -563,17 +562,10 @@ export default function NewsContentPage() {
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Views</label>
-                                    <input
-                                        type="text"
-                                        value={editData.views}
-                                        onChange={(e) => setEditData((d) => ({ ...d, views: e.target.value }))}
-                                        placeholder="2.5k"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
-                                    />
-                                </div>
                             </div>
+                            <p className="text-xs text-slate-400 flex items-center gap-1.5">
+                                <Eye size={12} /> Views di-track otomatis saat user membuka artikel.
+                            </p>
 
                             {/* Featured Toggle */}
                             <label className="flex items-center gap-2 cursor-pointer">

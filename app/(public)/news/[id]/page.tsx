@@ -83,6 +83,12 @@ export default function NewsDetail() {
 
     useEffect(() => {
         fetchArticleData();
+        // Track view in realtime
+        api.post(`/news/${id}/view`).then(res => {
+            if (res.data.status === 'success') {
+                setArticle(prev => prev ? { ...prev, views: res.data.views.toString() } : prev);
+            }
+        }).catch(() => {});
     }, [id]);
 
     if (loading) {
@@ -128,9 +134,10 @@ export default function NewsDetail() {
 
             {/* ── HERO ── */}
             <section className="relative h-[340px] sm:h-[440px] md:h-[500px] overflow-hidden">
-                <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${article.image})` }}
+                <img
+                    src={article.image}
+                    alt={article.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-all duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
 
@@ -201,17 +208,64 @@ export default function NewsDetail() {
 
                         <div className="w-full h-[1px] bg-neutral-100 mb-8" />
 
-                        {/* Paragraphs */}
-                        <div className="space-y-5">
-                            {article.content.map((paragraph, index) => (
-                                <p
-                                    key={index}
-                                    className="text-neutral-600 text-[15px] font-light leading-[1.85]"
-                                    style={{ fontFamily: JOST }}
-                                >
-                                    {paragraph}
-                                </p>
-                            ))}
+                        {/* Paragraphs — Rich Rendering */}
+                        <div className="space-y-6">
+                            {article.content.map((paragraph, index) => {
+                                const trimmed = paragraph.trim();
+                                if (!trimmed) return null;
+
+                                // Detect numbered heading: "1. Title Here" or "2. Another"
+                                const numberedHeading = trimmed.match(/^(\d+)\.\s+(.+)/);
+                                if (numberedHeading) {
+                                    return (
+                                        <div key={index} className="mt-8 mb-4">
+                                            <div className="flex items-start gap-3">
+                                                <span className="flex-shrink-0 w-8 h-8 bg-neutral-900 text-white flex items-center justify-center text-sm font-bold" style={{ fontFamily: JOST }}>
+                                                    {numberedHeading[1]}
+                                                </span>
+                                                <h2 className="text-xl sm:text-2xl font-medium text-neutral-900 leading-snug pt-0.5" style={{ fontFamily: CORMORANT }}>
+                                                    {numberedHeading[2]}
+                                                </h2>
+                                            </div>
+                                            <div className="w-full h-[1px] bg-neutral-100 mt-3" />
+                                        </div>
+                                    );
+                                }
+
+                                // Detect list items within paragraph (lines starting with - or • or ✓ or ⭐)
+                                const lines = trimmed.split('\n');
+                                const isList = lines.every(l => /^[\-•✓⭐✅]\s/.test(l.trim()) || l.trim() === '');
+                                if (isList && lines.filter(l => l.trim()).length > 0) {
+                                    return (
+                                        <ul key={index} className="space-y-2.5 pl-1">
+                                            {lines.filter(l => l.trim()).map((line, li) => {
+                                                const cleaned = line.trim().replace(/^[\-•✓⭐✅]\s*/, '');
+                                                return (
+                                                    <li key={li} className="flex items-start gap-3 text-neutral-600 text-[15px] font-light leading-[1.8]" style={{ fontFamily: JOST }}>
+                                                        <span className="mt-1.5 w-1.5 h-1.5 bg-neutral-400 rounded-full flex-shrink-0" />
+                                                        <span dangerouslySetInnerHTML={{ __html: cleaned.replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-neutral-800">$1</strong>') }} />
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    );
+                                }
+
+                                // Regular paragraph with bold support and drop cap on first
+                                const htmlContent = trimmed
+                                    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-neutral-800">$1</strong>')
+                                    .replace(/\n/g, '<br/>');
+
+                                const isFirst = index === 0;
+                                return (
+                                    <p
+                                        key={index}
+                                        className={`text-neutral-600 text-[15px] font-light leading-[1.85] ${isFirst ? 'first-letter:text-5xl first-letter:font-bold first-letter:text-neutral-900 first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:leading-[0.8]' : ''}`}
+                                        style={{ fontFamily: JOST }}
+                                        dangerouslySetInnerHTML={{ __html: htmlContent }}
+                                    />
+                                );
+                            })}
                         </div>
 
                         {/* Tags & Share */}
@@ -360,11 +414,10 @@ export default function NewsDetail() {
                                 >
                                     {/* Image */}
                                     <div className="relative h-48 sm:h-52 overflow-hidden">
-                                        <div
-                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                                            style={{
-                                                backgroundImage: `url(${related.image})`,
-                                            }}
+                                        <img
+                                            src={related.image}
+                                            alt={related.title}
+                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 

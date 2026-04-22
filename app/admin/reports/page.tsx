@@ -442,12 +442,12 @@ export default function ReportsPage() {
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
             Pusat Pelaporan &amp; Monitoring Admin
           </h1>
-          <p className="mt-0.5 text-sm text-gray-500">
+          <p className="mt-1 text-xs md:text-sm text-gray-500">
             Wawasan mendalam dan pelacakan kinerja di seluruh platform
             e-commerce Anda.
           </p>
@@ -475,7 +475,7 @@ export default function ReportsPage() {
               toast.error("Gagal mengunduh laporan");
             }
           }}
-          className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-600 active:scale-95 transition-all duration-150 w-fit"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-600 active:scale-95 transition-all duration-150 w-full md:w-fit"
         >
           <Download size={15} />
           Ekspor ke Excel
@@ -483,15 +483,15 @@ export default function ReportsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-1 flex-1">
           <label className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
             Rentang Waktu
           </label>
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[160px]"
+            className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
           >
             <option value="all">Semua Waktu</option>
             <option value="last_7">7 Hari Terakhir</option>
@@ -502,7 +502,7 @@ export default function ReportsPage() {
 
         <button
           onClick={fetchData}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm h-[38px]"
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           Perbarui
@@ -510,7 +510,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-xl bg-gray-100 p-1 w-fit">
+      <div className="flex gap-1 rounded-xl bg-gray-100 p-1 overflow-x-auto no-scrollbar">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -520,7 +520,7 @@ export default function ReportsPage() {
                 setActiveTab(tab.key);
                 setPage(1);
               }}
-              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 ${
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 whitespace-nowrap ${
                 activeTab === tab.key
                   ? "bg-white text-blue-600 shadow-sm"
                   : "text-gray-500 hover:text-gray-700"
@@ -535,7 +535,7 @@ export default function ReportsPage() {
 
       {/* Summary Cards */}
       {loading ? (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
@@ -547,7 +547,7 @@ export default function ReportsPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {summaryCards.map((card) => {
             const Icon = summaryIcons[card.label] || BarChart2;
             return (
@@ -576,8 +576,13 @@ export default function ReportsPage() {
       {activeTab === "traffic" && tableData.length > 0 && !loading && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="mb-6">
-            <h2 className="text-base font-semibold text-gray-800">Top 10 Halaman Paling Sering Dikunjungi</h2>
-            <p className="mt-0.5 text-xs text-gray-500">Visualisasi 10 halaman teratas berdasarkan Tayangan Halaman (Page Views)</p>
+            <h2 className="text-base font-semibold text-gray-800">
+              Top 10 Halaman Paling Sering Dikunjungi
+            </h2>
+            <p className="mt-0.5 text-xs text-gray-500">
+              Visualisasi 10 halaman teratas berdasarkan Tayangan Halaman (Page
+              Views)
+            </p>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -588,28 +593,40 @@ export default function ReportsPage() {
                 }))}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fontSize: 11, fill: '#6B7280' }} 
-                  axisLine={{ stroke: '#E5E7EB' }}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#E5E7EB"
+                />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 11, fill: "#6B7280" }}
+                  axisLine={{ stroke: "#E5E7EB" }}
                   tickLine={false}
                 />
-                <YAxis 
-                  tick={{ fontSize: 11, fill: '#6B7280' }} 
+                <YAxis
+                  tick={{ fontSize: 11, fill: "#6B7280" }}
                   axisLine={false}
                   tickLine={false}
                 />
-                <RechartsTooltip 
-                  cursor={{ fill: '#F3F4F6' }}
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                  labelStyle={{ fontWeight: 600, color: '#374151', marginBottom: '4px' }}
+                <RechartsTooltip
+                  cursor={{ fill: "#F3F4F6" }}
+                  contentStyle={{
+                    borderRadius: "8px",
+                    border: "1px solid #E5E7EB",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  }}
+                  labelStyle={{
+                    fontWeight: 600,
+                    color: "#374151",
+                    marginBottom: "4px",
+                  }}
                 />
-                <Bar 
-                  dataKey="views" 
-                  name="Tayangan Halaman" 
-                  fill="#3B82F6" 
-                  radius={[4, 4, 0, 0]} 
+                <Bar
+                  dataKey="views"
+                  name="Tayangan Halaman"
+                  fill="#3B82F6"
+                  radius={[4, 4, 0, 0]}
                   barSize={40}
                 />
               </BarChart>

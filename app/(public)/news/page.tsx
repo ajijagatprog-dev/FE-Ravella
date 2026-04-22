@@ -94,7 +94,11 @@ export default function News() {
 
       {/* ── HERO ── */}
       <section className="relative h-[300px] sm:h-[400px] overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)" }} />
+        <img 
+          src="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80" 
+          alt="News Hero" 
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
