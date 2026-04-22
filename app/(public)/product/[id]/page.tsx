@@ -116,9 +116,24 @@ export default function ProductDetail() {
     const selectedVariant = product?.variants?.find((v: any) => v.id === selectedVariantId) || null;
 
     // Compute active price/stock based on variant selection
-    const activePrice = selectedVariant?.price ?? product?.price ?? 0;
+    // Apply promotion discount to variant price if applicable
+    const computeActivePrice = () => {
+        const basePrice = selectedVariant?.price ?? product?.originalPrice ?? 0;
+        const promo = product?.active_promotion;
+        if (!promo) return basePrice;
+        if (promo.discount_type === 'percent') {
+            return Math.round(basePrice - (basePrice * promo.discount_value / 100));
+        }
+        if (promo.discount_type === 'fixed') {
+            return Math.max(0, basePrice - promo.discount_value);
+        }
+        return basePrice;
+    };
+    const activePrice = computeActivePrice();
     const activeStock = selectedVariant ? selectedVariant.stock : (product?.stock ?? 0);
     const activeInStock = activeStock > 0;
+    // Original price (before discount) — variant-aware
+    const activeOriginalPrice = selectedVariant?.price ?? product?.originalPrice ?? 0;
 
     // Build gallery items: variant images + main videos (always shown)
     const galleryItems = (() => {
@@ -505,21 +520,21 @@ export default function ProductDetail() {
                                 >
                                     {formatPrice(activePrice)}
                                 </span>
-                                {product.originalPrice > activePrice && (
+                                {activeOriginalPrice > activePrice && (
                                     <span
                                         className="text-sm text-neutral-400 line-through"
                                         style={{ fontFamily: JOST }}
                                     >
-                                        {formatPrice(product.originalPrice)}
+                                        {formatPrice(activeOriginalPrice)}
                                     </span>
                                 )}
                             </div>
-                            {product.originalPrice > activePrice && (
+                            {activeOriginalPrice > activePrice && (
                                 <p
                                     className="text-[11px] text-neutral-500 mt-1.5 tracking-wide"
                                     style={{ fontFamily: JOST }}
                                 >
-                                    Hemat {formatPrice(product.originalPrice - activePrice)}
+                                    Hemat {formatPrice(activeOriginalPrice - activePrice)}
                                 </p>
                             )}
                         </div>
