@@ -13,7 +13,13 @@ import {
     BookmarkPlus,
     User,
     Tag,
+    ChevronLeft,
+    Share,
+    Facebook,
+    Twitter,
+    Instagram,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "../../../HomePage/components/Header";
 import Footer from "../../../HomePage/components/Footer";
 import api from "@/lib/axios";
@@ -30,6 +36,7 @@ export default function NewsDetail() {
 
     const fetchArticleData = async () => {
         try {
+            setLoading(true);
             const res = await api.get(`/news/${id}`);
             if (res.data.status === 'success') {
                 const item = res.data.data;
@@ -48,7 +55,7 @@ export default function NewsDetail() {
                     content: item.content ? item.content.split('\n\n') : [""],
                 });
 
-                // Fetch all to get related
+                // Fetch related
                 const allRes = await api.get('/news?limit=100&status=published');
                 if (allRes.data.status === 'success') {
                     const mapped = allRes.data.data.data.map((allItem: any) => ({
@@ -83,7 +90,7 @@ export default function NewsDetail() {
 
     useEffect(() => {
         fetchArticleData();
-        // Track view in realtime
+        // Track view
         api.post(`/news/${id}/view`).then(res => {
             if (res.data.status === 'success') {
                 setArticle(prev => prev ? { ...prev, views: res.data.views.toString() } : prev);
@@ -92,35 +99,27 @@ export default function NewsDetail() {
     }, [id]);
 
     if (loading) {
-        return <div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>;
+        return (
+          <div className="min-h-screen bg-white flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900"></div>
+          </div>
+        );
     }
 
-    /* ─── 404 state ─── */
     if (!article) {
         return (
             <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
                 <Header />
-                <div className="flex flex-col items-center justify-center py-32 px-6">
-                    <h1
-                        className="text-5xl sm:text-6xl font-light text-neutral-900 mb-4"
-                        style={{ fontFamily: CORMORANT }}
-                    >
-                        Artikel Tidak Ditemukan
-                    </h1>
-                    <div className="w-10 h-[1px] bg-neutral-300 mb-6" />
-                    <p
-                        className="text-neutral-500 text-sm font-light mb-10 text-center max-w-md"
-                        style={{ fontFamily: JOST }}
-                    >
+                <div className="flex flex-col items-center justify-center py-40 px-6">
+                    <h1 className="text-6xl font-light text-neutral-900 mb-6" style={{ fontFamily: CORMORANT }}>Story Not Found</h1>
+                    <p className="text-neutral-500 text-sm font-light mb-12 text-center max-w-md">
                         Maaf, artikel yang Anda cari tidak tersedia atau telah dihapus.
                     </p>
                     <Link
                         href="/news"
-                        className="inline-flex items-center gap-2 px-8 py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-900 hover:text-white transition-colors"
-                        style={{ fontFamily: JOST }}
+                        className="inline-flex items-center gap-3 px-10 py-4 bg-neutral-900 text-white text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-all"
                     >
-                        <ArrowLeft className="w-3.5 h-3.5" />
-                        Kembali ke Artikel
+                        <ArrowLeft className="w-4 h-4" /> Back to Journal
                     </Link>
                 </div>
                 <Footer />
@@ -133,117 +132,130 @@ export default function NewsDetail() {
             <Header />
 
             {/* ── HERO ── */}
-            <section className="relative h-[340px] sm:h-[440px] md:h-[500px] overflow-hidden">
-                <img
-                    src={article.image}
-                    alt={article.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
+            <section className="relative h-[450px] sm:h-[550px] md:h-[650px] overflow-hidden bg-neutral-900">
+                <motion.div
+                  initial={{ scale: 1.1, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 0.5 }}
+                  transition={{ duration: 1.5 }}
+                  className="absolute inset-0"
+                >
+                   <img
+                       src={article.image}
+                       alt={article.title}
+                       className="w-full h-full object-cover"
+                   />
+                </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-                <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-16 lg:px-24 pb-10 sm:pb-14 max-w-[1000px]">
-                    {/* Category */}
-                    <span
-                        className="inline-block self-start px-3 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.15em] uppercase font-medium mb-5"
-                        style={{ fontFamily: JOST }}
+                <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-16 lg:px-24 xl:px-40 pb-16 sm:pb-24">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.8 }}
+                      className="max-w-4xl"
                     >
-                        {article.category}
-                    </span>
+                        <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md text-white text-[10px] tracking-[0.3em] font-black uppercase mb-8 border border-white/20">
+                            {article.category}
+                        </span>
+                        
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light text-white mb-10 leading-[0.95]" style={{ fontFamily: CORMORANT }}>
+                            {article.title}
+                        </h1>
 
-                    {/* Title */}
-                    <h1
-                        className="text-3xl sm:text-4xl md:text-5xl font-light text-white mb-5 leading-[1.1]"
-                        style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
-                    >
-                        {article.title}
-                    </h1>
-
-                    {/* Meta */}
-                    <div
-                        className="flex flex-wrap items-center gap-4 sm:gap-5 text-white/60 text-[11px] tracking-wide"
-                        style={{ fontFamily: JOST }}
-                    >
-                        <div className="flex items-center gap-1.5">
-                            <User className="w-3.5 h-3.5" />
-                            <span>{article.author}</span>
+                        <div className="flex flex-wrap items-center gap-8 text-white/60 text-[10px] tracking-[0.3em] uppercase font-black">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">
+                                   <User className="w-3.5 h-3.5" />
+                                </div>
+                                <span>{article.author}</span>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                                <Calendar className="w-4 h-4" />
+                                <span>{article.date}</span>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                                <Clock className="w-4 h-4" />
+                                <span>{article.readTime} Read</span>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                                <Eye className="w-4 h-4 text-amber-500" />
+                                <span className="text-amber-500">{article.views} Views</span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span>{article.date}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>{article.readTime}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>{article.views} views</span>
-                        </div>
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
             {/* ── CONTENT ── */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 py-12 sm:py-16">
-                <div className="grid lg:grid-cols-[1fr_280px] gap-12 lg:gap-16">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-20 sm:py-28"
+            >
+                <div className="grid lg:grid-cols-[1fr_320px] gap-20 xl:gap-32">
                     {/* Article Body */}
-                    <article>
-                        {/* Back link */}
-                        <Link
-                            href="/news"
-                            className="inline-flex items-center gap-2 text-neutral-400 text-[11px] tracking-[0.15em] uppercase font-medium hover:text-neutral-900 transition-colors mb-8 group"
-                            style={{ fontFamily: JOST }}
-                        >
-                            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-                            Kembali ke Artikel
-                        </Link>
+                    <article className="max-w-4xl">
+                        {/* Navigation Bar */}
+                        <div className="flex items-center justify-between mb-16 pb-8 border-b border-neutral-100">
+                           <Link
+                                href="/news"
+                                className="inline-flex items-center gap-2.5 text-neutral-400 text-[10px] tracking-[0.2em] uppercase font-black hover:text-neutral-900 transition-all group"
+                            >
+                                <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                                Back to All Stories
+                            </Link>
+                            
+                            <div className="flex items-center gap-6">
+                               <button className="text-neutral-400 hover:text-neutral-900 transition-colors"><Facebook className="w-4 h-4" /></button>
+                               <button className="text-neutral-400 hover:text-neutral-900 transition-colors"><Twitter className="w-4 h-4" /></button>
+                               <button className="text-neutral-400 hover:text-neutral-900 transition-colors"><Instagram className="w-4 h-4" /></button>
+                               <button className="text-neutral-400 hover:text-neutral-900 transition-colors ml-2"><Share className="w-4 h-4" /></button>
+                            </div>
+                        </div>
 
-                        {/* Excerpt / Lead */}
-                        <p
-                            className="text-neutral-600 text-base sm:text-lg font-light leading-relaxed mb-8 border-l-2 border-neutral-200 pl-5"
-                            style={{ fontFamily: JOST }}
-                        >
-                            {article.excerpt}
-                        </p>
+                        {/* Excerpt */}
+                        <div className="mb-16 relative">
+                           <div className="absolute left-0 top-0 bottom-0 w-[1px] bg-neutral-200" />
+                           <p className="text-neutral-900 text-2xl sm:text-3xl font-light italic leading-relaxed pl-10" style={{ fontFamily: CORMORANT }}>
+                               "{article.excerpt}"
+                           </p>
+                        </div>
 
-                        <div className="w-full h-[1px] bg-neutral-100 mb-8" />
-
-                        {/* Paragraphs — Rich Rendering */}
-                        <div className="space-y-6">
+                        {/* Main Body */}
+                        <div className="space-y-10">
                             {article.content.map((paragraph, index) => {
                                 const trimmed = paragraph.trim();
                                 if (!trimmed) return null;
 
-                                // Detect numbered heading: "1. Title Here" or "2. Another"
+                                // Numbered heading
                                 const numberedHeading = trimmed.match(/^(\d+)\.\s+(.+)/);
                                 if (numberedHeading) {
                                     return (
-                                        <div key={index} className="mt-8 mb-4">
-                                            <div className="flex items-start gap-3">
-                                                <span className="flex-shrink-0 w-8 h-8 bg-neutral-900 text-white flex items-center justify-center text-sm font-bold" style={{ fontFamily: JOST }}>
-                                                    {numberedHeading[1]}
-                                                </span>
-                                                <h2 className="text-xl sm:text-2xl font-medium text-neutral-900 leading-snug pt-0.5" style={{ fontFamily: CORMORANT }}>
+                                        <div key={index} className="pt-12 pb-4">
+                                            <div className="flex items-center gap-5 mb-6">
+                                                <span className="text-5xl font-light text-neutral-200" style={{ fontFamily: CORMORANT }}>{numberedHeading[1].padStart(2, '0')}</span>
+                                                <h2 className="text-3xl sm:text-4xl font-medium text-neutral-900 leading-tight" style={{ fontFamily: CORMORANT }}>
                                                     {numberedHeading[2]}
                                                 </h2>
                                             </div>
-                                            <div className="w-full h-[1px] bg-neutral-100 mt-3" />
+                                            <div className="w-20 h-[1px] bg-neutral-900" />
                                         </div>
                                     );
                                 }
 
-                                // Detect list items within paragraph (lines starting with - or • or ✓ or ⭐)
+                                // List items
                                 const lines = trimmed.split('\n');
                                 const isList = lines.every(l => /^[\-•✓⭐✅]\s/.test(l.trim()) || l.trim() === '');
                                 if (isList && lines.filter(l => l.trim()).length > 0) {
                                     return (
-                                        <ul key={index} className="space-y-2.5 pl-1">
+                                        <ul key={index} className="space-y-4 py-4">
                                             {lines.filter(l => l.trim()).map((line, li) => {
                                                 const cleaned = line.trim().replace(/^[\-•✓⭐✅]\s*/, '');
                                                 return (
-                                                    <li key={li} className="flex items-start gap-3 text-neutral-600 text-[15px] font-light leading-[1.8]" style={{ fontFamily: JOST }}>
-                                                        <span className="mt-1.5 w-1.5 h-1.5 bg-neutral-400 rounded-full flex-shrink-0" />
-                                                        <span dangerouslySetInnerHTML={{ __html: cleaned.replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-neutral-800">$1</strong>') }} />
+                                                    <li key={li} className="flex items-start gap-4 text-neutral-600 text-lg font-light leading-relaxed">
+                                                        <div className="mt-2.5 w-1.5 h-1.5 bg-neutral-900 rounded-full flex-shrink-0" />
+                                                        <span dangerouslySetInnerHTML={{ __html: cleaned.replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold text-neutral-900">$1</strong>') }} />
                                                     </li>
                                                 );
                                             })}
@@ -251,231 +263,120 @@ export default function NewsDetail() {
                                     );
                                 }
 
-                                // Regular paragraph with bold support and drop cap on first
+                                // Paragraph
                                 const htmlContent = trimmed
-                                    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-neutral-800">$1</strong>')
+                                    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold text-neutral-900">$1</strong>')
                                     .replace(/\n/g, '<br/>');
 
-                                const isFirst = index === 0;
                                 return (
                                     <p
                                         key={index}
-                                        className={`text-neutral-600 text-[15px] font-light leading-[1.85] ${isFirst ? 'first-letter:text-5xl first-letter:font-bold first-letter:text-neutral-900 first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:leading-[0.8]' : ''}`}
-                                        style={{ fontFamily: JOST }}
+                                        className="text-neutral-600 text-lg font-light leading-[1.8] first-letter:text-6xl first-letter:font-light first-letter:text-neutral-900 first-letter:float-left first-letter:mr-4 first-letter:mt-2"
                                         dangerouslySetInnerHTML={{ __html: htmlContent }}
                                     />
                                 );
                             })}
                         </div>
 
-                        {/* Tags & Share */}
-                        <div className="mt-12 pt-8 border-t border-neutral-100">
-                            <div className="flex flex-wrap items-center justify-between gap-4">
-                                <div className="flex items-center gap-2">
-                                    <Tag className="w-3.5 h-3.5 text-neutral-400" />
-                                    <span
-                                        className="px-3 py-1 border border-neutral-200 text-neutral-600 text-[10px] tracking-[0.12em] uppercase font-medium"
-                                        style={{ fontFamily: JOST }}
-                                    >
-                                        {article.category}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button className="w-9 h-9 border border-neutral-200 flex items-center justify-center hover:border-neutral-400 hover:bg-neutral-50 transition-all">
-                                        <BookmarkPlus className="w-4 h-4 text-neutral-500" />
-                                    </button>
-                                    <button className="w-9 h-9 border border-neutral-200 flex items-center justify-center hover:border-neutral-400 hover:bg-neutral-50 transition-all">
-                                        <Share2 className="w-4 h-4 text-neutral-500" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Author card */}
-                        <div className="mt-8 p-6 bg-neutral-50 border border-neutral-100">
+                        {/* Footer Meta */}
+                        <div className="mt-24 pt-12 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-8">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-neutral-200 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <User className="w-5 h-5 text-neutral-500" />
-                                </div>
-                                <div>
-                                    <p
-                                        className="text-neutral-900 text-sm font-medium"
-                                        style={{ fontFamily: JOST }}
-                                    >
-                                        {article.author}
-                                    </p>
-                                    <p
-                                        className="text-neutral-400 text-[11px] tracking-wide font-light"
-                                        style={{ fontFamily: JOST }}
-                                    >
-                                        Penulis
-                                    </p>
-                                </div>
+                               <Tag className="w-4 h-4 text-neutral-400" />
+                               <span className="px-4 py-2 bg-neutral-50 text-neutral-900 text-[10px] font-black uppercase tracking-widest border border-neutral-100">
+                                  {article.category}
+                               </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button className="p-3 border border-neutral-100 hover:bg-neutral-900 hover:text-white transition-all"><BookmarkPlus className="w-5 h-5" /></button>
+                                <button className="p-3 border border-neutral-100 hover:bg-neutral-900 hover:text-white transition-all"><Share2 className="w-5 h-5" /></button>
                             </div>
                         </div>
                     </article>
 
                     {/* Sidebar */}
                     <aside className="hidden lg:block">
-                        <div className="sticky top-8">
-                            {/* Info Box */}
-                            <div className="p-5 border border-neutral-100 mb-6">
-                                <h4
-                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-4"
-                                    style={{ fontFamily: JOST }}
-                                >
-                                    Info Artikel
-                                </h4>
-                                <div className="space-y-3">
-                                    {[
-                                        {
-                                            icon: Calendar,
-                                            label: "Tanggal",
-                                            value: article.date,
-                                        },
-                                        {
-                                            icon: Clock,
-                                            label: "Waktu Baca",
-                                            value: article.readTime,
-                                        },
-                                        {
-                                            icon: Eye,
-                                            label: "Dilihat",
-                                            value: `${article.views}×`,
-                                        },
-                                        {
-                                            icon: User,
-                                            label: "Penulis",
-                                            value: article.author,
-                                        },
-                                    ].map((item, i) => {
-                                        const Icon = item.icon;
-                                        return (
-                                            <div
-                                                key={i}
-                                                className="flex items-center justify-between py-2 border-b border-neutral-50 last:border-0"
-                                            >
-                                                <div className="flex items-center gap-2 text-neutral-400">
-                                                    <Icon className="w-3.5 h-3.5" />
-                                                    <span
-                                                        className="text-[11px] font-light tracking-wide"
-                                                        style={{ fontFamily: JOST }}
-                                                    >
-                                                        {item.label}
-                                                    </span>
-                                                </div>
-                                                <span
-                                                    className="text-neutral-700 text-[12px] font-medium"
-                                                    style={{ fontFamily: JOST }}
-                                                >
-                                                    {item.value}
-                                                </span>
-                                            </div>
-                                        );
-                                    })}
+                        <div className="sticky top-32 space-y-12">
+                            {/* Author */}
+                            <div className="p-10 border border-neutral-100 bg-neutral-50">
+                                <div className="flex flex-col items-center text-center">
+                                   <div className="w-20 h-20 bg-neutral-200 rounded-full flex items-center justify-center mb-6">
+                                      <User className="w-10 h-10 text-neutral-400" />
+                                   </div>
+                                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400 mb-2">Written By</p>
+                                   <h4 className="text-xl font-medium text-neutral-900 mb-4" style={{ fontFamily: CORMORANT }}>{article.author}</h4>
+                                   <p className="text-xs text-neutral-500 font-light leading-relaxed">
+                                      Expert contributor focusing on kitchen innovation and lifestyle trends.
+                                   </p>
                                 </div>
                             </div>
 
+                            {/* Info */}
+                            <div className="space-y-6">
+                               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400 border-b border-neutral-100 pb-4">Article Details</p>
+                               {[
+                                 { icon: Calendar, label: "Published", value: article.date },
+                                 { icon: Clock, label: "Reading Time", value: article.readTime },
+                                 { icon: Eye, label: "Audience", value: `${article.views} Views` }
+                               ].map((item, i) => (
+                                 <div key={i} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3 text-neutral-400">
+                                       <item.icon className="w-4 h-4" />
+                                       <span className="text-[11px] font-bold uppercase tracking-wider">{item.label}</span>
+                                    </div>
+                                    <span className="text-sm text-neutral-900 font-medium">{item.value}</span>
+                                 </div>
+                               ))}
+                            </div>
+                            
                             {/* CTA */}
                             <Link
                                 href="/news"
-                                className="flex items-center justify-center gap-2 w-full py-3 border border-neutral-200 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 hover:bg-neutral-50 transition-all group"
-                                style={{ fontFamily: JOST }}
+                                className="flex items-center justify-center gap-4 w-full py-5 bg-neutral-900 text-white text-[11px] font-black tracking-[0.3em] uppercase hover:bg-black transition-all shadow-2xl shadow-neutral-200"
                             >
-                                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-                                Semua Artikel
+                                <ArrowLeft className="w-4 h-4" />
+                                All Stories
                             </Link>
                         </div>
                     </aside>
                 </div>
-            </div>
+            </motion.div>
 
             {/* ── RELATED ARTICLES ── */}
             {relatedArticles.length > 0 && (
-                <section className="bg-neutral-50 py-14 sm:py-20">
-                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
-                        <div className="inline-flex items-center gap-2.5 mb-8">
-                            <div className="w-4 h-[1px] bg-neutral-400" />
-                            <span
-                                className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.22em]"
-                                style={{ fontFamily: JOST }}
-                            >
-                                Artikel Terkait
-                            </span>
-                            <div className="w-4 h-[1px] bg-neutral-400" />
+                <section className="bg-neutral-50 py-24 sm:py-32 border-t border-neutral-100">
+                    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
+                        <div className="flex items-center justify-between mb-16">
+                           <h2 className="text-4xl font-light text-neutral-900" style={{ fontFamily: CORMORANT }}>You Might <span className="italic font-medium">Also Enjoy</span></h2>
+                           <Link href="/news" className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400 hover:text-neutral-900 transition-colors">View All Stories</Link>
                         </div>
 
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
                             {relatedArticles.map((related: PublicArticle) => (
                                 <Link
                                     key={related.id}
                                     href={`/news/${related.id}`}
-                                    className="group bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                                    className="group flex flex-col"
                                 >
-                                    {/* Image */}
-                                    <div className="relative h-48 sm:h-52 overflow-hidden">
+                                    <div className="relative aspect-[16/10] overflow-hidden bg-white mb-6">
                                         <img
                                             src={related.image}
                                             alt={related.title}
-                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
-                                        <div className="absolute top-3.5 left-3.5">
-                                            <span
-                                                className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-medium border border-neutral-100"
-                                                style={{ fontFamily: JOST }}
-                                            >
+                                        <div className="absolute top-4 left-4">
+                                            <span className="px-3 py-1 bg-white text-neutral-900 text-[9px] font-black tracking-[0.2em] uppercase border border-neutral-100">
                                                 {related.category}
                                             </span>
                                         </div>
-
-                                        <div
-                                            className="absolute bottom-3.5 left-3.5 flex items-center gap-3 text-white/70 text-[11px]"
-                                            style={{ fontFamily: JOST }}
-                                        >
-                                            <div className="flex items-center gap-1">
-                                                <Clock className="w-3 h-3" />
-                                                <span>{related.readTime}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <Eye className="w-3 h-3" />
-                                                <span>{related.views}</span>
-                                            </div>
-                                        </div>
                                     </div>
 
-                                    {/* Content */}
-                                    <div className="p-5">
-                                        <div
-                                            className="flex items-center gap-2 text-[11px] text-neutral-400 mb-3 tracking-wide"
-                                            style={{ fontFamily: JOST }}
-                                        >
-                                            <Calendar className="w-3 h-3" />
-                                            <span>{related.date}</span>
-                                            <span className="text-neutral-200">•</span>
-                                            <span>{related.author}</span>
-                                        </div>
-                                        <h3
-                                            className="text-lg sm:text-xl font-light text-neutral-900 mb-3 line-clamp-2 group-hover:text-neutral-600 transition-colors leading-snug"
-                                            style={{ fontFamily: CORMORANT }}
-                                        >
-                                            {related.title}
-                                        </h3>
-                                        <p
-                                            className="text-neutral-500 text-sm font-light mb-5 line-clamp-2 leading-relaxed"
-                                            style={{ fontFamily: JOST }}
-                                        >
-                                            {related.excerpt}
-                                        </p>
-                                        <div
-                                            className="flex items-center gap-2 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium group-hover:text-neutral-900 transition-colors"
-                                            style={{ fontFamily: JOST }}
-                                        >
-                                            <span>Baca Artikel</span>
-                                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                                        </div>
-                                    </div>
+                                    <h3 className="text-2xl font-medium text-neutral-900 mb-4 line-clamp-2 group-hover:text-neutral-600 transition-colors leading-snug" style={{ fontFamily: CORMORANT }}>
+                                        {related.title}
+                                    </h3>
+                                    
+                                    <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400 group-hover:text-neutral-900 transition-colors">
+                                        Read Story <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                    </span>
                                 </Link>
                             ))}
                         </div>

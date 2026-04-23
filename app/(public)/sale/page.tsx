@@ -1,12 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { ShoppingCart, Check, Flame, Tag } from "lucide-react";
+import {
+  ShoppingCart,
+  Check,
+  Flame,
+  Tag,
+  ArrowRight,
+  Zap,
+  Eye,
+  Star,
+  ShoppingBag,
+  TrendingUp,
+  Award,
+  Shield,
+  ChevronRight,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import api from "@/lib/axios";
-import { motion } from "framer-motion";
 
 const JOST = "'Jost', system-ui, sans-serif";
 const CORMORANT = "'Cormorant Garamond', Georgia, serif";
@@ -14,7 +28,12 @@ const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 export default function SalePage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [addedToCart, setAddedToCart] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
+    {
+      visible: false,
+      productName: "",
+    },
+  );
 
   const formatPrice = (p: number) =>
     new Intl.NumberFormat("id-ID", {
@@ -26,6 +45,7 @@ export default function SalePage() {
   useEffect(() => {
     const fetchSaleProducts = async () => {
       try {
+        setLoading(true);
         const res = await api.get("/products", {
           params: { on_sale: true, limit: 50 },
         });
@@ -52,11 +72,12 @@ export default function SalePage() {
                 originalPrice: origPrice,
                 discount: discPercent,
                 active_promotion: activePromo,
+                rating: p.rating ? parseFloat(p.rating) : 0,
                 image:
                   p.image ||
-                  "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+                  "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=800&q=80",
                 badge: p.badge || "",
-                category: p.category || "",
+                category: p.category || "Exclusive",
                 stock: p.stock,
               };
             })
@@ -83,188 +104,376 @@ export default function SalePage() {
           : item,
       );
     } else {
-      cart = [...cart, { ...product, quantity: 1, selected: true }];
+      cart = [
+        ...cart,
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          image: product.image,
+          badge: product.badge,
+          discount: product.discount,
+          category: product.category,
+          quantity: 1,
+          selected: true,
+        },
+      ];
     }
     localStorage.setItem("ravelle_cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("ravelle_cart_updated"));
-    setAddedToCart(product.id);
-    setTimeout(() => setAddedToCart(null), 2000);
+    setToast({ visible: true, productName: product.name });
+    setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
   };
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
       <Header />
 
-      {/* Hero Banner */}
-      <section className="relative bg-stone-900 py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-rose-900/20 to-stone-900 pointer-events-none" />
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-rose-600/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-800/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-
-        <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 text-center">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-rose-400" />
-            <span className="text-rose-400 text-[11px] font-bold uppercase tracking-[0.3em]">
-              Penawaran Terbatas
-            </span>
-            <Flame className="w-5 h-5 text-rose-400" />
-          </div>
-          <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-light text-white mb-4"
-            style={{ fontFamily: CORMORANT }}
+      {/* ── Toast ── */}
+      <AnimatePresence>
+        {toast.visible && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, x: 20 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: -20, x: 20 }}
+            className="fixed top-24 right-6 z-[100]"
           >
-            SALE
-          </h1>
-          <div className="w-16 h-[1px] bg-rose-500 mx-auto mb-5" />
-          <p className="text-stone-400 text-sm font-light max-w-md mx-auto">
-            Produk pilihan dengan diskon eksklusif. Persediaan terbatas, segera
-            dapatkan sebelum kehabisan!
-          </p>
-          {products.length > 0 && (
-            <p className="text-rose-400 text-sm font-bold mt-4">
-              {products.length} produk tersedia
-            </p>
-          )}
+            <div className="flex items-center gap-3 bg-white border border-neutral-200 shadow-2xl px-6 py-4 min-w-[300px]">
+              <div className="w-8 h-8 bg-neutral-900 flex items-center justify-center">
+                <Check className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-neutral-900 text-[11px] uppercase tracking-wider">
+                  Added to Cart
+                </p>
+                <p className="text-[11px] text-neutral-400 truncate mt-0.5">
+                  {toast.productName}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── HERO ── */}
+      <section className="relative h-[450px] sm:h-[550px] overflow-hidden bg-neutral-900">
+        <motion.div
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.4 }}
+          transition={{ duration: 2 }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url(https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1920&q=80)",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/60 to-transparent" />
+
+        <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24 xl:px-40">
+          <div className="max-w-3xl">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="inline-flex items-center gap-3 mb-6"
+            >
+              <div className="w-6 h-[1px] bg-amber-500" />
+              <span className="text-amber-500 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em]">
+                Limited Time Offers
+              </span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-6xl sm:text-8xl md:text-9xl font-light text-white mb-6 leading-[0.9]"
+              style={{ fontFamily: CORMORANT }}
+            >
+              Pesta Diskon <br />
+              <span className="font-semibold italic text-amber-500">Harga</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.8 }}
+              className="text-white/60 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-10"
+            >
+              Bawa pulang produk premium Ravella dengan harga yang lebih
+              bersahabat. Kualitas terbaik, desain abadi, kini hadir khusus
+              untuk Anda.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1 }}
+              className="flex items-center gap-8"
+            >
+              <div className="flex flex-col">
+                <span
+                  className="text-white font-bold text-2xl"
+                  style={{ fontFamily: JOST }}
+                >
+                  {products.length}+
+                </span>
+                <span className="text-white/40 text-[10px] uppercase tracking-wider">
+                  On Sale
+                </span>
+              </div>
+              <div className="w-[1px] h-10 bg-white/10" />
+              <div className="flex flex-col">
+                <span
+                  className="text-white font-bold text-2xl"
+                  style={{ fontFamily: JOST }}
+                >
+                  Up to 70%
+                </span>
+                <span className="text-white/40 text-[10px] uppercase tracking-wider">
+                  Discount
+                </span>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Products Grid */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 py-14"
-      >
+      {/* ── MAIN ── */}
+      <section className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-20 sm:py-24">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 border-b border-neutral-100 pb-12">
+          <div className="max-w-xl">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400">
+                Penawaran Terbatas
+              </span>
+            </div>
+            <h2
+              className="text-4xl sm:text-5xl font-light text-neutral-900"
+              style={{ fontFamily: CORMORANT }}
+            >
+              Kejutan Mewah,{" "}
+              <span className="italic font-medium">Harga Ramah</span>
+            </h2>
+          </div>
+          <p className="text-neutral-500 text-sm font-light max-w-sm leading-relaxed">
+            Koleksi pilihan dengan potongan harga signifikan. Setiap produk
+            telah melewati standar kualitas Ravella yang ketat.
+          </p>
+        </div>
+
         {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="aspect-[3/4] bg-stone-100 mb-3" />
-                <div className="h-4 bg-stone-100 rounded mb-2 w-3/4" />
-                <div className="h-4 bg-stone-100 rounded w-1/2" />
+                <div className="aspect-[4/5] bg-neutral-100 mb-6" />
+                <div className="h-3 bg-neutral-100 mb-3 w-1/4" />
+                <div className="h-6 bg-neutral-100 mb-4 w-3/4" />
+                <div className="h-5 bg-neutral-100 w-1/2" />
               </div>
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center py-32">
-            <Tag className="w-16 h-16 text-stone-200 mx-auto mb-6" />
-            <h2
-              className="text-3xl font-light text-stone-300 mb-2"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-32"
+          >
+            <ShoppingBag className="w-16 h-16 text-neutral-100 mx-auto mb-6 stroke-[1]" />
+            <h3
+              className="text-3xl font-light text-neutral-900 mb-4"
               style={{ fontFamily: CORMORANT }}
             >
-              Belum Ada Produk Sale
-            </h2>
-            <p className="text-stone-400 text-sm mb-8">
-              Nantikan promo menarik dari kami!
+              Belum Ada Promo Aktif
+            </h3>
+            <p className="text-neutral-500 text-sm font-light mb-10 max-w-xs mx-auto">
+              Nantikan penawaran eksklusif kami selanjutnya. Ikuti terus koleksi
+              terbaru kami.
             </p>
             <Link
               href="/product"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-stone-900 text-white text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-black transition-colors"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-neutral-900 text-white text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-all"
             >
-              Lihat Semua Produk
+              Browse All Products <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
+          </motion.div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              show: {
+                opacity: 1,
+                y: 0,
+                transition: {
+                  staggerChildren: 0.1,
+                  duration: 0.8,
+                  ease: [0.16, 1, 0.3, 1],
+                },
+              },
+            }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-16"
+          >
             {products.map((product) => (
-              <div
+              <motion.div
                 key={product.id}
-                className="group bg-white border border-neutral-100 hover:border-rose-200 hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden flex flex-col"
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  show: { opacity: 1, y: 0 },
+                }}
+                className="group relative flex flex-col"
               >
-                {/* Image */}
-                <Link href={`/product/${product.id}`} className="block">
-                  <div className="relative aspect-square overflow-hidden bg-neutral-50 p-6 flex items-center justify-center">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105 mix-blend-multiply"
-                    />
+                {/* Image Container */}
+                <div className="relative aspect-[4/5] bg-neutral-50 overflow-hidden flex items-center justify-center p-8 group-hover:bg-neutral-100 transition-colors duration-500">
+                  <motion.img
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    src={product.image}
+                    alt={product.name}
+                    className="max-w-full max-h-full object-contain mix-blend-multiply"
+                  />
 
-                    {/* Badges Container */}
-                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-                      {/* Discount Percent */}
-                      {product.discount > 0 && (
-                        <span className="px-2.5 py-1 bg-red-600 text-white text-[11px] font-bold tracking-wide uppercase shadow-sm shadow-red-600/30 rounded-br-lg rounded-tl-sm w-fit">
-                          -{product.discount}%
-                        </span>
-                      )}
+                  {/* Overlay for quick actions */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
 
-                      {/* Flash Sale Indicator vs Normal Badge */}
-                      {product.active_promotion &&
-                      product.active_promotion.type === "flash_sale" ? (
-                        <span className="px-2.5 py-1 bg-stone-900 text-amber-400 text-[10px] font-bold tracking-[0.15em] uppercase shadow-sm flex items-center gap-1 rounded-br-lg rounded-tl-sm w-fit">
-                          <Flame className="w-3 h-3 fill-amber-400" />
-                          Flash Sale
-                        </span>
-                      ) : product.badge ? (
-                        <span className="px-2.5 py-1 bg-white text-stone-900 text-[10px] font-medium tracking-[0.12em] uppercase border border-neutral-200 shadow-sm rounded-br-lg rounded-tl-sm w-fit">
-                          {product.badge}
-                        </span>
-                      ) : null}
-                    </div>
+                  {/* Badges */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                    <span className="px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-black tracking-[0.2em] uppercase shadow-xl">
+                      -{product.discount}%
+                    </span>
+                    {product.active_promotion?.type === "flash_sale" && (
+                      <span className="px-3 py-1.5 bg-amber-500 text-white text-[9px] font-black tracking-[0.2em] uppercase flex items-center gap-1.5 shadow-xl">
+                        <Flame className="w-3 h-3 fill-white" /> Sale
+                      </span>
+                    )}
                   </div>
-                </Link>
+
+                  {/* Quick Look Button Floating */}
+                  <div className="absolute top-4 right-4 translate-x-0 sm:translate-x-4 opacity-100 sm:opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500 z-10">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      className="w-10 h-10 bg-white/90 backdrop-blur-sm shadow-xl flex items-center justify-center text-neutral-400 hover:bg-neutral-900 hover:text-white transition-all"
+                      title="Add to Cart"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Bottom Action - Add to Cart */}
+                  <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.16, 1, 0.3, 1]">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      className="w-full py-4 bg-neutral-900 text-white text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-colors flex items-center justify-center gap-3"
+                    >
+                      <ShoppingCart className="w-4 h-4" /> Add to Cart
+                    </button>
+                  </div>
+                </div>
 
                 {/* Info */}
-                <div className="p-5 flex flex-col flex-1">
-                  <Link href={`/product/${product.id}`}>
+                <div className="pt-6 flex flex-col flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                      {product.category}
+                    </span>
+                    {product.rating > 0 && (
+                      <>
+                        <div className="w-1 h-1 rounded-full bg-neutral-200" />
+                        <div className="flex items-center gap-1">
+                          <Star className="w-2.5 h-2.5 text-amber-400 fill-current" />
+                          <span className="text-[10px] font-bold text-neutral-600">
+                            {product.rating}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <Link href={`/product/${product.id}`} className="block mb-4">
                     <h3
-                      className="text-lg font-light text-neutral-900 mb-2 line-clamp-2 group-hover:text-rose-600 transition-colors leading-snug"
+                      className="text-xl sm:text-2xl font-medium text-neutral-900 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight"
                       style={{ fontFamily: CORMORANT }}
                     >
                       {product.name}
                     </h3>
                   </Link>
 
-                  <div className="mt-auto">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span
-                        className="text-sm text-neutral-400 line-through"
-                        style={{ fontFamily: JOST }}
-                      >
+                  <div className="mt-auto flex flex-col gap-1">
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-lg font-bold text-neutral-900">
+                        {formatPrice(product.price)}
+                      </span>
+                      <span className="text-xs text-neutral-400 line-through font-light">
                         {formatPrice(product.originalPrice)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span
-                        className="text-xl font-bold text-rose-600"
-                        style={{ fontFamily: JOST }}
-                      >
-                        {formatPrice(product.price)}
-                      </span>
-                      <span className="text-[10px] text-green-600 font-bold uppercase tracking-wider bg-green-50 px-2 py-1 rounded">
-                        Hemat{" "}
-                        {formatPrice(product.originalPrice - product.price)}
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className={`w-full py-3 text-[11px] font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all duration-300 rounded ${
-                        addedToCart === product.id
-                          ? "bg-green-600 text-white"
-                          : "bg-stone-900 hover:bg-black text-white"
-                      }`}
-                    >
-                      {addedToCart === product.id ? (
-                        <>
-                          <Check className="w-4 h-4" /> Ditambahkan!
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingCart className="w-4 h-4" /> Add to Cart
-                        </>
-                      )}
-                    </button>
+                    <span className="text-[9px] text-amber-600 font-bold uppercase tracking-widest">
+                      Hemat {formatPrice(product.originalPrice - product.price)}
+                    </span>
                   </div>
+
+                  {/* View Details Button (User Requested) */}
+                  <div className="mt-6">
+                    <Link
+                      href={`/product/${product.id}`}
+                      className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-neutral-900 hover:text-neutral-500 transition-colors group/link"
+                    >
+                      View Details
+                      <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </section>
+
+      {/* ── FEATURES STRIP ── */}
+      <section className="bg-neutral-50 py-16 border-y border-neutral-100">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            {[
+              {
+                icon: Shield,
+                title: "Official Warranty",
+                desc: "1 Year Full Warranty",
+              },
+              {
+                icon: Award,
+                title: "Premium Quality",
+                desc: "Certified Raw Materials",
+              },
+              {
+                icon: TrendingUp,
+                title: "Best Price",
+                desc: "Price Match Guarantee",
+              },
+              { icon: Zap, title: "Fast Shipping", desc: "Same Day Dispatch" },
+            ].map((item, idx) => (
+              <div key={idx} className="flex gap-5">
+                <div className="w-12 h-12 bg-white flex items-center justify-center border border-neutral-100 shadow-sm flex-shrink-0">
+                  <item.icon className="w-5 h-5 text-neutral-900" />
+                </div>
+                <div>
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] mb-1 text-neutral-900">
+                    {item.title}
+                  </h4>
+                  <p className="text-[11px] text-neutral-600 font-medium">
+                    {item.desc}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </motion.section>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );

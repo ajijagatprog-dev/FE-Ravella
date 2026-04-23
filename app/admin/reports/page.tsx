@@ -465,8 +465,11 @@ export default function ReportsPage() {
                 endpoint = "/admin/export/users";
                 filename = "customer_report.xlsx";
               } else if (activeTab === "transaction") {
-                endpoint = "/admin/export/orders";
+                endpoint = `/admin/export/orders?period=${dateRange}`;
                 filename = "transaction_report.xlsx";
+              } else if (activeTab === "sales") {
+                endpoint = `/admin/export/sales?period=${dateRange}`;
+                filename = "sales_report.xlsx";
               }
 
               await downloadFile(endpoint, filename);

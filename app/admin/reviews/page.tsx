@@ -121,12 +121,12 @@ export default function ReviewManagementPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl font-black text-gray-900 tracking-tight">Review Moderation</h1>
-                    <p className="text-sm text-gray-400 mt-1">Kelola dan moderasi ulasan produk dari pelanggan.</p>
+                    <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-tight">Review Moderation</h1>
+                    <p className="text-xs md:text-sm text-gray-400 mt-1">Kelola dan moderasi ulasan produk dari pelanggan.</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative">
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative w-full md:w-auto">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input 
                             type="text" 
@@ -134,14 +134,14 @@ export default function ReviewManagementPage() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && fetchReviews()}
-                            className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none w-64 transition-all"
+                            className="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none w-full md:w-64 transition-all"
                         />
                     </div>
                 </div>
             </div>
 
             {/* Stats / Filters */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                 {[
                     { label: 'Semua', value: 'all' },
                     { label: 'Pending', value: 'pending' },
@@ -152,7 +152,7 @@ export default function ReviewManagementPage() {
                         key={f.value}
                         onClick={() => setStatusFilter(f.value)}
                         className={cn(
-                            "px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all",
+                            "px-5 py-2.5 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap",
                             statusFilter === f.value 
                                 ? "bg-blue-600 text-white shadow-lg shadow-blue-200" 
                                 : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"
