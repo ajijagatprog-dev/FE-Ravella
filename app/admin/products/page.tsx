@@ -1,7 +1,15 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { Plus, Search, Download, Package, X, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Download,
+  Package,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 import ProductTable from "./components/ProductTable";
 import BulkActionBar from "./components/BulkActionBar";
@@ -9,6 +17,8 @@ import ModalDelete from "./components/ModalDelete";
 import ModalTambah from "./components/ModalTambah";
 import ModalEdit from "./components/ModalEdit";
 import api from "@/lib/axios";
+import toast from "react-hot-toast";
+import { downloadFile } from "@/lib/download";
 
 interface Product {
   id: number;
@@ -44,26 +54,29 @@ export default function ProductManagementPage() {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const res = await api.get('/products', {
+      const res = await api.get("/products", {
         params: {
           page: currentPage,
           limit: ITEMS_PER_PAGE,
           search: searchQuery || undefined,
-          sort: sortBy
-        }
+          sort: sortBy,
+        },
       });
-      if (res.data.status === 'success') {
+      if (res.data.status === "success") {
         const fetchedData = res.data.data.data;
         // Map the backend product model to frontend Product interface if necessary
         // Assuming backend has: id, name, category, image, price (retailPrice), sale_price (b2bPrice), stock
         const mappedProducts = fetchedData.map((item: any) => ({
           id: item.id,
           name: item.name,
-          category: item.category || 'homeliving',
-          image: item.image || 'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80',
+          category: item.category || "homeliving",
+          image:
+            item.image ||
+            "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&q=80",
           sku: item.slug || `SKU-${item.id}`,
           stock: item.stock,
-          stockStatus: item.stock > 50 ? 'high' : item.stock > 10 ? 'medium' : 'low',
+          stockStatus:
+            item.stock > 50 ? "high" : item.stock > 10 ? "medium" : "low",
           retailPrice: item.price,
           salePrice: item.sale_price !== null ? item.sale_price : 0,
           b2bPrice: item.b2b_price !== null ? item.b2b_price : item.price,
@@ -143,7 +156,11 @@ export default function ProductManagementPage() {
     } else {
       pages.push(1);
       if (currentPage > 3) pages.push("...");
-      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      for (
+        let i = Math.max(2, currentPage - 1);
+        i <= Math.min(totalPages - 1, currentPage + 1);
+        i++
+      ) {
         pages.push(i);
       }
       if (currentPage < totalPages - 2) pages.push("...");
@@ -177,7 +194,10 @@ export default function ProductManagementPage() {
           onClick={() => setOpenAddModal(true)}
           className="group inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-xl shadow-blue-100 transition-all duration-200 w-full md:w-auto"
         >
-          <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+          <Plus
+            size={18}
+            className="group-hover:rotate-90 transition-transform duration-300"
+          />
           Add New Product
         </button>
       </div>
@@ -213,14 +233,36 @@ export default function ProductManagementPage() {
                 <option value="price-high">Highest Price</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M19 9l-7 7-7-7" /></svg>
+                <svg
+                  width="12"
+                  height="12"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                >
+                  <path d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
             </div>
 
             {/* Export Button */}
-            <button className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-slate-100 active:bg-slate-200 text-slate-700 text-sm font-bold transition-all">
+            <button
+              onClick={async () => {
+                try {
+                  await downloadFile(
+                    "/admin/export/products",
+                    "products_report.xlsx",
+                  );
+                  toast.success("Products exported successfully");
+                } catch (error) {
+                  toast.error("Failed to export products");
+                }
+              }}
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-slate-100 active:bg-slate-200 text-slate-700 text-sm font-bold transition-all"
+            >
               <Download size={18} className="text-slate-500" />
-              <span className="hidden sm:inline">Export CSV</span>
+              <span className="hidden sm:inline">Export Excel</span>
             </button>
           </div>
         </div>
@@ -228,7 +270,9 @@ export default function ProductManagementPage() {
         {/* Active search filter badge */}
         {searchQuery && (
           <div className="mt-4 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Results for:</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Results for:
+            </span>
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold ring-1 ring-blue-200/50">
               "{searchQuery}"
               <button
@@ -257,7 +301,8 @@ export default function ProductManagementPage() {
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
           <p className="text-sm font-medium text-slate-500 order-2 sm:order-1">
-            Showing page <span className="text-slate-900 font-bold">{currentPage}</span> of{" "}
+            Showing page{" "}
+            <span className="text-slate-900 font-bold">{currentPage}</span> of{" "}
             <span className="text-slate-900 font-bold">{totalPages}</span>
           </p>
 
@@ -273,15 +318,21 @@ export default function ProductManagementPage() {
             <div className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200">
               {getPageNumbers().map((page, i) =>
                 page === "..." ? (
-                  <span key={`ellipsis-${i}`} className="px-3 text-slate-400 font-bold">...</span>
+                  <span
+                    key={`ellipsis-${i}`}
+                    className="px-3 text-slate-400 font-bold"
+                  >
+                    ...
+                  </span>
                 ) : (
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page as number)}
-                    className={`min-w-[40px] h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${currentPage === page
-                      ? "bg-white text-blue-600 shadow-sm scale-105"
-                      : "text-slate-500 hover:text-slate-900"
-                      }`}
+                    className={`min-w-[40px] h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                      currentPage === page
+                        ? "bg-white text-blue-600 shadow-sm scale-105"
+                        : "text-slate-500 hover:text-slate-900"
+                    }`}
                   >
                     {page}
                   </button>
@@ -304,8 +355,8 @@ export default function ProductManagementPage() {
       <BulkActionBar
         selectedCount={selectedProducts.length}
         onBulkDelete={handleBulkDelete}
-        onChangeCategory={() => { }}
-        onMarkInactive={() => { }}
+        onChangeCategory={() => {}}
+        onMarkInactive={() => {}}
       />
 
       {/* ── Modals ── */}
@@ -331,8 +382,9 @@ export default function ProductManagementPage() {
             ? `Hapus ${deleteTargetIds.length} Produk Terpilih?`
             : "Hapus Produk"
         }
-        description={`Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus ${deleteTargetIds.length > 1 ? "produk-produk ini" : "produk ini"
-          }?`}
+        description={`Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus ${
+          deleteTargetIds.length > 1 ? "produk-produk ini" : "produk ini"
+        }?`}
       />
     </div>
   );

@@ -179,23 +179,24 @@ export default function OrderPage() {
       </nav>
 
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
-          <p className="mt-0.5 text-sm text-gray-500">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">Order Management</h1>
+          <p className="mt-1 text-xs md:text-sm text-gray-500">
             Manage and track all customer orders from here.
           </p>
         </div>
         <button
           onClick={async () => {
             try {
-              await downloadFile('/admin/export/orders', 'orders_report.xlsx');
+              const filename = activeTab === 'all' ? 'all_orders_report.xlsx' : `${activeTab.toLowerCase()}_orders_report.xlsx`;
+              await downloadFile(`/admin/export/orders?status=${activeTab}`, filename);
               toast.success("Orders exported successfully");
             } catch (error) {
               toast.error("Failed to export orders");
             }
           }}
-          className="inline-flex w-fit items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-150"
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-95 transition-all duration-150 w-full md:w-fit"
         >
           <Download size={15} />
           Export Excel
@@ -275,7 +276,7 @@ export default function OrderPage() {
         {/* Tabs + Search */}
         <div className="flex flex-col gap-3 border-b border-gray-200 px-5 pt-5 pb-0 sm:flex-row sm:items-center sm:justify-between">
           {/* Tabs */}
-          <div className="flex items-center gap-0 overflow-x-auto">
+          <div className="flex items-center gap-0 overflow-x-auto no-scrollbar">
             {TABS.map((tab) => (
               <button
                 key={tab.key}

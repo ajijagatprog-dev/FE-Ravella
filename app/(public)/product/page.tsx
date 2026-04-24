@@ -21,6 +21,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useState, useMemo, useEffect, Suspense } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Header from "../../HomePage/components/Header";
@@ -67,7 +68,13 @@ function ProductPageContent() {
               description: item.description || "Deskripsi produk",
               price: item.promoted_price || item.price,
               originalPrice: item.price,
-              discount: activePromo ? (activePromo.discount_type === 'percent' ? activePromo.discount_value : Math.round((item.price - item.promoted_price) / item.price * 100)) : (item.discount || 0),
+              discount: activePromo
+                ? activePromo.discount_type === "percent"
+                  ? activePromo.discount_value
+                  : Math.round(
+                      ((item.price - item.promoted_price) / item.price) * 100,
+                    )
+                : item.discount || 0,
               active_promotion: activePromo,
               rating: item.rating ? parseFloat(item.rating) : 0,
               reviews: item.reviews || 0,
@@ -173,21 +180,16 @@ function ProductPageContent() {
 
   const handleAddToCart = (product: any) => {
     try {
-      // Baca cart yang ada
       const stored = localStorage.getItem("ravelle_cart");
       let cart: any[] = [];
-
       try {
         if (stored) {
           const parsed = JSON.parse(stored);
           cart = Array.isArray(parsed) ? parsed : [];
         }
       } catch (e) {
-        console.error("Malformed cart data:", e);
         cart = [];
       }
-
-      // Tambahkan atau update qty
       const exists = cart.find((item) => item.id === product.id);
       if (exists) {
         cart = cart.map((item) =>
@@ -212,14 +214,8 @@ function ProductPageContent() {
           },
         ];
       }
-
-      // Simpan ke localStorage
       localStorage.setItem("ravelle_cart", JSON.stringify(cart));
-
-      // Beritahu Header agar update cart badge
       window.dispatchEvent(new Event("ravelle_cart_updated"));
-
-      // Tampilkan toast — TIDAK redirect ke /cart
       setToast({ visible: true, productName: product.name });
       setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
     } catch (error) {
@@ -228,7 +224,7 @@ function ProductPageContent() {
   };
 
   const filteredProducts = useMemo(() => {
-    let filtered = products;
+    let filtered = [...products];
     if (activeCategory !== "ALL PRODUCTS") {
       const categoryId = categories.find((c) => c.name === activeCategory)?.id;
       filtered = filtered.filter((p) => p.category === categoryId);
@@ -254,7 +250,7 @@ function ProductPageContent() {
         filtered.sort((a, b) => b.reviews - a.reviews);
     }
     return filtered;
-  }, [activeCategory, searchQuery, sortBy, priceRange, products]);
+  }, [activeCategory, searchQuery, sortBy, priceRange, products, categories]);
 
   const displayedProducts = useMemo(() => {
     return filteredProducts.slice(0, displayLimit);
@@ -285,14 +281,6 @@ function ProductPageContent() {
     setTimeout(() => setSelectedProduct(null), 300);
   };
 
-  const badgeStyle: Record<string, string> = {
-    "Best Seller": "bg-neutral-900 text-white",
-    Premium: "bg-neutral-700 text-white",
-    Popular: "bg-neutral-100 text-neutral-700 border border-neutral-200",
-    New: "bg-white text-neutral-900 border border-neutral-200",
-    Sale: "bg-neutral-100 text-neutral-700 border border-neutral-200",
-  };
-
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
       <Header />
@@ -319,126 +307,209 @@ function ProductPageContent() {
       </div>
 
       {/* ── HERO ── */}
-      <section className="relative h-[380px] sm:h-[440px] overflow-hidden">
-        <div
+      <section className="relative h-[400px] sm:h-[500px] lg:h-[600px] overflow-hidden">
+        <motion.div
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
               "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2.5 mb-5">
-              <div className="w-5 h-[1px] bg-white/50" />
+          <div className="max-w-3xl">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="inline-flex items-center gap-3 mb-6"
+            >
+              <div className="w-8 h-[1px] bg-white/60" />
               <span
-                className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]"
+                className="text-white/80 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]"
                 style={{ fontFamily: JOST }}
               >
-                Shop Ravelle
+                Ravelle Shop
               </span>
-            </div>
+            </motion.div>
 
-            <h1
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-4 leading-[1.05]"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="
+                          text-3xl
+                          sm:text-4xl
+                          md:text-5xl
+                          lg:text-6xl
+                          xl:text-7xl 
+                          2xl:text-8xl
+                          font-light
+                          text-white
+                          mb-4
+                          sm:mb-5
+                          md:mb-6
+                          leading-[1.05]
+                          sm:leading-[1]
+                          break-words
+                        "
+              style={{
+                fontFamily: CORMORANT,
+                letterSpacing: "-0.02em",
+              }}
             >
-              Find Your{" "}
-              <em
-                className="font-semibold not-italic"
-                style={{ fontStyle: "italic" }}
-              >
-                Perfect Product
-              </em>
-            </h1>
+              Find Your Perfect <br />
+              <span className="font-semibold italic text-neutral-200">
+                Product
+              </span>
+            </motion.h1>
 
-            <div className="w-10 h-[1px] bg-white/30 mb-5" />
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1, delay: 0.8 }}
+              className="w-16 h-[1px] bg-white/40 mb-8 origin-left"
+            />
 
-            <p
-              className="text-white/70 text-sm sm:text-base font-light leading-relaxed max-w-lg"
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 1 }}
+              className="text-white/70 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-8"
               style={{ fontFamily: JOST }}
             >
-              Temukan peralatan rumah tangga berkualitas premium untuk kebutuhan
+              Kurasi peralatan rumah tangga eksklusif yang memadukan
+              fungsionalitas modern dengan estetika abadi untuk hunian impian
               Anda.
-            </p>
+            </motion.p>
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-5 h-8 border border-white/30 flex items-start justify-center pt-1.5">
-            <div className="w-1 h-2 bg-white/40 rounded-full" />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <div className="flex flex-col items-center gap-3">
+            <span className="text-white/40 text-[9px] uppercase tracking-[0.3em] rotate-90 mb-4 origin-left">
+              Explore
+            </span>
+            <div className="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent relative overflow-hidden">
+              <motion.div
+                animate={{ y: [0, 48] }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.5,
+                  ease: "easeInOut",
+                }}
+                className="absolute top-0 left-0 w-full h-1/3 bg-white"
+              />
+            </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── MAIN ── */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16">
         {/* Search Bar — pill style, centered */}
-        <div className="flex justify-center mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex justify-center mb-16"
+        >
           <div
-            className="flex items-center gap-3 w-full max-w-lg px-5 py-3.5 rounded-full border border-neutral-200 bg-white shadow-sm hover:border-neutral-300 transition-colors"
+            className="flex items-center gap-4 w-full max-w-2xl px-8 py-5 rounded-full border border-neutral-200 bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] focus-within:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.15)] focus-within:border-neutral-900 transition-all duration-500"
             style={{ fontFamily: JOST }}
           >
-            <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+            <Search className="w-5 h-5 text-neutral-400 flex-shrink-0" />
             <input
               type="text"
-              placeholder="Cari produk, tips, atau tutorial..."
+              placeholder="Cari produk, koleksi, atau inspirasi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent text-sm text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
+              className="flex-1 bg-transparent text-base text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
               style={{ fontFamily: JOST }}
             />
             {searchQuery && (
-              <button
+              <motion.button
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
                 onClick={() => setSearchQuery("")}
-                className="text-neutral-400 hover:text-neutral-700 transition-colors"
+                className="text-neutral-400 hover:text-neutral-900 p-1 transition-colors"
               >
-                <X className="w-3.5 h-3.5" />
-              </button>
+                <X className="w-4 h-4" />
+              </motion.button>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Category Tabs */}
-        <div className="mb-10">
-          <div className="flex items-center gap-2.5 mb-5">
-            <div className="w-4 h-[1px] bg-neutral-400" />
+        <div className="mb-14 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="flex items-center gap-3 mb-6"
+          >
+            <div className="w-6 h-[1px] bg-neutral-900" />
             <span
-              className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.22em]"
+              className="text-neutral-900 font-bold text-[10px] uppercase tracking-[0.3em]"
               style={{ fontFamily: JOST }}
             >
-              Categories
+              Categories Products
             </span>
-          </div>
-          <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-            <div className="flex gap-2 pb-2 min-w-max">
-              {categories.map((cat) => {
+          </motion.div>
+          <div className="overflow-x-auto no-scrollbar -mx-4 px-4">
+            <div className="flex gap-3 pb-2 min-w-max">
+              {categories.map((cat, idx) => {
                 const Icon = cat.icon;
                 return (
-                  <button
+                  <motion.button
                     key={cat.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
                     onClick={() => setActiveCategory(cat.name)}
-                    className={`flex items-center gap-2 px-4 py-2.5 text-[11px] tracking-[0.15em] uppercase font-medium transition-all whitespace-nowrap ${
+                    className={`group flex items-center gap-3 px-6 py-3.5 text-[10px] tracking-[0.2em] uppercase font-bold transition-all relative overflow-hidden border ${
                       activeCategory === cat.name
-                        ? "bg-neutral-900 text-white"
-                        : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-400 hover:text-neutral-900"
+                        ? "text-white border-neutral-900"
+                        : "text-neutral-500 bg-neutral-50 border-neutral-100 hover:bg-neutral-100 hover:border-neutral-200"
                     }`}
                     style={{ fontFamily: JOST }}
                   >
-                    {Icon ? <Icon className="w-3.5 h-3.5" /> : null}
-                    <span>{cat.name}</span>
+                    {activeCategory === cat.name && (
+                      <motion.div
+                        layoutId="activeCat"
+                        className="absolute inset-0 bg-neutral-900 z-0"
+                        transition={{
+                          type: "spring",
+                          bounce: 0.2,
+                          duration: 0.6,
+                        }}
+                      />
+                    )}
+                    {Icon ? (
+                      <Icon
+                        className={`w-4 h-4 relative z-10 transition-transform group-hover:scale-110 ${activeCategory === cat.name ? "text-white" : "text-neutral-400"}`}
+                      />
+                    ) : null}
+                    <span className="relative z-10">{cat.name}</span>
                     {cat.count > 0 && (
                       <span
-                        className={`text-[10px] ${activeCategory === cat.name ? "text-white/60" : "text-neutral-400"}`}
+                        className={`text-[9px] px-1.5 py-0.5 rounded-full ${activeCategory === cat.name ? "bg-white/20 text-white" : "bg-neutral-200 text-neutral-500"}`}
                       >
-                        ({cat.count})
+                        {cat.count}
                       </span>
                     )}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -494,157 +565,205 @@ function ProductPageContent() {
         </div>
 
         {/* Products */}
-        {filteredProducts.length === 0 && !isLoading ? (
-          <div className="text-center py-24">
-            <Package className="w-12 h-12 text-neutral-300 mx-auto mb-5" />
-            <h3
-              className="text-4xl font-light text-neutral-900 mb-3"
-              style={{ fontFamily: CORMORANT }}
+        <AnimatePresence mode="wait">
+          {filteredProducts.length === 0 && !isLoading ? (
+            <motion.div
+              key="no-results"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-32"
             >
-              No Products Found
-            </h3>
-            <p
-              className="text-neutral-500 text-sm font-light mb-8"
-              style={{ fontFamily: JOST }}
-            >
-              Try adjusting your filters or search query
-            </p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setActiveCategory("ALL PRODUCTS");
-                setPriceRange([0, 5000000]);
-              }}
-              className="px-8 py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-900 hover:text-white transition-colors"
-              style={{ fontFamily: JOST }}
-            >
-              Reset Filters
-            </button>
-          </div>
-        ) : (
-          <div
-            className={
-              viewMode === "grid"
-                ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                : "flex flex-col gap-4"
-            }
-          >
-            {displayedProducts.map((product) => (
-              <div
-                key={product.id}
-                onMouseEnter={() => setHoveredProduct(product.id)}
-                onMouseLeave={() => setHoveredProduct(null)}
-                className={`group relative bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-300 ${viewMode === "list" ? "flex flex-row" : ""}`}
+              <Package className="w-16 h-16 text-neutral-200 mx-auto mb-6 stroke-[1]" />
+              <h3
+                className="text-4xl font-light text-neutral-900 mb-4"
+                style={{ fontFamily: CORMORANT }}
               >
-                {/* Image */}
-                <div
-                  className={`relative overflow-hidden bg-neutral-50 flex items-center justify-center p-6 ${viewMode === "grid" ? "aspect-square" : "w-56 sm:w-72 flex-shrink-0 aspect-square"}`}
+                No Products Found
+              </h3>
+              <p
+                className="text-neutral-500 text-sm font-light mb-10"
+                style={{ fontFamily: JOST }}
+              >
+                Try adjusting your filters or search query
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveCategory("ALL PRODUCTS");
+                  setPriceRange([0, 5000000]);
+                }}
+                className="px-12 py-4 border border-neutral-900 text-neutral-900 text-[10px] tracking-[0.25em] uppercase font-bold hover:bg-neutral-900 hover:text-white transition-all duration-300"
+                style={{ fontFamily: JOST }}
+              >
+                Reset Filters
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={activeCategory + searchQuery + sortBy}
+              variants={{
+                hidden: { opacity: 0 },
+                show: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.05,
+                  },
+                },
+              }}
+              initial="hidden"
+              animate="show"
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12"
+                  : "flex flex-col gap-8"
+              }
+            >
+              {displayedProducts.map((product) => (
+                <motion.div
+                  key={product.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    show: { opacity: 1, y: 0 },
+                  }}
+                  onMouseEnter={() => setHoveredProduct(product.id)}
+                  onMouseLeave={() => setHoveredProduct(null)}
+                  className={`group relative bg-white transition-all duration-500 ${
+                    viewMode === "list"
+                      ? "flex flex-col md:flex-row gap-8 lg:gap-16 border-b border-neutral-100 pb-12 pt-8 px-6 -mx-6 hover:bg-neutral-50/50"
+                      : ""
+                  }`}
                 >
-                  <img
-                    src={hoveredVariantImage[product.id] || product.image}
-                    alt={product.name}
-                    className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                  {/* Badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-                    {product.badge && (
-                      <span
-                        className="px-3 py-1 bg-white shadow-sm text-neutral-900 text-[10px] font-bold tracking-[0.14em] uppercase border border-neutral-100"
-                        style={{ fontFamily: JOST }}
-                      >
-                        {product.badge}
-                      </span>
-                    )}
-                    {product.active_promotion?.type === 'flash_sale' && (
-                      <span
-                        className="px-2.5 py-1 bg-amber-500 text-white text-[10px] tracking-[0.12em] uppercase font-bold shadow-sm flex items-center gap-1"
-                        style={{ fontFamily: JOST }}
-                      >
-                        <Zap className="w-3 h-3 fill-white" /> Flash Sale
-                      </span>
-                    )}
-                    {product.discount > 0 && (
-                      <span
-                        className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] font-medium tracking-[0.12em] uppercase"
-                        style={{ fontFamily: JOST }}
-                      >
-                        -{Math.round(product.discount)}%
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Quick view */}
-                  <button
-                    onClick={() => openQuickView(product)}
-                    className="absolute top-3 right-3 w-8 h-8 bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 hover:bg-neutral-100"
+                  {/* Image Container */}
+                  <div
+                    className={`relative overflow-hidden bg-[#F9F9F9] group-hover:bg-[#F3F3F3] transition-colors duration-500 flex items-center justify-center p-8 sm:p-12 ${viewMode === "grid" ? "aspect-[4/5]" : "w-full md:w-[400px] flex-shrink-0 aspect-[4/5]"}`}
                   >
-                    <Eye className="w-3.5 h-3.5 text-neutral-700" />
-                  </button>
+                    <motion.img
+                      initial={false}
+                      animate={{
+                        scale: hoveredProduct === product.id ? 1.08 : 1,
+                      }}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                      src={hoveredVariantImage[product.id] || product.image}
+                      alt={product.name}
+                      className="max-w-full max-h-full object-contain mix-blend-multiply"
+                    />
 
-                  {/* Quick Add */}
-                  <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full py-3 bg-neutral-900 text-white text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-black transition-colors flex items-center justify-center gap-2"
-                      style={{ fontFamily: JOST }}
-                    >
-                      <ShoppingCart className="w-3.5 h-3.5" />
-                      Add to Cart
-                    </button>
-                  </div>
+                    {/* Overlay effects */}
+                    <div className="absolute inset-0 bg-neutral-900/0 group-hover:bg-neutral-900/5 transition-colors duration-500" />
 
-                  {/* Out of Stock */}
-                  {!product.inStock && (
-                    <div className="absolute inset-0 bg-white/90 flex items-center justify-center">
-                      <span
-                        className="px-5 py-2.5 bg-neutral-900 text-white text-[11px] tracking-[0.2em] uppercase font-medium"
+                    {/* Badges */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                      {product.badge && (
+                        <span
+                          className="px-3 py-1.5 bg-white shadow-sm text-neutral-900 text-[9px] font-black tracking-[0.2em] uppercase"
+                          style={{ fontFamily: JOST }}
+                        >
+                          {product.badge}
+                        </span>
+                      )}
+                      {product.active_promotion?.type === "flash_sale" && (
+                        <span
+                          className="px-3 py-1.5 bg-amber-500 text-white text-[9px] tracking-[0.2em] uppercase font-black shadow-sm flex items-center gap-1.5"
+                          style={{ fontFamily: JOST }}
+                        >
+                          <Zap className="w-3 h-3 fill-white" /> Flash Sale
+                        </span>
+                      )}
+                      {product.discount > 0 && (
+                        <span
+                          className="px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-black tracking-[0.2em] uppercase"
+                          style={{ fontFamily: JOST }}
+                        >
+                          -{Math.round(product.discount)}%
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Action Buttons Floating */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2 z-10 translate-x-0 sm:translate-x-4 opacity-100 sm:opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
+                      <button
+                        onClick={() => openQuickView(product)}
+                        className="w-10 h-10 bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center text-neutral-400 hover:bg-neutral-900 hover:text-white transition-all duration-300"
+                        title="Quick View"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => toggleFavorite(product.id)}
+                        className={`w-10 h-10 bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center transition-all duration-300 ${favorites.includes(product.id) ? "text-red-500 bg-red-50" : "text-neutral-400 hover:bg-neutral-900 hover:text-white"}`}
+                        title="Add to Wishlist"
+                      >
+                        <Heart
+                          className={`w-4 h-4 ${favorites.includes(product.id) ? "fill-current" : ""}`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Quick Add at bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.16, 1, 0.3, 1]">
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        disabled={!product.inStock}
+                        className="w-full py-4 bg-neutral-900 text-white text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-colors flex items-center justify-center gap-3 disabled:bg-neutral-300 disabled:cursor-not-allowed"
                         style={{ fontFamily: JOST }}
                       >
-                        Out of Stock
-                      </span>
+                        <ShoppingCart className="w-4 h-4" />
+                        {product.inStock ? "Add to Cart" : "Out of Stock"}
+                      </button>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {/* Info */}
-                {/* Info */}
-                <div
-                  className={`p-4 sm:p-5 ${viewMode === "list" ? "flex-1 flex flex-col justify-center" : "flex flex-col items-center text-center"}`}
-                >
-                  {/* Variant Preview Dots (Grid only) */}
-                  {viewMode === "grid" &&
-                    product._variants &&
-                    product._variants.length > 0 && (
-                      <div className="flex items-center justify-center gap-1.5 mb-2">
-                        {product._variants.slice(0, 5).map((v: any) => {
+                  {/* Info Area */}
+                  <div
+                    className={`pt-6 ${viewMode === "list" ? "flex-1 flex flex-col justify-center" : "flex flex-col"}`}
+                  >
+                    {/* Category Label */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-[0.2em]">
+                        {product.category}
+                      </span>
+                      {product.rating > 0 && (
+                        <>
+                          <div className="w-1 h-1 rounded-full bg-neutral-200" />
+                          <div className="flex items-center gap-1">
+                            <Star className="w-2.5 h-2.5 text-amber-400 fill-current" />
+                            <span className="text-[10px] font-bold text-neutral-600">
+                              {product.rating}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Variant Preview (Grid only) */}
+                    {viewMode === "grid" && product._variants?.length > 0 && (
+                      <div className="flex items-center gap-2 mb-4">
+                        {product._variants.slice(0, 4).map((v: any) => {
                           const varThumb = v.media?.[0]?.url;
                           return (
                             <button
                               key={v.id}
-                              onMouseEnter={() => {
-                                if (varThumb) {
-                                  setHoveredVariantImage((prev) => ({
-                                    ...prev,
-                                    [product.id]: varThumb,
-                                  }));
-                                }
-                              }}
-                              onMouseLeave={() => {
+                              onMouseEnter={() =>
+                                varThumb &&
+                                setHoveredVariantImage((prev) => ({
+                                  ...prev,
+                                  [product.id]: varThumb,
+                                }))
+                              }
+                              onMouseLeave={() =>
                                 setHoveredVariantImage((prev) => {
                                   const next = { ...prev };
                                   delete next[product.id];
                                   return next;
-                                });
-                              }}
-                              className="w-5 h-5 rounded-full overflow-hidden border-2 border-neutral-200 hover:border-neutral-900 transition-all hover:scale-110"
-                              title={v.variant_value}
+                                })
+                              }
+                              className="w-4 h-4 rounded-full overflow-hidden border border-neutral-200 hover:border-neutral-900 hover:scale-125 transition-all duration-300"
                             >
                               {varThumb ? (
                                 <img
                                   src={varThumb}
-                                  alt={v.variant_value}
+                                  alt=""
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
@@ -653,300 +772,233 @@ function ProductPageContent() {
                             </button>
                           );
                         })}
-                        {product._variants.length > 5 && (
-                          <span className="text-[9px] text-neutral-400 font-medium">
-                            +{product._variants.length - 5}
-                          </span>
-                        )}
                       </div>
                     )}
 
-                  {/* Name */}
-                  <h3
-                    className="text-lg sm:text-lg font-medium text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-snug"
-                    style={{ fontFamily: CORMORANT }}
-                  >
-                    {product.name}
-                  </h3>
-
-                  {/* Price */}
-                  <div className="flex items-baseline justify-center gap-2 mb-1">
-                    <span
-                      className="text-base sm:text-base font-semibold text-neutral-900"
-                      style={{ fontFamily: JOST }}
-                    >
-                      {formatPrice(product.price)}
-                    </span>
-                    {product.originalPrice > product.price && (
-                      <span
-                        className="text-xs text-neutral-400 line-through"
-                        style={{ fontFamily: JOST }}
+                    {/* Name */}
+                    <Link href={`/product/${product.id}`}>
+                      <h3
+                        className="text-xl sm:text-2xl font-medium text-neutral-900 mb-3 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight"
+                        style={{ fontFamily: CORMORANT }}
                       >
-                        {formatPrice(product.originalPrice)}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* View Details — grid only */}
-                  {viewMode === "grid" && (
-                    <Link
-                      href={`/product/${product.id}`}
-                      className="w-full mt-4 py-2.5 border border-neutral-200 bg-white text-neutral-900 text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-neutral-900 hover:text-white transition-all flex items-center justify-center gap-2 group/btn"
-                      style={{ fontFamily: JOST }}
-                    >
-                      View Details
-                      <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                        {product.name}
+                      </h3>
                     </Link>
-                  )}
-                </div>
 
-                {/* List CTA */}
-                {viewMode === "list" && (
-                  <div className="flex items-center gap-2 p-4 border-l border-neutral-100">
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="px-5 py-2.5 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors"
-                      style={{ fontFamily: JOST }}
-                    >
-                      Add to Cart
-                    </button>
-                    <Link
-                      href={`/product/${product.id}`}
-                      className="px-5 py-2.5 border border-neutral-200 text-neutral-700 text-[11px] tracking-[0.18em] uppercase font-medium hover:border-neutral-800 transition-colors"
-                      style={{ fontFamily: JOST }}
-                    >
-                      Details
-                    </Link>
+                    {/* Price & Description Area */}
+                    <div className="mb-8">
+                      <div className="flex items-baseline gap-3 mb-4">
+                        <span
+                          className="text-xl font-bold text-neutral-900"
+                          style={{ fontFamily: JOST }}
+                        >
+                          {formatPrice(product.price)}
+                        </span>
+                        {product.originalPrice > product.price && (
+                          <span
+                            className="text-sm text-neutral-400 line-through font-light"
+                            style={{ fontFamily: JOST }}
+                          >
+                            {formatPrice(product.originalPrice)}
+                          </span>
+                        )}
+                      </div>
+
+                      {viewMode === "list" && (
+                        <p className="text-neutral-400 text-sm font-light leading-relaxed line-clamp-3 max-w-xl italic">
+                          {product.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* View Details Link */}
+                    <div className="mt-auto">
+                      <Link
+                        href={`/product/${product.id}`}
+                        className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-neutral-900 hover:text-neutral-500 transition-colors group/link"
+                      >
+                        View Details
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Load More */}
         {filteredProducts.length > displayLimit && !isLoading && (
-          <div className="mt-16 text-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mt-24 text-center"
+          >
             <button
               onClick={() => setDisplayLimit((prev) => prev + 12)}
-              className="px-10 py-3.5 border border-neutral-300 text-neutral-700 text-[11px] tracking-[0.2em] uppercase font-medium hover:border-neutral-800 hover:text-neutral-900 transition-all cursor-pointer"
+              className="group relative px-16 py-5 bg-white text-neutral-900 text-[10px] tracking-[0.3em] uppercase font-bold border border-neutral-200 overflow-hidden transition-all duration-500 hover:border-neutral-900 shadow-sm hover:shadow-xl"
               style={{ fontFamily: JOST }}
             >
-              Load More Products
+              <span className="relative z-10">Load More Products</span>
+              <motion.div className="absolute inset-0 bg-neutral-900 -z-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+              <span className="relative z-10 group-hover:text-white transition-colors duration-500 ml-3">
+                ↓
+              </span>
             </button>
-          </div>
+          </motion.div>
         )}
       </div>
 
       {/* ── QUICK VIEW MODAL ── */}
-      {showModal && selectedProduct && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={closeModal}
-          style={{ fontFamily: JOST }}
-        >
+      <AnimatePresence>
+        {showModal && selectedProduct && (
           <div
-            className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-8"
+            style={{ fontFamily: JOST }}
           >
-            {/* Close */}
-            <button
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={closeModal}
-              className="absolute top-5 right-5 w-9 h-9 bg-white border border-neutral-200 flex items-center justify-center hover:bg-neutral-900 hover:text-white hover:border-neutral-900 transition-all z-10"
-            >
-              <X className="w-4 h-4" />
-            </button>
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
 
-            <div className="grid md:grid-cols-2">
-              {/* Image */}
-              <div className="relative aspect-square bg-neutral-50 overflow-hidden">
-                <img
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="bg-white w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] relative z-10 flex flex-col md:flex-row"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close */}
+              <button
+                onClick={closeModal}
+                className="absolute top-6 right-6 w-12 h-12 bg-neutral-900 text-white flex items-center justify-center hover:bg-black transition-all z-20 group shadow-xl"
+              >
+                <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+              </button>
+
+              {/* Image Section */}
+              <div className="relative w-full md:w-1/2 aspect-square bg-[#F9F9F9] flex items-center justify-center p-12 lg:p-24 overflow-hidden">
+                <motion.img
+                  layoutId={`img-${selectedProduct.id}`}
                   src={selectedProduct.image}
                   alt={selectedProduct.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain mix-blend-multiply"
                 />
-                <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+                <div className="absolute top-8 left-8 flex flex-col gap-3">
                   {selectedProduct.badge && (
-                    <span
-                      className="px-3 py-1 bg-white shadow-sm text-neutral-900 text-[10px] tracking-[0.14em] font-bold uppercase border border-neutral-100"
-                      style={{ fontFamily: JOST }}
-                    >
+                    <span className="px-5 py-2 bg-white shadow-sm text-neutral-900 text-[10px] tracking-[0.2em] font-black uppercase border border-neutral-100">
                       {selectedProduct.badge}
                     </span>
                   )}
-                  {selectedProduct.active_promotion?.type === 'flash_sale' && (
-                    <span
-                      className="px-2.5 py-1 bg-amber-500 text-white text-[10px] tracking-[0.12em] uppercase font-bold shadow-sm flex items-center gap-1"
-                      style={{ fontFamily: JOST }}
-                    >
-                      <Zap className="w-3 h-3 fill-white" /> Flash Sale
-                    </span>
-                  )}
-                  {selectedProduct.discount > 0 && (
-                    <span
-                      className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase"
-                      style={{ fontFamily: JOST }}
-                    >
-                      -{Math.round(selectedProduct.discount)}%
+                  {selectedProduct.active_promotion?.type === "flash_sale" && (
+                    <span className="px-4 py-2 bg-amber-500 text-white text-[10px] tracking-[0.2em] uppercase font-black shadow-sm flex items-center gap-2">
+                      <Zap className="w-3.5 h-3.5 fill-white" /> Flash Sale
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Details */}
-              <div className="p-7 sm:p-8 flex flex-col">
-                {/* Rating */}
-                <div className="flex items-center gap-1.5 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${i < Math.floor(selectedProduct.rating) ? "fill-yellow-400 text-yellow-400" : "text-neutral-200"}`}
-                    />
-                  ))}
-                  <span
-                    className="text-xs text-neutral-500 ml-1"
-                    style={{ fontFamily: JOST }}
+              {/* Details Section */}
+              <div className="w-full md:w-1/2 p-10 sm:p-16 flex flex-col overflow-y-auto">
+                <div className="mb-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em]">
+                      {selectedProduct.category}
+                    </span>
+                    {selectedProduct.rating > 0 && (
+                      <>
+                        <div className="w-1 h-1 rounded-full bg-neutral-200" />
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-amber-400 fill-current" />
+                          <span className="text-[11px] font-bold text-neutral-600">
+                            {selectedProduct.rating}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <h2
+                    className="text-3xl lg:text-4xl font-light text-neutral-900 leading-tight mb-6"
+                    style={{ fontFamily: CORMORANT }}
                   >
-                    {selectedProduct.rating} ({selectedProduct.reviews} reviews)
-                  </span>
-                </div>
-
-                {/* Name */}
-                <h2
-                  className="text-2xl sm:text-3xl font-light text-neutral-900 mb-2 leading-tight"
-                  style={{ fontFamily: CORMORANT }}
-                >
-                  {selectedProduct.name}
-                </h2>
-                <div className="w-8 h-[1px] bg-neutral-200 mb-4" />
-
-                {/* Description */}
-                <p
-                  className="text-neutral-500 text-sm font-light leading-relaxed mb-5"
-                  style={{ fontFamily: JOST }}
-                >
-                  {selectedProduct.description}
-                </p>
-
-                {/* Price */}
-                <div className="border border-neutral-100 bg-neutral-50 p-4 mb-5">
-                  <div className="flex items-baseline gap-3">
-                    <span
-                      className="text-2xl font-medium text-neutral-900"
-                      style={{ fontFamily: JOST }}
-                    >
+                    {selectedProduct.name}
+                  </h2>
+                  <div className="flex items-baseline gap-4">
+                    <span className="text-2xl font-bold text-neutral-900">
                       {formatPrice(selectedProduct.price)}
                     </span>
                     {selectedProduct.originalPrice > selectedProduct.price && (
-                      <span
-                        className="text-sm text-neutral-400 line-through"
-                        style={{ fontFamily: JOST }}
-                      >
+                      <span className="text-lg text-neutral-400 line-through font-light">
                         {formatPrice(selectedProduct.originalPrice)}
                       </span>
                     )}
                   </div>
-                  {selectedProduct.originalPrice > selectedProduct.price && (
-                    <p
-                      className="text-[11px] text-neutral-500 mt-1 tracking-wide"
-                      style={{ fontFamily: JOST }}
-                    >
-                      Hemat{" "}
-                      {formatPrice(
-                        selectedProduct.originalPrice - selectedProduct.price,
-                      )}
+                </div>
+
+                <div className="space-y-8 mb-12">
+                  <div>
+                    <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 font-black mb-3">
+                      About This Piece
                     </p>
+                    <p className="text-neutral-600 font-light leading-relaxed text-sm">
+                      {selectedProduct.description}
+                    </p>
+                  </div>
+
+                  {selectedProduct.features?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 font-black mb-4">
+                        Features
+                      </p>
+                      <div className="grid grid-cols-2 gap-3">
+                        {selectedProduct.features
+                          .slice(0, 4)
+                          .map((f: string, i: number) => (
+                            <div
+                              key={i}
+                              className="flex items-center gap-3 text-xs text-neutral-600 font-medium"
+                            >
+                              <div className="w-1 h-1 rounded-full bg-neutral-900" />
+                              {f}
+                            </div>
+                          ))}
+                      </div>
+                    </div>
                   )}
                 </div>
 
-                {/* Features */}
-                <div className="mb-4">
-                  <p
-                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-2.5"
-                    style={{ fontFamily: JOST }}
-                  >
-                    Fitur Utama
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProduct.features.map((f: string, i: number) => (
-                      <span
-                        key={i}
-                        className="flex items-center gap-1.5 px-3 py-1.5 border border-neutral-200 text-neutral-600 text-[11px] tracking-[0.1em] uppercase font-medium"
-                        style={{ fontFamily: JOST }}
-                      >
-                        <Check className="w-3 h-3" />
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Specifications */}
-                <div className="mb-6">
-                  <p
-                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-2.5"
-                    style={{ fontFamily: JOST }}
-                  >
-                    Spesifikasi
-                  </p>
-                  <div className="space-y-1.5">
-                    {Object.entries(
-                      selectedProduct.specifications as Record<string, string>,
-                    ).map(([k, v]) => (
-                      <div
-                        key={k}
-                        className="flex justify-between py-1.5 border-b border-neutral-100 text-sm"
-                        style={{ fontFamily: JOST }}
-                      >
-                        <span className="text-neutral-400 font-light">{k}</span>
-                        <span className="text-neutral-800 font-medium">
-                          {v}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 mt-auto">
-                  <button
-                    onClick={() => toggleFavorite(selectedProduct.id)}
-                    className={`w-11 h-11 flex items-center justify-center border transition-all ${favorites.includes(selectedProduct.id) ? "bg-neutral-900 border-neutral-900 text-white" : "border-neutral-200 text-neutral-500 hover:border-neutral-800"}`}
-                  >
-                    <Heart
-                      className={`w-4 h-4 ${favorites.includes(selectedProduct.id) ? "fill-current" : ""}`}
-                    />
-                  </button>
+                <div className="mt-auto space-y-4">
                   <button
                     onClick={() => {
-                      closeModal();
                       handleAddToCart(selectedProduct);
+                      closeModal();
                     }}
-                    className="flex-1 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-black transition-colors flex items-center justify-center gap-2"
-                    style={{ fontFamily: JOST }}
+                    className="w-full py-6 bg-neutral-900 text-white text-[11px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-2xl shadow-neutral-200"
                   >
-                    <ShoppingCart className="w-4 h-4" />
-                    Add to Cart
+                    <ShoppingCart className="w-5 h-5" />
+                    Add to Shopping Bag
                   </button>
-                </div>
 
-                {/* Stock */}
-                <div className="mt-3 flex items-center gap-2">
-                  <div
-                    className={`w-1.5 h-1.5 rounded-full ${selectedProduct.inStock ? "bg-green-500" : "bg-red-400"}`}
-                  />
-                  <span
-                    className="text-[11px] text-neutral-400 tracking-wide"
-                    style={{ fontFamily: JOST }}
+                  <Link
+                    href={`/product/${selectedProduct.id}`}
+                    onClick={closeModal}
+                    className="w-full py-6 border border-neutral-200 text-neutral-900 text-[11px] tracking-[0.3em] uppercase font-bold hover:bg-neutral-50 transition-all flex items-center justify-center gap-4 group/link"
                   >
-                    {selectedProduct.inStock ? "In Stock" : "Out of Stock"}
-                  </span>
+                    View Full Experience
+                    <ArrowRight className="w-5 h-5 group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* ── FEATURES STRIP ── */}
       <section className="bg-neutral-900 py-12 sm:py-14">
@@ -978,16 +1030,10 @@ function ProductPageContent() {
                 >
                   <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0" />
                   <div>
-                    <p
-                      className="text-[11px] tracking-[0.18em] uppercase text-white font-medium mb-0.5"
-                      style={{ fontFamily: JOST }}
-                    >
+                    <h4 className="text-white text-[10px] font-black uppercase tracking-[0.2em] mb-1">
                       {f.title}
-                    </p>
-                    <p
-                      className="text-[11px] text-white/40 font-light tracking-wide"
-                      style={{ fontFamily: JOST }}
-                    >
+                    </h4>
+                    <p className="text-white/60 text-[9px] font-medium tracking-wide">
                       {f.desc}
                     </p>
                   </div>

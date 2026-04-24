@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Plus, Pencil, Trash2, Tag, X, Loader2, CheckCircle2,
-  AlertCircle, Upload, FileSpreadsheet
+  AlertCircle, Upload, FileSpreadsheet, Download
 } from "lucide-react";
 import api from "@/lib/axios";
+import toast from "react-hot-toast";
+import { downloadFile } from "@/lib/download";
 
 const JOST = "'Jost', system-ui, sans-serif";
 
@@ -194,23 +196,37 @@ export default function VouchersPage() {
   return (
     <div className="p-6" style={{ fontFamily: JOST }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-stone-900">Manajemen Voucher</h1>
-          <p className="text-stone-500 text-sm mt-1">Kelola kode voucher diskon untuk pelanggan</p>
+          <h1 className="text-xl md:text-2xl font-bold text-stone-900 leading-tight">Manajemen Voucher</h1>
+          <p className="text-stone-500 text-xs md:text-sm mt-1">Kelola kode voucher diskon untuk pelanggan</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          {/* Export Button */}
+          <button
+            onClick={async () => {
+              try {
+                await downloadFile('/admin/export/vouchers', 'vouchers_report.xlsx');
+                toast.success("Voucher exported successfully");
+              } catch (error) {
+                toast.error("Failed to export vouchers");
+              }
+            }}
+            className="flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2.5 text-sm font-medium hover:bg-stone-50 transition-colors"
+          >
+            <Download className="w-4 h-4" /> Ekspor Excel
+          </button>
           {/* Bulk Import Button */}
           <button
             onClick={() => { setShowImportModal(true); setImportFile(null); setImportResult(null); }}
-            className="flex items-center gap-2 border border-stone-300 text-stone-700 px-4 py-2.5 text-sm font-medium hover:bg-stone-50 transition-colors"
+            className="flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2.5 text-sm font-medium hover:bg-stone-50 transition-colors"
           >
             <Upload className="w-4 h-4" /> Import Excel
           </button>
           {/* Create Button */}
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 bg-stone-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-black transition-colors"
+            className="flex items-center justify-center gap-2 bg-stone-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-black transition-colors"
           >
             <Plus className="w-4 h-4" /> Buat Voucher
           </button>
@@ -246,8 +262,8 @@ export default function VouchersPage() {
           <button onClick={openCreate} className="mt-4 text-stone-900 text-sm font-medium underline">Buat sekarang</button>
         </div>
       ) : (
-        <div className="bg-white border border-stone-100 overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="bg-white border border-stone-100 overflow-x-auto rounded-xl shadow-sm">
+          <table className="w-full text-sm min-w-[1000px] md:min-w-full">
             <thead>
               <tr className="border-b border-stone-100 text-[10px] uppercase tracking-wider text-stone-500 font-bold">
                 <th className="px-5 py-4 text-left font-bold">Produk / SKU</th>
@@ -456,7 +472,7 @@ export default function VouchersPage() {
       {/* ── CREATE / EDIT MODAL ── */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg shadow-2xl" style={{ fontFamily: JOST }}>
+          <div className="bg-white w-full max-w-lg shadow-2xl rounded-2xl overflow-hidden" style={{ fontFamily: JOST }}>
             <div className="flex items-center justify-between px-6 py-5 border-b border-stone-100">
               <h2 className="text-base font-bold text-stone-900 uppercase tracking-wide">
                 {editingId ? 'Edit Voucher' : 'Buat Voucher Baru'}
@@ -471,7 +487,7 @@ export default function VouchersPage() {
                   <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-1">Kode Produk / SKU (Opsional)</label>
                   <input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })}
@@ -518,7 +534,7 @@ export default function VouchersPage() {
 
                 <div className="col-span-2 bg-stone-50 p-4 border border-stone-100">
                   <label className="block text-[11px] uppercase tracking-wider text-stone-500 font-bold mb-3">Masa Berlaku Voucher</label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-tight mb-1">Periode On (Mulai)</label>
                       <input type="date" value={form.starts_at} onChange={e => setForm({ ...form, starts_at: e.target.value })}
@@ -569,7 +585,7 @@ export default function VouchersPage() {
       {/* ── CONFIRM DELETE MODAL ── */}
       {showConfirm && (
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-sm shadow-2xl border border-stone-100" style={{ fontFamily: JOST }}>
+          <div className="bg-white w-full max-w-sm shadow-2xl rounded-3xl overflow-hidden border border-stone-100" style={{ fontFamily: JOST }}>
             <div className="p-8 text-center">
               <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Trash2 className="w-8 h-8" />
