@@ -156,7 +156,7 @@ export default function News() {
             >
               <div className="w-8 h-[1px] bg-white/60" />
               <span className="text-white/80 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em]">
-                Ravella Journal
+                Eksplorasi Kuliner
               </span>
             </motion.div>
 
@@ -167,9 +167,9 @@ export default function News() {
               className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]"
               style={{ fontFamily: CORMORANT }}
             >
-              Culinary <br />
+              Inspirasi Rasa <br />
               <span className="font-semibold italic text-neutral-200">
-                Inspiration
+                Dan Gaya
               </span>
             </motion.h1>
 
@@ -248,7 +248,7 @@ export default function News() {
                 )}
                 <span className="relative z-10">{cat.name}</span>
                 <span
-                  className={`ml-2 text-[9px] ${activeCategory === cat.name ? "text-white/50" : "text-neutral-300"}`}
+                  className={`ml-2 text-[10px] font-bold ${activeCategory === cat.name ? "text-white/80" : "text-neutral-500"}`}
                 >
                   ({cat.count})
                 </span>
@@ -346,14 +346,7 @@ export default function News() {
                         </span>
                       </div>
                       {/* Action Buttons */}
-                      <div className="absolute top-3.5 right-3.5 flex gap-1.5 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <span className="w-7 h-7 bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-neutral-900 hover:text-white transition-all">
-                          <BookmarkPlus className="w-3.5 h-3.5 text-neutral-400 group-hover:text-inherit" />
-                        </span>
-                        <span className="w-7 h-7 bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-neutral-900 hover:text-white transition-all">
-                          <Share2 className="w-3.5 h-3.5 text-neutral-400 group-hover:text-inherit" />
-                        </span>
-                      </div>
+                      <div className="absolute top-3.5 right-3.5 flex gap-1.5 z-20 opacity-100 transition-all duration-300"></div>
                     </div>
                   </Link>
 

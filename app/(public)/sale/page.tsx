@@ -188,7 +188,7 @@ export default function SalePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-6xl sm:text-8xl md:text-9xl font-light text-white mb-6 leading-[0.9]"
+              className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]"
               style={{ fontFamily: CORMORANT }}
             >
               Pesta Diskon <br />

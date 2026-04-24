@@ -628,7 +628,11 @@ function ProductPageContent() {
                   }}
                   onMouseEnter={() => setHoveredProduct(product.id)}
                   onMouseLeave={() => setHoveredProduct(null)}
-                  className={`group relative bg-white transition-all duration-500 ${viewMode === "list" ? "flex flex-col md:flex-row gap-8 border-b border-neutral-100 pb-12" : ""}`}
+                  className={`group relative bg-white transition-all duration-500 ${
+                    viewMode === "list"
+                      ? "flex flex-col md:flex-row gap-8 lg:gap-16 border-b border-neutral-100 pb-12 pt-8 px-6 -mx-6 hover:bg-neutral-50/50"
+                      : ""
+                  }`}
                 >
                   {/* Image Container */}
                   <div
@@ -781,25 +785,33 @@ function ProductPageContent() {
                       </h3>
                     </Link>
 
-                    {/* Price */}
-                    <div className="flex items-baseline gap-3 mb-6">
-                      <span
-                        className="text-lg font-bold text-neutral-900"
-                        style={{ fontFamily: JOST }}
-                      >
-                        {formatPrice(product.price)}
-                      </span>
-                      {product.originalPrice > product.price && (
+                    {/* Price & Description Area */}
+                    <div className="mb-8">
+                      <div className="flex items-baseline gap-3 mb-4">
                         <span
-                          className="text-sm text-neutral-400 line-through font-light"
+                          className="text-xl font-bold text-neutral-900"
                           style={{ fontFamily: JOST }}
                         >
-                          {formatPrice(product.originalPrice)}
+                          {formatPrice(product.price)}
                         </span>
+                        {product.originalPrice > product.price && (
+                          <span
+                            className="text-sm text-neutral-400 line-through font-light"
+                            style={{ fontFamily: JOST }}
+                          >
+                            {formatPrice(product.originalPrice)}
+                          </span>
+                        )}
+                      </div>
+
+                      {viewMode === "list" && (
+                        <p className="text-neutral-400 text-sm font-light leading-relaxed line-clamp-3 max-w-xl italic">
+                          {product.description}
+                        </p>
                       )}
                     </div>
 
-                    {/* View Details Link (User Requested) */}
+                    {/* View Details Link */}
                     <div className="mt-auto">
                       <Link
                         href={`/product/${product.id}`}
@@ -809,12 +821,6 @@ function ProductPageContent() {
                         <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                       </Link>
                     </div>
-
-                    {viewMode === "list" && (
-                      <p className="mt-4 text-neutral-500 text-sm font-light leading-relaxed line-clamp-3 max-w-xl">
-                        {product.description}
-                      </p>
-                    )}
                   </div>
                 </motion.div>
               ))}
