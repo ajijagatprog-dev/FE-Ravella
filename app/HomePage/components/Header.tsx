@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import api from "@/lib/axios";
 import {
   Search,
   ShoppingCart,
@@ -52,6 +53,7 @@ export default function Header({
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
+  const [categories, setCategories] = useState<string[]>([]);
   const [authObj, setAuthObj] = useState<{
     role: string;
     email: string;
@@ -86,6 +88,42 @@ export default function Header({
     setCartCount(readCartCount());
 
     const handleCartUpdate = () => setCartCount(readCartCount());
+
+    const fetchCategories = async () => {
+      try {
+        const res = await api.get("/products", { params: { limit: 100 } });
+        if (res.data.status === "success") {
+          const items = res.data.data.data || res.data.data;
+
+          // Normalize categories to fix 'homeliving' and 'home living' duplicates
+          const rawCats = items.map((i: any) => i.category).filter(Boolean);
+          const catMap = new Map<string, string>();
+
+          rawCats.forEach((c: string) => {
+            // Normalize: lowercase, remove spaces
+            let normalized = c.toLowerCase().replace(/\s+/g, "");
+            if (normalized === "homeliving") {
+              // Force unified display and query for home living
+              catMap.set("homeliving", "Home Living");
+            } else if (!catMap.has(normalized)) {
+              // Title case format
+              const display = c
+                .split(" ")
+                .map(
+                  (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(),
+                )
+                .join(" ");
+              catMap.set(normalized, display);
+            }
+          });
+
+          setCategories(Array.from(catMap.values()));
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
 
     const checkAuth = () => {
       try {
@@ -132,7 +170,7 @@ export default function Header({
     { label: "PRODUCT", href: "/product" },
     { label: "NEWS", href: "/news" },
     { label: "CONTACT", href: "/contact" },
-    { label: "TESTIMONIAL", href: "/testimonial" },
+    { label: "CONTENTS", href: "/contents" },
   ];
 
   const saleMenu = { label: "SALE", href: "/sale" };
@@ -161,14 +199,97 @@ export default function Header({
 
               <nav className="hidden lg:flex items-center gap-5 xl:gap-8 transition-opacity duration-300">
                 {menus.map((menu) => (
-                  <Link
+                  <div
                     key={menu.label}
-                    href={menu.href}
-                    className="group relative text-[12px] tracking-[0.15em] font-medium text-neutral-600 hover:text-black transition-colors duration-300 whitespace-nowrap"
+                    className="group flex items-center h-full"
                   >
-                    {menu.label}
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full" />
-                  </Link>
+                    <Link
+                      href={menu.href}
+                      className="relative text-[12px] tracking-[0.15em] font-medium text-neutral-600 hover:text-black transition-colors duration-300 whitespace-nowrap py-6"
+                    >
+                      {menu.label}
+                      <span className="absolute bottom-5 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full" />
+                    </Link>
+
+                    {/* Mega Menu Dropdown */}
+                    {menu.label === "PRODUCT" && (
+                      <div
+                        className="absolute left-0 top-full w-[100vw] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 pointer-events-none group-hover:pointer-events-auto"
+                        style={{ left: "50%", transform: "translateX(-50%)" }}
+                      >
+                        {/* Invisible bridge to maintain hover */}
+                        <div className="absolute w-full h-[40px] -top-[40px] bg-transparent pointer-events-auto" />
+                        <div
+                          className="w-full bg-white shadow-2xl border-t border-neutral-200"
+                          style={{ fontFamily: JOST }}
+                        >
+                          <div className="max-w-[1320px] mx-auto px-6 md:px-12 py-10 flex justify-between gap-10">
+                            {/* Dynamic Categories Grid */}
+                            <div className="flex-1">
+                              <h4 className="text-sm font-bold text-neutral-900 mb-6 tracking-wider uppercase">
+                                Jelajahi Kategori
+                              </h4>
+                              <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
+                                {categories.length > 0 ? (
+                                  categories.map((cat) => (
+                                    <Link
+                                      key={cat}
+                                      href={`/search?q=${encodeURIComponent(cat)}`}
+                                      className="group/cat relative flex flex-col justify-end p-5 rounded-xl border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-rose-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 overflow-hidden min-h-[100px]"
+                                    >
+                                      <div className="absolute right-0 top-0 w-20 h-20 bg-gradient-to-bl from-rose-100/50 to-transparent rounded-bl-[100px] opacity-0 group-hover/cat:opacity-100 transition-opacity duration-500" />
+                                      <h4 className="text-[13px] font-bold text-neutral-800 group-hover/cat:text-rose-600 transition-colors z-10 capitalize tracking-wide">
+                                        {cat}
+                                      </h4>
+                                      <p className="text-[10px] uppercase tracking-widest font-medium text-neutral-400 mt-2 z-10 group-hover/cat:text-rose-400 transition-colors flex items-center gap-1">
+                                        Eksplor{" "}
+                                        <span className="group-hover/cat:translate-x-1 transition-transform">
+                                          →
+                                        </span>
+                                      </p>
+                                    </Link>
+                                  ))
+                                ) : (
+                                  <div className="col-span-full flex items-center py-10">
+                                    <Loader2 className="w-5 h-5 text-neutral-300 animate-spin" />
+                                    <span className="ml-3 text-sm text-neutral-400">
+                                      Memuat kategori...
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Featured Image */}
+                            <div className="w-[340px] flex-shrink-0">
+                              <Link
+                                href="/product"
+                                className="group/featured block overflow-hidden rounded-2xl border border-neutral-100 bg-neutral-50 aspect-[4/3] relative w-full shadow-sm hover:shadow-xl transition-all duration-500"
+                              >
+                                <img
+                                  src="https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&q=80"
+                                  alt="Featured Product"
+                                  className="w-full h-full object-cover transition-transform duration-1000 group-hover/featured:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 group-hover/featured:opacity-100 transition-opacity duration-500" />
+                                <div className="absolute bottom-0 left-0 w-full p-6 text-white flex flex-col justify-end">
+                                  <span className="inline-block px-2.5 py-1 bg-rose-500/90 backdrop-blur-sm text-white text-[9px] font-bold tracking-widest uppercase rounded mb-3 self-start">
+                                    Koleksi Terbaru
+                                  </span>
+                                  <h4 className="text-lg font-bold mb-1 shadow-sm leading-tight tracking-wide">
+                                    Ravelle Premium Collection
+                                  </h4>
+                                  <p className="text-[11px] font-medium tracking-[0.2em] text-rose-200 mt-3 flex items-center gap-2 group-hover/featured:gap-3 transition-all">
+                                    SHOP NOW <span className="text-sm">→</span>
+                                  </p>
+                                </div>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ))}
                 {/* SALE - highlighted */}
                 <Link
