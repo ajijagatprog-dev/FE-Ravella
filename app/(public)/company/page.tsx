@@ -21,14 +21,12 @@ import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function Company() {
   const [activeTimeline, setActiveTimeline] = useState(0);
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
+    <div className="min-h-screen bg-white" >
       <Header />
 
       {/* ── HERO ── */}
@@ -51,7 +49,7 @@ export default function Company() {
               <div className="w-5 h-[1px] bg-white/50" />
               <span
                 className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]"
-                style={{ fontFamily: JOST }}
+                
               >
                 About Ravelle
               </span>
@@ -60,7 +58,7 @@ export default function Company() {
             {/* Heading */}
             <h1
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-5 leading-[1.05]"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              style={{  letterSpacing: "-0.01em" }}
             >
               Kitchen{" "}
               <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
@@ -73,7 +71,7 @@ export default function Company() {
 
             <p
               className="text-white/75 text-sm sm:text-base font-light leading-relaxed mb-8 max-w-lg"
-              style={{ fontFamily: JOST }}
+              
             >
               Providing premium quality kitchen appliances with modern and
               innovative designs to make your cooking activities easier.
@@ -83,14 +81,14 @@ export default function Company() {
               <a
                 href="/contact"
                 className="px-8 py-3.5 bg-white text-neutral-900 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-100 transition-colors"
-                style={{ fontFamily: JOST }}
+                
               >
                 Contact Us
               </a>
               <a
                 href="/product"
                 className="px-8 py-3.5 border border-white/50 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-white/10 transition-colors"
-                style={{ fontFamily: JOST }}
+                
               >
                 View Products
               </a>
@@ -139,13 +137,13 @@ export default function Company() {
                   <div>
                     <div
                       className="text-2xl font-light text-neutral-900"
-                      style={{ fontFamily: CORMORANT }}
+                      
                     >
                       4.8
                     </div>
                     <div
                       className="text-[10px] tracking-[0.15em] uppercase text-neutral-400 font-medium"
-                      style={{ fontFamily: JOST }}
+                      
                     >
                       Rating
                     </div>
@@ -162,7 +160,7 @@ export default function Company() {
                 <div className="w-5 h-[1px] bg-neutral-400" />
                 <span
                   className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
-                  style={{ fontFamily: JOST }}
+                  
                 >
                   Our Story
                 </span>
@@ -170,7 +168,7 @@ export default function Company() {
 
               <h2
                 className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900 leading-[1.05]"
-                style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+                style={{  letterSpacing: "-0.01em" }}
               >
                 Improve the{" "}
                 <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
@@ -182,7 +180,7 @@ export default function Company() {
 
               <p
                 className="text-base text-neutral-600 font-light leading-relaxed"
-                style={{ fontFamily: JOST }}
+                
               >
                 Since its debut in{" "}
                 <span className="font-medium text-neutral-900">2020</span>,
@@ -205,7 +203,7 @@ export default function Company() {
                       <div className="w-4 h-[1px] bg-neutral-400 flex-shrink-0 mt-[10px]" />
                       <span
                         className="text-sm sm:text-base font-light text-neutral-700 tracking-wide"
-                        style={{ fontFamily: JOST }}
+                        
                       >
                         {value}
                       </span>
@@ -224,7 +222,7 @@ export default function Company() {
               <div className="w-5 h-[1px] bg-neutral-400" />
               <span
                 className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
-                style={{ fontFamily: JOST }}
+                
               >
                 Excellence
               </span>
@@ -232,7 +230,7 @@ export default function Company() {
             </div>
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900 mb-4"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              style={{  letterSpacing: "-0.01em" }}
             >
               Ravelle{" "}
               <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
@@ -241,7 +239,7 @@ export default function Company() {
             </h2>
             <p
               className="text-neutral-500 text-sm sm:text-base font-light max-w-2xl mx-auto"
-              style={{ fontFamily: JOST }}
+              
             >
               These values are consistently translated into all RAVELLE products through:
             </p>
@@ -267,7 +265,7 @@ export default function Company() {
                   </div>
                   <p
                     className="text-sm sm:text-base font-light text-neutral-600 leading-relaxed pt-2"
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     {feature.text}
                   </p>
@@ -287,7 +285,7 @@ export default function Company() {
                   <div className="w-5 h-[1px] bg-white/30" />
                   <span
                     className="text-white/50 font-medium text-[11px] uppercase tracking-[0.25em]"
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     Achievements
                   </span>
@@ -295,7 +293,7 @@ export default function Company() {
                 </div>
                 <h2
                   className="text-4xl sm:text-5xl font-light text-white mb-3"
-                  style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+                  style={{  letterSpacing: "-0.01em" }}
                 >
                   Proud{" "}
                   <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
@@ -307,7 +305,7 @@ export default function Company() {
                 </div>
                 <p
                   className="text-white/50 text-sm font-light max-w-xl mx-auto"
-                  style={{ fontFamily: JOST }}
+                  
                 >
                   Numbers that prove our dedication to delivering the best
                 </p>
@@ -329,13 +327,13 @@ export default function Company() {
                       <Icon className="w-6 h-6 text-white/40 mx-auto mb-4" />
                       <div
                         className="text-4xl sm:text-5xl font-light text-white mb-2"
-                        style={{ fontFamily: CORMORANT }}
+                        
                       >
                         {stat.value}
                       </div>
                       <div
                         className="text-[11px] text-white/45 tracking-[0.18em] uppercase font-medium"
-                        style={{ fontFamily: JOST }}
+                        
                       >
                         {stat.label}
                       </div>
@@ -354,7 +352,7 @@ export default function Company() {
               <div className="w-5 h-[1px] bg-neutral-400" />
               <span
                 className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
-                style={{ fontFamily: JOST }}
+                
               >
                 Direction
               </span>
@@ -362,7 +360,7 @@ export default function Company() {
             </div>
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              style={{  letterSpacing: "-0.01em" }}
             >
               Vision &amp;{" "}
               <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
@@ -379,20 +377,20 @@ export default function Company() {
               </div>
               <p
                 className="text-[11px] tracking-[0.22em] uppercase text-white/40 font-medium mb-3"
-                style={{ fontFamily: JOST }}
+                
               >
                 Vision
               </p>
               <h3
                 className="text-3xl sm:text-4xl font-light text-white mb-5"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 Leading with <em style={{ fontStyle: "italic" }}>Purpose</em>
               </h3>
               <div className="w-8 h-[1px] bg-white/20 mb-5" />
               <p
                 className="text-white/65 text-sm sm:text-base font-light leading-relaxed"
-                style={{ fontFamily: JOST }}
+                
               >
                 To become the leading kitchen appliance brand in Indonesia,
                 known for innovation, premium quality, and high customer trust
@@ -407,13 +405,13 @@ export default function Company() {
               </div>
               <p
                 className="text-[11px] tracking-[0.22em] uppercase text-neutral-400 font-medium mb-3"
-                style={{ fontFamily: JOST }}
+                
               >
                 Mission
               </p>
               <h3
                 className="text-3xl sm:text-4xl font-light text-neutral-900 mb-5"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 Built to <em style={{ fontStyle: "italic" }}>Serve</em>
               </h3>
@@ -428,7 +426,7 @@ export default function Company() {
                     <div className="w-4 h-[1px] bg-neutral-400 flex-shrink-0 mt-[10px]" />
                     <span
                       className="text-sm text-neutral-600 font-light leading-relaxed"
-                      style={{ fontFamily: JOST }}
+                      
                     >
                       {item}
                     </span>
@@ -446,7 +444,7 @@ export default function Company() {
               <div className="w-5 h-[1px] bg-neutral-400" />
               <span
                 className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
-                style={{ fontFamily: JOST }}
+                
               >
                 Milestones
               </span>
@@ -454,7 +452,7 @@ export default function Company() {
             </div>
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              style={{  letterSpacing: "-0.01em" }}
             >
               Our{" "}
               <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
@@ -503,20 +501,20 @@ export default function Company() {
                           />
                           <span
                             className={`text-3xl sm:text-4xl font-light ${activeTimeline === i ? "text-white" : "text-neutral-900"}`}
-                            style={{ fontFamily: CORMORANT }}
+                            
                           >
                             {item.year}
                           </span>
                         </div>
                         <h3
                           className={`text-base sm:text-lg font-medium mb-2 tracking-wide ${activeTimeline === i ? "text-white" : "text-neutral-900"}`}
-                          style={{ fontFamily: JOST }}
+                          
                         >
                           {item.title}
                         </h3>
                         <p
                           className={`text-sm font-light leading-relaxed ${activeTimeline === i ? "text-white/60" : "text-neutral-500"}`}
-                          style={{ fontFamily: JOST }}
+                          
                         >
                           {item.description}
                         </p>

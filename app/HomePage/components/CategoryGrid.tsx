@@ -4,8 +4,6 @@ import { ArrowRight, Home, Utensils, Package, Sofa, Laptop } from "lucide-react"
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function CategoryGrid() {
   const router = useRouter();
@@ -60,7 +58,7 @@ export default function CategoryGrid() {
   return (
     <section
       className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20 md:py-24 bg-white relative overflow-hidden"
-      style={{ fontFamily: JOST }}
+      
     >
       <motion.div 
         initial={{ opacity: 0, y: 40 }}
@@ -78,7 +76,7 @@ export default function CategoryGrid() {
             <div className="w-5 h-[1px] bg-neutral-400" />
             <span
               className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
-              style={{ fontFamily: JOST }}
+              
             >
               Kategori Produk
             </span>
@@ -88,12 +86,12 @@ export default function CategoryGrid() {
           {/* Heading — Cormorant Garamond */}
           <h2
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] text-neutral-900 mb-4"
-            style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+            style={{  letterSpacing: "-0.01em" }}
           >
             Shop by{" "}
             <em
               className="font-semibold not-italic"
-              style={{ fontFamily: CORMORANT, fontStyle: "italic" }}
+              style={{  fontStyle: "italic" }}
             >
               Category
             </em>
@@ -106,7 +104,7 @@ export default function CategoryGrid() {
 
           <p
             className="text-neutral-500 text-sm sm:text-base font-light max-w-xl mx-auto leading-relaxed tracking-wide"
-            style={{ fontFamily: JOST }}
+            
           >
             Temukan produk berkualitas dalam kategori yang telah kami kurasi khusus untuk Anda
           </p>
@@ -128,7 +126,7 @@ export default function CategoryGrid() {
         <div className="text-center mt-12 sm:mt-16">
           <button
             className="group inline-flex items-center gap-3 px-10 py-4 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-[11px] tracking-[0.2em] uppercase font-medium"
-            style={{ fontFamily: JOST }}
+            
           >
             <span>Lihat Semua Kategori</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -165,7 +163,7 @@ function CategoryCard({ category, index, onClick }: { category: any; index: numb
       <div className="absolute top-4 sm:top-5 left-4 sm:left-5 z-10">
         <div
           className="flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm"
-          style={{ fontFamily: JOST }}
+          
         >
           {Icon ? <Icon className="w-3.5 h-3.5 text-neutral-700" /> : <div className="w-3.5 h-3.5" />}
           <span className="text-[10px] font-medium text-neutral-800 tracking-[0.12em] uppercase">
@@ -180,7 +178,7 @@ function CategoryCard({ category, index, onClick }: { category: any; index: numb
         {/* Subtitle — appears on hover */}
         <p
           className="text-white/70 text-[10px] sm:text-[11px] font-light mb-1.5 uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500"
-          style={{ fontFamily: JOST }}
+          
         >
           {category.subtitle}
         </p>
@@ -188,7 +186,7 @@ function CategoryCard({ category, index, onClick }: { category: any; index: numb
         {/* Title — Cormorant Garamond */}
         <h3
           className="text-white text-2xl sm:text-3xl md:text-4xl font-light leading-tight mb-4 drop-shadow-lg transition-all duration-700 group-hover:-translate-y-1"
-          style={{ fontFamily: CORMORANT, letterSpacing: "0" }}
+          style={{  letterSpacing: "0" }}
         >
           {category.title}
         </h3>
@@ -196,7 +194,7 @@ function CategoryCard({ category, index, onClick }: { category: any; index: numb
         {/* Jelajahi Button — appears on hover */}
         <button
           className="inline-flex items-center gap-2.5 bg-white text-neutral-900 px-6 py-2.5 text-[10px] tracking-[0.2em] uppercase font-medium opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out hover:bg-neutral-100"
-          style={{ fontFamily: JOST }}
+          
         >
           Jelajahi
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

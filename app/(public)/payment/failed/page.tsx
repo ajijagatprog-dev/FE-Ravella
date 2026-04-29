@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { XCircle, RefreshCw, ArrowRight, Loader2 } from "lucide-react";
 
-const JOST = "'Jost', system-ui, sans-serif";
 
 function FailedContent() {
     const searchParams = useSearchParams();
@@ -13,7 +12,7 @@ function FailedContent() {
     const source = searchParams.get("source") || "retail";
 
     return (
-        <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" style={{ fontFamily: JOST }}>
+        <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" >
             <div className="bg-white border border-stone-200 max-w-md w-full p-10 text-center">
                 {/* Failed Icon */}
                 <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -61,7 +60,7 @@ function FailedContent() {
 export default function PaymentFailedPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-stone-50 flex items-center justify-center" style={{ fontFamily: JOST }}>
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center" >
                 <Loader2 className="w-8 h-8 animate-spin text-stone-400" />
             </div>
         }>

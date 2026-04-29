@@ -8,8 +8,6 @@ import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function SearchPage() {
     return (
@@ -95,7 +93,7 @@ function SearchContent() {
     const totalResults = products.length + news.length;
 
     return (
-        <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
+        <div className="min-h-screen bg-white" >
             <Header />
 
             <main className="max-w-[1400px] mx-auto px-6 py-16 md:py-24">
@@ -107,7 +105,7 @@ function SearchContent() {
                         <span className="text-neutral-900">Search Results</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl font-light text-neutral-900 mb-6" style={{ fontFamily: CORMORANT }}>
+                    <h1 className="text-4xl md:text-5xl font-light text-neutral-900 mb-6" >
                         Search results for: <span className="italic font-normal">"{query}"</span>
                     </h1>
 
@@ -148,7 +146,7 @@ function SearchContent() {
                         <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Search className="w-6 h-6 text-neutral-300" />
                         </div>
-                        <h2 className="text-3xl font-light text-neutral-900 mb-3" style={{ fontFamily: CORMORANT }}>
+                        <h2 className="text-3xl font-light text-neutral-900 mb-3" >
                             No results found
                         </h2>
                         <p className="text-neutral-500 text-sm font-light mb-10 max-w-md mx-auto">
@@ -192,12 +190,12 @@ function SearchContent() {
                                                     className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
                                                 />
                                                 {product.badge && (
-                                                    <span className="absolute top-3 left-3 px-3 py-1 bg-white shadow-sm border border-neutral-100 text-[10px] font-bold tracking-[0.14em] uppercase text-neutral-900" style={{ fontFamily: JOST }}>
+                                                    <span className="absolute top-3 left-3 px-3 py-1 bg-white shadow-sm border border-neutral-100 text-[10px] font-bold tracking-[0.14em] uppercase text-neutral-900" >
                                                         {product.badge}
                                                     </span>
                                                 )}
                                                 {product.discount > 0 && (
-                                                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-neutral-900 text-white text-[10px] font-medium tracking-[0.12em] uppercase" style={{ fontFamily: JOST, marginTop: product.badge ? '28px' : '0' }}>
+                                                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-neutral-900 text-white text-[10px] font-medium tracking-[0.12em] uppercase" style={{  marginTop: product.badge ? '28px' : '0' }}>
                                                         -{product.discount}%
                                                     </span>
                                                 )}
@@ -205,13 +203,13 @@ function SearchContent() {
                                             </div>
 
                                             <div className="p-4 sm:p-5 flex flex-col items-center text-center flex-1">
-                                                <h3 className="text-lg sm:text-lg font-medium text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-snug" style={{ fontFamily: CORMORANT }}>
+                                                <h3 className="text-lg sm:text-lg font-medium text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-snug" >
                                                     {product.name}
                                                 </h3>
                                                 <div className="flex items-baseline justify-center gap-2 mt-auto">
-                                                    <span className="text-base sm:text-base font-semibold text-neutral-900" style={{ fontFamily: JOST }}>{formatPrice(product.price)}</span>
+                                                    <span className="text-base sm:text-base font-semibold text-neutral-900" >{formatPrice(product.price)}</span>
                                                     {product.originalPrice > product.price && (
-                                                        <span className="text-xs text-neutral-400 line-through" style={{ fontFamily: JOST }}>{formatPrice(product.originalPrice)}</span>
+                                                        <span className="text-xs text-neutral-400 line-through" >{formatPrice(product.originalPrice)}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -260,7 +258,7 @@ function SearchContent() {
                                                 <span>•</span>
                                                 <span>{item.readTime}</span>
                                             </div>
-                                            <h3 className="text-xl font-light text-neutral-900 mb-3 group-hover:text-neutral-500 transition-colors line-clamp-2 leading-tight" style={{ fontFamily: CORMORANT }}>
+                                            <h3 className="text-xl font-light text-neutral-900 mb-3 group-hover:text-neutral-500 transition-colors line-clamp-2 leading-tight" >
                                                 {item.title}
                                             </h3>
                                             <p className="text-sm text-neutral-500 font-light line-clamp-2 leading-relaxed mb-4">

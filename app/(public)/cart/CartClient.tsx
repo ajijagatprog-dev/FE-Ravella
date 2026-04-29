@@ -10,8 +10,6 @@ import {
 import Link from "next/link";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 interface CartItem {
   id: number;
@@ -180,7 +178,7 @@ export default function CartClient() {
   if (!hydrated) return null;
 
   return (
-    <div className="min-h-screen bg-neutral-50" style={{ fontFamily: JOST }}>
+    <div className="min-h-screen bg-neutral-50" >
 
       {/* ── TOP BAR ── */}
       <div className="bg-white border-b border-neutral-200 sticky top-0 z-30">
@@ -190,7 +188,7 @@ export default function CartClient() {
             className="flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-[11px] tracking-[0.18em] uppercase font-medium hidden sm:block" style={{ fontFamily: JOST }}>
+            <span className="text-[11px] tracking-[0.18em] uppercase font-medium hidden sm:block" >
               Lanjut Belanja
             </span>
           </Link>
@@ -199,7 +197,7 @@ export default function CartClient() {
 
           <div className="flex items-center gap-2.5">
             <ShoppingCart className="w-4 h-4 text-neutral-600" />
-            <h1 className="text-base font-medium text-neutral-900 tracking-wide" style={{ fontFamily: JOST }}>
+            <h1 className="text-base font-medium text-neutral-900 tracking-wide" >
               Keranjang
             </h1>
             {cart.length > 0 && (
@@ -217,17 +215,17 @@ export default function CartClient() {
         {cart.length === 0 ? (
           <div className="bg-white border border-neutral-100 p-16 text-center">
             <ShoppingCart className="w-12 h-12 text-neutral-200 mx-auto mb-5" />
-            <h2 className="text-4xl font-light text-neutral-900 mb-2" style={{ fontFamily: CORMORANT }}>
+            <h2 className="text-4xl font-light text-neutral-900 mb-2" >
               Keranjang <em style={{ fontStyle: "italic" }}>Kosong</em>
             </h2>
             <div className="w-8 h-[1px] bg-neutral-200 mx-auto mb-4" />
-            <p className="text-neutral-400 text-sm font-light mb-8" style={{ fontFamily: JOST }}>
+            <p className="text-neutral-400 text-sm font-light mb-8" >
               Yuk, temukan produk yang kamu suka!
             </p>
             <Link
               href="/product"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-neutral-900 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-black transition-colors"
-              style={{ fontFamily: JOST }}
+              
             >
               <Package className="w-4 h-4" />
               Lihat Produk
@@ -248,14 +246,14 @@ export default function CartClient() {
                 >
                   {selectAll && <CheckCircle className="w-3 h-3 text-white" />}
                 </button>
-                <span className="text-[11px] tracking-[0.15em] uppercase text-neutral-600 font-medium" style={{ fontFamily: JOST }}>
+                <span className="text-[11px] tracking-[0.15em] uppercase text-neutral-600 font-medium" >
                   Pilih Semua ({cart.length} produk)
                 </span>
                 {selectedItems.length > 0 && (
                   <button
                     onClick={() => setCart((prev) => prev.filter((item) => !item.selected))}
                     className="ml-auto flex items-center gap-1.5 text-[11px] tracking-[0.12em] uppercase text-neutral-400 hover:text-neutral-900 font-medium transition-colors"
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Hapus Dipilih
@@ -274,7 +272,7 @@ export default function CartClient() {
                     {/* Store Header */}
                     <div className="px-5 py-3.5 border-b border-neutral-100 flex items-center gap-2">
                       <Store className="w-3.5 h-3.5 text-neutral-400" />
-                      <span className="text-[11px] tracking-[0.18em] uppercase text-neutral-700 font-medium" style={{ fontFamily: JOST }}>
+                      <span className="text-[11px] tracking-[0.18em] uppercase text-neutral-700 font-medium" >
                         Ravelle Official Store
                       </span>
                       <ChevronRight className="w-3.5 h-3.5 text-neutral-300 ml-auto" />
@@ -304,7 +302,7 @@ export default function CartClient() {
                             {item.discount && item.discount > 0 && (
                               <span
                                 className="absolute -top-1.5 -right-1.5 bg-neutral-900 text-white text-[10px] font-medium px-1.5 py-0.5 tracking-wide"
-                                style={{ fontFamily: JOST }}
+                                
                               >
                                 -{item.discount}%
                               </span>
@@ -313,23 +311,23 @@ export default function CartClient() {
 
                           {/* Info */}
                           <div className="flex-1 min-w-0">
-                            <p className="font-light text-neutral-900 text-sm leading-snug line-clamp-2 mb-1.5" style={{ fontFamily: JOST }}>
+                            <p className="font-light text-neutral-900 text-sm leading-snug line-clamp-2 mb-1.5" >
                               {item.name}
                             </p>
                             {item.badge && (
                               <span
                                 className="inline-block text-[10px] px-2 py-0.5 bg-white text-neutral-600 border border-neutral-200 tracking-[0.1em] uppercase font-medium mb-2"
-                                style={{ fontFamily: JOST }}
+                                
                               >
                                 {item.badge}
                               </span>
                             )}
                             <div className="flex items-baseline gap-2 mb-3">
-                              <span className="text-base font-medium text-neutral-900" style={{ fontFamily: JOST }}>
+                              <span className="text-base font-medium text-neutral-900" >
                                 {formatPrice(item.price)}
                               </span>
                               {item.originalPrice > item.price && (
-                                <span className="text-xs text-neutral-400 line-through font-light" style={{ fontFamily: JOST }}>
+                                <span className="text-xs text-neutral-400 line-through font-light" >
                                   {formatPrice(item.originalPrice)}
                                 </span>
                               )}
@@ -344,7 +342,7 @@ export default function CartClient() {
                                 >
                                   <Minus className="w-3 h-3" />
                                 </button>
-                                <span className="w-9 text-center text-sm font-medium text-neutral-900" style={{ fontFamily: JOST }}>
+                                <span className="w-9 text-center text-sm font-medium text-neutral-900" >
                                   {item.quantity}
                                 </span>
                                 <button
@@ -358,7 +356,7 @@ export default function CartClient() {
                               <button
                                 onClick={() => removeItem(item.id)}
                                 className="flex items-center gap-1 text-[10px] tracking-[0.12em] uppercase text-neutral-400 hover:text-neutral-900 transition-colors px-2 py-1 hover:bg-neutral-50"
-                                style={{ fontFamily: JOST }}
+                                
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                                 <span className="hidden sm:block">Hapus</span>
@@ -378,7 +376,7 @@ export default function CartClient() {
               <div className="bg-white border border-neutral-100 px-5 py-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Ticket className="w-3.5 h-3.5 text-neutral-400" />
-                  <span className="text-[11px] tracking-[0.18em] uppercase text-neutral-600 font-medium" style={{ fontFamily: JOST }}>
+                  <span className="text-[11px] tracking-[0.18em] uppercase text-neutral-600 font-medium" >
                     Kode Promo
                   </span>
                 </div>
@@ -387,7 +385,7 @@ export default function CartClient() {
                   <div className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200">
                     <div className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="font-medium text-neutral-900 text-[11px] tracking-wide" style={{ fontFamily: JOST }}>
+                      <span className="font-medium text-neutral-900 text-[11px] tracking-wide" >
                         {couponResult.code} — Diskon Rp {couponDiscount.toLocaleString('id-ID')}
                       </span>
                     </div>
@@ -410,14 +408,14 @@ export default function CartClient() {
                           onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(""); }}
                           onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
                           className="w-full pl-9 pr-4 py-3 border border-neutral-200 text-sm text-neutral-900 uppercase font-bold focus:border-neutral-800 focus:outline-none transition-colors placeholder:text-neutral-400 placeholder:font-light"
-                          style={{ fontFamily: JOST }}
+                          
                         />
                       </div>
                       <button
                         onClick={applyCoupon}
                         disabled={validatingCoupon || !couponCode.trim()}
                         className="px-5 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-black transition-colors disabled:bg-neutral-300"
-                        style={{ fontFamily: JOST }}
+                        
                       >
                         {validatingCoupon ? "Cek..." : "Pakai"}
                       </button>
@@ -428,7 +426,7 @@ export default function CartClient() {
 
                 {availableVouchers.length > 0 && !couponResult && (
                   <div className="mt-4 pt-4 border-t border-neutral-100">
-                    <p className="text-[10px] text-neutral-500 mb-2 font-medium tracking-wide uppercase" style={{ fontFamily: JOST }}>
+                    <p className="text-[10px] text-neutral-500 mb-2 font-medium tracking-wide uppercase" >
                       Voucher Tersedia:
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -454,21 +452,21 @@ export default function CartClient() {
               {/* Summary */}
               <div className="bg-white border border-neutral-100 overflow-hidden">
                 <div className="px-5 py-4 border-b border-neutral-100">
-                  <h2 className="text-2xl font-light text-neutral-900" style={{ fontFamily: CORMORANT }}>
+                  <h2 className="text-2xl font-light text-neutral-900" >
                     Ringkasan <em style={{ fontStyle: "italic" }}>Belanja</em>
                   </h2>
-                  <p className="text-[11px] text-neutral-400 font-light tracking-wide mt-0.5" style={{ fontFamily: JOST }}>
+                  <p className="text-[11px] text-neutral-400 font-light tracking-wide mt-0.5" >
                     {selectedItems.length} produk dipilih
                   </p>
                 </div>
 
                 <div className="px-5 py-4 space-y-3">
-                  <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
+                  <div className="flex justify-between text-sm" >
                     <span className="text-neutral-500 font-light">Subtotal</span>
                     <span className="font-medium text-neutral-900">{formatPrice(subtotal)}</span>
                   </div>
                   {couponResult && (
-                    <div className="flex justify-between text-sm" style={{ fontFamily: JOST }}>
+                    <div className="flex justify-between text-sm" >
                       <span className="text-neutral-500 font-light">Diskon Voucher ({couponResult.code})</span>
                       <span className="font-medium text-green-600">-{formatPrice(couponDiscount)}</span>
                     </div>
@@ -477,15 +475,15 @@ export default function CartClient() {
 
                   <div className="pt-3 border-t border-neutral-100">
                     <div className="flex justify-between items-center">
-                      <span className="text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium" style={{ fontFamily: JOST }}>
+                      <span className="text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium" >
                         Total Belanja
                       </span>
-                      <span className="text-xl font-light text-neutral-900" style={{ fontFamily: CORMORANT }}>
+                      <span className="text-xl font-light text-neutral-900" >
                         {formatPrice(grandTotal)}
                       </span>
                     </div>
                     {couponResult && (
-                      <p className="text-right text-[11px] text-green-600 font-medium mt-1 tracking-wide" style={{ fontFamily: JOST }}>
+                      <p className="text-right text-[11px] text-green-600 font-medium mt-1 tracking-wide" >
                         Hemat {formatPrice(couponDiscount)}
                       </p>
                     )}
@@ -500,7 +498,7 @@ export default function CartClient() {
                       ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
                       : "bg-neutral-900 text-white hover:bg-black"
                       }`}
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     {showCheckoutAnim ? (
                       <>
@@ -525,7 +523,7 @@ export default function CartClient() {
                   return (
                     <div key={i} className="flex items-center gap-3">
                       <Icon className="w-4 h-4 text-neutral-400 flex-shrink-0" />
-                      <span className="text-[11px] text-neutral-500 font-light tracking-wide" style={{ fontFamily: JOST }}>
+                      <span className="text-[11px] text-neutral-500 font-light tracking-wide" >
                         {item.text}
                       </span>
                     </div>
@@ -540,13 +538,13 @@ export default function CartClient() {
 
       {/* ── AUTH REQUIRED MODAL ── */}
       {showAuthOverlay && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4 transition-all animate-in fade-in duration-300" style={{ fontFamily: JOST }}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4 transition-all animate-in fade-in duration-300" >
           <div className="bg-white w-full max-w-sm rounded-none border border-neutral-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="p-8 text-center flex flex-col items-center">
               <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
                 <Lock className="w-8 h-8 text-neutral-800" />
               </div>
-              <h3 className="text-xl font-light text-neutral-900 mb-3" style={{ fontFamily: CORMORANT }}>
+              <h3 className="text-xl font-light text-neutral-900 mb-3" >
                 Login Diperlukan
               </h3>
               <p className="text-sm text-neutral-500 font-light mb-8 leading-relaxed">

@@ -29,8 +29,6 @@ import Footer from "../../HomePage/components/Footer";
 import { products as fallbackProducts } from "./products";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ProductPage() {
   return (
@@ -282,7 +280,7 @@ function ProductPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
+    <div className="min-h-screen bg-white" >
       <Header />
 
       {/* ── Toast ── */}
@@ -291,7 +289,7 @@ function ProductPageContent() {
       >
         <div
           className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm"
-          style={{ fontFamily: JOST }}
+          
         >
           <ShoppingCart className="w-4 h-4 text-neutral-600 flex-shrink-0" />
           <div className="flex-1 min-w-0">
@@ -332,7 +330,7 @@ function ProductPageContent() {
               <div className="w-8 h-[1px] bg-white/60" />
               <span
                 className="text-white/80 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]"
-                style={{ fontFamily: JOST }}
+                
               >
                 Ravelle Shop
               </span>
@@ -359,7 +357,7 @@ function ProductPageContent() {
                           break-words
                         "
               style={{
-                fontFamily: CORMORANT,
+                
                 letterSpacing: "-0.02em",
               }}
             >
@@ -381,7 +379,7 @@ function ProductPageContent() {
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 1 }}
               className="text-white/70 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-8"
-              style={{ fontFamily: JOST }}
+              
             >
               Kurasi peralatan rumah tangga eksklusif yang memadukan
               fungsionalitas modern dengan estetika abadi untuk hunian impian
@@ -427,7 +425,7 @@ function ProductPageContent() {
         >
           <div
             className="flex items-center gap-4 w-full max-w-2xl px-8 py-5 rounded-full border border-neutral-200 bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] focus-within:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.15)] focus-within:border-neutral-900 transition-all duration-500"
-            style={{ fontFamily: JOST }}
+            
           >
             <Search className="w-5 h-5 text-neutral-400 flex-shrink-0" />
             <input
@@ -436,7 +434,7 @@ function ProductPageContent() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 bg-transparent text-base text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
-              style={{ fontFamily: JOST }}
+              
             />
             {searchQuery && (
               <motion.button
@@ -462,7 +460,7 @@ function ProductPageContent() {
             <div className="w-6 h-[1px] bg-neutral-900" />
             <span
               className="text-neutral-900 font-bold text-[10px] uppercase tracking-[0.3em]"
-              style={{ fontFamily: JOST }}
+              
             >
               Categories Products
             </span>
@@ -483,7 +481,7 @@ function ProductPageContent() {
                         ? "text-white border-neutral-900"
                         : "text-neutral-500 bg-neutral-50 border-neutral-100 hover:bg-neutral-100 hover:border-neutral-200"
                     }`}
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     {activeCategory === cat.name && (
                       <motion.div
@@ -520,7 +518,7 @@ function ProductPageContent() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8 py-4 border-y border-neutral-100">
           <span
             className="text-sm text-neutral-500 font-light"
-            style={{ fontFamily: JOST }}
+            
           >
             <span className="font-medium text-neutral-900">
               {filteredProducts.length}
@@ -551,7 +549,7 @@ function ProductPageContent() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="appearance-none pl-4 pr-9 py-2 border border-neutral-200 text-[11px] tracking-[0.12em] uppercase text-neutral-700 hover:border-neutral-400 focus:outline-none cursor-pointer bg-white"
-                style={{ fontFamily: JOST }}
+                
               >
                 <option value="featured">Featured</option>
                 <option value="newest">Newest</option>
@@ -577,13 +575,13 @@ function ProductPageContent() {
               <Package className="w-16 h-16 text-neutral-200 mx-auto mb-6 stroke-[1]" />
               <h3
                 className="text-4xl font-light text-neutral-900 mb-4"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 No Products Found
               </h3>
               <p
                 className="text-neutral-500 text-sm font-light mb-10"
-                style={{ fontFamily: JOST }}
+                
               >
                 Try adjusting your filters or search query
               </p>
@@ -594,7 +592,7 @@ function ProductPageContent() {
                   setPriceRange([0, 5000000]);
                 }}
                 className="px-12 py-4 border border-neutral-900 text-neutral-900 text-[10px] tracking-[0.25em] uppercase font-bold hover:bg-neutral-900 hover:text-white transition-all duration-300"
-                style={{ fontFamily: JOST }}
+                
               >
                 Reset Filters
               </button>
@@ -657,7 +655,7 @@ function ProductPageContent() {
                       {product.badge && (
                         <span
                           className="px-3 py-1.5 bg-white shadow-sm text-neutral-900 text-[9px] font-black tracking-[0.2em] uppercase"
-                          style={{ fontFamily: JOST }}
+                          
                         >
                           {product.badge}
                         </span>
@@ -665,7 +663,7 @@ function ProductPageContent() {
                       {product.active_promotion?.type === "flash_sale" && (
                         <span
                           className="px-3 py-1.5 bg-amber-500 text-white text-[9px] tracking-[0.2em] uppercase font-black shadow-sm flex items-center gap-1.5"
-                          style={{ fontFamily: JOST }}
+                          
                         >
                           <Zap className="w-3 h-3 fill-white" /> Flash Sale
                         </span>
@@ -673,7 +671,7 @@ function ProductPageContent() {
                       {product.discount > 0 && (
                         <span
                           className="px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-black tracking-[0.2em] uppercase"
-                          style={{ fontFamily: JOST }}
+                          
                         >
                           -{Math.round(product.discount)}%
                         </span>
@@ -706,7 +704,7 @@ function ProductPageContent() {
                         onClick={() => handleAddToCart(product)}
                         disabled={!product.inStock}
                         className="w-full py-4 bg-neutral-900 text-white text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-colors flex items-center justify-center gap-3 disabled:bg-neutral-300 disabled:cursor-not-allowed"
-                        style={{ fontFamily: JOST }}
+                        
                       >
                         <ShoppingCart className="w-4 h-4" />
                         {product.inStock ? "Add to Cart" : "Out of Stock"}
@@ -779,7 +777,7 @@ function ProductPageContent() {
                     <Link href={`/product/${product.id}`}>
                       <h3
                         className="text-xl sm:text-2xl font-medium text-neutral-900 mb-3 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight"
-                        style={{ fontFamily: CORMORANT }}
+                        
                       >
                         {product.name}
                       </h3>
@@ -790,14 +788,14 @@ function ProductPageContent() {
                       <div className="flex items-baseline gap-3 mb-4">
                         <span
                           className="text-xl font-bold text-neutral-900"
-                          style={{ fontFamily: JOST }}
+                          
                         >
                           {formatPrice(product.price)}
                         </span>
                         {product.originalPrice > product.price && (
                           <span
                             className="text-sm text-neutral-400 line-through font-light"
-                            style={{ fontFamily: JOST }}
+                            
                           >
                             {formatPrice(product.originalPrice)}
                           </span>
@@ -839,7 +837,7 @@ function ProductPageContent() {
             <button
               onClick={() => setDisplayLimit((prev) => prev + 12)}
               className="group relative px-16 py-5 bg-white text-neutral-900 text-[10px] tracking-[0.3em] uppercase font-bold border border-neutral-200 overflow-hidden transition-all duration-500 hover:border-neutral-900 shadow-sm hover:shadow-xl"
-              style={{ fontFamily: JOST }}
+              
             >
               <span className="relative z-10">Load More Products</span>
               <motion.div className="absolute inset-0 bg-neutral-900 -z-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
@@ -856,7 +854,7 @@ function ProductPageContent() {
         {showModal && selectedProduct && (
           <div
             className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-8"
-            style={{ fontFamily: JOST }}
+            
           >
             <motion.div
               initial={{ opacity: 0 }}
@@ -925,7 +923,7 @@ function ProductPageContent() {
                   </div>
                   <h2
                     className="text-3xl lg:text-4xl font-light text-neutral-900 leading-tight mb-6"
-                    style={{ fontFamily: CORMORANT }}
+                    
                   >
                     {selectedProduct.name}
                   </h2>

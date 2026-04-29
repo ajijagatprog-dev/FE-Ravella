@@ -20,8 +20,6 @@ import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
@@ -68,7 +66,7 @@ export default function ContactPage() {
   const inputClass = "w-full px-4 py-3.5 bg-white border border-neutral-200 focus:border-neutral-800 focus:outline-none transition-colors text-neutral-900 placeholder:text-neutral-400 text-sm font-light";
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
+    <div className="min-h-screen bg-white" >
       <Header />
 
       {/* ── HERO ── */}
@@ -82,12 +80,12 @@ export default function ContactPage() {
 
             <div className="inline-flex items-center gap-2.5 mb-5">
               <div className="w-5 h-[1px] bg-white/50" />
-              <span className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]" style={{ fontFamily: JOST }}>
+              <span className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]" >
                 Get in Touch
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-4 leading-[1.05]" style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-4 leading-[1.05]" style={{  letterSpacing: "-0.01em" }}>
               Contact{" "}
               <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
                 Ravelle
@@ -96,7 +94,7 @@ export default function ContactPage() {
 
             <div className="w-10 h-[1px] bg-white/30 mb-5" />
 
-            <p className="text-white/70 text-sm sm:text-base font-light leading-relaxed max-w-lg" style={{ fontFamily: JOST }}>
+            <p className="text-white/70 text-sm sm:text-base font-light leading-relaxed max-w-lg" >
               We're here to help! Reach out to us for any questions, support, or feedback.
             </p>
           </div>
@@ -127,13 +125,13 @@ export default function ContactPage() {
                   <div className="w-10 h-10 flex items-center justify-center border border-neutral-200 mb-5 group-hover:bg-neutral-900 group-hover:border-neutral-900 transition-all duration-300">
                     <Icon className="w-4 h-4 text-neutral-600 group-hover:text-white transition-colors" />
                   </div>
-                  <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-2" style={{ fontFamily: JOST }}>
+                  <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-2" >
                     {item.title}
                   </p>
-                  <p className="text-base font-medium text-neutral-900 mb-1" style={{ fontFamily: JOST }}>
+                  <p className="text-base font-medium text-neutral-900 mb-1" >
                     {item.info}
                   </p>
-                  <p className="text-sm text-neutral-400 font-light" style={{ fontFamily: JOST }}>
+                  <p className="text-sm text-neutral-400 font-light" >
                     {item.subInfo}
                   </p>
                 </a>
@@ -153,25 +151,25 @@ export default function ContactPage() {
               <div>
                 <div className="inline-flex items-center gap-2.5 mb-5">
                   <div className="w-5 h-[1px] bg-neutral-400" />
-                  <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]" style={{ fontFamily: JOST }}>
+                  <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]" >
                     Send Message
                   </span>
                 </div>
-                <h2 className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3 leading-[1.05]" style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}>
+                <h2 className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3 leading-[1.05]" style={{  letterSpacing: "-0.01em" }}>
                   Let's{" "}
                   <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
                     Connect
                   </em>
                 </h2>
                 <div className="w-8 h-[1px] bg-neutral-200 mb-4" />
-                <p className="text-neutral-500 text-sm font-light leading-relaxed" style={{ fontFamily: JOST }}>
+                <p className="text-neutral-500 text-sm font-light leading-relaxed" >
                   Fill out the form below and our team will get back to you within 24 hours.
                 </p>
               </div>
 
               {/* Success Message */}
               {submitSuccess && (
-                <div className="flex items-center gap-3 p-4 border border-neutral-200 bg-neutral-50" style={{ fontFamily: JOST }}>
+                <div className="flex items-center gap-3 p-4 border border-neutral-200 bg-neutral-50" >
                   <CheckCircle className="w-5 h-5 text-neutral-700 flex-shrink-0" />
                   <div>
                     <p className="font-medium text-neutral-900 text-sm">Pesan Terkirim</p>
@@ -184,43 +182,43 @@ export default function ContactPage() {
 
                 {/* Name */}
                 <div>
-                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" style={{ fontFamily: JOST }}>
+                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
                     Full Name *
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300" />
-                    <input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="Your full name" className={`${inputClass} pl-11`} style={{ fontFamily: JOST }} />
+                    <input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="Your full name" className={`${inputClass} pl-11`}  />
                   </div>
                 </div>
 
                 {/* Email & Phone */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" style={{ fontFamily: JOST }}>
+                    <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
                       Email *
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300" />
-                      <input type="email" name="email" value={formData.email} onChange={handleInputChange} required placeholder="your@email.com" className={`${inputClass} pl-11`} style={{ fontFamily: JOST }} />
+                      <input type="email" name="email" value={formData.email} onChange={handleInputChange} required placeholder="your@email.com" className={`${inputClass} pl-11`}  />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" style={{ fontFamily: JOST }}>
+                    <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
                       Phone
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300" />
-                      <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+62 xxx xxxx xxxx" className={`${inputClass} pl-11`} style={{ fontFamily: JOST }} />
+                      <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+62 xxx xxxx xxxx" className={`${inputClass} pl-11`}  />
                     </div>
                   </div>
                 </div>
 
                 {/* Subject */}
                 <div>
-                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" style={{ fontFamily: JOST }}>
+                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
                     Subject *
                   </label>
-                  <select name="subject" value={formData.subject} onChange={handleInputChange} required className={inputClass} style={{ fontFamily: JOST }}>
+                  <select name="subject" value={formData.subject} onChange={handleInputChange} required className={inputClass} >
                     <option value="">Select a subject</option>
                     <option value="product">Product Inquiry</option>
                     <option value="support">Technical Support</option>
@@ -233,10 +231,10 @@ export default function ContactPage() {
 
                 {/* Message */}
                 <div>
-                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" style={{ fontFamily: JOST }}>
+                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
                     Message *
                   </label>
-                  <textarea name="message" value={formData.message} onChange={handleInputChange} required rows={6} placeholder="Tell us how we can help you..." className={inputClass + " resize-none"} style={{ fontFamily: JOST }} />
+                  <textarea name="message" value={formData.message} onChange={handleInputChange} required rows={6} placeholder="Tell us how we can help you..." className={inputClass + " resize-none"}  />
                 </div>
 
                 {/* Submit */}
@@ -244,7 +242,7 @@ export default function ContactPage() {
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full py-4 bg-neutral-900 text-white text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 group"
-                  style={{ fontFamily: JOST }}
+                  
                 >
                   {isSubmitting ? (
                     <>
@@ -280,8 +278,8 @@ export default function ContactPage() {
                   <div className="flex items-center gap-3">
                     <MapPin className="w-4 h-4 text-neutral-600 flex-shrink-0" />
                     <div>
-                      <p className="text-xs font-medium text-neutral-900 tracking-wide" style={{ fontFamily: JOST }}>Visit Our Office</p>
-                      <p className="text-[11px] text-neutral-400 font-light" style={{ fontFamily: JOST }}>Jakarta Pusat</p>
+                      <p className="text-xs font-medium text-neutral-900 tracking-wide" >Visit Our Office</p>
+                      <p className="text-[11px] text-neutral-400 font-light" >Jakarta Pusat</p>
                     </div>
                   </div>
                 </div>
@@ -289,14 +287,14 @@ export default function ContactPage() {
 
               {/* Social Media */}
               <div className="bg-neutral-900 p-7">
-                <p className="text-[11px] tracking-[0.22em] uppercase text-white/40 font-medium mb-1" style={{ fontFamily: JOST }}>
+                <p className="text-[11px] tracking-[0.22em] uppercase text-white/40 font-medium mb-1" >
                   Follow Us
                 </p>
-                <h3 className="text-3xl font-light text-white mb-1" style={{ fontFamily: CORMORANT }}>
+                <h3 className="text-3xl font-light text-white mb-1" >
                   Stay <em style={{ fontStyle: "italic" }}>Connected</em>
                 </h3>
                 <div className="w-6 h-[1px] bg-white/20 mb-5" />
-                <p className="text-white/45 text-sm font-light mb-6" style={{ fontFamily: JOST }}>
+                <p className="text-white/45 text-sm font-light mb-6" >
                   Get the latest updates and tips.
                 </p>
 
@@ -313,8 +311,8 @@ export default function ContactPage() {
                           <Icon className="w-3.5 h-3.5 text-white/70 group-hover:text-neutral-900 transition-colors" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[11px] tracking-[0.12em] uppercase text-white font-medium" style={{ fontFamily: JOST }}>{social.name}</p>
-                          <p className="text-[10px] text-white/40 font-light truncate" style={{ fontFamily: JOST }}>{social.handle}</p>
+                          <p className="text-[11px] tracking-[0.12em] uppercase text-white font-medium" >{social.name}</p>
+                          <p className="text-[10px] text-white/40 font-light truncate" >{social.handle}</p>
                         </div>
                       </a>
                     );
@@ -330,12 +328,12 @@ export default function ContactPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2.5 mb-4">
               <div className="w-5 h-[1px] bg-neutral-400" />
-              <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]" style={{ fontFamily: JOST }}>
+              <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]" >
                 FAQ
               </span>
               <div className="w-5 h-[1px] bg-neutral-400" />
             </div>
-            <h2 className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3" style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}>
+            <h2 className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3" style={{  letterSpacing: "-0.01em" }}>
               Common{" "}
               <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
                 Questions
@@ -344,7 +342,7 @@ export default function ContactPage() {
             <div className="flex justify-center mb-4">
               <div className="w-8 h-[1px] bg-neutral-200" />
             </div>
-            <p className="text-neutral-500 text-sm font-light max-w-xl mx-auto" style={{ fontFamily: JOST }}>
+            <p className="text-neutral-500 text-sm font-light max-w-xl mx-auto" >
               Find answers to the most frequently asked questions
             </p>
           </div>
@@ -356,7 +354,7 @@ export default function ContactPage() {
                 className="group border border-neutral-100 hover:border-neutral-300 transition-colors overflow-hidden"
               >
                 <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none">
-                  <h3 className="text-base font-medium text-neutral-900 pr-6" style={{ fontFamily: JOST }}>
+                  <h3 className="text-base font-medium text-neutral-900 pr-6" >
                     {faq.question}
                   </h3>
                   <div className="w-7 h-7 flex items-center justify-center border border-neutral-200 flex-shrink-0 group-open:bg-neutral-900 group-open:border-neutral-900 transition-all">
@@ -364,7 +362,7 @@ export default function ContactPage() {
                   </div>
                 </summary>
                 <div className="px-6 pb-5 border-t border-neutral-100">
-                  <p className="text-neutral-500 text-sm font-light leading-relaxed pt-4" style={{ fontFamily: JOST }}>
+                  <p className="text-neutral-500 text-sm font-light leading-relaxed pt-4" >
                     {faq.answer}
                   </p>
                 </div>

@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
 
 const emptyForm = {
   sku: "",
@@ -202,7 +201,7 @@ export default function FlashSalePage() {
   };
 
   return (
-    <div className="p-6" style={{ fontFamily: JOST }}>
+    <div className="p-6" >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
@@ -358,7 +357,7 @@ export default function FlashSalePage() {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div
             className="bg-white w-full max-w-lg shadow-2xl"
-            style={{ fontFamily: JOST }}
+            
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-stone-100">
               <h2 className="text-base font-bold text-stone-900 uppercase tracking-wide">
@@ -543,7 +542,7 @@ export default function FlashSalePage() {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div
             className="bg-white w-full max-w-lg shadow-2xl"
-            style={{ fontFamily: JOST }}
+            
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-stone-100">
               <h2 className="text-base font-bold text-stone-900 uppercase tracking-wide">
@@ -640,7 +639,7 @@ export default function FlashSalePage() {
         <div className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div 
             className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-stone-100 animate-in zoom-in-95 duration-200"
-            style={{ fontFamily: JOST }}
+            
           >
             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-5">
               <Trash2 className="w-8 h-8 text-red-500" />

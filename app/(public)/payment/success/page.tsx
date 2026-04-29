@@ -6,7 +6,6 @@ import Link from "next/link";
 import { CheckCircle2, Loader2, Package, ArrowRight } from "lucide-react";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
 
 function SuccessContent() {
     const searchParams = useSearchParams();
@@ -49,7 +48,7 @@ function SuccessContent() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-stone-50 flex items-center justify-center" style={{ fontFamily: JOST }}>
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center" >
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="w-8 h-8 animate-spin text-stone-400" />
                     <p className="text-stone-500">Memverifikasi pembayaran...</p>
@@ -59,7 +58,7 @@ function SuccessContent() {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" style={{ fontFamily: JOST }}>
+        <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" >
             <div className="bg-white border border-stone-200 max-w-md w-full p-10 text-center">
                 {/* Success Icon */}
                 <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -120,7 +119,7 @@ function SuccessContent() {
 export default function PaymentSuccessPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-stone-50 flex items-center justify-center" style={{ fontFamily: JOST }}>
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center" >
                 <Loader2 className="w-8 h-8 animate-spin text-stone-400" />
             </div>
         }>

@@ -27,8 +27,8 @@ import api from "@/lib/axios";
 import { downloadFile } from "@/lib/download";
 import toast from "react-hot-toast";
 import {
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -589,50 +589,71 @@ export default function ReportsPage() {
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart
+              <AreaChart
                 data={tableData.slice(0, 10).map((d: any) => ({
                   name: d.human_readable_path || d.page_path,
                   views: parseInt(d.views || 0, 10),
                 }))}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
               >
+                <defs>
+                  <linearGradient
+                    id="colorViewsRep"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.01} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
-                  stroke="#E5E7EB"
+                  stroke="#F3F4F6"
                 />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 11, fill: "#6B7280" }}
-                  axisLine={{ stroke: "#E5E7EB" }}
+                  tick={{ fontSize: 11, fill: "#9CA3AF" }}
+                  axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: "#6B7280" }}
+                  tick={{ fontSize: 11, fill: "#9CA3AF" }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <RechartsTooltip
-                  cursor={{ fill: "#F3F4F6" }}
                   contentStyle={{
-                    borderRadius: "8px",
-                    border: "1px solid #E5E7EB",
-                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    borderRadius: "12px",
+                    border: "none",
+                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                    padding: "8px 12px",
                   }}
                   labelStyle={{
                     fontWeight: 600,
                     color: "#374151",
+                    fontSize: "11px",
                     marginBottom: "4px",
                   }}
+                  itemStyle={{
+                    fontSize: "12px",
+                    color: "#10B981",
+                    fontWeight: 600,
+                  }}
                 />
-                <Bar
+                <Area
+                  type="monotone"
                   dataKey="views"
-                  name="Tayangan Halaman"
-                  fill="#3B82F6"
-                  radius={[4, 4, 0, 0]}
-                  barSize={40}
+                  name="Tayangan"
+                  stroke="#10B981"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorViewsRep)"
+                  animationDuration={1500}
                 />
-              </BarChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
