@@ -23,8 +23,6 @@ interface Props {
   distribution: Record<string, number>;
 }
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function ProductReviewsSection({ productId, calculatedRating, totalReviews, distribution }: Props) {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -69,7 +67,7 @@ export default function ProductReviewsSection({ productId, calculatedRating, tot
   };
 
   return (
-    <section className="py-20 bg-white border-t border-stone-100" style={{ fontFamily: JOST }}>
+    <section className="py-20 bg-white border-t border-stone-100" >
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
         <div className="inline-flex items-center gap-2.5 mb-10">
           <div className="w-4 h-[1px] bg-stone-300" />
@@ -81,7 +79,7 @@ export default function ProductReviewsSection({ productId, calculatedRating, tot
           {/* Left: Summary & Stats */}
           <div className="lg:col-span-4 space-y-8">
             <div className="text-center lg:text-left p-8 bg-stone-50 rounded-3xl space-y-4">
-              <h3 className="text-5xl font-black text-stone-900 tracking-tight" style={{ fontFamily: CORMORANT }}>
+              <h3 className="text-5xl font-black text-stone-900 tracking-tight" >
                 {calculatedRating.toFixed(1)}
               </h3>
               <div className="flex justify-center lg:justify-start">

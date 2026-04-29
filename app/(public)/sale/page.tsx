@@ -22,8 +22,6 @@ import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function SalePage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -127,7 +125,7 @@ export default function SalePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
+    <div className="min-h-screen bg-white" >
       <Header />
 
       {/* ── Toast ── */}
@@ -189,7 +187,7 @@ export default function SalePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]"
-              style={{ fontFamily: CORMORANT }}
+              
             >
               Pesta Diskon <br />
               <span className="font-semibold italic text-amber-500">Harga</span>
@@ -215,7 +213,7 @@ export default function SalePage() {
               <div className="flex flex-col">
                 <span
                   className="text-white font-bold text-2xl"
-                  style={{ fontFamily: JOST }}
+                  
                 >
                   {products.length}+
                 </span>
@@ -227,7 +225,7 @@ export default function SalePage() {
               <div className="flex flex-col">
                 <span
                   className="text-white font-bold text-2xl"
-                  style={{ fontFamily: JOST }}
+                  
                 >
                   Up to 70%
                 </span>
@@ -253,7 +251,7 @@ export default function SalePage() {
             </div>
             <h2
               className="text-4xl sm:text-5xl font-light text-neutral-900"
-              style={{ fontFamily: CORMORANT }}
+              
             >
               Kejutan Mewah,{" "}
               <span className="italic font-medium">Harga Ramah</span>
@@ -285,7 +283,7 @@ export default function SalePage() {
             <ShoppingBag className="w-16 h-16 text-neutral-100 mx-auto mb-6 stroke-[1]" />
             <h3
               className="text-3xl font-light text-neutral-900 mb-4"
-              style={{ fontFamily: CORMORANT }}
+              
             >
               Belum Ada Promo Aktif
             </h3>
@@ -397,7 +395,7 @@ export default function SalePage() {
                   <Link href={`/product/${product.id}`} className="block mb-4">
                     <h3
                       className="text-xl sm:text-2xl font-medium text-neutral-900 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight"
-                      style={{ fontFamily: CORMORANT }}
+                      
                     >
                       {product.name}
                     </h3>

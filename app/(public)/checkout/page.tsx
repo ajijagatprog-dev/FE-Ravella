@@ -10,7 +10,6 @@ import Link from "next/link";
 import api from "@/lib/axios";
 import toast, { Toaster } from "react-hot-toast";
 
-const JOST = "'Jost', system-ui, sans-serif";
 
 const COURIERS = [
     { value: "jnt",      label: "J&T Express" },
@@ -226,7 +225,7 @@ export default function CheckoutPage() {
 
     if (authError) {
         return (
-            <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" style={{ fontFamily: JOST }}>
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" >
                 <div className="bg-white p-10 max-w-sm w-full border border-stone-200 text-center shadow-lg">
                     <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Lock className="w-8 h-8 text-stone-800" />
@@ -242,7 +241,7 @@ export default function CheckoutPage() {
 
     if (cart.length === 0) {
         return (
-            <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" style={{ fontFamily: JOST }}>
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6" >
                 <div className="bg-white p-10 max-w-sm w-full border border-stone-100 text-center shadow-lg">
                     <Package className="w-16 h-16 text-stone-300 mx-auto mb-4" />
                     <h2 className="text-xl font-bold text-stone-800 mb-2">Keranjang Kosong</h2>
@@ -345,7 +344,7 @@ export default function CheckoutPage() {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 py-10" style={{ fontFamily: JOST }}>
+        <div className="min-h-screen bg-stone-50 py-10" >
             <Toaster position="top-center" />
             <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col lg:flex-row gap-8">
 

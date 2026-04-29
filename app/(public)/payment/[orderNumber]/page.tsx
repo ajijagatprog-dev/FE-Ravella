@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { CreditCard, CheckCircle2, XCircle, ArrowLeft, Loader2 } from "lucide-react";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
 
 export default function PaymentSimulationPage({ params }: { params: { orderNumber: string } }) {
     const router = useRouter();
@@ -33,7 +32,7 @@ export default function PaymentSimulationPage({ params }: { params: { orderNumbe
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 py-16 flex items-center justify-center p-4" style={{ fontFamily: JOST }}>
+        <div className="min-h-screen bg-stone-50 py-16 flex items-center justify-center p-4" >
             <div className="bg-white max-w-md w-full p-8 border border-stone-200 text-center shadow-lg">
 
                 {status === "idle" && (

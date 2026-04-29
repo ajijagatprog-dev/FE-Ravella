@@ -26,8 +26,6 @@ interface VideoFeedItemProps {
   isActive: boolean;
 }
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function VideoFeedItem({
   product,
@@ -149,7 +147,7 @@ export default function VideoFeedItem({
           </div>
           <span
             className="text-[10px] text-white font-medium"
-            style={{ fontFamily: JOST }}
+            
           >
             1.2k
           </span>
@@ -161,7 +159,7 @@ export default function VideoFeedItem({
           </div>
           <span
             className="text-[10px] text-white font-medium"
-            style={{ fontFamily: JOST }}
+            
           >
             Share
           </span>
@@ -195,13 +193,13 @@ export default function VideoFeedItem({
           >
             <h3
               className="text-lg sm:text-2xl font-semibold text-white drop-shadow-lg group-hover:text-neutral-300 transition-colors"
-              style={{ fontFamily: CORMORANT }}
+              
             >
               {product.name}
             </h3>
             <p
               className="text-xs sm:text-sm text-white/80 line-clamp-2 mb-3 sm:mb-4 font-light leading-relaxed"
-              style={{ fontFamily: JOST }}
+              
             >
               {product.description}
             </p>
@@ -222,20 +220,20 @@ export default function VideoFeedItem({
             <div className="flex-1 min-w-0">
               <p
                 className="text-[8px] sm:text-[10px] text-white/60 font-bold uppercase tracking-wider mb-0.5 sm:mb-1"
-                style={{ fontFamily: JOST }}
+                
               >
                 Featured Product
               </p>
               <p
                 className="text-white font-bold text-xs sm:text-sm mb-0.5 sm:mb-1 truncate"
-                style={{ fontFamily: JOST }}
+                
               >
                 {formatPrice(product.price)}
               </p>
               <Link
                 href={`/product/${product.id}`}
                 className="inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-white hover:text-neutral-300 transition-colors"
-                style={{ fontFamily: JOST }}
+                
               >
                 Buy Now <ChevronRight className="w-3 h-3" />
               </Link>
@@ -251,7 +249,7 @@ export default function VideoFeedItem({
         </div>
         <span
           className="text-[10px] text-white/40 tracking-widest uppercase font-medium"
-          style={{ fontFamily: JOST }}
+          
         >
           Original Sound - Ravelle Official
         </span>

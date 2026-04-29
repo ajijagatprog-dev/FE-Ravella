@@ -6,8 +6,6 @@ import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 import { motion } from "framer-motion";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 interface Product {
   id: number;
@@ -102,7 +100,7 @@ export default function NewProducts() {
   return (
     <section
       className="bg-white px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16 md:py-20"
-      style={{ fontFamily: JOST }}
+      
     >
       {/* Toast */}
       <div
@@ -113,7 +111,7 @@ export default function NewProducts() {
       >
         <div
           className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm"
-          style={{ fontFamily: JOST }}
+          
         >
           <ShoppingCart className="w-4 h-4 text-neutral-600 flex-shrink-0" />
           <div className="flex-1 min-w-0">
@@ -144,7 +142,7 @@ export default function NewProducts() {
               <div className="w-5 h-[1px] bg-neutral-400" />
               <span
                 className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
-                style={{ fontFamily: JOST }}
+                
               >
                 Koleksi Terbaru
               </span>
@@ -153,12 +151,12 @@ export default function NewProducts() {
             {/* Heading — Cormorant Garamond, brand-matched serif */}
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-light leading-[1.05] text-neutral-900 mb-3"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              style={{  letterSpacing: "-0.01em" }}
             >
               New{" "}
               <em
                 className="font-semibold not-italic"
-                style={{ fontFamily: CORMORANT, fontStyle: "italic" }}
+                style={{  fontStyle: "italic" }}
               >
                 Products
               </em>
@@ -166,7 +164,7 @@ export default function NewProducts() {
 
             <p
               className="text-neutral-500 text-sm sm:text-base font-light tracking-wide"
-              style={{ fontFamily: JOST }}
+              
             >
               Produk terbaru yang baru saja kami tambahkan ke katalog
             </p>
@@ -176,7 +174,7 @@ export default function NewProducts() {
           <Link
             href="/product"
             className="group flex items-center gap-2.5 px-7 py-3 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-[11px] tracking-[0.2em] uppercase font-medium"
-            style={{ fontFamily: JOST }}
+            
           >
             <span>Lihat Semua</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -228,7 +226,7 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
   return (
     <div
       className="min-w-[260px] sm:min-w-[300px] lg:min-w-0 snap-start group"
-      style={{ fontFamily: JOST }}
+      
     >
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-6 flex items-center justify-center">
@@ -238,7 +236,7 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
           <span
             className={`inline-block px-3 py-1 text-[10px] font-medium tracking-[0.15em] uppercase shadow-sm ${badgeStyle[product.badge] ?? "bg-neutral-900 text-white"
               }`}
-            style={{ fontFamily: JOST }}
+            
           >
             {product.badge}
           </span>
@@ -261,7 +259,7 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
             onAddToCart(product);
           }}
           className="absolute bottom-4 left-4 right-4 bg-white py-3 font-medium text-neutral-900 text-[11px] tracking-[0.2em] uppercase translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 hover:bg-neutral-100"
-          style={{ fontFamily: JOST }}
+          
         >
           <ShoppingBag className="w-3.5 h-3.5" />
           Tambah ke Keranjang
@@ -273,7 +271,7 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
         {/* Category */}
         <p
           className="text-neutral-400 text-[10px] font-medium mb-1.5 uppercase tracking-[0.18em]"
-          style={{ fontFamily: JOST }}
+          
         >
           {product.category}
         </p>
@@ -281,7 +279,7 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
         {/* Product Title — Cormorant Garamond */}
         <h3
           className="font-light text-xl sm:text-2xl text-neutral-900 mb-2 line-clamp-1 group-hover:text-neutral-600 transition-colors leading-tight"
-          style={{ fontFamily: CORMORANT, letterSpacing: "0" }}
+          style={{  letterSpacing: "0" }}
         >
           {product.title}
         </h3>
@@ -290,7 +288,7 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
         <div className="flex items-center justify-between">
           <p
             className="font-medium text-base sm:text-lg text-neutral-900 tracking-wide"
-            style={{ fontFamily: JOST }}
+            
           >
             {product.price}
           </p>
@@ -300,7 +298,7 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
             </svg>
             <span
               className="text-xs font-medium text-neutral-500 tracking-wide"
-              style={{ fontFamily: JOST }}
+              
             >
               {product.rating}
             </span>

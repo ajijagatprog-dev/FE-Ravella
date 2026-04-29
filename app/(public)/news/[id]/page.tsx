@@ -25,8 +25,6 @@ import Footer from "../../../HomePage/components/Footer";
 import api from "@/lib/axios";
 import { type PublicArticle } from "../page";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function NewsDetail() {
   const { id } = useParams<{ id: string }>();
@@ -148,12 +146,12 @@ export default function NewsDetail() {
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
+      <div className="min-h-screen bg-white" >
         <Header />
         <div className="flex flex-col items-center justify-center py-40 px-6">
           <h1
             className="text-6xl font-light text-neutral-900 mb-6"
-            style={{ fontFamily: CORMORANT }}
+            
           >
             Story Not Found
           </h1>
@@ -173,7 +171,7 @@ export default function NewsDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
+    <div className="min-h-screen bg-white" >
       <Header />
 
       {/* ── HERO ── */}
@@ -205,7 +203,7 @@ export default function NewsDetail() {
 
             <h1
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white mb-6 leading-[1.1]"
-              style={{ fontFamily: CORMORANT }}
+              
             >
               {article.title}
             </h1>
@@ -275,7 +273,7 @@ export default function NewsDetail() {
               <div className="absolute left-0 top-0 bottom-0 w-[1px] bg-neutral-200" />
               <p
                 className="text-neutral-900 text-2xl sm:text-3xl font-light italic leading-relaxed pl-10"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 "{article.excerpt}"
               </p>
@@ -295,13 +293,13 @@ export default function NewsDetail() {
                       <div className="flex items-center gap-5 mb-6">
                         <span
                           className="text-5xl font-light text-neutral-200"
-                          style={{ fontFamily: CORMORANT }}
+                          
                         >
                           {numberedHeading[1].padStart(2, "0")}
                         </span>
                         <h2
                           className="text-3xl sm:text-4xl font-medium text-neutral-900 leading-tight"
-                          style={{ fontFamily: CORMORANT }}
+                          
                         >
                           {numberedHeading[2]}
                         </h2>
@@ -397,7 +395,7 @@ export default function NewsDetail() {
                   </p>
                   <h4
                     className="text-xl font-medium text-neutral-900 mb-4"
-                    style={{ fontFamily: CORMORANT }}
+                    
                   >
                     {article.author}
                   </h4>
@@ -460,7 +458,7 @@ export default function NewsDetail() {
             <div className="flex items-center justify-between mb-16">
               <h2
                 className="text-4xl font-light text-neutral-900"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 You Might <span className="italic font-medium">Also Enjoy</span>
               </h2>
@@ -494,7 +492,7 @@ export default function NewsDetail() {
 
                   <h3
                     className="text-2xl font-medium text-neutral-900 mb-4 line-clamp-2 group-hover:text-neutral-600 transition-colors leading-snug"
-                    style={{ fontFamily: CORMORANT }}
+                    
                   >
                     {related.title}
                   </h3>

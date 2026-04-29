@@ -7,8 +7,6 @@ import {
   MapPin,
 } from "lucide-react";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function Footer() {
   const companyLinks = [
@@ -40,7 +38,7 @@ export default function Footer() {
   return (
     <footer
       className="bg-[#edeae5] px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20"
-      style={{ fontFamily: JOST }}
+      
     >
       <div className="max-w-[1600px] mx-auto">
 
@@ -59,7 +57,7 @@ export default function Footer() {
 
             <p
               className="text-sm text-neutral-600 leading-relaxed mb-7 max-w-sm font-light"
-              style={{ fontFamily: JOST }}
+              
             >
               Menyediakan peralatan dapur berkualitas premium dengan desain
               modern dan inovatif sejak 2018. Kepercayaan Anda adalah prioritas kami.
@@ -102,7 +100,7 @@ export default function Footer() {
             <div>
               <h5
                 className="font-medium text-neutral-800 mb-4 text-[11px] uppercase tracking-[0.22em]"
-                style={{ fontFamily: JOST }}
+                
               >
                 Ikuti Kami
               </h5>
@@ -131,7 +129,7 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <h4
               className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]"
-              style={{ fontFamily: JOST }}
+              
             >
               Company
             </h4>
@@ -141,7 +139,7 @@ export default function Footer() {
                   <a
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     {link.name}
                   </a>
@@ -154,7 +152,7 @@ export default function Footer() {
           <div className="lg:col-span-3">
             <h4
               className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]"
-              style={{ fontFamily: JOST }}
+              
             >
               Customer
             </h4>
@@ -164,7 +162,7 @@ export default function Footer() {
                   <a
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     {link.name}
                   </a>
@@ -177,7 +175,7 @@ export default function Footer() {
           <div className="lg:col-span-3">
             <h4
               className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]"
-              style={{ fontFamily: JOST }}
+              
             >
               Products
             </h4>
@@ -187,7 +185,7 @@ export default function Footer() {
                   <a
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     {link.name}
                   </a>
@@ -201,7 +199,7 @@ export default function Footer() {
         <div className="pt-7 border-t border-neutral-300/60 flex flex-col sm:flex-row items-center justify-between gap-5">
           <p
             className="text-xs text-neutral-400 font-light tracking-wide text-center sm:text-left"
-            style={{ fontFamily: JOST }}
+            
           >
             © 2026 Ravelle. All rights reserved. Made with ❤️ in Indonesia
           </p>
@@ -212,7 +210,7 @@ export default function Footer() {
                 key={label}
                 href={`/${label.toLowerCase().replace(/ /g, "-")}`}
                 className="text-xs text-neutral-400 hover:text-neutral-800 transition-colors font-light tracking-wide"
-                style={{ fontFamily: JOST }}
+                
               >
                 {label}
               </a>

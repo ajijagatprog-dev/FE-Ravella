@@ -62,8 +62,6 @@ const HERO_DATA = [
   },
 ];
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function HeroSection() {
   const [active, setActive] = useState(0);
@@ -93,7 +91,7 @@ export default function HeroSection() {
   return (
     <section
       className="relative w-full overflow-hidden bg-neutral-900"
-      style={{ fontFamily: JOST }}
+      
     >
       {/* ── HERO IMAGE & CONTENT — full width ── */}
       <div className="relative">
@@ -149,7 +147,7 @@ export default function HeroSection() {
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
                     }`}
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     {HERO_DATA[i].subtitle}
                   </div>
@@ -166,7 +164,7 @@ export default function HeroSection() {
               </div>
               <span
                 className="text-white/50 text-[11px] font-light tracking-[0.2em] min-w-[3rem]"
-                style={{ fontFamily: JOST }}
+                
               >
                 {String(active + 1).padStart(2, "0")} /{" "}
                 {String(HERO_IMAGES.length).padStart(2, "0")}
@@ -265,7 +263,7 @@ function HeroContent({ active }: { active: number }) {
               <div className="w-5 h-[1px] bg-white/50" />
               <span
                 className="text-[10px] sm:text-[11px] font-medium tracking-[0.28em] uppercase text-white/70"
-                style={{ fontFamily: JOST }}
+                
               >
                 {data.badge}
               </span>
@@ -276,7 +274,7 @@ function HeroContent({ active }: { active: number }) {
           <motion.div variants={itemVariants}>
             <p
               className="text-white/60 font-light text-[11px] sm:text-xs mb-3 tracking-[0.22em] uppercase"
-              style={{ fontFamily: JOST }}
+              
             >
               {data.subtitle}
             </p>
@@ -286,12 +284,12 @@ function HeroContent({ active }: { active: number }) {
           <motion.div variants={itemVariants}>
             <h1
               className="text-[42px] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[78px] font-light leading-[1.05] text-white mb-4 sm:mb-5"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              style={{  letterSpacing: "-0.01em" }}
             >
               {data.title.split(" ").slice(0, 2).join(" ")}
               <em
                 className="block not-italic font-semibold mt-0.5"
-                style={{ fontFamily: CORMORANT, fontStyle: "italic" }}
+                style={{  fontStyle: "italic" }}
               >
                 {data.title.split(" ").slice(2).join(" ")}
               </em>
@@ -307,7 +305,7 @@ function HeroContent({ active }: { active: number }) {
           <motion.div variants={itemVariants}>
             <p
               className="text-white/75 text-sm sm:text-base leading-relaxed max-w-md mb-7 sm:mb-8 font-light"
-              style={{ fontFamily: JOST }}
+              
             >
               {data.description}
             </p>
@@ -321,7 +319,7 @@ function HeroContent({ active }: { active: number }) {
             <Link
               href="/product"
               className="group w-full sm:w-auto px-8 py-3.5 bg-white text-neutral-900 font-medium text-[11px] tracking-[0.22em] uppercase hover:bg-neutral-100 transition-all duration-300 flex items-center justify-center gap-3"
-              style={{ fontFamily: JOST }}
+              
             >
               {data.cta}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -342,14 +340,14 @@ function HeroContent({ active }: { active: number }) {
               ))}
               <span
                 className="text-white font-medium text-xs tracking-[0.1em] ml-1"
-                style={{ fontFamily: JOST }}
+                
               >
                 4.9
               </span>
             </div>
             <div
               className="flex items-center gap-2"
-              style={{ fontFamily: JOST }}
+              
             >
               <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
               <span className="text-white/65 text-xs font-light tracking-[0.08em]">
@@ -377,7 +375,7 @@ function FeatureBadge({
   return (
     <div
       className="group flex items-center gap-3 px-5 sm:px-6 py-4 sm:py-5 hover:bg-white/5 transition-colors duration-300"
-      style={{ fontFamily: JOST }}
+      
     >
       <div className="flex-shrink-0 text-white/60 group-hover:text-white/90 transition-colors duration-300">
         {icon}

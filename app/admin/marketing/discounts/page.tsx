@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
 
 const emptyForm = {
   sku: "",
@@ -141,7 +140,7 @@ export default function DiscountsPage() {
   };
 
   return (
-    <div className="p-6" style={{ fontFamily: JOST }}>
+    <div className="p-6" >
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -236,7 +235,7 @@ export default function DiscountsPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md shadow-2xl" style={{ fontFamily: JOST }}>
+          <div className="bg-white w-full max-w-md shadow-2xl" >
             <div className="flex items-center justify-between px-6 py-5 border-b border-stone-100">
               <h2 className="text-base font-bold text-stone-900 uppercase tracking-wide">
                 {editingId ? 'Edit Diskon' : 'Tambah Diskon Baru'}
@@ -284,7 +283,7 @@ export default function DiscountsPage() {
       {/* Import Modal */}
       {showImportModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg shadow-2xl" style={{ fontFamily: JOST }}>
+          <div className="bg-white w-full max-w-lg shadow-2xl" >
             <div className="flex items-center justify-between px-6 py-5 border-b border-stone-100">
               <h2 className="text-base font-bold text-stone-900 uppercase tracking-wide">Import Diskon via Excel</h2>
               <button onClick={() => setShowImportModal(false)} className="text-stone-400 hover:text-stone-900"><X className="w-5 h-5" /></button>

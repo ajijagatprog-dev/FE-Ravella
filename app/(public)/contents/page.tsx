@@ -13,9 +13,6 @@ import Link from "next/link";
 import api from "@/lib/axios";
 import VideoFeedItem from "./components/VideoFeedItem";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
-
 export default function ContentsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -115,10 +112,7 @@ export default function ContentsPage() {
     return (
       <div className="h-screen w-full bg-black flex flex-col items-center justify-center gap-4">
         <Loader2 className="w-10 h-10 text-white animate-spin" />
-        <p
-          className="text-white/60 text-sm font-light tracking-[0.2em] uppercase"
-          style={{ fontFamily: JOST }}
-        >
+        <p className="text-white/60 text-sm font-light tracking-[0.2em] uppercase">
           Loading Experience...
         </p>
       </div>
@@ -129,23 +123,14 @@ export default function ContentsPage() {
     return (
       <div className="h-screen w-full bg-black flex flex-col items-center justify-center p-6 text-center">
         <Sparkles className="w-16 h-16 text-white/20 mb-6" />
-        <h2
-          className="text-3xl text-white font-medium mb-4"
-          style={{ fontFamily: CORMORANT }}
-        >
-          No Videos Yet
-        </h2>
-        <p
-          className="text-white/60 max-w-xs mb-8 font-light"
-          style={{ fontFamily: JOST }}
-        >
+        <h2 className="text-3xl text-white font-medium mb-4">No Videos Yet</h2>
+        <p className="text-white/60 max-w-xs mb-8 font-light">
           Our video gallery is currently being curated. Check back soon for more
           product inspirations!
         </p>
         <Link
           href="/product"
           className="px-8 py-3 bg-white text-black text-[10px] font-black uppercase tracking-[0.2em] hover:bg-neutral-200 transition-all"
-          style={{ fontFamily: JOST }}
         >
           Explore Shop
         </Link>
@@ -164,11 +149,8 @@ export default function ContentsPage() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex flex-col items-center">
-          <span
-            className="text-white font-black text-[10px] tracking-[0.4em] uppercase"
-            style={{ fontFamily: JOST }}
-          >
-            Testimonials
+          <span className="text-white font-black text-[10px] tracking-[0.4em] uppercase">
+            Konten Produk
           </span>
           <div className="w-8 h-[1px] bg-white/40 mt-1" />
         </div>
@@ -200,10 +182,7 @@ export default function ContentsPage() {
             exit={{ opacity: 0 }}
             className="absolute bottom-32 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none"
           >
-            <span
-              className="text-white/40 text-[8px] uppercase tracking-[0.3em] font-bold"
-              style={{ fontFamily: JOST }}
-            >
+            <span className="text-white/40 text-[8px] uppercase tracking-[0.3em] font-bold">
               Swipe Up
             </span>
             <motion.div

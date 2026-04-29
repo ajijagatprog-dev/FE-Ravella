@@ -3,14 +3,12 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function BrandStory() {
   return (
     <section
       className="relative px-4 md:px-10 lg:px-40 py-20 md:py-28 bg-white overflow-hidden"
-      style={{ fontFamily: JOST }}
+      
     >
       <motion.div 
         initial={{ opacity: 0, y: 40 }}
@@ -26,7 +24,7 @@ export default function BrandStory() {
           {/* Eyebrow — matches screenshot: monospace-feel, tight tracking */}
           <span
             className="inline-block mb-5 font-medium tracking-[0.28em] uppercase text-[11px] text-neutral-500"
-            style={{ fontFamily: JOST }}
+            
           >
             Welcome to Ravelle
           </span>
@@ -34,7 +32,7 @@ export default function BrandStory() {
           {/* Heading — Cormorant Garamond, same weight & style as screenshot */}
           <h2
             className="text-5xl md:text-6xl lg:text-7xl font-light leading-[1.08] mb-6 text-neutral-900"
-            style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+            style={{  letterSpacing: "-0.01em" }}
           >
             Quality
             <br />
@@ -46,7 +44,7 @@ export default function BrandStory() {
           {/* Body — Jost light, matches screenshot paragraph weight */}
           <p
             className="text-neutral-600 text-base md:text-lg leading-relaxed mb-10 max-w-xl font-light"
-            style={{ fontFamily: JOST }}
+            
           >
             From the iconic stand mixer to innovative appliances,{" "}
             <span className="font-medium text-neutral-900">Ravelle&apos;s</span>{" "}
@@ -59,13 +57,13 @@ export default function BrandStory() {
             <div>
               <h4
                 className="text-3xl md:text-4xl font-light text-neutral-900 mb-1"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 100%
               </h4>
               <p
                 className="text-xs text-neutral-400 tracking-[0.15em] uppercase font-medium"
-                style={{ fontFamily: JOST }}
+                
               >
                 Quality-Driven Design
               </p>
@@ -73,14 +71,14 @@ export default function BrandStory() {
             <div>
               <h4
                 className="text-2xl md:text-3xl font-light text-neutral-900 mb-1 leading-tight"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 Thoughtfully
                 <br />Built
               </h4>
               <p
                 className="text-xs text-neutral-400 tracking-[0.15em] uppercase font-medium"
-                style={{ fontFamily: JOST }}
+                
               >
                 Engineered for Modern Homes
               </p>
@@ -91,7 +89,7 @@ export default function BrandStory() {
           <Link
             href="/company"
             className="inline-flex items-center gap-3 px-8 py-4 bg-neutral-900 text-white hover:bg-black transition-colors duration-300 text-[11px] tracking-[0.25em] uppercase font-medium"
-            style={{ fontFamily: JOST }}
+            
           >
             Read More
           </Link>
@@ -114,7 +112,7 @@ export default function BrandStory() {
           {/* Floating badge — clean white card, no border radius */}
           <div
             className="absolute -bottom-5 -right-2 md:-right-6 bg-white px-5 py-3.5 shadow-lg border border-neutral-100"
-            style={{ fontFamily: JOST }}
+            
           >
             <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-0.5">
               Trusted by

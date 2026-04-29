@@ -4,8 +4,6 @@ import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
@@ -52,7 +50,7 @@ export default function Newsletter() {
   return (
     <section
       className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20 md:py-24 bg-white"
-      style={{ fontFamily: JOST }}
+      
     >
       <div className="max-w-[1600px] mx-auto bg-neutral-900 overflow-hidden">
         <div className="relative p-6 sm:p-10 md:p-16 lg:p-20">
@@ -65,7 +63,7 @@ export default function Newsletter() {
               <div className="w-5 h-[1px] bg-white/30" />
               <span
                 className="text-white/50 font-medium text-[11px] uppercase tracking-[0.25em]"
-                style={{ fontFamily: JOST }}
+                
               >
                 Ravelle Insight
               </span>
@@ -75,7 +73,7 @@ export default function Newsletter() {
             {/* Title — Cormorant Garamond */}
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-light text-white mb-4 sm:mb-6 leading-[1.05]"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              style={{  letterSpacing: "-0.01em" }}
             >
               Insight &amp;{" "}
               <em
@@ -94,7 +92,7 @@ export default function Newsletter() {
             {/* Description */}
             <p
               className="text-white/60 text-sm sm:text-base font-light max-w-2xl mx-auto leading-relaxed"
-              style={{ fontFamily: JOST }}
+              
             >
               Dapatkan tips, tutorial, dan insight terbaru seputar peralatan dapur Ravelle.
               Dari cara penggunaan hingga perawatan agar alat dapur lebih awet.
@@ -121,7 +119,7 @@ export default function Newsletter() {
                   <div className="absolute top-3 left-3">
                     <span
                       className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] font-medium tracking-[0.15em] uppercase"
-                      style={{ fontFamily: JOST }}
+                      
                     >
                       {item.category}
                     </span>
@@ -132,13 +130,13 @@ export default function Newsletter() {
                 <div className="p-4 sm:p-5">
                   <p
                     className="text-[10px] text-white/40 mb-2 tracking-[0.15em] uppercase font-medium"
-                    style={{ fontFamily: JOST }}
+                    
                   >
                     {item.date}
                   </p>
                   <h3
                     className="text-base sm:text-lg font-light text-white leading-snug group-hover:text-white/70 transition-colors line-clamp-2"
-                    style={{ fontFamily: CORMORANT, fontSize: "clamp(1rem, 2vw, 1.25rem)" }}
+                    style={{  fontSize: "clamp(1rem, 2vw, 1.25rem)" }}
                   >
                     {item.title}
                   </h3>
@@ -160,7 +158,7 @@ export default function Newsletter() {
             <a
               href="/news"
               className="inline-flex items-center gap-3 px-8 py-3.5 border border-white/30 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 text-[11px] tracking-[0.22em] uppercase font-medium"
-              style={{ fontFamily: JOST }}
+              
             >
               Lihat Semua Artikel &amp; Tips Dapur
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

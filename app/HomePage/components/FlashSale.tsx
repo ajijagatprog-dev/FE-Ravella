@@ -15,8 +15,6 @@ import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 import { motion } from "framer-motion";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 interface Product {
   id: number;
@@ -212,7 +210,7 @@ export default function FlashSale() {
   return (
     <section
       className="bg-stone-900 px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16 md:py-20 relative overflow-hidden"
-      style={{ fontFamily: JOST }}
+      
     >
       {/* Background Decorative Elements */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
@@ -268,7 +266,7 @@ export default function FlashSale() {
 
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-light leading-[1.05] text-white mb-4"
-              style={{ fontFamily: CORMORANT, letterSpacing: "-0.01em" }}
+              style={{  letterSpacing: "-0.01em" }}
             >
               Flash{" "}
               <em
@@ -443,7 +441,7 @@ function ProductCard({
         <Link href={`/product/${product.id}`}>
           <h3
             className="font-light text-xl sm:text-2xl text-white mb-2 line-clamp-1 group-hover:text-red-400 transition-colors leading-tight"
-            style={{ fontFamily: CORMORANT, letterSpacing: "0" }}
+            style={{  letterSpacing: "0" }}
           >
             {product.title}
           </h3>
@@ -512,7 +510,7 @@ function VoucherCard({
             </p>
             <p
               className="text-white text-sm sm:text-base font-light tracking-wide"
-              style={{ fontFamily: CORMORANT }}
+              
             >
               {voucher.description}
             </p>

@@ -20,8 +20,6 @@ import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 export interface PublicArticle {
   id: number;
@@ -129,7 +127,7 @@ export default function News() {
   const featuredArticles = articles.filter((a) => a.isFeatured);
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: JOST }}>
+    <div className="min-h-screen bg-white" >
       <Header />
 
       {/* ── HERO ── */}
@@ -165,7 +163,7 @@ export default function News() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]"
-              style={{ fontFamily: CORMORANT }}
+              
             >
               Inspirasi Rasa <br />
               <span className="font-semibold italic text-neutral-200">
@@ -266,7 +264,7 @@ export default function News() {
               <TrendingUp className="w-5 h-5 text-neutral-900" />
               <h2
                 className="text-3xl font-light text-neutral-900"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 {activeCategory === "Semua"
                   ? "Latest Articles"
@@ -294,7 +292,7 @@ export default function News() {
               <BookmarkPlus className="w-12 h-12 text-neutral-200 mx-auto mb-6" />
               <h3
                 className="text-2xl font-light text-neutral-900 mb-2"
-                style={{ fontFamily: CORMORANT }}
+                
               >
                 No articles found
               </h3>
@@ -363,7 +361,7 @@ export default function News() {
                     <Link href={`/news/${article.id}`}>
                       <h3
                         className="text-2xl font-medium text-neutral-900 mb-4 line-clamp-2 hover:text-neutral-500 transition-colors leading-snug"
-                        style={{ fontFamily: CORMORANT }}
+                        
                       >
                         {article.title}
                       </h3>

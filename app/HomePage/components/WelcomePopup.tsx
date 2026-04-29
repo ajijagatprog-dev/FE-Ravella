@@ -5,8 +5,6 @@ import { X, Tag, Copy, Check, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
 
-const JOST = "'Jost', system-ui, sans-serif";
-const CORMORANT = "'Cormorant Garamond', Georgia, serif";
 
 const POPUP_SESSION_KEY = "ravella_popup_dismissed";
 const POPUP_DELAY_MS = 2500;
@@ -90,7 +88,7 @@ export default function WelcomePopup() {
                 <div
                     className="relative bg-white w-full max-w-md shadow-2xl overflow-hidden"
                     style={{
-                        fontFamily: JOST,
+                        
                         pointerEvents: "auto",
                         animation: "popupIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
                     }}
@@ -118,7 +116,7 @@ export default function WelcomePopup() {
                             </p>
                             <h2
                                 className="text-3xl text-white font-light leading-tight"
-                                style={{ fontFamily: CORMORANT }}
+                                
                             >
                                 Selamat Datang
                                 <br />
