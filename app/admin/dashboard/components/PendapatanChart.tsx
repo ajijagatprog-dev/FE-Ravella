@@ -2,6 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface ChartDataPoint {
   label: string;
@@ -18,42 +27,46 @@ interface PendapatanChartProps {
   };
 }
 
-const CHART_H = 180;
+const CHART_H = 220;
 
 function formatRp(val: number): string {
   if (val >= 1000000) return `Rp ${(val / 1000000).toFixed(1)}jt`;
   if (val >= 1000) return `Rp ${Math.round(val / 1000)}k`;
-  return `Rp ${val.toLocaleString('id-ID')}`;
+  return `Rp ${val.toLocaleString("id-ID")}`;
 }
 
-export default function PendapatanChart({ dailyData, weeklyData, summary }: PendapatanChartProps) {
-  const [animate, setAnimate] = useState(false);
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-gray-900 text-white text-[10px] font-semibold px-3 py-2 rounded-lg shadow-xl border border-gray-800">
+        <p className="mb-0.5 text-gray-400">{label}</p>
+        <p className="text-blue-400 text-xs">{formatRp(payload[0].value)}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
+export default function PendapatanChart({
+  dailyData,
+  weeklyData,
+  summary,
+}: PendapatanChartProps) {
   const [range, setRange] = useState<"week" | "month">("week");
+  const [mounted, setMounted] = useState(false);
 
   const rawData = range === "week" ? dailyData : weeklyData;
 
-  // Normalize data to percentage of max for bar heights
-  const maxVal = Math.max(...rawData.map(d => d.value), 1);
-  const chartData = rawData.map(d => ({
-    ...d,
-    height: Math.max(5, Math.round((d.value / maxVal) * 100)),
-  }));
-
-  const peakIdx = chartData.reduce(
-    (mi, d, i, arr) => (d.height > arr[mi].height ? i : mi),
-    0
-  );
-
   useEffect(() => {
-    setAnimate(false);
-    const t = setTimeout(() => setAnimate(true), 80);
-    return () => clearTimeout(t);
-  }, [range]);
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <div style={{ height: CHART_H + 200 }} />;
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
       {/* ── Header ── */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-8">
         <div>
           <h3 className="text-base font-bold text-gray-900">Trafik Penjualan</h3>
           <p className="text-xs text-gray-500 mt-0.5">
@@ -69,50 +82,53 @@ export default function PendapatanChart({ dailyData, weeklyData, summary }: Pend
         </button>
       </div>
 
-      {/* ── Bar Chart ── */}
-      <div className="flex gap-2 sm:gap-3 items-end" style={{ height: CHART_H }}>
-        {chartData.map((d, i) => {
-          const barPx = Math.round((d.height / 100) * CHART_H);
-          const isPeak = i === peakIdx;
-
-          return (
-            <div
-              key={`${range}-${i}`}
-              className="relative flex-1 flex flex-col items-center justify-end group"
-              style={{ height: CHART_H }}
-            >
-              {/* Tooltip */}
-              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-semibold px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-xl">
-                {formatRp(d.value)}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
-              </div>
-
-              {/* Bar */}
-              <div
-                className={`w-full rounded-t-xl transition-all duration-700 ease-out ${isPeak
-                    ? "bg-blue-600 shadow-lg shadow-blue-200"
-                    : "bg-blue-100 group-hover:bg-blue-200"
-                  }`}
-                style={{
-                  height: animate ? barPx : 0,
-                  transitionDelay: `${i * 60}ms`,
-                }}
-              />
-
-              {/* Label */}
-              <span
-                className={`absolute -bottom-6 text-[11px] font-semibold transition-colors ${isPeak ? "text-blue-600" : "text-gray-400"
-                  }`}
-              >
-                {d.label}
-              </span>
-            </div>
-          );
-        })}
+      {/* ── Line/Area Chart ── */}
+      <div className="w-full" style={{ height: CHART_H }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={rawData}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.15} />
+                <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.01} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="#F3F4F6"
+            />
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 11, fill: "#9CA3AF", fontWeight: 500 }}
+              dy={10}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 11, fill: "#9CA3AF" }}
+              tickFormatter={(val) => (val >= 1000000 ? `${val / 1000000}jt` : val)}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke="#3B82F6"
+              strokeWidth={3}
+              fillOpacity={1}
+              fill="url(#colorValue)"
+              animationDuration={1500}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
 
-      <div className="h-8" />
-      <div className="h-px bg-gray-100 mb-5" />
+      <div className="h-10" />
+      <div className="h-px bg-gray-100 mb-6" />
 
       {/* ── Summary cards ── */}
       <div className="grid grid-cols-3 gap-3">

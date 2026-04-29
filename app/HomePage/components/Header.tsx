@@ -12,6 +12,7 @@ import {
   Instagram,
   Phone,
   Facebook,
+  Loader2,
 } from "lucide-react";
 
 const JOST = "'Jost', system-ui, sans-serif";
@@ -131,6 +132,7 @@ export default function Header({
     { label: "PRODUCT", href: "/product" },
     { label: "NEWS", href: "/news" },
     { label: "CONTACT", href: "/contact" },
+    { label: "TESTIMONIAL", href: "/testimonial" },
   ];
 
   const saleMenu = { label: "SALE", href: "/sale" };
@@ -148,8 +150,8 @@ export default function Header({
         <div className="mx-auto max-w-[1320px] px-6 md:px-12 py-3">
           <div className="flex items-center justify-between">
             {/* LEFT */}
-            <div className="flex items-center gap-14">
-              <Link href="/" className="group flex items-center">
+            <div className="flex items-center gap-6 xl:gap-14">
+              <Link href="/" className="group flex items-center flex-shrink-0">
                 <img
                   src="/lg-ravella-gold.png"
                   alt="Ravelle Logo"
@@ -157,24 +159,28 @@ export default function Header({
                 />
               </Link>
 
-              <nav className="hidden lg:flex items-center gap-10">
+              <nav className="hidden lg:flex items-center gap-5 xl:gap-8 transition-opacity duration-300">
                 {menus.map((menu) => (
                   <Link
                     key={menu.label}
                     href={menu.href}
-                    className="group relative text-[13px] tracking-[0.18em] font-medium text-neutral-800 hover:text-black transition-colors duration-300"
+                    className="group relative text-[12px] tracking-[0.15em] font-medium text-neutral-600 hover:text-black transition-colors duration-300 whitespace-nowrap"
                   >
                     {menu.label}
-                    <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full" />
+                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full" />
                   </Link>
                 ))}
                 {/* SALE - highlighted */}
                 <Link
                   href={saleMenu.href}
-                  className="group relative text-[13px] tracking-[0.18em] font-bold text-rose-600 hover:text-rose-700 transition-colors duration-300 animate-pulse"
+                  className="group relative text-[12px] tracking-[0.15em] font-bold text-rose-600 hover:text-rose-700 transition-colors duration-300 flex items-center gap-1.5"
                 >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
+                  </span>
                   {saleMenu.label}
-                  <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-rose-600 transition-all duration-300 group-hover:w-full" />
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-rose-600 transition-all duration-300 group-hover:w-full" />
                 </Link>
               </nav>
             </div>
@@ -182,43 +188,14 @@ export default function Header({
             {/* RIGHT */}
             <div className="flex items-center gap-5">
               {/* SEARCH */}
-              <div className="hidden md:block relative">
-                {!searchOpen ? (
-                  <button
-                    onClick={() => setSearchOpen(true)}
-                    className="flex items-center justify-center text-neutral-800 hover:text-black transition-colors duration-200"
-                    aria-label="Search"
-                  >
-                    <Search className="w-5 h-5" />
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-2 px-3 py-1.5 border border-neutral-300">
-                    <Search className="w-4 h-4 text-neutral-700" />
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        onSearch(e.target.value);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && searchQuery.trim()) {
-                          router.push(
-                            `/search?q=${encodeURIComponent(searchQuery.trim())}`,
-                          );
-                          setSearchOpen(false);
-                        }
-                      }}
-                      autoFocus
-                      className="w-40 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
-                      style={{ fontFamily: JOST }}
-                    />
-                    <button onClick={() => setSearchOpen(false)}>
-                      <X className="w-4 h-4 text-neutral-700" />
-                    </button>
-                  </div>
-                )}
+              <div className="hidden md:block">
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="flex items-center justify-center text-neutral-800 hover:text-black transition-colors duration-200"
+                  aria-label="Search"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
               </div>
 
               {/* CART — badge muncul otomatis dari localStorage */}
@@ -253,7 +230,7 @@ export default function Header({
                       className="flex items-center gap-2 px-5 py-2 text-[12px] tracking-[0.15em] font-medium border border-black text-black hover:bg-black hover:text-white transition-all duration-300"
                     >
                       <User className="w-4 h-4" />
-                      PROFILE
+                      <span className="hidden xl:inline">PROFILE</span>
                     </Link>
                     <div className="absolute right-0 mt-2 w-48 bg-white border border-neutral-100 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top translate-y-2 group-hover:translate-y-0">
                       <Link
@@ -283,7 +260,7 @@ export default function Header({
                       className="flex items-center gap-2 px-5 py-2 text-[12px] tracking-[0.15em] font-medium border border-black text-black hover:bg-black hover:text-white transition-all duration-300"
                     >
                       <User className="w-4 h-4" />
-                      ACCOUNT
+                      <span className="hidden xl:inline">ACCOUNT</span>
                     </Link>
 
                     {/* Dropdown Menu */}
@@ -318,6 +295,47 @@ export default function Header({
                 aria-label="Open menu"
               >
                 <Menu className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Search Overlay ── */}
+        <div
+          className={`absolute inset-0 z-[60] bg-white transition-all duration-500 ease-in-out ${
+            searchOpen
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-full pointer-events-none"
+          }`}
+        >
+          <div className="mx-auto max-w-[1320px] h-full px-6 md:px-12 flex items-center">
+            <div className="flex-1 flex items-center gap-6">
+              <Search className="w-6 h-6 text-neutral-300" />
+              <input
+                type="text"
+                placeholder="What are you looking for?"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  onSearch(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    router.push(
+                      `/search?q=${encodeURIComponent(searchQuery.trim())}`,
+                    );
+                    setSearchOpen(false);
+                  }
+                }}
+                autoFocus={searchOpen}
+                className="flex-1 text-xl md:text-2xl font-light bg-transparent outline-none text-neutral-900 placeholder:text-neutral-300"
+                style={{ fontFamily: JOST }}
+              />
+              <button
+                onClick={() => setSearchOpen(false)}
+                className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-neutral-900" />
               </button>
             </div>
           </div>
