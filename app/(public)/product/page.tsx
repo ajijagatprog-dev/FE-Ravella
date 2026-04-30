@@ -29,7 +29,6 @@ import Footer from "../../HomePage/components/Footer";
 import { products as fallbackProducts } from "./products";
 import api from "@/lib/axios";
 
-
 export default function ProductPage() {
   return (
     <Suspense
@@ -47,7 +46,7 @@ export default function ProductPage() {
 function ProductPageContent() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [displayLimit, setDisplayLimit] = useState(12);
+  const [displayLimit, setDisplayLimit] = useState(8);
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category");
 
@@ -255,7 +254,7 @@ function ProductPageContent() {
   }, [filteredProducts, displayLimit]);
 
   useEffect(() => {
-    setDisplayLimit(12);
+    setDisplayLimit(8);
   }, [activeCategory, searchQuery, sortBy, priceRange]);
 
   const formatPrice = (price: number) =>
@@ -280,17 +279,14 @@ function ProductPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white" >
+    <div className="min-h-screen bg-white">
       <Header />
 
       {/* ── Toast ── */}
       <div
         className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${toast.visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}`}
       >
-        <div
-          className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm"
-          
-        >
+        <div className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm">
           <ShoppingCart className="w-4 h-4 text-neutral-600 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="font-medium text-neutral-900 text-sm">
@@ -328,10 +324,7 @@ function ProductPageContent() {
               className="inline-flex items-center gap-3 mb-6"
             >
               <div className="w-8 h-[1px] bg-white/60" />
-              <span
-                className="text-white/80 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]"
-                
-              >
+              <span className="text-white/80 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]">
                 Ravelle Shop
               </span>
             </motion.div>
@@ -357,7 +350,6 @@ function ProductPageContent() {
                           break-words
                         "
               style={{
-                
                 letterSpacing: "-0.02em",
               }}
             >
@@ -379,7 +371,6 @@ function ProductPageContent() {
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 1 }}
               className="text-white/70 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-8"
-              
             >
               Kurasi peralatan rumah tangga eksklusif yang memadukan
               fungsionalitas modern dengan estetika abadi untuk hunian impian
@@ -423,10 +414,7 @@ function ProductPageContent() {
           viewport={{ once: true }}
           className="flex justify-center mb-16"
         >
-          <div
-            className="flex items-center gap-4 w-full max-w-2xl px-8 py-5 rounded-full border border-neutral-200 bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] focus-within:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.15)] focus-within:border-neutral-900 transition-all duration-500"
-            
-          >
+          <div className="flex items-center gap-4 w-full max-w-2xl px-8 py-5 rounded-full border border-neutral-200 bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] focus-within:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.15)] focus-within:border-neutral-900 transition-all duration-500">
             <Search className="w-5 h-5 text-neutral-400 flex-shrink-0" />
             <input
               type="text"
@@ -434,7 +422,6 @@ function ProductPageContent() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 bg-transparent text-base text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
-              
             />
             {searchQuery && (
               <motion.button
@@ -458,10 +445,7 @@ function ProductPageContent() {
             className="flex items-center gap-3 mb-6"
           >
             <div className="w-6 h-[1px] bg-neutral-900" />
-            <span
-              className="text-neutral-900 font-bold text-[10px] uppercase tracking-[0.3em]"
-              
-            >
+            <span className="text-neutral-900 font-bold text-[10px] uppercase tracking-[0.3em]">
               Categories Products
             </span>
           </motion.div>
@@ -481,7 +465,6 @@ function ProductPageContent() {
                         ? "text-white border-neutral-900"
                         : "text-neutral-500 bg-neutral-50 border-neutral-100 hover:bg-neutral-100 hover:border-neutral-200"
                     }`}
-                    
                   >
                     {activeCategory === cat.name && (
                       <motion.div
@@ -516,10 +499,7 @@ function ProductPageContent() {
 
         {/* Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8 py-4 border-y border-neutral-100">
-          <span
-            className="text-sm text-neutral-500 font-light"
-            
-          >
+          <span className="text-sm text-neutral-500 font-light">
             <span className="font-medium text-neutral-900">
               {filteredProducts.length}
             </span>{" "}
@@ -549,7 +529,6 @@ function ProductPageContent() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="appearance-none pl-4 pr-9 py-2 border border-neutral-200 text-[11px] tracking-[0.12em] uppercase text-neutral-700 hover:border-neutral-400 focus:outline-none cursor-pointer bg-white"
-                
               >
                 <option value="featured">Featured</option>
                 <option value="newest">Newest</option>
@@ -573,16 +552,10 @@ function ProductPageContent() {
               className="text-center py-32"
             >
               <Package className="w-16 h-16 text-neutral-200 mx-auto mb-6 stroke-[1]" />
-              <h3
-                className="text-4xl font-light text-neutral-900 mb-4"
-                
-              >
+              <h3 className="text-4xl font-light text-neutral-900 mb-4">
                 No Products Found
               </h3>
-              <p
-                className="text-neutral-500 text-sm font-light mb-10"
-                
-              >
+              <p className="text-neutral-500 text-sm font-light mb-10">
                 Try adjusting your filters or search query
               </p>
               <button
@@ -592,7 +565,6 @@ function ProductPageContent() {
                   setPriceRange([0, 5000000]);
                 }}
                 className="px-12 py-4 border border-neutral-900 text-neutral-900 text-[10px] tracking-[0.25em] uppercase font-bold hover:bg-neutral-900 hover:text-white transition-all duration-300"
-                
               >
                 Reset Filters
               </button>
@@ -613,7 +585,7 @@ function ProductPageContent() {
               animate="show"
               className={
                 viewMode === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12"
+                  ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-8 sm:gap-y-12"
                   : "flex flex-col gap-8"
               }
             >
@@ -634,7 +606,7 @@ function ProductPageContent() {
                 >
                   {/* Image Container */}
                   <div
-                    className={`relative overflow-hidden bg-[#F9F9F9] group-hover:bg-[#F3F3F3] transition-colors duration-500 flex items-center justify-center p-8 sm:p-12 ${viewMode === "grid" ? "aspect-[4/5]" : "w-full md:w-[400px] flex-shrink-0 aspect-[4/5]"}`}
+                    className={`relative overflow-hidden bg-[#F9F9F9] group-hover:bg-[#F3F3F3] transition-colors duration-500 flex items-center justify-center p-4 sm:p-8 ${viewMode === "grid" ? "aspect-square" : "w-full md:w-[300px] flex-shrink-0 aspect-square"}`}
                   >
                     <motion.img
                       initial={false}
@@ -653,26 +625,17 @@ function ProductPageContent() {
                     {/* Badges */}
                     <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                       {product.badge && (
-                        <span
-                          className="px-3 py-1.5 bg-white shadow-sm text-neutral-900 text-[9px] font-black tracking-[0.2em] uppercase"
-                          
-                        >
+                        <span className="px-3 py-1.5 bg-white shadow-sm text-neutral-900 text-[9px] font-black tracking-[0.2em] uppercase">
                           {product.badge}
                         </span>
                       )}
                       {product.active_promotion?.type === "flash_sale" && (
-                        <span
-                          className="px-3 py-1.5 bg-amber-500 text-white text-[9px] tracking-[0.2em] uppercase font-black shadow-sm flex items-center gap-1.5"
-                          
-                        >
+                        <span className="px-3 py-1.5 bg-amber-500 text-white text-[9px] tracking-[0.2em] uppercase font-black shadow-sm flex items-center gap-1.5">
                           <Zap className="w-3 h-3 fill-white" /> Flash Sale
                         </span>
                       )}
                       {product.discount > 0 && (
-                        <span
-                          className="px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-black tracking-[0.2em] uppercase"
-                          
-                        >
+                        <span className="px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-black tracking-[0.2em] uppercase">
                           -{Math.round(product.discount)}%
                         </span>
                       )}
@@ -704,7 +667,6 @@ function ProductPageContent() {
                         onClick={() => handleAddToCart(product)}
                         disabled={!product.inStock}
                         className="w-full py-4 bg-neutral-900 text-white text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-colors flex items-center justify-center gap-3 disabled:bg-neutral-300 disabled:cursor-not-allowed"
-                        
                       >
                         <ShoppingCart className="w-4 h-4" />
                         {product.inStock ? "Add to Cart" : "Out of Stock"}
@@ -775,28 +737,19 @@ function ProductPageContent() {
 
                     {/* Name */}
                     <Link href={`/product/${product.id}`}>
-                      <h3
-                        className="text-xl sm:text-2xl font-medium text-neutral-900 mb-3 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight"
-                        
-                      >
+                      <h3 className="text-sm sm:text-base md:text-lg font-medium text-neutral-900 mb-2 sm:mb-3 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight">
                         {product.name}
                       </h3>
                     </Link>
 
                     {/* Price & Description Area */}
-                    <div className="mb-8">
-                      <div className="flex items-baseline gap-3 mb-4">
-                        <span
-                          className="text-xl font-bold text-neutral-900"
-                          
-                        >
+                    <div className="mb-6 sm:mb-8">
+                      <div className="flex items-baseline gap-2 sm:gap-3 mb-3 sm:mb-4">
+                        <span className="text-base sm:text-lg font-bold text-neutral-900">
                           {formatPrice(product.price)}
                         </span>
                         {product.originalPrice > product.price && (
-                          <span
-                            className="text-sm text-neutral-400 line-through font-light"
-                            
-                          >
+                          <span className="text-sm text-neutral-400 line-through font-light">
                             {formatPrice(product.originalPrice)}
                           </span>
                         )}
@@ -829,22 +782,33 @@ function ProductPageContent() {
         {/* Load More */}
         {filteredProducts.length > displayLimit && !isLoading && (
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mt-24 text-center"
+            className="mt-24 text-center flex justify-center"
           >
-            <button
-              onClick={() => setDisplayLimit((prev) => prev + 12)}
-              className="group relative px-16 py-5 bg-white text-neutral-900 text-[10px] tracking-[0.3em] uppercase font-bold border border-neutral-200 overflow-hidden transition-all duration-500 hover:border-neutral-900 shadow-sm hover:shadow-xl"
-              
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setDisplayLimit((prev) => prev + 8)}
+              className="group relative px-16 py-5 bg-white text-neutral-900 text-[10px] tracking-[0.3em] uppercase font-bold border border-neutral-200 overflow-hidden transition-all duration-500 hover:border-neutral-900 shadow-sm hover:shadow-xl flex items-center gap-3"
             >
-              <span className="relative z-10">Load More Products</span>
-              <motion.div className="absolute inset-0 bg-neutral-900 -z-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-              <span className="relative z-10 group-hover:text-white transition-colors duration-500 ml-3">
-                ↓
+              <span className="relative z-10 group-hover:text-white transition-colors duration-500">
+                Load More
               </span>
-            </button>
+              <motion.div className="absolute inset-0 bg-neutral-900 -z-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+              <motion.span
+                animate={{ y: [0, 5, 0] }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.5,
+                  ease: "easeInOut",
+                }}
+                className="relative z-10 group-hover:text-white transition-colors duration-500"
+              >
+                ↓
+              </motion.span>
+            </motion.button>
           </motion.div>
         )}
       </div>
@@ -852,10 +816,7 @@ function ProductPageContent() {
       {/* ── QUICK VIEW MODAL ── */}
       <AnimatePresence>
         {showModal && selectedProduct && (
-          <div
-            className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-8"
-            
-          >
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-8">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -921,10 +882,7 @@ function ProductPageContent() {
                       </>
                     )}
                   </div>
-                  <h2
-                    className="text-3xl lg:text-4xl font-light text-neutral-900 leading-tight mb-6"
-                    
-                  >
+                  <h2 className="text-3xl lg:text-4xl font-light text-neutral-900 leading-tight mb-6">
                     {selectedProduct.name}
                   </h2>
                   <div className="flex items-baseline gap-4">

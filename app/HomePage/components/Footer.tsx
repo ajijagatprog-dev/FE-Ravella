@@ -7,7 +7,6 @@ import {
   MapPin,
 } from "lucide-react";
 
-
 export default function Footer() {
   const companyLinks = [
     { name: "About", href: "/about" },
@@ -30,21 +29,20 @@ export default function Footer() {
 
   const socialMedia = [
     { name: "WhatsApp", icon: Phone, href: "https://wa.me/628123456789" },
-    { name: "Instagram", icon: Instagram, href: "https://instagram.com/ravelle" },
+    {
+      name: "Instagram",
+      icon: Instagram,
+      href: "https://instagram.com/ravelle",
+    },
     { name: "Facebook", icon: Facebook, href: "https://facebook.com/ravelle" },
     { name: "YouTube", icon: Youtube, href: "https://youtube.com/ravelle" },
   ];
 
   return (
-    <footer
-      className="bg-[#edeae5] px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20"
-      
-    >
+    <footer className="bg-[#e5e5e5] px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20">
       <div className="max-w-[1600px] mx-auto">
-
         {/* ── Main Grid ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 mb-12 sm:mb-16">
-
           {/* Brand */}
           <div className="lg:col-span-4">
             <div className="mb-6">
@@ -55,12 +53,10 @@ export default function Footer() {
               />
             </div>
 
-            <p
-              className="text-sm text-neutral-600 leading-relaxed mb-7 max-w-sm font-light"
-              
-            >
+            <p className="text-sm text-neutral-600 leading-relaxed mb-7 max-w-sm font-light">
               Menyediakan peralatan dapur berkualitas premium dengan desain
-              modern dan inovatif sejak 2018. Kepercayaan Anda adalah prioritas kami.
+              modern dan inovatif sejak 2018. Kepercayaan Anda adalah prioritas
+              kami.
             </p>
 
             {/* Contact */}
@@ -70,9 +66,15 @@ export default function Footer() {
                 className="flex items-center gap-3 text-sm text-neutral-600 hover:text-neutral-900 transition-colors group"
               >
                 <div className="w-8 h-8 bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-neutral-900 transition-colors">
-                  {Phone ? <Phone className="w-3.5 h-3.5 group-hover:text-white transition-colors" /> : <div className="w-3.5 h-3.5" />}
+                  {Phone ? (
+                    <Phone className="w-3.5 h-3.5 group-hover:text-white transition-colors" />
+                  ) : (
+                    <div className="w-3.5 h-3.5" />
+                  )}
                 </div>
-                <span className="font-medium tracking-wide">+62 812-3456-7890</span>
+                <span className="font-medium tracking-wide">
+                  +62 812-3456-7890
+                </span>
               </a>
 
               <a
@@ -80,17 +82,28 @@ export default function Footer() {
                 className="flex items-center gap-3 text-sm text-neutral-600 hover:text-neutral-900 transition-colors group"
               >
                 <div className="w-8 h-8 bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-neutral-900 transition-colors">
-                  {Mail ? <Mail className="w-3.5 h-3.5 group-hover:text-white transition-colors" /> : <div className="w-3.5 h-3.5" />}
+                  {Mail ? (
+                    <Mail className="w-3.5 h-3.5 group-hover:text-white transition-colors" />
+                  ) : (
+                    <div className="w-3.5 h-3.5" />
+                  )}
                 </div>
-                <span className="font-medium tracking-wide">info@ravelle.com</span>
+                <span className="font-medium tracking-wide">
+                  info@ravelle.com
+                </span>
               </a>
 
               <div className="flex items-start gap-3 text-sm text-neutral-600">
                 <div className="w-8 h-8 bg-white flex items-center justify-center flex-shrink-0">
-                  {MapPin ? <MapPin className="w-3.5 h-3.5" /> : <div className="w-3.5 h-3.5" />}
+                  {MapPin ? (
+                    <MapPin className="w-3.5 h-3.5" />
+                  ) : (
+                    <div className="w-3.5 h-3.5" />
+                  )}
                 </div>
                 <span className="font-light leading-relaxed">
-                  Jl. Industri No. 123<br />
+                  Jl. Industri No. 123
+                  <br />
                   Jakarta Selatan, Indonesia
                 </span>
               </div>
@@ -98,10 +111,7 @@ export default function Footer() {
 
             {/* Social */}
             <div>
-              <h5
-                className="font-medium text-neutral-800 mb-4 text-[11px] uppercase tracking-[0.22em]"
-                
-              >
+              <h5 className="font-medium text-neutral-800 mb-4 text-[11px] uppercase tracking-[0.22em]">
                 Ikuti Kami
               </h5>
               <div className="flex flex-wrap gap-2.5">
@@ -127,10 +137,7 @@ export default function Footer() {
 
           {/* Company Links */}
           <div className="lg:col-span-2">
-            <h4
-              className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]"
-              
-            >
+            <h4 className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]">
               Company
             </h4>
             <ul className="space-y-3">
@@ -139,7 +146,6 @@ export default function Footer() {
                   <a
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
-                    
                   >
                     {link.name}
                   </a>
@@ -150,10 +156,7 @@ export default function Footer() {
 
           {/* Customer Links */}
           <div className="lg:col-span-3">
-            <h4
-              className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]"
-              
-            >
+            <h4 className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]">
               Customer
             </h4>
             <ul className="space-y-3">
@@ -162,7 +165,6 @@ export default function Footer() {
                   <a
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
-                    
                   >
                     {link.name}
                   </a>
@@ -173,10 +175,7 @@ export default function Footer() {
 
           {/* Product Links */}
           <div className="lg:col-span-3">
-            <h4
-              className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]"
-              
-            >
+            <h4 className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]">
               Products
             </h4>
             <ul className="space-y-3">
@@ -185,7 +184,6 @@ export default function Footer() {
                   <a
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
-                    
                   >
                     {link.name}
                   </a>
@@ -197,24 +195,22 @@ export default function Footer() {
 
         {/* ── Bottom Bar ── */}
         <div className="pt-7 border-t border-neutral-300/60 flex flex-col sm:flex-row items-center justify-between gap-5">
-          <p
-            className="text-xs text-neutral-400 font-light tracking-wide text-center sm:text-left"
-            
-          >
+          <p className="text-xs text-neutral-400 font-light tracking-wide text-center sm:text-left">
             © 2026 Ravelle. All rights reserved. Made with ❤️ in Indonesia
           </p>
 
           <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
-            {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((label) => (
-              <a
-                key={label}
-                href={`/${label.toLowerCase().replace(/ /g, "-")}`}
-                className="text-xs text-neutral-400 hover:text-neutral-800 transition-colors font-light tracking-wide"
-                
-              >
-                {label}
-              </a>
-            ))}
+            {["Privacy Policy", "Terms of Service", "Cookie Policy"].map(
+              (label) => (
+                <a
+                  key={label}
+                  href={`/${label.toLowerCase().replace(/ /g, "-")}`}
+                  className="text-xs text-neutral-400 hover:text-neutral-800 transition-colors font-light tracking-wide"
+                >
+                  {label}
+                </a>
+              ),
+            )}
           </div>
         </div>
       </div>
