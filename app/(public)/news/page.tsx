@@ -20,7 +20,6 @@ import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import api from "@/lib/axios";
 
-
 export interface PublicArticle {
   id: number;
   title: string;
@@ -127,11 +126,11 @@ export default function News() {
   const featuredArticles = articles.filter((a) => a.isFeatured);
 
   return (
-    <div className="min-h-screen bg-white" >
+    <div className="min-h-screen bg-white">
       <Header />
 
       {/* ── HERO ── */}
-      <section className="relative h-[400px] sm:h-[500px] overflow-hidden bg-neutral-900">
+      <section className="relative h-[380px] sm:h-[440px] overflow-hidden bg-neutral-900">
         <motion.div
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.5 }}
@@ -162,13 +161,10 @@ export default function News() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]"
-              
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-5 leading-tight"
             >
               Inspirasi Rasa <br />
-              <span className="font-semibold italic text-neutral-200">
-                Dan Gaya
-              </span>
+              <span className="font-normal text-white">Dan Gaya</span>
             </motion.h1>
 
             <motion.p
@@ -262,10 +258,7 @@ export default function News() {
           <div className="flex items-center justify-between mb-12 border-b border-neutral-100 pb-8">
             <div className="flex items-center gap-4">
               <TrendingUp className="w-5 h-5 text-neutral-900" />
-              <h2
-                className="text-3xl font-light text-neutral-900"
-                
-              >
+              <h2 className="text-3xl font-light text-neutral-900">
                 {activeCategory === "Semua"
                   ? "Latest Articles"
                   : activeCategory}
@@ -290,10 +283,7 @@ export default function News() {
           ) : filteredArticles.length === 0 ? (
             <div className="text-center py-32 bg-neutral-50 border border-dashed border-neutral-200">
               <BookmarkPlus className="w-12 h-12 text-neutral-200 mx-auto mb-6" />
-              <h3
-                className="text-2xl font-light text-neutral-900 mb-2"
-                
-              >
+              <h3 className="text-2xl font-light text-neutral-900 mb-2">
                 No articles found
               </h3>
               <p className="text-neutral-500 text-sm font-light">
@@ -359,10 +349,7 @@ export default function News() {
                     </div>
 
                     <Link href={`/news/${article.id}`}>
-                      <h3
-                        className="text-2xl font-medium text-neutral-900 mb-4 line-clamp-2 hover:text-neutral-500 transition-colors leading-snug"
-                        
-                      >
+                      <h3 className="text-2xl font-medium text-neutral-900 mb-4 line-clamp-2 hover:text-neutral-500 transition-colors leading-snug">
                         {article.title}
                       </h3>
                     </Link>

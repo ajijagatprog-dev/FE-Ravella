@@ -20,13 +20,22 @@ import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 
-
 export default function ContactPage() {
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -43,10 +52,34 @@ export default function ContactPage() {
   };
 
   const contactInfo = [
-    { icon: Phone, title: "Phone", info: "+62 21 1234 5678", subInfo: "Mon–Fri 9AM–6PM", href: "tel:+622112345678" },
-    { icon: Mail, title: "Email", info: "hello@ravelle.co.id", subInfo: "24/7 Support", href: "mailto:hello@ravelle.co.id" },
-    { icon: MapPin, title: "Head Office", info: "Jl. Sudirman No. 123", subInfo: "Jakarta Pusat 10220", href: "#map" },
-    { icon: Clock, title: "Working Hours", info: "Mon–Fri: 9AM–6PM", subInfo: "Sat: 9AM–3PM", href: null },
+    {
+      icon: Phone,
+      title: "Phone",
+      info: "+62 21 1234 5678",
+      subInfo: "Mon–Fri 9AM–6PM",
+      href: "tel:+622112345678",
+    },
+    {
+      icon: Mail,
+      title: "Email",
+      info: "hello@ravelle.co.id",
+      subInfo: "24/7 Support",
+      href: "mailto:hello@ravelle.co.id",
+    },
+    {
+      icon: MapPin,
+      title: "Head Office",
+      info: "Jl. Sudirman No. 123",
+      subInfo: "Jakarta Pusat 10220",
+      href: "#map",
+    },
+    {
+      icon: Clock,
+      title: "Working Hours",
+      info: "Mon–Fri: 9AM–6PM",
+      subInfo: "Sat: 9AM–3PM",
+      href: null,
+    },
   ];
 
   const socialMedia = [
@@ -57,45 +90,65 @@ export default function ContactPage() {
   ];
 
   const faqs = [
-    { question: "Berapa lama pengiriman produk?", answer: "Pengiriman reguler memakan waktu 2–3 hari kerja. Untuk same-day delivery tersedia di area Jakarta dan sekitarnya." },
-    { question: "Apakah produk memiliki garansi?", answer: "Ya, semua produk Ravelle dilengkapi dengan garansi resmi 1 tahun. Garansi mencakup kerusakan manufaktur dan dapat diklaim di service center kami." },
-    { question: "Bagaimana cara melakukan retur produk?", answer: "Retur dapat dilakukan dalam 7 hari setelah produk diterima. Hubungi customer service kami untuk proses retur dan pengembalian dana." },
-    { question: "Apakah tersedia pembayaran cicilan?", answer: "Ya, kami menyediakan berbagai opsi pembayaran cicilan melalui kartu kredit dan platform payment partner kami dengan tenor 3, 6, atau 12 bulan." },
+    {
+      question: "Berapa lama pengiriman produk?",
+      answer:
+        "Pengiriman reguler memakan waktu 2–3 hari kerja. Untuk same-day delivery tersedia di area Jakarta dan sekitarnya.",
+    },
+    {
+      question: "Apakah produk memiliki garansi?",
+      answer:
+        "Ya, semua produk Ravelle dilengkapi dengan garansi resmi 1 tahun. Garansi mencakup kerusakan manufaktur dan dapat diklaim di service center kami.",
+    },
+    {
+      question: "Bagaimana cara melakukan retur produk?",
+      answer:
+        "Retur dapat dilakukan dalam 7 hari setelah produk diterima. Hubungi customer service kami untuk proses retur dan pengembalian dana.",
+    },
+    {
+      question: "Apakah tersedia pembayaran cicilan?",
+      answer:
+        "Ya, kami menyediakan berbagai opsi pembayaran cicilan melalui kartu kredit dan platform payment partner kami dengan tenor 3, 6, atau 12 bulan.",
+    },
   ];
 
-  const inputClass = "w-full px-4 py-3.5 bg-white border border-neutral-200 focus:border-neutral-800 focus:outline-none transition-colors text-neutral-900 placeholder:text-neutral-400 text-sm font-light";
+  const inputClass =
+    "w-full px-4 py-3.5 bg-white border border-neutral-200 focus:border-neutral-800 focus:outline-none transition-colors text-neutral-900 placeholder:text-neutral-400 text-sm font-light";
 
   return (
-    <div className="min-h-screen bg-white" >
+    <div className="min-h-screen bg-white">
       <Header />
 
       {/* ── HERO ── */}
       <section className="relative h-[380px] sm:h-[440px] overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80)" }} />
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url(https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80)",
+          }}
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
           <div className="max-w-2xl">
-
             <div className="inline-flex items-center gap-2.5 mb-5">
               <div className="w-5 h-[1px] bg-white/50" />
-              <span className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]" >
+              <span className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]">
                 Get in Touch
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-4 leading-[1.05]" style={{  letterSpacing: "-0.01em" }}>
-              Contact{" "}
-              <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
-                Ravelle
-              </em>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+              Contact <span className="font-normal">Ravelle</span>
             </h1>
 
             <div className="w-10 h-[1px] bg-white/30 mb-5" />
 
-            <p className="text-white/70 text-sm sm:text-base font-light leading-relaxed max-w-lg" >
-              We're here to help! Reach out to us for any questions, support, or feedback.
+            <p className="text-white/70 text-sm sm:text-base font-light leading-relaxed max-w-lg">
+              We're here to help! Reach out to us for any questions, support, or
+              feedback.
             </p>
           </div>
         </div>
@@ -110,7 +163,6 @@ export default function ContactPage() {
 
       {/* ── MAIN ── */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-
         {/* ── CONTACT INFO CARDS ── */}
         <section className="py-16 sm:py-20">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-neutral-100">
@@ -125,13 +177,13 @@ export default function ContactPage() {
                   <div className="w-10 h-10 flex items-center justify-center border border-neutral-200 mb-5 group-hover:bg-neutral-900 group-hover:border-neutral-900 transition-all duration-300">
                     <Icon className="w-4 h-4 text-neutral-600 group-hover:text-white transition-colors" />
                   </div>
-                  <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-2" >
+                  <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-2">
                     {item.title}
                   </p>
-                  <p className="text-base font-medium text-neutral-900 mb-1" >
+                  <p className="text-base font-medium text-neutral-900 mb-1">
                     {item.info}
                   </p>
-                  <p className="text-sm text-neutral-400 font-light" >
+                  <p className="text-sm text-neutral-400 font-light">
                     {item.subInfo}
                   </p>
                 </a>
@@ -143,82 +195,119 @@ export default function ContactPage() {
         {/* ── FORM & MAP ── */}
         <section className="py-16 sm:py-20 border-t border-neutral-100">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
-
             {/* Contact Form */}
             <div className="space-y-8">
-
               {/* Heading */}
               <div>
                 <div className="inline-flex items-center gap-2.5 mb-5">
                   <div className="w-5 h-[1px] bg-neutral-400" />
-                  <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]" >
+                  <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]">
                     Send Message
                   </span>
                 </div>
-                <h2 className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3 leading-[1.05]" style={{  letterSpacing: "-0.01em" }}>
+                <h2
+                  className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3 leading-[1.05]"
+                  style={{ letterSpacing: "-0.01em" }}
+                >
                   Let's{" "}
-                  <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
+                  <em
+                    className="font-semibold not-italic"
+                    style={{ fontStyle: "italic" }}
+                  >
                     Connect
                   </em>
                 </h2>
                 <div className="w-8 h-[1px] bg-neutral-200 mb-4" />
-                <p className="text-neutral-500 text-sm font-light leading-relaxed" >
-                  Fill out the form below and our team will get back to you within 24 hours.
+                <p className="text-neutral-500 text-sm font-light leading-relaxed">
+                  Fill out the form below and our team will get back to you
+                  within 24 hours.
                 </p>
               </div>
 
               {/* Success Message */}
               {submitSuccess && (
-                <div className="flex items-center gap-3 p-4 border border-neutral-200 bg-neutral-50" >
+                <div className="flex items-center gap-3 p-4 border border-neutral-200 bg-neutral-50">
                   <CheckCircle className="w-5 h-5 text-neutral-700 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-neutral-900 text-sm">Pesan Terkirim</p>
-                    <p className="text-xs text-neutral-500 font-light">Kami akan menghubungi Anda segera.</p>
+                    <p className="font-medium text-neutral-900 text-sm">
+                      Pesan Terkirim
+                    </p>
+                    <p className="text-xs text-neutral-500 font-light">
+                      Kami akan menghubungi Anda segera.
+                    </p>
                   </div>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
-
                 {/* Name */}
                 <div>
-                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
+                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2">
                     Full Name *
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300" />
-                    <input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="Your full name" className={`${inputClass} pl-11`}  />
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="Your full name"
+                      className={`${inputClass} pl-11`}
+                    />
                   </div>
                 </div>
 
                 {/* Email & Phone */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
+                    <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2">
                       Email *
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300" />
-                      <input type="email" name="email" value={formData.email} onChange={handleInputChange} required placeholder="your@email.com" className={`${inputClass} pl-11`}  />
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="your@email.com"
+                        className={`${inputClass} pl-11`}
+                      />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
+                    <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2">
                       Phone
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300" />
-                      <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+62 xxx xxxx xxxx" className={`${inputClass} pl-11`}  />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="+62 xxx xxxx xxxx"
+                        className={`${inputClass} pl-11`}
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Subject */}
                 <div>
-                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
+                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2">
                     Subject *
                   </label>
-                  <select name="subject" value={formData.subject} onChange={handleInputChange} required className={inputClass} >
+                  <select
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                    required
+                    className={inputClass}
+                  >
                     <option value="">Select a subject</option>
                     <option value="product">Product Inquiry</option>
                     <option value="support">Technical Support</option>
@@ -231,10 +320,18 @@ export default function ContactPage() {
 
                 {/* Message */}
                 <div>
-                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2" >
+                  <label className="block text-[11px] tracking-[0.15em] uppercase text-neutral-500 font-medium mb-2">
                     Message *
                   </label>
-                  <textarea name="message" value={formData.message} onChange={handleInputChange} required rows={6} placeholder="Tell us how we can help you..." className={inputClass + " resize-none"}  />
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    rows={6}
+                    placeholder="Tell us how we can help you..."
+                    className={inputClass + " resize-none"}
+                  />
                 </div>
 
                 {/* Submit */}
@@ -242,7 +339,6 @@ export default function ContactPage() {
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full py-4 bg-neutral-900 text-white text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 group"
-                  
                 >
                   {isSubmitting ? (
                     <>
@@ -261,9 +357,11 @@ export default function ContactPage() {
 
             {/* Map & Social */}
             <div className="space-y-6">
-
               {/* Map */}
-              <div className="relative h-[380px] lg:h-[440px] overflow-hidden border border-neutral-100" id="map">
+              <div
+                className="relative h-[380px] lg:h-[440px] overflow-hidden border border-neutral-100"
+                id="map"
+              >
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.521260322283!2d106.8195613!3d-6.1944491!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d2e764b12d%3A0x3d2ad6e1e0e9bcc8!2sJl.%20Jend.%20Sudirman%2C%20Jakarta!5e0!3m2!1sen!2sid!4v1234567890"
                   width="100%"
@@ -278,8 +376,12 @@ export default function ContactPage() {
                   <div className="flex items-center gap-3">
                     <MapPin className="w-4 h-4 text-neutral-600 flex-shrink-0" />
                     <div>
-                      <p className="text-xs font-medium text-neutral-900 tracking-wide" >Visit Our Office</p>
-                      <p className="text-[11px] text-neutral-400 font-light" >Jakarta Pusat</p>
+                      <p className="text-xs font-medium text-neutral-900 tracking-wide">
+                        Visit Our Office
+                      </p>
+                      <p className="text-[11px] text-neutral-400 font-light">
+                        Jakarta Pusat
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -287,14 +389,14 @@ export default function ContactPage() {
 
               {/* Social Media */}
               <div className="bg-neutral-900 p-7">
-                <p className="text-[11px] tracking-[0.22em] uppercase text-white/40 font-medium mb-1" >
+                <p className="text-[11px] tracking-[0.22em] uppercase text-white/40 font-medium mb-1">
                   Follow Us
                 </p>
-                <h3 className="text-3xl font-light text-white mb-1" >
+                <h3 className="text-3xl font-light text-white mb-1">
                   Stay <em style={{ fontStyle: "italic" }}>Connected</em>
                 </h3>
                 <div className="w-6 h-[1px] bg-white/20 mb-5" />
-                <p className="text-white/45 text-sm font-light mb-6" >
+                <p className="text-white/45 text-sm font-light mb-6">
                   Get the latest updates and tips.
                 </p>
 
@@ -311,8 +413,12 @@ export default function ContactPage() {
                           <Icon className="w-3.5 h-3.5 text-white/70 group-hover:text-neutral-900 transition-colors" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[11px] tracking-[0.12em] uppercase text-white font-medium" >{social.name}</p>
-                          <p className="text-[10px] text-white/40 font-light truncate" >{social.handle}</p>
+                          <p className="text-[11px] tracking-[0.12em] uppercase text-white font-medium">
+                            {social.name}
+                          </p>
+                          <p className="text-[10px] text-white/40 font-light truncate">
+                            {social.handle}
+                          </p>
                         </div>
                       </a>
                     );
@@ -328,21 +434,27 @@ export default function ContactPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2.5 mb-4">
               <div className="w-5 h-[1px] bg-neutral-400" />
-              <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]" >
+              <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]">
                 FAQ
               </span>
               <div className="w-5 h-[1px] bg-neutral-400" />
             </div>
-            <h2 className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3" style={{  letterSpacing: "-0.01em" }}>
+            <h2
+              className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3"
+              style={{ letterSpacing: "-0.01em" }}
+            >
               Common{" "}
-              <em className="font-semibold not-italic" style={{ fontStyle: "italic" }}>
+              <em
+                className="font-semibold not-italic"
+                style={{ fontStyle: "italic" }}
+              >
                 Questions
               </em>
             </h2>
             <div className="flex justify-center mb-4">
               <div className="w-8 h-[1px] bg-neutral-200" />
             </div>
-            <p className="text-neutral-500 text-sm font-light max-w-xl mx-auto" >
+            <p className="text-neutral-500 text-sm font-light max-w-xl mx-auto">
               Find answers to the most frequently asked questions
             </p>
           </div>
@@ -354,7 +466,7 @@ export default function ContactPage() {
                 className="group border border-neutral-100 hover:border-neutral-300 transition-colors overflow-hidden"
               >
                 <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none">
-                  <h3 className="text-base font-medium text-neutral-900 pr-6" >
+                  <h3 className="text-base font-medium text-neutral-900 pr-6">
                     {faq.question}
                   </h3>
                   <div className="w-7 h-7 flex items-center justify-center border border-neutral-200 flex-shrink-0 group-open:bg-neutral-900 group-open:border-neutral-900 transition-all">
@@ -362,7 +474,7 @@ export default function ContactPage() {
                   </div>
                 </summary>
                 <div className="px-6 pb-5 border-t border-neutral-100">
-                  <p className="text-neutral-500 text-sm font-light leading-relaxed pt-4" >
+                  <p className="text-neutral-500 text-sm font-light leading-relaxed pt-4">
                     {faq.answer}
                   </p>
                 </div>
@@ -370,7 +482,6 @@ export default function ContactPage() {
             ))}
           </div>
         </section>
-
       </div>
       <Footer />
     </div>

@@ -62,7 +62,6 @@ const HERO_DATA = [
   },
 ];
 
-
 export default function HeroSection() {
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -89,13 +88,10 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section
-      className="relative w-full overflow-hidden bg-neutral-900"
-      
-    >
+    <section className="relative w-full overflow-hidden bg-neutral-900">
       {/* ── HERO IMAGE & CONTENT — full width ── */}
       <div className="relative">
-        <div className="relative h-[380px] sm:h-[440px] md:h-[480px] lg:h-[540px] w-full">
+        <div className="relative h-[380px] sm:h-[440px] w-full">
           <HeroBackground active={active} />
 
           {/* Nav Arrows */}
@@ -147,7 +143,6 @@ export default function HeroSection() {
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
                     }`}
-                    
                   >
                     {HERO_DATA[i].subtitle}
                   </div>
@@ -162,10 +157,7 @@ export default function HeroSection() {
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span
-                className="text-white/50 text-[11px] font-light tracking-[0.2em] min-w-[3rem]"
-                
-              >
+              <span className="text-white/50 text-[11px] font-light tracking-[0.2em] min-w-[3rem]">
                 {String(active + 1).padStart(2, "0")} /{" "}
                 {String(HERO_IMAGES.length).padStart(2, "0")}
               </span>
@@ -259,12 +251,9 @@ function HeroContent({ active }: { active: number }) {
         >
           {/* Badge */}
           <motion.div variants={itemVariants}>
-            <div className="inline-flex items-center gap-2.5 mb-4 sm:mb-5">
-              <div className="w-5 h-[1px] bg-white/50" />
-              <span
-                className="text-[10px] sm:text-[11px] font-medium tracking-[0.28em] uppercase text-white/70"
-                
-              >
+            <div className="inline-flex items-center gap-2 mb-2 sm:mb-3">
+              <div className="w-4 h-[1px] bg-white/50" />
+              <span className="text-[9px] sm:text-[10px] font-medium tracking-[0.25em] uppercase text-white/70">
                 {data.badge}
               </span>
             </div>
@@ -272,41 +261,29 @@ function HeroContent({ active }: { active: number }) {
 
           {/* Subtitle */}
           <motion.div variants={itemVariants}>
-            <p
-              className="text-white/60 font-light text-[11px] sm:text-xs mb-3 tracking-[0.22em] uppercase"
-              
-            >
+            <p className="text-white/60 font-light text-[10px] sm:text-[11px] mb-2 tracking-[0.2em] uppercase">
               {data.subtitle}
             </p>
           </motion.div>
 
           {/* Title */}
           <motion.div variants={itemVariants}>
-            <h1
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] text-white mb-4 sm:mb-5"
-              style={{  letterSpacing: "-0.01em" }}
-            >
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold leading-tight text-white mb-2 sm:mb-3">
               {data.title.split(" ").slice(0, 2).join(" ")}
-              <em
-                className="block not-italic font-semibold mt-0.5"
-                style={{  fontStyle: "italic" }}
-              >
+              <span className="block font-normal mt-0.5">
                 {data.title.split(" ").slice(2).join(" ")}
-              </em>
+              </span>
             </h1>
           </motion.div>
 
           {/* Thin rule */}
           <motion.div variants={itemVariants}>
-            <div className="w-10 h-[1px] bg-white/30 mb-4 sm:mb-5" />
+            <div className="w-8 h-[1px] bg-white/30 mb-3 sm:mb-4" />
           </motion.div>
 
           {/* Description */}
           <motion.div variants={itemVariants}>
-            <p
-              className="text-white/75 text-sm sm:text-base leading-relaxed max-w-md mb-7 sm:mb-8 font-light"
-              
-            >
+            <p className="text-white/75 text-xs sm:text-sm leading-relaxed max-w-sm lg:max-w-md mb-4 sm:mb-5 font-light line-clamp-2 sm:line-clamp-none">
               {data.description}
             </p>
           </motion.div>
@@ -314,43 +291,36 @@ function HeroContent({ active }: { active: number }) {
           {/* CTA */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-7"
+            className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-5"
           >
             <Link
               href="/product"
-              className="group w-full sm:w-auto px-8 py-3.5 bg-white text-neutral-900 font-medium text-[11px] tracking-[0.22em] uppercase hover:bg-neutral-100 transition-all duration-300 flex items-center justify-center gap-3"
-              
+              className="group w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3 bg-white text-neutral-900 font-medium text-[10px] tracking-[0.2em] uppercase hover:bg-neutral-100 transition-all duration-300 flex items-center justify-center gap-2"
             >
               {data.cta}
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
 
           {/* Trust */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-wrap items-center gap-5 sm:gap-6"
+            className="flex flex-wrap items-center gap-4 sm:gap-5"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className="w-3 h-3 fill-yellow-400 text-yellow-400"
+                  className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400"
                 />
               ))}
-              <span
-                className="text-white font-medium text-xs tracking-[0.1em] ml-1"
-                
-              >
+              <span className="text-white font-medium text-[10px] sm:text-xs tracking-[0.1em] ml-1">
                 4.9
               </span>
             </div>
-            <div
-              className="flex items-center gap-2"
-              
-            >
+            <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-              <span className="text-white/65 text-xs font-light tracking-[0.08em]">
+              <span className="text-white/65 text-[10px] sm:text-xs font-light tracking-[0.08em]">
                 <span className="font-medium text-white">12,500+</span>{" "}
                 Pelanggan Puas
               </span>
@@ -373,10 +343,7 @@ function FeatureBadge({
   subtext: string;
 }) {
   return (
-    <div
-      className="group flex items-center gap-3 px-5 sm:px-6 py-4 sm:py-5 hover:bg-white/5 transition-colors duration-300"
-      
-    >
+    <div className="group flex items-center gap-3 px-5 sm:px-6 py-4 sm:py-5 hover:bg-white/5 transition-colors duration-300">
       <div className="flex-shrink-0 text-white/60 group-hover:text-white/90 transition-colors duration-300">
         {icon}
       </div>
