@@ -155,10 +155,10 @@ function ProductPageContent() {
         count: products.filter((p) => p.category === "home living").length,
       },
       {
-        id: "Kitchen Tools",
-        name: "KITCHEN TOOLS",
+        id: "Keyboard",
+        name: "KEYBOARDS",
         icon: Sparkles,
-        count: products.filter((p) => p.category === "Kitchen Tools").length,
+        count: products.filter((p) => p.category === "Keyboard").length,
       },
     ],
     [products],
@@ -301,7 +301,7 @@ function ProductPageContent() {
       </div>
 
       {/* ── HERO ── */}
-      <section className="relative h-[400px] sm:h-[500px] lg:h-[600px] overflow-hidden">
+      <section className="relative h-[380px] sm:h-[440px] overflow-hidden">
         <motion.div
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
@@ -333,30 +333,10 @@ function ProductPageContent() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="
-                          text-3xl
-                          sm:text-4xl
-                          md:text-5xl
-                          lg:text-6xl
-                          xl:text-7xl 
-                          2xl:text-8xl
-                          font-light
-                          text-white
-                          mb-4
-                          sm:mb-5
-                          md:mb-6
-                          leading-[1.05]
-                          sm:leading-[1]
-                          break-words
-                        "
-              style={{
-                letterSpacing: "-0.02em",
-              }}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight break-words"
             >
               Find Your Perfect <br />
-              <span className="font-semibold italic text-neutral-200">
-                Product
-              </span>
+              <span className="font-normal text-white">Product</span>
             </motion.h1>
 
             <motion.div

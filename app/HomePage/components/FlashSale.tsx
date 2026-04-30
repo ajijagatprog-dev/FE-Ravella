@@ -315,7 +315,10 @@ export default function FlashSale() {
           {isLoading ? (
             <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 overflow-x-auto gap-4 lg:gap-6 pb-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="min-w-[200px] animate-pulse">
+                <div
+                  key={i}
+                  className="min-w-[160px] sm:min-w-[200px] md:min-w-0 animate-pulse"
+                >
                   <div className="aspect-square bg-white/5 rounded-xl mb-3 sm:mb-4" />
                   <div className="h-4 bg-white/10 rounded mb-2 w-3/4" />
                   <div className="h-4 bg-white/10 rounded w-1/2" />
@@ -381,7 +384,7 @@ function ProductCard({
     }).format(p);
 
   return (
-    <div className="min-w-[200px] sm:min-w-[240px] md:min-w-0 snap-start group">
+    <div className="min-w-[160px] sm:min-w-[200px] md:min-w-0 snap-start group">
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden mb-3 sm:mb-4 bg-white rounded-xl border border-white/10 p-4 sm:p-5 flex items-center justify-center">
         {/* Discount Badge */}
@@ -426,7 +429,7 @@ function ProductCard({
         </p>
 
         <Link href={`/product/${product.id}`}>
-          <h3 className="font-semibold text-base sm:text-lg md:text-xl text-white mb-1.5 sm:mb-2 line-clamp-1 group-hover:text-red-400 transition-colors leading-tight">
+          <h3 className="font-semibold text-sm sm:text-base text-white mb-1.5 line-clamp-1 group-hover:text-red-400 transition-colors">
             {product.title}
           </h3>
         </Link>
@@ -443,7 +446,7 @@ function ProductCard({
             )}
           </div>
           <div className="flex items-center justify-between">
-            <p className="font-bold text-sm sm:text-base md:text-lg text-white tracking-wide">
+            <p className="font-bold text-base text-white tracking-wide mt-1">
               {product.price}
             </p>
             <div className="flex items-center gap-1.5">

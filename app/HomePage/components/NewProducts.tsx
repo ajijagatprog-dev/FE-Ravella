@@ -236,7 +236,7 @@ function ProductCard({
   onAddToCart: (p: Product) => void;
 }) {
   return (
-    <div className="min-w-[200px] sm:min-w-[240px] md:min-w-0 snap-start group">
+    <div className="min-w-[160px] sm:min-w-[200px] md:min-w-0 snap-start group">
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden mb-3 sm:mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-4 sm:p-5 flex items-center justify-center">
         {/* Badge */}

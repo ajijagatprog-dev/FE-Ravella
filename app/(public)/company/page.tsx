@@ -29,12 +29,11 @@ export default function Company() {
       <Header />
 
       {/* ── HERO ── */}
-      <section className="relative h-[400px] sm:h-[500px] md:h-[600px] overflow-hidden">
+      <section className="relative h-[380px] sm:h-[440px] overflow-hidden bg-neutral-900">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)",
+            backgroundImage: "url(/Company/company.webp)",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
@@ -51,17 +50,8 @@ export default function Company() {
             </div>
 
             {/* Heading */}
-            <h1
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-5 leading-[1.05]"
-              style={{ letterSpacing: "-0.01em" }}
-            >
-              Ravelle{" "}
-              <em
-                className="font-semibold not-italic"
-                style={{ fontStyle: "italic" }}
-              >
-                Indonesia
-              </em>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+              Ravelle <span className="font-normal text-white">Indonesia</span>
             </h1>
 
             <div className="w-10 h-[1px] bg-white/30 mb-5" />
@@ -98,80 +88,38 @@ export default function Company() {
 
       {/* ── MAIN CONTENT ── */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-        {/* ── COMPANY STORY ── */}
+        {/* ── COMPANY STORY & EXCELLENCE ── */}
         <section className="py-16 sm:py-20 md:py-24">
-          <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-20 items-start">
-            {/* Images */}
-            <div className="relative space-y-4">
-              <div className="relative overflow-hidden group">
-                <img
-                  src="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80"
-                  alt="Ravelle Kitchen Setup"
-                  className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
-              </div>
-
-              <div className="relative overflow-hidden h-60 sm:h-72 group">
-                <img
-                  src="https://cdn.shopify.com/s/files/1/0931/2382/files/Products_A2_480x480.gif?v=1718387274"
-                  alt="Ravelle Products"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-
-              {/* Floating rating badge */}
-              <div className="absolute top-4 right-4 bg-white border border-neutral-100 px-4 py-3 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
-                  <div>
-                    <div className="text-2xl font-light text-neutral-900">
-                      4.8
-                    </div>
-                    <div className="text-[10px] tracking-[0.15em] uppercase text-neutral-400 font-medium">
-                      Rating
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div className="grid lg:grid-cols-2 gap-0 items-stretch max-w-[1400px] mx-auto">
+            {/* Image */}
+            <div className="relative w-full h-full min-h-[400px] lg:min-h-[800px]">
+              <img
+                src="/Company/company2.png"
+                alt="Ravelle Company"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             </div>
 
             {/* Content */}
-            <div className="space-y-6 lg:space-y-8">
-              {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2.5">
-                <div className="w-5 h-[1px] bg-neutral-400" />
-                <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]">
-                  Our Story
-                </span>
-              </div>
+            <div className="bg-[#fcfcfc] border border-neutral-100 p-8 sm:p-12 md:p-16 lg:p-20 space-y-16">
+              {/* Improve the Living Quality */}
+              <div className="space-y-6">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-neutral-900 leading-tight">
+                  Improve the <br />
+                  <span className="font-normal text-neutral-900">
+                    Living Quality
+                  </span>
+                </h2>
 
-              <h2
-                className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900 leading-[1.05]"
-                style={{ letterSpacing: "-0.01em" }}
-              >
-                Improve the{" "}
-                <em
-                  className="font-semibold not-italic"
-                  style={{ fontStyle: "italic" }}
-                >
-                  Living Quality
-                </em>
-              </h2>
+                <p className="text-sm sm:text-base text-neutral-600 font-light leading-relaxed">
+                  Since its debut in{" "}
+                  <span className="font-medium text-neutral-900">2020</span>,
+                  RAVELLE has continued to improve the living quality of
+                  Indonesian families especially during the pandemic time by
+                  consistently carrying these values in all of its products:
+                </p>
 
-              <div className="w-10 h-[1px] bg-neutral-200" />
-
-              <p className="text-base text-neutral-600 font-light leading-relaxed">
-                Since its debut in{" "}
-                <span className="font-medium text-neutral-900">2020</span>,
-                RAVELLE has continued to improve the living quality of
-                Indonesian families especially during the pandemic time by
-                consistently carrying these values in all of its products:
-              </p>
-
-              {/* Core Values */}
-              <div className="border border-neutral-100 p-6 sm:p-8 bg-neutral-50">
-                <ul className="space-y-3.5">
+                <ul className="space-y-2.5">
                   {[
                     "Quality everyday life",
                     "Joyful experience",
@@ -180,88 +128,49 @@ export default function Company() {
                     "Clarity and transparency",
                   ].map((value, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <div className="w-4 h-[1px] bg-neutral-400 flex-shrink-0 mt-[10px]" />
-                      <span className="text-sm sm:text-base font-light text-neutral-700 tracking-wide">
+                      <span className="text-neutral-400 text-sm sm:text-base mt-1">
+                        •
+                      </span>
+                      <span className="text-sm sm:text-base font-light text-neutral-600">
                         {value}
                       </span>
                     </li>
                   ))}
                 </ul>
               </div>
-            </div>
-          </div>
-        </section>
 
-        {/* ── PRODUCT EXCELLENCE ── */}
-        <section className="py-16 sm:py-20 border-t border-neutral-100">
-          <div className="text-center mb-12 sm:mb-16">
-            <div className="inline-flex items-center gap-2.5 mb-4">
-              <div className="w-5 h-[1px] bg-neutral-400" />
-              <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]">
-                Excellence
-              </span>
-              <div className="w-5 h-[1px] bg-neutral-400" />
-            </div>
-            <h2
-              className="text-4xl sm:text-5xl md:text-6xl font-light text-neutral-900 mb-4"
-              style={{ letterSpacing: "-0.01em" }}
-            >
-              Ravelle{" "}
-              <em
-                className="font-semibold not-italic"
-                style={{ fontStyle: "italic" }}
-              >
-                Product
-              </em>
-            </h2>
-            <p className="text-neutral-500 text-sm sm:text-base font-light max-w-2xl mx-auto">
-              These values are consistently translated into all RAVELLE products
-              through:
-            </p>
-          </div>
+              {/* Ravelle Product */}
+              <div className="space-y-6">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-neutral-900 leading-tight">
+                  Ravelle Product
+                </h2>
 
-          <div className="max-w-4xl mx-auto space-y-3">
-            {[
-              {
-                text: "Modern and innovative product designs.",
-                icon: Sparkles,
-              },
-              {
-                text: "Colourful, creative and unique shapes and sizes.",
-                icon: Palette,
-              },
-              {
-                text: "Excellent built quality for product durability.",
-                icon: Shield,
-              },
-              {
-                text: "Open and positive product communications to convey accurate information.",
-                icon: MessageCircle,
-              },
-              {
-                text: "Responsive customer service combined with excellent product knowledge for better customer piece of mind.",
-                icon: Users,
-              },
-              {
-                text: "Fostering good and ethical working relationship with our business partners and customers alike.",
-                icon: Handshake,
-              },
-            ].map((feature, i) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={i}
-                  className="group flex items-start gap-5 p-5 sm:p-6 border border-neutral-100 hover:border-neutral-300 hover:bg-neutral-50 transition-all duration-300"
-                >
-                  <div className="w-10 h-10 flex items-center justify-center bg-neutral-900 text-white flex-shrink-0 group-hover:bg-black transition-colors">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <p className="text-sm sm:text-base font-light text-neutral-600 leading-relaxed pt-2">
-                    {feature.text}
-                  </p>
-                </div>
-              );
-            })}
+                <p className="text-sm sm:text-base text-neutral-600 font-light leading-relaxed">
+                  These values are consistently translated into all RAVELLE
+                  products through:
+                </p>
+
+                <ul className="space-y-2.5">
+                  {[
+                    "Modern and innovative product designs.",
+                    "Colourful, creative and unique shapes and sizes.",
+                    "Excellent built quality for product durability.",
+                    "Open and positive product communications to convey accurate information.",
+                    "Responsive customer service combined with excellent product knowledge for better customer piece of mind.",
+                    "Fostering good and ethical working relationship with our business partners and customers alike.",
+                  ].map((text, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="text-neutral-400 text-sm sm:text-base mt-1">
+                        •
+                      </span>
+                      <span className="text-sm sm:text-base font-light text-neutral-600">
+                        {text}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 
