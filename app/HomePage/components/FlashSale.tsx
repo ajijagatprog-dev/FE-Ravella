@@ -15,7 +15,6 @@ import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 import { motion } from "framer-motion";
 
-
 interface Product {
   id: number;
   title: string;
@@ -208,10 +207,7 @@ export default function FlashSale() {
   }
 
   return (
-    <section
-      className="bg-stone-900 px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16 md:py-20 relative overflow-hidden"
-      
-    >
+    <section className="bg-stone-900 px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16 md:py-20 relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-rose-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
@@ -247,7 +243,7 @@ export default function FlashSale() {
       >
         {/* Voucher Banners */}
         {vouchers.length > 0 && (
-          <div className="mb-10 w-full grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div className="mb-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {vouchers.map((v, idx) => (
               <VoucherCard key={idx} voucher={v} />
             ))}
@@ -264,17 +260,8 @@ export default function FlashSale() {
               </span>
             </div>
 
-            <h2
-              className="text-4xl sm:text-5xl md:text-6xl font-light leading-[1.05] text-white mb-4"
-              style={{  letterSpacing: "-0.01em" }}
-            >
-              Flash{" "}
-              <em
-                className="font-semibold not-italic"
-                style={{ fontStyle: "italic" }}
-              >
-                Sale
-              </em>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-white mb-3">
+              Flash Sale
             </h2>
 
             {/* Countdown Timer */}
@@ -326,10 +313,10 @@ export default function FlashSale() {
         {/* ── Products Grid ── */}
         <div className="relative">
           {isLoading ? (
-            <div className="flex lg:grid lg:grid-cols-4 overflow-x-auto gap-4 sm:gap-6 pb-6">
+            <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 overflow-x-auto gap-4 lg:gap-6 pb-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="min-w-[260px] animate-pulse">
-                  <div className="aspect-square bg-white/5 rounded-xl mb-4" />
+                <div key={i} className="min-w-[200px] animate-pulse">
+                  <div className="aspect-square bg-white/5 rounded-xl mb-3 sm:mb-4" />
                   <div className="h-4 bg-white/10 rounded mb-2 w-3/4" />
                   <div className="h-4 bg-white/10 rounded w-1/2" />
                 </div>
@@ -338,7 +325,7 @@ export default function FlashSale() {
           ) : (
             <>
               {/* Mobile: Horizontal Scroll */}
-              <div className="flex lg:hidden overflow-x-auto gap-4 sm:gap-6 pb-6 snap-x snap-mandatory scrollbar-hide">
+              <div className="flex md:hidden overflow-x-auto gap-4 pb-6 snap-x snap-mandatory scrollbar-hide">
                 {products.map((item, i) => (
                   <ProductCard
                     key={i}
@@ -349,8 +336,8 @@ export default function FlashSale() {
                 ))}
               </div>
 
-              {/* Desktop: Grid */}
-              <div className="hidden lg:grid lg:grid-cols-4 gap-6">
+              {/* Tablet & Desktop: Grid */}
+              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                 {products.map((item, i) => (
                   <ProductCard
                     key={i}
@@ -394,9 +381,9 @@ function ProductCard({
     }).format(p);
 
   return (
-    <div className="min-w-[260px] sm:min-w-[300px] lg:min-w-0 snap-start group">
+    <div className="min-w-[200px] sm:min-w-[240px] md:min-w-0 snap-start group">
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden mb-4 bg-white rounded-xl border border-white/10 p-6 flex items-center justify-center">
+      <div className="relative aspect-square overflow-hidden mb-3 sm:mb-4 bg-white rounded-xl border border-white/10 p-4 sm:p-5 flex items-center justify-center">
         {/* Discount Badge */}
         {product.discount > 0 && (
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
@@ -439,10 +426,7 @@ function ProductCard({
         </p>
 
         <Link href={`/product/${product.id}`}>
-          <h3
-            className="font-light text-xl sm:text-2xl text-white mb-2 line-clamp-1 group-hover:text-red-400 transition-colors leading-tight"
-            style={{  letterSpacing: "0" }}
-          >
+          <h3 className="font-semibold text-base sm:text-lg md:text-xl text-white mb-1.5 sm:mb-2 line-clamp-1 group-hover:text-red-400 transition-colors leading-tight">
             {product.title}
           </h3>
         </Link>
@@ -459,7 +443,7 @@ function ProductCard({
             )}
           </div>
           <div className="flex items-center justify-between">
-            <p className="font-bold text-lg sm:text-xl text-white tracking-wide">
+            <p className="font-bold text-sm sm:text-base md:text-lg text-white tracking-wide">
               {product.price}
             </p>
             <div className="flex items-center gap-1.5">
@@ -495,31 +479,28 @@ function VoucherCard({
       animate={{ opacity: 1, y: 0 }}
       className="w-full h-full"
     >
-      <div className="border border-white/20 bg-stone-900/40 backdrop-blur-md rounded-[2rem] p-4 sm:p-5 flex flex-col xl:flex-row items-center justify-between gap-5 shadow-2xl overflow-hidden relative h-full">
+      <div className="border border-white/20 bg-stone-900/40 backdrop-blur-md rounded-[1.5rem] p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-5 shadow-2xl overflow-hidden relative h-full">
         {/* Decorative gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 via-transparent to-transparent opacity-50 pointer-events-none" />
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full xl:w-auto relative z-10 flex-1">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-red-500/20 to-rose-600/20 border border-red-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
-            <Tag className="w-6 h-6 text-red-400" />
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto relative z-10 flex-1">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-red-500/20 to-rose-600/20 border border-red-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
+            <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" />
           </div>
           <div className="text-center sm:text-left">
             <p className="text-[10px] text-red-400/80 uppercase tracking-[0.25em] font-bold mb-1.5 flex items-center justify-center sm:justify-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               Voucher Promo
             </p>
-            <p
-              className="text-white text-sm sm:text-base font-light tracking-wide"
-              
-            >
+            <p className="text-white text-xs sm:text-sm md:text-base font-light tracking-wide line-clamp-2">
               {voucher.description}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full xl:w-auto bg-black/50 rounded-2xl p-2 border border-white/10 relative z-10">
-          <div className="px-5 py-2 flex-1 text-center xl:text-left border-r border-white/10 border-dashed">
-            <span className="font-mono text-white text-lg sm:text-xl font-bold tracking-[0.15em]">
+        <div className="flex flex-col md:flex-row items-center gap-2 w-full sm:w-auto bg-black/50 rounded-2xl p-2 border border-white/10 relative z-10">
+          <div className="px-3 sm:px-4 py-2 w-full md:w-auto text-center md:text-left md:border-r border-white/10 border-dashed">
+            <span className="font-mono text-white text-sm sm:text-base lg:text-lg font-bold tracking-[0.1em] sm:tracking-[0.15em] break-all md:break-normal">
               {voucher.code}
             </span>
           </div>
@@ -529,7 +510,7 @@ function VoucherCard({
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
-            className={`flex-shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all duration-300 min-w-[120px] ${
+            className={`flex-shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all duration-300 min-w-[120px] w-full md:w-auto ${
               copied
                 ? "bg-green-500/20 text-green-400 border border-green-500/30"
                 : "bg-white text-stone-900 hover:bg-stone-200"

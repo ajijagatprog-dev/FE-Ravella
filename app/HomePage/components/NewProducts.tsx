@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 import { motion } from "framer-motion";
 
-
 interface Product {
   id: number;
   title: string;
@@ -22,23 +21,34 @@ export default function NewProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
-    { visible: false, productName: "" }
+    { visible: false, productName: "" },
   );
 
   useEffect(() => {
     const fetchNewProducts = async () => {
       try {
-        const res = await api.get('/products', { params: { limit: 4, sort: 'latest' } });
-        if (res.data.status === 'success') {
+        const res = await api.get("/products", {
+          params: { limit: 4, sort: "latest" },
+        });
+        if (res.data.status === "success") {
           const mapped = res.data.data.data.map((item: any) => {
-            const displayPrice = item.sale_price && item.sale_price > 0 ? item.sale_price : item.price;
+            const displayPrice =
+              item.sale_price && item.sale_price > 0
+                ? item.sale_price
+                : item.price;
             return {
               id: item.id,
               title: item.name,
-              category: item.category || 'Peralatan Masak',
-              price: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(displayPrice),
+              category: item.category || "Peralatan Masak",
+              price: new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0,
+              }).format(displayPrice),
               rawPrice: displayPrice,
-              image: item.image || "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+              image:
+                item.image ||
+                "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
               badge: item.badge || (item.is_featured ? "Best Seller" : "New"),
               rating: item.rating ? parseFloat(item.rating) : 0,
             };
@@ -70,7 +80,9 @@ export default function NewProducts() {
       const exists = cart.find((item) => item.id === p.id);
       if (exists) {
         cart = cart.map((item) =>
-          item.id === p.id ? { ...item, quantity: (item.quantity || 0) + 1 } : item
+          item.id === p.id
+            ? { ...item, quantity: (item.quantity || 0) + 1 }
+            : item,
         );
       } else {
         cart = [
@@ -98,21 +110,16 @@ export default function NewProducts() {
   };
 
   return (
-    <section
-      className="bg-white px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16 md:py-20"
-      
-    >
+    <section className="bg-white px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-16 md:py-20">
       {/* Toast */}
       <div
-        className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${toast.visible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 -translate-y-4 pointer-events-none"
-          }`}
+        className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${
+          toast.visible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-4 pointer-events-none"
+        }`}
       >
-        <div
-          className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm"
-          
-        >
+        <div className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm">
           <ShoppingCart className="w-4 h-4 text-neutral-600 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="font-medium text-neutral-900 text-sm">
@@ -126,46 +133,30 @@ export default function NewProducts() {
         </div>
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-[1600px] mx-auto"
       >
-
         {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 sm:mb-10 md:mb-14 gap-4">
           <div>
             {/* Eyebrow — Jost, wide tracking, matches header/hero style */}
             <div className="flex items-center gap-2.5 mb-3">
               <div className="w-5 h-[1px] bg-neutral-400" />
-              <span
-                className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
-                
-              >
+              <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]">
                 Koleksi Terbaru
               </span>
             </div>
 
             {/* Heading — Cormorant Garamond, brand-matched serif */}
-            <h2
-              className="text-4xl sm:text-5xl md:text-6xl font-light leading-[1.05] text-neutral-900 mb-3"
-              style={{  letterSpacing: "-0.01em" }}
-            >
-              New{" "}
-              <em
-                className="font-semibold not-italic"
-                style={{  fontStyle: "italic" }}
-              >
-                Products
-              </em>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-neutral-900 mb-2">
+              New Products
             </h2>
 
-            <p
-              className="text-neutral-500 text-sm sm:text-base font-light tracking-wide"
-              
-            >
+            <p className="text-neutral-500 text-xs sm:text-sm md:text-base font-normal tracking-wide">
               Produk terbaru yang baru saja kami tambahkan ke katalog
             </p>
           </div>
@@ -174,7 +165,6 @@ export default function NewProducts() {
           <Link
             href="/product"
             className="group flex items-center gap-2.5 px-7 py-3 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-[11px] tracking-[0.2em] uppercase font-medium"
-            
           >
             <span>Lihat Semua</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -184,21 +174,31 @@ export default function NewProducts() {
         {/* ── Products Grid ── */}
         <div className="relative">
           {/* Mobile: Horizontal Scroll */}
-          <div className="flex lg:hidden overflow-x-auto gap-4 sm:gap-6 pb-6 snap-x snap-mandatory scrollbar-hide">
+          <div className="flex md:hidden overflow-x-auto gap-4 pb-6 snap-x snap-mandatory scrollbar-hide">
             {products.map((item, i) => (
-              <ProductCard key={i} product={item} index={i} onAddToCart={handleAddToCart} />
+              <ProductCard
+                key={i}
+                product={item}
+                index={i}
+                onAddToCart={handleAddToCart}
+              />
             ))}
           </div>
 
-          {/* Desktop: Grid */}
-          <div className="hidden lg:grid lg:grid-cols-4 gap-6">
+          {/* Tablet & Desktop: Grid */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
             {products.map((item, i) => (
-              <ProductCard key={i} product={item} index={i} onAddToCart={handleAddToCart} />
+              <ProductCard
+                key={i}
+                product={item}
+                index={i}
+                onAddToCart={handleAddToCart}
+              />
             ))}
           </div>
 
           {/* Scroll dots — mobile */}
-          <div className="flex lg:hidden justify-center gap-2 mt-4">
+          <div className="flex md:hidden justify-center gap-2 mt-4">
             {products.map((_, i) => (
               <div key={i} className="w-4 h-[1px] bg-neutral-300" />
             ))}
@@ -207,8 +207,13 @@ export default function NewProducts() {
       </motion.div>
 
       <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
     </section>
   );
@@ -217,26 +222,29 @@ export default function NewProducts() {
 /* ── BADGE COLORS ── */
 const badgeStyle: Record<string, string> = {
   "Best Seller": "bg-neutral-900 text-white",
-  "New": "bg-white text-neutral-900 border border-neutral-200",
-  "Hot": "bg-neutral-700 text-white",
-  "Sale": "bg-neutral-100 text-neutral-700 border border-neutral-200",
+  New: "bg-white text-neutral-900 border border-neutral-200",
+  Hot: "bg-neutral-700 text-white",
+  Sale: "bg-neutral-100 text-neutral-700 border border-neutral-200",
 };
 
-function ProductCard({ product, onAddToCart }: { product: Product; index: number, onAddToCart: (p: Product) => void }) {
+function ProductCard({
+  product,
+  onAddToCart,
+}: {
+  product: Product;
+  index: number;
+  onAddToCart: (p: Product) => void;
+}) {
   return (
-    <div
-      className="min-w-[260px] sm:min-w-[300px] lg:min-w-0 snap-start group"
-      
-    >
+    <div className="min-w-[200px] sm:min-w-[240px] md:min-w-0 snap-start group">
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-6 flex items-center justify-center">
-
+      <div className="relative aspect-square overflow-hidden mb-3 sm:mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-4 sm:p-5 flex items-center justify-center">
         {/* Badge */}
         <div className="absolute top-3 left-3 z-10">
           <span
-            className={`inline-block px-3 py-1 text-[10px] font-medium tracking-[0.15em] uppercase shadow-sm ${badgeStyle[product.badge] ?? "bg-neutral-900 text-white"
-              }`}
-            
+            className={`inline-block px-3 py-1 text-[10px] font-medium tracking-[0.15em] uppercase shadow-sm ${
+              badgeStyle[product.badge] ?? "bg-neutral-900 text-white"
+            }`}
           >
             {product.badge}
           </span>
@@ -259,7 +267,6 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
             onAddToCart(product);
           }}
           className="absolute bottom-4 left-4 right-4 bg-white py-3 font-medium text-neutral-900 text-[11px] tracking-[0.2em] uppercase translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 hover:bg-neutral-100"
-          
         >
           <ShoppingBag className="w-3.5 h-3.5" />
           Tambah ke Keranjang
@@ -269,37 +276,28 @@ function ProductCard({ product, onAddToCart }: { product: Product; index: number
       {/* Product Info */}
       <div>
         {/* Category */}
-        <p
-          className="text-neutral-400 text-[10px] font-medium mb-1.5 uppercase tracking-[0.18em]"
-          
-        >
+        <p className="text-neutral-400 text-[10px] font-medium mb-1.5 uppercase tracking-[0.18em]">
           {product.category}
         </p>
 
-        {/* Product Title — Cormorant Garamond */}
-        <h3
-          className="font-light text-xl sm:text-2xl text-neutral-900 mb-2 line-clamp-1 group-hover:text-neutral-600 transition-colors leading-tight"
-          style={{  letterSpacing: "0" }}
-        >
+        {/* Product Title */}
+        <h3 className="font-semibold text-base sm:text-lg md:text-xl text-neutral-900 mb-1.5 sm:mb-2 line-clamp-1 group-hover:text-neutral-600 transition-colors leading-tight">
           {product.title}
         </h3>
 
         {/* Price & Rating */}
         <div className="flex items-center justify-between">
-          <p
-            className="font-medium text-base sm:text-lg text-neutral-900 tracking-wide"
-            
-          >
+          <p className="font-medium text-sm sm:text-base md:text-lg text-neutral-900 tracking-wide">
             {product.price}
           </p>
           <div className="flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" viewBox="0 0 20 20">
+            <svg
+              className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
+              viewBox="0 0 20 20"
+            >
               <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
             </svg>
-            <span
-              className="text-xs font-medium text-neutral-500 tracking-wide"
-              
-            >
+            <span className="text-xs font-medium text-neutral-500 tracking-wide">
               {product.rating}
             </span>
           </div>

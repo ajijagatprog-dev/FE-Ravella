@@ -95,7 +95,7 @@ export default function HeroSection() {
     >
       {/* ── HERO IMAGE & CONTENT — full width ── */}
       <div className="relative">
-        <div className="relative min-h-[480px] sm:min-h-[500px] md:min-h-[580px] lg:min-h-[650px] aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9] xl:aspect-[25/9] w-full">
+        <div className="relative h-[380px] sm:h-[440px] md:h-[480px] lg:h-[540px] w-full">
           <HeroBackground active={active} />
 
           {/* Nav Arrows */}
@@ -283,7 +283,7 @@ function HeroContent({ active }: { active: number }) {
           {/* Title */}
           <motion.div variants={itemVariants}>
             <h1
-              className="text-[42px] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[78px] font-light leading-[1.05] text-white mb-4 sm:mb-5"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] text-white mb-4 sm:mb-5"
               style={{  letterSpacing: "-0.01em" }}
             >
               {data.title.split(" ").slice(0, 2).join(" ")}
