@@ -56,25 +56,10 @@ export default function Company() {
 
             <div className="w-10 h-[1px] bg-white/30 mb-5" />
 
-            <p className="text-white/75 text-sm sm:text-base font-light leading-relaxed mb-8 max-w-lg">
+            <p className="text-white/75 text-sm sm:text-base font-light leading-relaxed max-w-lg">
               Providing premium quality kitchen appliances with modern and
               innovative designs to make your cooking activities easier.
             </p>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <a
-                href="/contact"
-                className="px-8 py-3.5 bg-white text-neutral-900 text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-neutral-100 transition-colors"
-              >
-                Contact Us
-              </a>
-              <a
-                href="/product"
-                className="px-8 py-3.5 border border-white/50 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-white/10 transition-colors"
-              >
-                View Products
-              </a>
-            </div>
           </div>
         </div>
 
@@ -170,6 +155,29 @@ export default function Company() {
                   ))}
                 </ul>
               </div>
+            </div>
+          </div>
+
+          {/* ── CLOSING MESSAGE ── */}
+          <div className="max-w-3xl mx-auto text-center mt-20 sm:mt-24 space-y-6">
+            <p className="text-[10px] sm:text-xs text-neutral-900 font-medium leading-relaxed uppercase tracking-[0.15em] sm:tracking-[0.2em]">
+              With your continuous support, Ravelle will enrich the lives of
+              Indonesian families... creating quality living for many years to
+              come.
+            </p>
+            <p
+              className="text-sm sm:text-base text-neutral-600 font-light"
+              style={{ fontStyle: "italic" }}
+            >
+              Thank you and happy cooking
+            </p>
+            <div className="pt-6">
+              <a
+                href="/product"
+                className="inline-block px-10 py-3.5 bg-black text-white text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-800 transition-colors"
+              >
+                Product
+              </a>
             </div>
           </div>
         </section>
