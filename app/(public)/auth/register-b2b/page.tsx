@@ -129,7 +129,7 @@ export default function RegisterB2BPage() {
             {/* Form */}
             <div className="space-y-4">
                 {/* Personal Details */}
-                <h2 className="text-sm font-bold border-b pb-2 mb-2 text-[#8B5E3C]">Detail Personal</h2>
+                <h2 className="text-sm font-bold border-b pb-2 mb-2 text-[#5E492C]">Detail Personal</h2>
 
                 <Field
                     label="Nama Lengkap PJ / PIC"
@@ -178,7 +178,7 @@ export default function RegisterB2BPage() {
                 </div>
 
                 {/* Company Details */}
-                <h2 className="text-sm font-bold border-b pb-2 mb-2 mt-6 text-[#8B5E3C]">Detail Perusahaan</h2>
+                <h2 className="text-sm font-bold border-b pb-2 mb-2 mt-6 text-[#5E492C]">Detail Perusahaan</h2>
 
                 <div className="grid grid-cols-2 gap-4">
                     <Field
@@ -227,11 +227,11 @@ export default function RegisterB2BPage() {
                             className={`w-full rounded-xl pl-10 pr-4 py-3
                  border bg-white text-sm text-[#1a1a1a]
                  placeholder:text-gray-300
-                 transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
+                 transition-all focus:outline-none focus:ring-2 focus:ring-[#5E492C]/30
                  ${touched.address && errors.address
                                     ? "border-red-400"
                                     : focused === "address"
-                                        ? "border-[#8B5E3C] shadow-sm"
+                                        ? "border-[#5E492C] shadow-sm"
                                         : "border-gray-200 hover:border-gray-300"
                                 }`}
                         />
@@ -246,7 +246,7 @@ export default function RegisterB2BPage() {
 
 
                 {/* Security / Password */}
-                <h2 className="text-sm font-bold border-b pb-2 mb-2 mt-6 text-[#8B5E3C]">Keamanan Akun</h2>
+                <h2 className="text-sm font-bold border-b pb-2 mb-2 mt-6 text-[#5E492C]">Keamanan Akun</h2>
                 <div>
                     <label className="block text-xs font-semibold text-[#1a1a1a] mb-1.5 uppercase tracking-wide">
                         Password Akses Dasbor
@@ -264,18 +264,18 @@ export default function RegisterB2BPage() {
                             className={`w-full h-11 rounded-xl pl-10 pr-11
                 border bg-white text-sm text-[#1a1a1a]
                 placeholder:text-gray-300
-                transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
+                transition-all focus:outline-none focus:ring-2 focus:ring-[#5E492C]/30
                 ${touched.password && errors.password
                                     ? "border-red-400"
                                     : focused === "password"
-                                        ? "border-[#8B5E3C] shadow-sm"
+                                        ? "border-[#5E492C] shadow-sm"
                                         : "border-gray-200 hover:border-gray-300"
                                 }`}
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B5E3C] transition-colors"
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#5E492C] transition-colors"
                         >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -293,7 +293,7 @@ export default function RegisterB2BPage() {
                     <div
                         onClick={() => setAgreeTerms(!agreeTerms)}
                         className={`mt-0.5 w-4 h-4 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all cursor-pointer
-              ${agreeTerms ? "bg-[#8B5E3C] border-[#8B5E3C]" : "border-gray-300 bg-white"}`}
+              ${agreeTerms ? "bg-[#5E492C] border-[#5E492C]" : "border-gray-300 bg-white"}`}
                     >
                         {agreeTerms && (
                             <svg viewBox="0 0 10 8" fill="none" className="w-2.5 h-2.5">
@@ -309,7 +309,7 @@ export default function RegisterB2BPage() {
                     </div>
                     <span className="text-xs text-gray-600 select-none group-hover:text-gray-800 transition-colors leading-relaxed">
                         I agree to the{" "}
-                        <Link href="/terms" className="text-[#8B5E3C] font-semibold hover:underline">
+                        <Link href="/terms" className="text-[#5E492C] font-semibold hover:underline">
                             B2B Partner Terms & Conditions
                         </Link>{" "}
                         and verify that all provided information is accurate.
@@ -323,8 +323,8 @@ export default function RegisterB2BPage() {
                     className={`w-full h-12 rounded-xl font-bold text-white text-sm tracking-wide mt-2
             transition-all duration-200 flex items-center justify-center gap-2
             ${isSubmitting || !agreeTerms
-                            ? "bg-[#8B5E3C]/40 cursor-not-allowed"
-                            : "bg-[#8B5E3C] hover:bg-[#7a5234] active:scale-[0.98] shadow-md shadow-[#8B5E3C]/30 hover:shadow-lg hover:shadow-[#8B5E3C]/40"
+                            ? "bg-[#5E492C]/40 cursor-not-allowed"
+                            : "bg-[#5E492C] hover:bg-[#352309] active:scale-[0.98] shadow-md shadow-[#5E492C]/30 hover:shadow-lg hover:shadow-[#5E492C]/40"
                         }`}
                 >
                     {isSubmitting ? (
@@ -348,7 +348,7 @@ export default function RegisterB2BPage() {
                 <div className="flex items-center justify-between">
                     <Link
                         href="/"
-                        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#8B5E3C] transition-colors font-medium"
+                        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#5E492C] transition-colors font-medium"
                     >
                         <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
                             <path
@@ -366,7 +366,7 @@ export default function RegisterB2BPage() {
                         Sudah terdaftar B2B?{" "}
                         <Link
                             href="/auth/login"
-                            className="text-[#8B5E3C] font-bold hover:underline"
+                            className="text-[#5E492C] font-bold hover:underline"
                         >
                             Login
                         </Link>
@@ -490,11 +490,11 @@ function Field({
                     className={`w-full h-11 rounded-xl pl-10 pr-10
             border bg-white text-sm text-[#1a1a1a]
             placeholder:text-gray-300
-            transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
+            transition-all focus:outline-none focus:ring-2 focus:ring-[#5E492C]/30
             ${touched && error
                             ? "border-red-400"
                             : isFocused
-                                ? "border-[#8B5E3C] shadow-sm"
+                                ? "border-[#5E492C] shadow-sm"
                                 : "border-gray-200 hover:border-gray-300"
                         }`}
                 />

@@ -345,7 +345,7 @@ export default function Header({
                       </Link>
                       <Link
                         href="/auth/register-b2b"
-                        className="block px-5 py-3.5 text-[11px] tracking-[0.1em] text-neutral-700 hover:bg-neutral-50 hover:text-[#8B5E3C] transition-colors"
+                        className="block px-5 py-3.5 text-[11px] tracking-[0.1em] text-neutral-700 hover:bg-neutral-50 hover:text-[#5E492C] transition-colors"
                       >
                         DAFTAR MITRA B2B
                       </Link>
@@ -476,7 +476,7 @@ export default function Header({
 
                   {/* Badge */}
                   <div className="absolute top-4 left-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#C9A84C] text-white text-[9px] font-bold tracking-[0.2em] uppercase rounded-sm shadow-lg">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#B79F5D] text-white text-[9px] font-bold tracking-[0.2em] uppercase rounded-sm shadow-lg">
                       <Sparkles className="w-2.5 h-2.5" />
                       Koleksi Terbaru
                     </span>
@@ -496,8 +496,8 @@ export default function Header({
                       <span className="text-[10px] font-bold tracking-[0.22em] uppercase">
                         Shop Now
                       </span>
-                      <div className="h-[1px] w-8 bg-[#C9A84C] group-hover/feat:w-12 transition-all duration-500" />
-                      <ArrowRight className="w-3.5 h-3.5 text-[#C9A84C] group-hover/feat:translate-x-1 transition-transform duration-300" />
+                      <div className="h-[1px] w-8 bg-[#B79F5D] group-hover/feat:w-12 transition-all duration-500" />
+                      <ArrowRight className="w-3.5 h-3.5 text-[#B79F5D] group-hover/feat:translate-x-1 transition-transform duration-300" />
                     </div>
                   </div>
                 </Link>

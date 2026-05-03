@@ -57,7 +57,7 @@ export default function RecentOrders({ orders }: { orders: any[] }) {
                         >
                             <p className="text-sm font-bold text-stone-900 tracking-tight">{order.order_number}</p>
                             <p className="text-xs font-medium text-stone-500">{formattedDate}</p>
-                            <p className="text-sm font-bold text-[#8B5E3C]">Rp {parseInt(order.total_amount).toLocaleString('id-ID')}</p>
+                            <p className="text-sm font-bold text-[#5E492C]">Rp {parseInt(order.total_amount).toLocaleString('id-ID')}</p>
                             <div className="flex items-center">
                                 <span className={cn("text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm", className)}>
                                     {label}

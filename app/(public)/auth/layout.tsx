@@ -20,7 +20,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
         {/* Logo */}
         <div className="relative z-10 px-10 pt-10 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#8B5E3C] flex items-center justify-center shadow-md">
+          <div className="w-9 h-9 rounded-full bg-[#5E492C] flex items-center justify-center shadow-md">
             <svg
               viewBox="0 0 24 24"
               fill="white"
