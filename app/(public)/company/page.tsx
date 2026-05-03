@@ -20,6 +20,7 @@ import {
 import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
+import BestSellers from "../../HomePage/components/BestSellers";
 
 export default function Company() {
   const [activeTimeline, setActiveTimeline] = useState(0);
@@ -60,13 +61,6 @@ export default function Company() {
               Providing premium quality kitchen appliances with modern and
               innovative designs to make your cooking activities easier.
             </p>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-5 h-8 border border-white/30 flex items-start justify-center pt-1.5">
-            <div className="w-1 h-2 bg-white/50 rounded-full" />
           </div>
         </div>
       </section>
@@ -181,7 +175,12 @@ export default function Company() {
             </div>
           </div>
         </section>
+      </div>
 
+      {/* ── BEST SELLERS ── */}
+      <BestSellers />
+
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
         {/* ── STATS ── */}
         <section className="py-16 sm:py-20 md:py-24">
           <div className="bg-neutral-900 p-8 sm:p-12 md:p-16 relative overflow-hidden">

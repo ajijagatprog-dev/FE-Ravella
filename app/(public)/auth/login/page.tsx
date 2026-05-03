@@ -129,10 +129,10 @@ export default function AdminLoginPage() {
               className={`w-full h-11 rounded-xl pl-10 pr-4
                 border bg-white text-sm text-[#1a1a1a]
                 placeholder:text-gray-300
-                transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
+                transition-all focus:outline-none focus:ring-2 focus:ring-[#5E492C]/30
                 ${errors.email
                   ? "border-red-400"
-                  : "border-gray-200 hover:border-gray-300 focus:border-[#8B5E3C]"
+                  : "border-gray-200 hover:border-gray-300 focus:border-[#5E492C]"
                 }`}
             />
           </div>
@@ -150,7 +150,7 @@ export default function AdminLoginPage() {
             <button
               type="button"
               onClick={() => alert("Redirect to forgot password page")}
-              className="text-xs text-[#8B5E3C] font-semibold hover:underline"
+              className="text-xs text-[#5E492C] font-semibold hover:underline"
             >
               Forgot Password?
             </button>
@@ -168,16 +168,16 @@ export default function AdminLoginPage() {
               className={`w-full h-11 rounded-xl pl-10 pr-11
                 border bg-white text-sm text-[#1a1a1a]
                 placeholder:text-gray-300
-                transition-all focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30
+                transition-all focus:outline-none focus:ring-2 focus:ring-[#5E492C]/30
                 ${errors.password
                   ? "border-red-400"
-                  : "border-gray-200 hover:border-gray-300 focus:border-[#8B5E3C]"
+                  : "border-gray-200 hover:border-gray-300 focus:border-[#5E492C]"
                 }`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B5E3C] transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#5E492C] transition-colors"
             >
               {showPassword ? (
                 <EyeOff className="w-4 h-4" />
@@ -197,7 +197,7 @@ export default function AdminLoginPage() {
             onClick={() => setKeepLogged(!keepLogged)}
             className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all cursor-pointer
               ${keepLogged
-                ? "bg-[#8B5E3C] border-[#8B5E3C]"
+                ? "bg-[#5E492C] border-[#5E492C]"
                 : "border-gray-300 bg-white"
               }`}
           >
@@ -225,8 +225,8 @@ export default function AdminLoginPage() {
           className={`w-full h-12 rounded-xl font-bold text-white text-sm tracking-wide
             transition-all duration-200 flex items-center justify-center gap-2
             ${isSubmitting
-              ? "bg-[#8B5E3C]/50 cursor-not-allowed"
-              : "bg-[#8B5E3C] hover:bg-[#7a5234] active:scale-[0.98] shadow-md shadow-[#8B5E3C]/30 hover:shadow-lg hover:shadow-[#8B5E3C]/40"
+              ? "bg-[#5E492C]/50 cursor-not-allowed"
+              : "bg-[#5E492C] hover:bg-[#352309] active:scale-[0.98] shadow-md shadow-[#5E492C]/30 hover:shadow-lg hover:shadow-[#5E492C]/40"
             }`}
         >
           {isSubmitting ? (

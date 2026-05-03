@@ -152,13 +152,6 @@ export default function ContactPage() {
             </p>
           </div>
         </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-5 h-8 border border-white/30 flex items-start justify-center pt-1.5">
-            <div className="w-1 h-2 bg-white/40 rounded-full" />
-          </div>
-        </div>
       </section>
 
       {/* ── MAIN ── */}

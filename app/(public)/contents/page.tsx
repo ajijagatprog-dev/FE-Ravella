@@ -354,7 +354,7 @@ export default function ContentsPage() {
                 <div className="flex items-center gap-3 mb-3 text-[11px] font-semibold tracking-wider uppercase">
                   <span className="text-neutral-400">{item.date}</span>
                 </div>
-                <h3 className="text-[19px] font-bold text-black group-hover:text-[#C9A84C] transition-colors mb-2 leading-snug">
+                <h3 className="text-[19px] font-bold text-black group-hover:text-[#B79F5D] transition-colors mb-2 leading-snug">
                   {item.title}
                 </h3>
                 <p className="text-neutral-500 text-sm line-clamp-2 leading-relaxed">
@@ -377,19 +377,19 @@ export default function ContentsPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
 
             <div className="relative z-10">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#C9A84C] text-white text-[10px] font-bold tracking-[0.2em] uppercase rounded-full mb-6">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#B79F5D] text-white text-[10px] font-bold tracking-[0.2em] uppercase rounded-full mb-6">
                 <Sparkles className="w-3 h-3" />
                 Program Afiliasi Resmi
               </span>
               <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
                 Ubah Pengaruh Anda <br /> Menjadi{" "}
-                <span className="text-[#C9A84C]">Penghasilan</span>
+                <span className="text-[#B79F5D]">Penghasilan</span>
               </h1>
               <p className="text-neutral-300 text-sm md:text-base max-w-lg mx-auto mb-10 leading-relaxed font-light">
                 Dapatkan penghasilan tak terbatas setiap bulannya hanya dengan
                 membagikan link produk eksklusif Ravelle ke media sosial Anda.
               </p>
-              <button className="px-8 py-4 bg-white text-black font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-[#C9A84C] hover:text-white transition-all duration-300 shadow-[0_8px_30px_rgba(201,168,76,0.3)]">
+              <button className="px-8 py-4 bg-white text-black font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-[#B79F5D] hover:text-white transition-all duration-300 shadow-[0_8px_30px_rgba(183,159,93,0.3)]">
                 Daftar Sekarang
               </button>
             </div>
@@ -423,7 +423,7 @@ export default function ContentsPage() {
               ].map((b, i) => (
                 <div
                   key={i}
-                  className="p-8 bg-white rounded-2xl border border-neutral-100 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_-8px_rgba(201,168,76,0.15)] transition-shadow duration-300"
+                  className="p-8 bg-white rounded-2xl border border-neutral-100 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_-8px_rgba(183,159,93,0.15)] transition-shadow duration-300"
                 >
                   <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mb-6">
                     <CheckCircle2 className="w-6 h-6 text-rose-500" />
@@ -442,7 +442,7 @@ export default function ContentsPage() {
           {/* Terms & Conditions */}
           <div className="bg-neutral-50 p-8 md:p-10 rounded-3xl border border-neutral-100">
             <div className="flex items-center gap-3 mb-8 border-b border-neutral-200 pb-6">
-              <FileText className="w-6 h-6 text-[#C9A84C]" />
+              <FileText className="w-6 h-6 text-[#B79F5D]" />
               <h2 className="text-xl font-bold text-black">
                 Syarat & Ketentuan
               </h2>

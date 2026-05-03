@@ -6,6 +6,7 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
   const companyLinks = [
@@ -39,7 +40,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#e5e5e5] px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20">
+    <footer className="bg-[#EEEEEE] px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20">
       <div className="max-w-[1600px] mx-auto">
         {/* ── Main Grid ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 mb-12 sm:mb-16">
@@ -143,12 +144,12 @@ export default function Footer() {
             <ul className="space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.name}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -162,12 +163,12 @@ export default function Footer() {
             <ul className="space-y-3">
               {customerLinks.map((link) => (
                 <li key={link.name}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -181,12 +182,12 @@ export default function Footer() {
             <ul className="space-y-3">
               {productLinks.map((link) => (
                 <li key={link.name}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

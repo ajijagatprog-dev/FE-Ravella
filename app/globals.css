@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FEF9EE;
+  --foreground: #352309;
+  --color-primary: #B79F5D;
+  --color-primary-dark: #5E492C;
+  --color-primary-darker: #352309;
+  --color-secondary: #CEC3B2;
+  --color-secondary-light: #EEEEEE;
+  --color-cream: #FEF9EE;
 }
 
 @theme inline {
@@ -86,7 +92,7 @@ h1, h2, h3, h4, h5, h6 {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #fff 0%, #f9f5ef 100%);
+  background: linear-gradient(135deg, #FEF9EE 0%, #f5efe3 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -97,20 +103,20 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   width: 0%;
   height: 2px;
-  background: linear-gradient(90deg, #C9A84C, #e8c96a);
+  background: linear-gradient(90deg, #B79F5D, #CEC3B2);
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .cat-card:hover {
-  border-color: #C9A84C40;
+  border-color: #B79F5D40;
   background: #fff;
-  box-shadow: 0 12px 40px -8px rgba(201,168,76,0.15), 0 4px 16px -4px rgba(0,0,0,0.06);
+  box-shadow: 0 12px 40px -8px rgba(183,159,93,0.15), 0 4px 16px -4px rgba(0,0,0,0.06);
   transform: translateY(-3px);
 }
 .cat-card:hover::before { opacity: 1; }
 .cat-card:hover::after { width: 100%; }
 .cat-card:hover .cat-icon { transform: scale(1.15) rotate(-5deg); }
-.cat-card:hover .cat-label { color: #9a7a2e; }
-.cat-card:hover .cat-eksplor { color: #C9A84C; letter-spacing: 0.25em; }
+.cat-card:hover .cat-label { color: #5E492C; }
+.cat-card:hover .cat-eksplor { color: #B79F5D; letter-spacing: 0.25em; }
 .cat-card:hover .cat-arrow { transform: translateX(4px); }
 
 .cat-icon { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-block; }
@@ -179,7 +185,7 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   width: 0;
   height: 1px;
-  background: #C9A84C;
+  background: #B79F5D;
   transition: width 0.3s ease;
 }
 .mobile-nav-link:hover::after { width: 100%; }
@@ -196,7 +202,7 @@ h1, h2, h3, h4, h5, h6 {
   100% { background-position: 200% center; }
 }
 .gold-shimmer {
-  background: linear-gradient(90deg, #C9A84C 0%, #f0d380 40%, #C9A84C 60%, #a07830 100%);
+  background: linear-gradient(90deg, #B79F5D 0%, #CEC3B2 40%, #B79F5D 60%, #5E492C 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
