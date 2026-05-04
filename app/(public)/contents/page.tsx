@@ -182,19 +182,6 @@ export default function ContentsPage() {
               <span>Video</span>
             </button>
             <button
-              onClick={() => setActiveTab("article")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-bold tracking-[0.1em] uppercase transition-all whitespace-nowrap flex-shrink-0 ${
-                activeTab === "article"
-                  ? "bg-black text-white shadow-sm"
-                  : activeTab === "video"
-                    ? "text-white/70 hover:text-white"
-                    : "text-neutral-500 hover:text-black"
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span>Artikel Collab</span>
-            </button>
-            <button
               onClick={() => setActiveTab("affiliate")}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-bold tracking-[0.1em] uppercase transition-all whitespace-nowrap flex-shrink-0 ${
                 activeTab === "affiliate"

@@ -10,6 +10,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
+import { useBanners } from "@/lib/useBanners";
 
 // ─── SETUP FONT (tambahkan ke layout.tsx / _document.tsx) ────────────────────
 // <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -26,7 +27,7 @@ import Link from "next/link";
 // }
 // ─────────────────────────────────────────────────────────────────────────────
 
-const HERO_IMAGES = [
+const DEFAULT_HERO_IMAGES = [
   "/Hero/banner1.png",
   "/Hero/banner2.png",
   "/Hero/banner3.png",
@@ -65,6 +66,7 @@ const HERO_DATA = [
 export default function HeroSection() {
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
+  const HERO_IMAGES = useBanners("home", DEFAULT_HERO_IMAGES);
 
   const nextSlide = () => {
     setActive((p) => (p + 1) % HERO_IMAGES.length);
@@ -92,7 +94,7 @@ export default function HeroSection() {
       {/* ── HERO IMAGE & CONTENT — full width ── */}
       <div className="relative">
         <div className="relative h-[380px] sm:h-[440px] w-full">
-          <HeroBackground active={active} />
+          <HeroBackground active={active} images={HERO_IMAGES} />
 
           {/* Nav Arrows */}
           <button
@@ -189,10 +191,16 @@ export default function HeroSection() {
 }
 
 /* ── BACKGROUND ── */
-function HeroBackground({ active }: { active: number }) {
+function HeroBackground({
+  active,
+  images,
+}: {
+  active: number;
+  images: string[];
+}) {
   return (
     <div className="absolute inset-0 bg-neutral-900">
-      {HERO_IMAGES.map((img, i) => (
+      {images.map((img, i) => (
         <div
           key={i}
           className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out ${
@@ -209,9 +217,7 @@ function HeroBackground({ active }: { active: number }) {
           />
         </div>
       ))}
-      {/* Left-to-right gradient — text sits on the darker left side */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25" />
+      {/* Gradient overlays removed for brighter banner */}
     </div>
   );
 }

@@ -16,6 +16,7 @@ import {
   Newspaper,
   Tag,
   MessageSquare,
+  Image,
 } from "lucide-react";
 
 // ── Menu Config ───────────────────────────────────────────────────────────────
@@ -33,6 +34,7 @@ const menuItems = [
 const contentMenuItems = [
   { label: "Kelola Produk", href: "/admin/content/products", icon: Package },
   { label: "Kelola Berita", href: "/admin/content/news", icon: Newspaper },
+  { label: "Kelola Banner", href: "/admin/content/banners", icon: Image },
   { label: "Review Management", href: "/admin/reviews", icon: MessageSquare },
 ];
 

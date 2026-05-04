@@ -28,6 +28,7 @@ import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import { products as fallbackProducts } from "./products";
 import api from "@/lib/axios";
+import { useBanners } from "@/lib/useBanners";
 
 export default function ProductPage() {
   return (
@@ -120,6 +121,10 @@ function ProductPageContent() {
       productName: "",
     },
   );
+
+  const [productBanner] = useBanners("product", [
+    "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80",
+  ]);
 
   const categories = useMemo(
     () => [
@@ -308,12 +313,9 @@ function ProductPageContent() {
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)",
+            backgroundImage: `url(${productBanner})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
           <div className="max-w-3xl">

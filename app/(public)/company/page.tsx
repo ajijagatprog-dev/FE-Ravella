@@ -21,9 +21,12 @@ import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import BestSellers from "../../HomePage/components/BestSellers";
+import { useBanners } from "@/lib/useBanners";
 
 export default function Company() {
   const [activeTimeline, setActiveTimeline] = useState(0);
+
+  const [companyBanner] = useBanners("company", ["/Company/company.webp"]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -34,11 +37,9 @@ export default function Company() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url(/Company/company.webp)",
+            backgroundImage: `url(${companyBanner})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
           <div className="max-w-2xl">

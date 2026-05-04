@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
+import { useBanners } from "@/lib/useBanners";
 
 interface ServiceLocation {
   city: string;
@@ -27,6 +28,10 @@ interface ServiceLocation {
 
 export default function ServiceCenterPage() {
   const [activeLocation, setActiveLocation] = useState<number | null>(null);
+
+  const [serviceBanner] = useBanners("service-center", [
+    "/ServiceCenter/service-center.jpg",
+  ]);
 
   const serviceLocations: ServiceLocation[] = [
     {
@@ -98,11 +103,9 @@ export default function ServiceCenterPage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url(/ServiceCenter/service-center.jpg)",
+            backgroundImage: `url(${serviceBanner})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
           <div className="max-w-2xl">
