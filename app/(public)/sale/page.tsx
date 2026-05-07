@@ -21,7 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import api from "@/lib/axios";
-
+import { useBanners } from "@/lib/useBanners";
 
 export default function SalePage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -32,6 +32,10 @@ export default function SalePage() {
       productName: "",
     },
   );
+
+  const [saleBanner] = useBanners("sale", [
+    "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1920&q=80",
+  ]);
 
   const formatPrice = (p: number) =>
     new Intl.NumberFormat("id-ID", {
@@ -125,7 +129,7 @@ export default function SalePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white" >
+    <div className="min-h-screen bg-white">
       <Header />
 
       {/* ── Toast ── */}
@@ -158,15 +162,13 @@ export default function SalePage() {
       <section className="relative h-[450px] sm:h-[550px] overflow-hidden bg-neutral-900">
         <motion.div
           initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.4 }}
+          animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 2 }}
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1920&q=80)",
+            backgroundImage: `url(${saleBanner})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/60 to-transparent" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24 xl:px-40">
           <div className="max-w-3xl">
@@ -174,9 +176,9 @@ export default function SalePage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-3 mb-6"
+              className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-amber-500/10 backdrop-blur-md border border-amber-500/20 shadow-lg"
             >
-              <div className="w-6 h-[1px] bg-amber-500" />
+              <div className="w-1.5 h-1.5 bg-amber-500" />
               <span className="text-amber-500 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em]">
                 Limited Time Offers
               </span>
@@ -187,7 +189,6 @@ export default function SalePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]"
-              
             >
               Pesta Diskon <br />
               <span className="font-semibold italic text-amber-500">Harga</span>
@@ -211,10 +212,7 @@ export default function SalePage() {
               className="flex items-center gap-8"
             >
               <div className="flex flex-col">
-                <span
-                  className="text-white font-bold text-2xl"
-                  
-                >
+                <span className="text-white font-bold text-2xl">
                   {products.length}+
                 </span>
                 <span className="text-white/40 text-[10px] uppercase tracking-wider">
@@ -223,12 +221,7 @@ export default function SalePage() {
               </div>
               <div className="w-[1px] h-10 bg-white/10" />
               <div className="flex flex-col">
-                <span
-                  className="text-white font-bold text-2xl"
-                  
-                >
-                  Up to 70%
-                </span>
+                <span className="text-white font-bold text-2xl">Up to 70%</span>
                 <span className="text-white/40 text-[10px] uppercase tracking-wider">
                   Discount
                 </span>
@@ -249,10 +242,7 @@ export default function SalePage() {
                 Penawaran Terbatas
               </span>
             </div>
-            <h2
-              className="text-4xl sm:text-5xl font-light text-neutral-900"
-              
-            >
+            <h2 className="text-4xl sm:text-5xl font-light text-neutral-900">
               Kejutan Mewah,{" "}
               <span className="italic font-medium">Harga Ramah</span>
             </h2>
@@ -281,10 +271,7 @@ export default function SalePage() {
             className="text-center py-32"
           >
             <ShoppingBag className="w-16 h-16 text-neutral-100 mx-auto mb-6 stroke-[1]" />
-            <h3
-              className="text-3xl font-light text-neutral-900 mb-4"
-              
-            >
+            <h3 className="text-3xl font-light text-neutral-900 mb-4">
               Belum Ada Promo Aktif
             </h3>
             <p className="text-neutral-500 text-sm font-light mb-10 max-w-xs mx-auto">
@@ -393,10 +380,7 @@ export default function SalePage() {
                   </div>
 
                   <Link href={`/product/${product.id}`} className="block mb-4">
-                    <h3
-                      className="text-xl sm:text-2xl font-medium text-neutral-900 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight"
-                      
-                    >
+                    <h3 className="text-xl sm:text-2xl font-medium text-neutral-900 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight">
                       {product.name}
                     </h3>
                   </Link>

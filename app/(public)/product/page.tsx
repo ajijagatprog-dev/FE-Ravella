@@ -28,6 +28,7 @@ import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import { products as fallbackProducts } from "./products";
 import api from "@/lib/axios";
+import { useBanners } from "@/lib/useBanners";
 
 export default function ProductPage() {
   return (
@@ -120,6 +121,10 @@ function ProductPageContent() {
       productName: "",
     },
   );
+
+  const [productBanner] = useBanners("product", [
+    "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80",
+  ]);
 
   const categories = useMemo(
     () => [
@@ -308,12 +313,9 @@ function ProductPageContent() {
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)",
+            backgroundImage: `url(${productBanner})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
           <div className="max-w-3xl">
@@ -321,10 +323,10 @@ function ProductPageContent() {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-3 mb-6"
+              className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
             >
-              <div className="w-8 h-[1px] bg-white/60" />
-              <span className="text-white/80 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]">
+              <div className="w-1.5 h-1.5 bg-white/80" />
+              <span className="text-white/90 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]">
                 Ravelle Shop
               </span>
             </motion.div>

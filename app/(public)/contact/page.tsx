@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
+import { useBanners } from "@/lib/useBanners";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -30,6 +31,10 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const [contactBanner] = useBanners("contact", [
+    "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80",
+  ]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -124,18 +129,15 @@ export default function ContactPage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80)",
+            backgroundImage: `url(${contactBanner})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2.5 mb-5">
-              <div className="w-5 h-[1px] bg-white/50" />
-              <span className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]">
+            <div className="inline-flex items-center gap-2.5 mb-5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+              <div className="w-1.5 h-1.5 bg-white/80" />
+              <span className="text-white/90 font-medium text-[11px] uppercase tracking-[0.25em]">
                 Get in Touch
               </span>
             </div>

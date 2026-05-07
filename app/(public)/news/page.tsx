@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import api from "@/lib/axios";
+import { useBanners } from "@/lib/useBanners";
 
 export interface PublicArticle {
   id: number;
@@ -40,6 +41,10 @@ export default function News() {
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [articles, setArticles] = useState<PublicArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [newsBanner] = useBanners("news", [
+    "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80",
+  ]);
 
   const fetchArticles = async () => {
     try {
@@ -133,15 +138,13 @@ export default function News() {
       <section className="relative h-[380px] sm:h-[440px] overflow-hidden bg-neutral-900">
         <motion.div
           initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.5 }}
+          animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 2 }}
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80)",
+            backgroundImage: `url(${newsBanner})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24 xl:px-40">
           <div className="max-w-2xl">
@@ -149,10 +152,10 @@ export default function News() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-3 mb-6"
+              className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
             >
-              <div className="w-8 h-[1px] bg-white/60" />
-              <span className="text-white/80 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em]">
+              <div className="w-1.5 h-1.5 bg-white/80" />
+              <span className="text-white/90 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em]">
                 Eksplorasi Kuliner
               </span>
             </motion.div>

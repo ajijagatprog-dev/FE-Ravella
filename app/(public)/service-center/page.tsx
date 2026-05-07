@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
+import { useBanners } from "@/lib/useBanners";
 
 interface ServiceLocation {
   city: string;
@@ -27,6 +28,10 @@ interface ServiceLocation {
 
 export default function ServiceCenterPage() {
   const [activeLocation, setActiveLocation] = useState<number | null>(null);
+
+  const [serviceBanner] = useBanners("service-center", [
+    "/ServiceCenter/service-center.jpg",
+  ]);
 
   const serviceLocations: ServiceLocation[] = [
     {
@@ -98,17 +103,15 @@ export default function ServiceCenterPage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url(/ServiceCenter/service-center.jpg)",
+            backgroundImage: `url(${serviceBanner})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2.5 mb-5">
-              <div className="w-5 h-[1px] bg-white/50" />
-              <span className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]">
+            <div className="inline-flex items-center gap-2.5 mb-5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+              <div className="w-1.5 h-1.5 bg-white/80" />
+              <span className="text-white/90 font-medium text-[11px] uppercase tracking-[0.25em]">
                 Ravelle Indonesia
               </span>
             </div>
