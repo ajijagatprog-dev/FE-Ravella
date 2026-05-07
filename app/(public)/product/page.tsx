@@ -323,10 +323,10 @@ function ProductPageContent() {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-3 mb-6"
+              className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
             >
-              <div className="w-8 h-[1px] bg-white/60" />
-              <span className="text-white/80 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]">
+              <div className="w-1.5 h-1.5 bg-white/80" />
+              <span className="text-white/90 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]">
                 Ravelle Shop
               </span>
             </motion.div>

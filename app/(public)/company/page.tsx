@@ -44,9 +44,9 @@ export default function Company() {
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
           <div className="max-w-2xl">
             {/* Eyebrow */}
-            <div className="inline-flex items-center gap-2.5 mb-5">
-              <div className="w-5 h-[1px] bg-white/50" />
-              <span className="text-white/70 font-medium text-[11px] uppercase tracking-[0.25em]">
+            <div className="inline-flex items-center gap-2.5 mb-5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+              <div className="w-1.5 h-1.5 bg-white/80" />
+              <span className="text-white/90 font-medium text-[11px] uppercase tracking-[0.25em]">
                 About Us
               </span>
             </div>

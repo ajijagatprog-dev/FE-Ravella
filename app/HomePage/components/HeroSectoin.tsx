@@ -257,9 +257,9 @@ function HeroContent({ active }: { active: number }) {
         >
           {/* Badge */}
           <motion.div variants={itemVariants}>
-            <div className="inline-flex items-center gap-2 mb-2 sm:mb-3">
-              <div className="w-4 h-[1px] bg-white/50" />
-              <span className="text-[9px] sm:text-[10px] font-medium tracking-[0.25em] uppercase text-white/70">
+            <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+              <div className="w-1.5 h-1.5 bg-white/80" />
+              <span className="text-[9px] sm:text-[10px] font-medium tracking-[0.25em] uppercase text-white/90">
                 {data.badge}
               </span>
             </div>
