@@ -326,7 +326,7 @@ function ProductPageContent() {
               className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
             >
               <div className="w-1.5 h-1.5 bg-white/80" />
-              <span className="text-white/90 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em]">
+              <span className="text-white/90 font-medium text-[11px] sm:text-xs uppercase tracking-[0.3em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 Ravelle Shop
               </span>
             </motion.div>
@@ -335,24 +335,24 @@ function ProductPageContent() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight break-words"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight break-words drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]"
             >
               Find Your Perfect <br />
-              <span className="font-normal text-white">Product</span>
+              <span className="font-normal text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">Product</span>
             </motion.h1>
 
             <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 1, delay: 0.8 }}
-              className="w-16 h-[1px] bg-white/40 mb-8 origin-left"
+              className="w-16 h-[2px] bg-white/80 mb-8 origin-left shadow-[0_2px_4px_rgba(0,0,0,0.6)]"
             />
 
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 1 }}
-              className="text-white/70 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-8"
+              className="text-white/70 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
             >
               Kurasi peralatan rumah tangga eksklusif yang memadukan
               fungsionalitas modern dengan estetika abadi untuk hunian impian
