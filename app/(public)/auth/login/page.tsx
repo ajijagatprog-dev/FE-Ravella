@@ -3,7 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Shield, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import {
+  Shield,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Loader2,
+  ArrowLeft,
+} from "lucide-react";
 import api from "@/lib/axios";
 
 export default function AdminLoginPage() {
@@ -35,19 +43,19 @@ export default function AdminLoginPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await api.post('/auth/login', {
+      const response = await api.post("/auth/login", {
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
 
-      if (response.data.status === 'success') {
+      if (response.data.status === "success") {
         const { user, access_token } = response.data.data;
 
         // Save the real token
         // In the existing code, role might not be explicitly set.
         // If 'role' is not in user table, we'll map using email domain or an explicit type field.
         // Default to admin for now if type isn't present, or use user.role if you add it.
-        const userRole = user.role || 'admin';
+        const userRole = user.role || "admin";
 
         localStorage.setItem(
           "auth",
@@ -56,7 +64,7 @@ export default function AdminLoginPage() {
             role: userRole,
             token: access_token,
             loggedIn: true,
-          })
+          }),
         );
 
         if (userRole === "admin") {
@@ -90,6 +98,15 @@ export default function AdminLoginPage() {
 
   return (
     <div className="w-full">
+      {/* Back Button */}
+      <Link
+        href="/"
+        className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-[#5E492C] transition-colors mb-6"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Kembali ke Beranda
+      </Link>
+
       {/* Heading */}
       <div className="mb-8">
         <h1 className="text-[#1a1a1a] text-2xl font-black mb-1 tracking-tight">
@@ -106,8 +123,6 @@ export default function AdminLoginPage() {
           {errors.general}
         </div>
       )}
-
-
 
       {/* Form */}
       <div className="space-y-4">
@@ -130,9 +145,10 @@ export default function AdminLoginPage() {
                 border bg-white text-sm text-[#1a1a1a]
                 placeholder:text-gray-300
                 transition-all focus:outline-none focus:ring-2 focus:ring-[#5E492C]/30
-                ${errors.email
-                  ? "border-red-400"
-                  : "border-gray-200 hover:border-gray-300 focus:border-[#5E492C]"
+                ${
+                  errors.email
+                    ? "border-red-400"
+                    : "border-gray-200 hover:border-gray-300 focus:border-[#5E492C]"
                 }`}
             />
           </div>
@@ -169,9 +185,10 @@ export default function AdminLoginPage() {
                 border bg-white text-sm text-[#1a1a1a]
                 placeholder:text-gray-300
                 transition-all focus:outline-none focus:ring-2 focus:ring-[#5E492C]/30
-                ${errors.password
-                  ? "border-red-400"
-                  : "border-gray-200 hover:border-gray-300 focus:border-[#5E492C]"
+                ${
+                  errors.password
+                    ? "border-red-400"
+                    : "border-gray-200 hover:border-gray-300 focus:border-[#5E492C]"
                 }`}
             />
             <button
@@ -196,9 +213,10 @@ export default function AdminLoginPage() {
           <div
             onClick={() => setKeepLogged(!keepLogged)}
             className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all cursor-pointer
-              ${keepLogged
-                ? "bg-[#5E492C] border-[#5E492C]"
-                : "border-gray-300 bg-white"
+              ${
+                keepLogged
+                  ? "bg-[#5E492C] border-[#5E492C]"
+                  : "border-gray-300 bg-white"
               }`}
           >
             {keepLogged && (
@@ -224,9 +242,10 @@ export default function AdminLoginPage() {
           disabled={isSubmitting}
           className={`w-full h-12 rounded-xl font-bold text-white text-sm tracking-wide
             transition-all duration-200 flex items-center justify-center gap-2
-            ${isSubmitting
-              ? "bg-[#5E492C]/50 cursor-not-allowed"
-              : "bg-[#5E492C] hover:bg-[#352309] active:scale-[0.98] shadow-md shadow-[#5E492C]/30 hover:shadow-lg hover:shadow-[#5E492C]/40"
+            ${
+              isSubmitting
+                ? "bg-[#5E492C]/50 cursor-not-allowed"
+                : "bg-[#5E492C] hover:bg-[#352309] active:scale-[0.98] shadow-md shadow-[#5E492C]/30 hover:shadow-lg hover:shadow-[#5E492C]/40"
             }`}
         >
           {isSubmitting ? (

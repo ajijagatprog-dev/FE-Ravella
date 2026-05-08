@@ -155,7 +155,7 @@ export default function News() {
               className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
             >
               <div className="w-1.5 h-1.5 bg-white/80" />
-              <span className="text-white/90 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em]">
+              <span className="text-white/90 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 Eksplorasi Kuliner
               </span>
             </motion.div>
@@ -164,17 +164,19 @@ export default function News() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-5 leading-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-5 leading-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]"
             >
               Inspirasi Rasa <br />
-              <span className="font-normal text-white">Dan Gaya</span>
+              <span className="font-normal text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">
+                Dan Gaya
+              </span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.8 }}
-              className="text-white/60 text-sm sm:text-lg font-light leading-relaxed max-w-lg"
+              className="text-white/60 text-sm sm:text-lg font-light leading-relaxed max-w-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
             >
               Temukan tips eksklusif, tutorial mendalam, dan tren gaya hidup
               terkini dari para ahli Ravella.

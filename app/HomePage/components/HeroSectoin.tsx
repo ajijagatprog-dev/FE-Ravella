@@ -257,9 +257,9 @@ function HeroContent({ active }: { active: number }) {
         >
           {/* Badge */}
           <motion.div variants={itemVariants}>
-            <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
-              <div className="w-1.5 h-1.5 bg-white/80" />
-              <span className="text-[9px] sm:text-[10px] font-medium tracking-[0.25em] uppercase text-white/90">
+            <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-3 py-1.5 bg-[#1a1a1a] shadow-xl border border-white/10 rounded-sm">
+              <div className="w-1.5 h-1.5 bg-[#D4AF37]" />
+              <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.25em] uppercase text-white">
                 {data.badge}
               </span>
             </div>
@@ -267,14 +267,14 @@ function HeroContent({ active }: { active: number }) {
 
           {/* Subtitle */}
           <motion.div variants={itemVariants}>
-            <p className="text-white/60 font-light text-[10px] sm:text-[11px] mb-2 tracking-[0.2em] uppercase">
+            <p className="text-white font-medium text-[10px] sm:text-[11px] mb-2 tracking-[0.2em] uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               {data.subtitle}
             </p>
           </motion.div>
 
           {/* Title */}
           <motion.div variants={itemVariants}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold leading-tight text-white mb-2 sm:mb-3">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold leading-tight text-white mb-2 sm:mb-3 drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">
               {data.title.split(" ").slice(0, 2).join(" ")}
               <span className="block font-normal mt-0.5">
                 {data.title.split(" ").slice(2).join(" ")}
@@ -284,12 +284,12 @@ function HeroContent({ active }: { active: number }) {
 
           {/* Thin rule */}
           <motion.div variants={itemVariants}>
-            <div className="w-8 h-[1px] bg-white/30 mb-3 sm:mb-4" />
+            <div className="w-8 h-[2px] bg-white/80 mb-3 sm:mb-4 shadow-[0_2px_4px_rgba(0,0,0,0.6)]" />
           </motion.div>
 
           {/* Description */}
           <motion.div variants={itemVariants}>
-            <p className="text-white/75 text-xs sm:text-sm leading-relaxed max-w-sm lg:max-w-md mb-4 sm:mb-5 font-light line-clamp-2 sm:line-clamp-none">
+            <p className="text-white/90 text-xs sm:text-sm leading-relaxed max-w-sm lg:max-w-md mb-4 sm:mb-5 font-light line-clamp-2 sm:line-clamp-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               {data.description}
             </p>
           </motion.div>
@@ -301,7 +301,7 @@ function HeroContent({ active }: { active: number }) {
           >
             <Link
               href="/product"
-              className="group w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3 bg-white text-neutral-900 font-medium text-[10px] tracking-[0.2em] uppercase hover:bg-neutral-100 transition-all duration-300 flex items-center justify-center gap-2"
+              className="group w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3 bg-white text-neutral-900 font-medium text-[10px] tracking-[0.2em] uppercase hover:bg-neutral-100 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
             >
               {data.cta}
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -320,13 +320,13 @@ function HeroContent({ active }: { active: number }) {
                   className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400"
                 />
               ))}
-              <span className="text-white font-medium text-[10px] sm:text-xs tracking-[0.1em] ml-1">
+              <span className="text-white font-medium text-[10px] sm:text-xs tracking-[0.1em] ml-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 4.9
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-              <span className="text-white/65 text-[10px] sm:text-xs font-light tracking-[0.08em]">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
+              <span className="text-white/90 text-[10px] sm:text-xs font-light tracking-[0.08em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 <span className="font-medium text-white">12,500+</span>{" "}
                 Pelanggan Puas
               </span>

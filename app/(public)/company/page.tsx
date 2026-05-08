@@ -46,19 +46,19 @@ export default function Company() {
             {/* Eyebrow */}
             <div className="inline-flex items-center gap-2.5 mb-5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
               <div className="w-1.5 h-1.5 bg-white/80" />
-              <span className="text-white/90 font-medium text-[11px] uppercase tracking-[0.25em]">
+              <span className="text-white/90 font-medium text-[11px] uppercase tracking-[0.25em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 About Us
               </span>
             </div>
 
             {/* Heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-              Ravelle <span className="font-normal text-white">Indonesia</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">
+              Ravelle <span className="font-normal text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">Indonesia</span>
             </h1>
 
-            <div className="w-10 h-[1px] bg-white/30 mb-5" />
+            <div className="w-10 h-[2px] bg-white/80 mb-5 shadow-[0_2px_4px_rgba(0,0,0,0.6)]" />
 
-            <p className="text-white/75 text-sm sm:text-base font-light leading-relaxed max-w-lg">
+            <p className="text-white/75 text-sm sm:text-base font-light leading-relaxed max-w-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               Providing premium quality kitchen appliances with modern and
               innovative designs to make your cooking activities easier.
             </p>
