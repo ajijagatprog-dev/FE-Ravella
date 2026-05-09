@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import api from "@/lib/axios";
+import { useBanners } from "@/lib/useBanners";
 import {
   Search,
   ShoppingCart,
@@ -90,6 +91,13 @@ export default function Header({
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Dynamic banners for the product dropdown mega-menu
+  const dropdownBanners = useBanners("product-dropdown", [
+    "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&q=80",
+    "",
+    "",
+  ]);
 
   useEffect(() => {
     setMounted(true);
@@ -364,31 +372,48 @@ export default function Header({
             </div>
           </div>
         </div>
-
         {/* ══════════════════════════════════════
             MEGA MENU DROPDOWN — PRODUCT
         ══════════════════════════════════════ */}
         <div
           ref={megaRef}
-          className={`mega-panel absolute left-0 w-full bg-white border-t border-neutral-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.12)] z-40 ${megaOpen ? "open" : ""}`}
+          className={`mega-panel absolute left-0 w-full border-t border-neutral-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.12)] z-40 overflow-hidden ${megaOpen ? "open" : ""}`}
           onMouseEnter={openMega}
           onMouseLeave={closeMega}
+          style={{ background: dropdownBanners[2] ? "transparent" : "#fff" }}
         >
-          <div className="max-w-[1320px] mx-auto px-6 md:px-12 py-10">
-            <div className="flex gap-12">
+          {/* Dynamic Background Banner (slot 3) */}
+          {dropdownBanners[2] && (
+            <>
+              <img
+                src={dropdownBanners[2]}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/55 to-black/40" />
+            </>
+          )}
+          <div className="relative max-w-[1320px] mx-auto px-6 md:px-12 py-10">
+            <div className="flex flex-col xl:flex-row gap-8 xl:gap-12">
               {/* ── LEFT: Categories ── */}
               <div className="flex-1 min-w-0">
                 {/* Section header */}
                 <div className="flex items-center gap-3 mb-7">
                   <div>
-                    <p className="text-[10px] font-bold tracking-[0.28em] text-neutral-400 uppercase mb-0.5">
+                    <p
+                      className={`text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 ${dropdownBanners[2] ? "text-white/50" : "text-neutral-400"}`}
+                    >
                       Koleksi Kami
                     </p>
-                    <h3 className="text-[17px] font-bold text-neutral-900 tracking-tight leading-tight">
+                    <h3
+                      className={`text-[17px] font-bold tracking-tight leading-tight ${dropdownBanners[2] ? "text-white" : "text-neutral-900"}`}
+                    >
                       Jelajahi Kategori
                     </h3>
                   </div>
-                  <div className="h-[1px] flex-1 bg-gradient-to-r from-neutral-200 to-transparent divider-line ml-3" />
+                  <div
+                    className={`h-[1px] flex-1 divider-line ml-3 ${dropdownBanners[2] ? "bg-gradient-to-r from-white/20 to-transparent" : "bg-gradient-to-r from-neutral-200 to-transparent"}`}
+                  />
                 </div>
 
                 {/* Category grid */}
@@ -398,7 +423,7 @@ export default function Header({
                       <Link
                         key={cat}
                         href={`/search?q=${encodeURIComponent(cat)}`}
-                        className="cat-card cat-card-stagger rounded-xl p-5 block"
+                        className={`cat-card cat-card-stagger rounded-xl p-5 block ${dropdownBanners[2] ? "!bg-white/10 backdrop-blur-md border border-white/10 hover:!bg-white/20" : ""}`}
                         style={{ transitionDelay: `${0.05 + i * 0.04}s` }}
                         onMouseEnter={() => setHoveredCat(cat)}
                         onMouseLeave={() => setHoveredCat(null)}
@@ -408,14 +433,20 @@ export default function Header({
                             <span className="cat-icon text-2xl leading-none">
                               {getCategoryIcon(cat)}
                             </span>
-                            <span className="cat-arrow text-neutral-300 text-sm font-light">
+                            <span
+                              className={`cat-arrow text-sm font-light ${dropdownBanners[2] ? "text-white/40" : "text-neutral-300"}`}
+                            >
                               →
                             </span>
                           </div>
-                          <h4 className="cat-label text-[13px] font-bold text-neutral-800 tracking-wide capitalize leading-tight mb-1">
+                          <h4
+                            className={`cat-label text-[13px] font-bold tracking-wide capitalize leading-tight mb-1 ${dropdownBanners[2] ? "text-white" : "text-neutral-800"}`}
+                          >
                             {cat}
                           </h4>
-                          <p className="cat-eksplor text-[9.5px] uppercase tracking-[0.22em] font-semibold text-neutral-400 flex items-center gap-1">
+                          <p
+                            className={`cat-eksplor text-[9.5px] uppercase tracking-[0.22em] font-semibold flex items-center gap-1 ${dropdownBanners[2] ? "text-white/50" : "text-neutral-400"}`}
+                          >
                             Eksplor
                           </p>
                         </div>
@@ -423,8 +454,12 @@ export default function Header({
                     ))
                   ) : (
                     <div className="col-span-full flex items-center py-10">
-                      <Loader2 className="w-4 h-4 text-neutral-300 animate-spin" />
-                      <span className="ml-3 text-[12px] text-neutral-400 tracking-wide">
+                      <Loader2
+                        className={`w-4 h-4 animate-spin ${dropdownBanners[2] ? "text-white/40" : "text-neutral-300"}`}
+                      />
+                      <span
+                        className={`ml-3 text-[12px] tracking-wide ${dropdownBanners[2] ? "text-white/50" : "text-neutral-400"}`}
+                      >
                         Memuat kategori...
                       </span>
                     </div>
@@ -432,17 +467,23 @@ export default function Header({
                 </div>
 
                 {/* Stats row */}
-                <div className="mt-8 pt-6 border-t border-neutral-100 flex items-center gap-8">
+                <div
+                  className={`mt-8 pt-6 flex flex-wrap items-center gap-6 xl:gap-8 ${dropdownBanners[2] ? "border-t border-white/10" : "border-t border-neutral-100"}`}
+                >
                   {[
                     { value: "500+", label: "Produk" },
                     { value: "15+", label: "Kategori" },
                     { value: "10K+", label: "Pelanggan" },
                   ].map((s) => (
                     <div key={s.label} className="stat-item text-center">
-                      <p className="text-[15px] font-bold text-neutral-900">
+                      <p
+                        className={`text-[15px] font-bold ${dropdownBanners[2] ? "text-white" : "text-neutral-900"}`}
+                      >
                         {s.value}
                       </p>
-                      <p className="text-[10px] tracking-[0.18em] uppercase text-neutral-400 font-medium">
+                      <p
+                        className={`text-[10px] tracking-[0.18em] uppercase font-medium ${dropdownBanners[2] ? "text-white/50" : "text-neutral-400"}`}
+                      >
                         {s.label}
                       </p>
                     </div>
@@ -450,7 +491,11 @@ export default function Header({
                   <div className="ml-auto">
                     <Link
                       href="/product"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-[10.5px] tracking-[0.2em] font-bold uppercase rounded-sm hover:bg-neutral-800 transition-all duration-300 group/btn"
+                      className={`inline-flex items-center gap-2 px-5 py-2.5 text-[10.5px] tracking-[0.2em] font-bold uppercase rounded-sm transition-all duration-300 group/btn ${
+                        dropdownBanners[2]
+                          ? "bg-white text-black hover:bg-white/90"
+                          : "bg-black text-white hover:bg-neutral-800"
+                      }`}
                     >
                       Semua Produk
                       <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-300" />
@@ -459,16 +504,19 @@ export default function Header({
                 </div>
               </div>
 
-              {/* ── RIGHT: Featured Card ── */}
-              <div className="w-[300px] xl:w-[340px] flex-shrink-0 flex flex-col gap-4">
+              {/* ── RIGHT: Featured Card (hidden on smaller screens) ── */}
+              <div className="hidden xl:flex w-[300px] xl:w-[340px] flex-shrink-0 flex-col gap-4">
                 {/* Main featured */}
                 <Link
                   href="/product"
-                  className="featured-card block aspect-[3/4] w-full flex-1 relative shadow-sm hover:shadow-xl transition-shadow duration-500 group/feat"
+                  className="featured-card block aspect-[3/4] w-full flex-1 relative shadow-sm hover:shadow-xl transition-shadow duration-500 group/feat rounded-xl overflow-hidden"
                 >
                   <img
-                    src="https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&q=80"
-                    alt="Featured"
+                    src={
+                      dropdownBanners[0] ||
+                      "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&q=80"
+                    }
+                    alt="Featured Collection"
                     className="w-full h-full object-cover"
                   />
                   {/* Gradient overlay */}
@@ -507,7 +555,18 @@ export default function Header({
                   href="/sale"
                   className="relative overflow-hidden rounded-xl p-5 flex items-center justify-between bg-gradient-to-r from-neutral-900 to-neutral-700 hover:from-neutral-800 hover:to-neutral-600 transition-all duration-500 group/sale"
                 >
-                  <div>
+                  {/* Dynamic background image for slot 2 */}
+                  {dropdownBanners[1] && (
+                    <>
+                      <img
+                        src={dropdownBanners[1]}
+                        alt="Promo Banner"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+                    </>
+                  )}
+                  <div className="relative z-10">
                     <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-rose-400 mb-1">
                       🔥 Flash Sale
                     </p>
@@ -519,7 +578,7 @@ export default function Header({
                       </span>
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="relative z-10 text-right">
                     <p className="text-neutral-400 text-[9px] tracking-widest uppercase mb-1">
                       Lihat
                     </p>

@@ -12,6 +12,8 @@ import {
   RefreshCw,
   Monitor,
   X,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
@@ -24,6 +26,7 @@ interface PageConfig {
   description: string;
   slots: number;
   defaultImages: string[];
+  slotLabels?: string[];
 }
 
 const PAGE_CONFIGS: PageConfig[] = [
@@ -32,21 +35,42 @@ const PAGE_CONFIGS: PageConfig[] = [
     label: "Home — Hero Slider",
     description: "Banner slider utama di halaman beranda (3 slide)",
     slots: 3,
-    defaultImages: ["/Hero/banner1.png", "/Hero/banner2.png", "/Hero/banner3.png"],
+    defaultImages: [
+      "/Hero/banner1.png",
+      "/Hero/banner2.png",
+      "/Hero/banner3.png",
+    ],
   },
   {
     key: "product",
     label: "Product",
     description: "Banner hero halaman produk",
     slots: 1,
-    defaultImages: ["https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80"],
+    defaultImages: [
+      "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80",
+    ],
+  },
+  {
+    key: "product-dropdown",
+    label: "Product — Dropdown Menu",
+    description:
+      "Banner di mega-menu dropdown navigasi Product (Featured Card, Mini Promo, Background)",
+    slots: 3,
+    slotLabels: ["Featured Card", "Mini Promo", "Background"],
+    defaultImages: [
+      "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&q=80",
+      "",
+      "",
+    ],
   },
   {
     key: "news",
     label: "News",
     description: "Banner hero halaman berita",
     slots: 1,
-    defaultImages: ["https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80"],
+    defaultImages: [
+      "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80",
+    ],
   },
   {
     key: "company",
@@ -60,14 +84,18 @@ const PAGE_CONFIGS: PageConfig[] = [
     label: "Contact",
     description: "Banner hero halaman kontak",
     slots: 1,
-    defaultImages: ["https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80"],
+    defaultImages: [
+      "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80",
+    ],
   },
   {
     key: "sale",
     label: "Sale",
     description: "Banner hero halaman promo / sale",
     slots: 1,
-    defaultImages: ["https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1920&q=80"],
+    defaultImages: [
+      "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1920&q=80",
+    ],
   },
   {
     key: "service-center",
@@ -160,6 +188,72 @@ export default function BannerManagementPage() {
     }
   };
 
+  const handleDeleteImage = (bannerId: number) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle size={20} className="text-red-500" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-900">Hapus Banner?</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Gambar banner akan dihapus dan kembali ke default.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 justify-end">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              onClick={async () => {
+                toast.dismiss(t.id);
+                try {
+                  const res = await api.delete(
+                    `/admin/banners/${bannerId}/image`,
+                  );
+                  if (res.data?.status === "success") {
+                    toast.success("Gambar banner berhasil dihapus", {
+                      icon: "🗑️",
+                      style: {
+                        borderRadius: "12px",
+                        background: "#111",
+                        color: "#fff",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                      },
+                    });
+                    fetchBanners();
+                  }
+                } catch (err) {
+                  toast.error("Gagal menghapus gambar banner");
+                }
+              }}
+              className="px-4 py-2 text-xs font-bold text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors shadow-sm"
+            >
+              Ya, Hapus
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: 10000,
+        style: {
+          maxWidth: "380px",
+          padding: "16px",
+          borderRadius: "16px",
+          boxShadow:
+            "0 20px 60px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)",
+        },
+      },
+    );
+  };
+
   const handleDrop = (
     e: React.DragEvent,
     bannerId: number,
@@ -238,7 +332,9 @@ export default function BannerManagementPage() {
             <li>• Format yang didukung: JPEG, PNG, JPG, GIF, WebP</li>
             <li>• Ukuran maksimal: 5MB per gambar</li>
             <li>• Banner akan otomatis responsif di semua perangkat</li>
-            <li>• Gunakan gambar landscape beresolusi tinggi untuk hasil terbaik</li>
+            <li>
+              • Gunakan gambar landscape beresolusi tinggi untuk hasil terbaik
+            </li>
           </ul>
         </div>
       </div>
@@ -266,7 +362,9 @@ export default function BannerManagementPage() {
                     <h3 className="text-sm font-bold text-gray-900">
                       {config.label}
                     </h3>
-                    <p className="text-xs text-gray-500">{config.description}</p>
+                    <p className="text-xs text-gray-500">
+                      {config.description}
+                    </p>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-100 px-3 py-1.5 rounded-full">
@@ -295,7 +393,7 @@ export default function BannerManagementPage() {
                       {config.slots > 1 && (
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                            Slide {slot}
+                            {config.slotLabels?.[slotIndex] || `Slide ${slot}`}
                           </span>
                           {banner && (
                             <button
@@ -363,13 +461,26 @@ export default function BannerManagementPage() {
                                     }
                                   />
                                 </label>
-                                <button
-                                  onClick={() => setPreviewImage(imageUrl)}
-                                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-lg hover:bg-white/30 transition-colors border border-white/20"
-                                >
-                                  <Eye size={14} />
-                                  Preview
-                                </button>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => setPreviewImage(imageUrl)}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-lg hover:bg-white/30 transition-colors border border-white/20"
+                                  >
+                                    <Eye size={14} />
+                                    Preview
+                                  </button>
+                                  {banner?.image && config.slots > 1 && (
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteImage(banner.id)
+                                      }
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/80 backdrop-blur-sm text-white text-xs font-bold rounded-lg hover:bg-red-600 transition-colors border border-red-400/30 shadow-lg"
+                                    >
+                                      <Trash2 size={14} />
+                                      Hapus
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             </div>
 
@@ -377,9 +488,7 @@ export default function BannerManagementPage() {
                             {banner && config.slots === 1 && (
                               <div className="absolute top-3 right-3">
                                 <button
-                                  onClick={() =>
-                                    handleToggleActive(banner.id)
-                                  }
+                                  onClick={() => handleToggleActive(banner.id)}
                                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm ${
                                     banner.is_active
                                       ? "bg-green-500 text-white"
@@ -409,12 +518,31 @@ export default function BannerManagementPage() {
                             )}
                           </div>
                         ) : (
-                          /* Empty State */
+                          /* Empty State — with upload button */
                           <div className="aspect-[21/9] flex flex-col items-center justify-center gap-3 text-gray-400">
                             <ImageIcon size={32} className="text-gray-300" />
                             <p className="text-xs font-medium">
                               Belum ada banner
                             </p>
+                            {banner && (
+                              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                                <Upload size={14} />
+                                Upload Banner
+                                <input
+                                  type="file"
+                                  accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                                  className="hidden"
+                                  onChange={(e) =>
+                                    handleFileSelect(
+                                      e,
+                                      banner.id,
+                                      config.key,
+                                      slot,
+                                    )
+                                  }
+                                />
+                              </label>
+                            )}
                           </div>
                         )}
 
@@ -431,6 +559,19 @@ export default function BannerManagementPage() {
                           </div>
                         )}
                       </div>
+
+                      {/* ── Action Buttons (always visible) ── */}
+                      {banner?.image && config.slots > 1 && (
+                        <div className="flex items-center justify-end gap-2 mt-2">
+                          <button
+                            onClick={() => handleDeleteImage(banner.id)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-red-500 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 hover:text-red-600 transition-all duration-200"
+                          >
+                            <Trash2 size={12} />
+                            Hapus Banner
+                          </button>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
