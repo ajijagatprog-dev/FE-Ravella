@@ -111,17 +111,15 @@ export default function HeroSection() {
           >
             <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
           </button>
-
-          <HeroContent active={active} />
         </div>
       </div>
 
       {/* ── CONTROLS ── */}
       <div className="max-w-[1600px] mx-auto">
         <div className="relative px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 border-t border-white/10">
-          {/* Dots & Progress */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 py-5 sm:py-6">
-            <div className="flex items-center gap-4">
+          {/* Tabs & Progress */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-5 lg:gap-6 py-5 lg:py-6">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-4 w-full lg:w-auto">
               {HERO_IMAGES.map((_, i) => (
                 <button
                   key={i}
@@ -129,37 +127,38 @@ export default function HeroSection() {
                     setActive(i);
                     setProgress(0);
                   }}
-                  className="relative group"
+                  className="relative group px-3 py-2 sm:px-4 sm:py-2.5 transition-all duration-300"
                   aria-label={`Go to slide ${i + 1}`}
                 >
-                  <div
-                    className={`h-[1px] transition-all duration-500 ${
+                  <span
+                    className={`text-[9px] sm:text-[10px] md:text-[11px] font-medium tracking-[0.15em] sm:tracking-[0.2em] uppercase whitespace-nowrap transition-colors duration-300 ${
                       active === i
-                        ? "w-10 sm:w-12 bg-white"
-                        : "w-4 bg-white/30 hover:bg-white/60 hover:w-7"
-                    }`}
-                  />
-                  <div
-                    className={`absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 bg-neutral-900 border border-white/10 text-white/80 text-[9px] tracking-[0.2em] uppercase pointer-events-none transition-all duration-200 ${
-                      active === i
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
+                        ? "text-white"
+                        : "text-white/40 group-hover:text-white/80"
                     }`}
                   >
-                    {HERO_DATA[i].subtitle}
-                  </div>
+                    {HERO_DATA[i]?.subtitle || `Banner ${i + 1}`}
+                  </span>
+
+                  <div
+                    className={`absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-500 ease-out ${
+                      active === i
+                        ? "w-full"
+                        : "w-0 group-hover:w-1/2 group-hover:bg-white/40"
+                    }`}
+                  />
                 </button>
               ))}
             </div>
 
-            <div className="w-full sm:w-56 md:w-64 flex items-center gap-3">
-              <div className="flex-1 h-[1px] bg-white/15 overflow-hidden">
+            <div className="w-full lg:w-64 flex items-center gap-4 px-2 sm:px-4 lg:px-0">
+              <div className="flex-1 h-[2px] bg-white/10 overflow-hidden rounded-full">
                 <div
-                  className="h-full bg-white transition-all duration-100"
+                  className="h-full bg-white transition-all duration-100 ease-linear rounded-full"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className="text-white/50 text-[11px] font-light tracking-[0.2em] min-w-[3rem]">
+              <span className="text-white/50 text-[10px] sm:text-[11px] font-medium tracking-[0.2em] min-w-[3rem] text-right">
                 {String(active + 1).padStart(2, "0")} /{" "}
                 {String(HERO_IMAGES.length).padStart(2, "0")}
               </span>
@@ -167,19 +166,19 @@ export default function HeroSection() {
           </div>
 
           {/* Feature Badges */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10 border-t border-white/10 mb-8 sm:mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10 border-t border-white/10 mb-6 sm:mb-8 lg:mb-10">
             <FeatureBadge
-              icon={<Truck className="w-4 h-4" />}
+              icon={<Truck className="w-4 h-4 sm:w-5 sm:h-5" />}
               label="Gratis Ongkir"
               subtext="Min. Belanja 100k"
             />
             <FeatureBadge
-              icon={<ShieldCheck className="w-4 h-4" />}
+              icon={<ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />}
               label="Garansi Resmi"
               subtext="100% Original"
             />
             <FeatureBadge
-              icon={<Award className="w-4 h-4" />}
+              icon={<Award className="w-4 h-4 sm:w-5 sm:h-5" />}
               label="Kualitas Premium"
               subtext="Trusted Quality"
             />
@@ -200,140 +199,29 @@ function HeroBackground({
 }) {
   return (
     <div className="absolute inset-0 bg-neutral-900">
-      {images.map((img, i) => (
-        <div
-          key={i}
-          className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out ${
-            active === i ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url(${img})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-        </div>
-      ))}
-      {/* Gradient overlays removed for brighter banner */}
-    </div>
-  );
-}
-
-import { motion, Variants } from "framer-motion";
-
-/* ── CONTENT ── */
-function HeroContent({ active }: { active: number }) {
-  const data = HERO_DATA[active];
-
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" },
-    },
-  };
-
-  return (
-    <div className="relative z-10 h-full flex items-center">
-      <div className="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
-        <motion.div
-          key={active}
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="max-w-xl lg:max-w-2xl"
-        >
-          {/* Badge */}
-          <motion.div variants={itemVariants}>
-            <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-3 py-1.5 bg-[#1a1a1a] shadow-xl border border-white/10 rounded-sm">
-              <div className="w-1.5 h-1.5 bg-[#D4AF37]" />
-              <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.25em] uppercase text-white">
-                {data.badge}
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Subtitle */}
-          <motion.div variants={itemVariants}>
-            <p className="text-white font-medium text-[10px] sm:text-[11px] mb-2 tracking-[0.2em] uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              {data.subtitle}
-            </p>
-          </motion.div>
-
-          {/* Title */}
-          <motion.div variants={itemVariants}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold leading-tight text-white mb-2 sm:mb-3 drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">
-              {data.title.split(" ").slice(0, 2).join(" ")}
-              <span className="block font-normal mt-0.5">
-                {data.title.split(" ").slice(2).join(" ")}
-              </span>
-            </h1>
-          </motion.div>
-
-          {/* Thin rule */}
-          <motion.div variants={itemVariants}>
-            <div className="w-8 h-[2px] bg-white/80 mb-3 sm:mb-4 shadow-[0_2px_4px_rgba(0,0,0,0.6)]" />
-          </motion.div>
-
-          {/* Description */}
-          <motion.div variants={itemVariants}>
-            <p className="text-white/90 text-xs sm:text-sm leading-relaxed max-w-sm lg:max-w-md mb-4 sm:mb-5 font-light line-clamp-2 sm:line-clamp-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              {data.description}
-            </p>
-          </motion.div>
-
-          {/* CTA */}
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-5"
+      {images.map((img, i) => {
+        const link = HERO_DATA[i]?.link || "/products";
+        return (
+          <Link
+            href={link}
+            key={i}
+            className={`absolute inset-0 block transition-opacity duration-[1400ms] ease-in-out ${
+              active === i
+                ? "opacity-100 z-10"
+                : "opacity-0 z-0 pointer-events-none"
+            }`}
           >
-            <Link
-              href="/product"
-              className="group w-full sm:w-auto px-6 py-2.5 sm:px-8 sm:py-3 bg-white text-neutral-900 font-medium text-[10px] tracking-[0.2em] uppercase hover:bg-neutral-100 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
-            >
-              {data.cta}
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </motion.div>
-
-          {/* Trust */}
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-wrap items-center gap-4 sm:gap-5"
-          >
-            <div className="flex items-center gap-1.5">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400"
-                />
-              ))}
-              <span className="text-white font-medium text-[10px] sm:text-xs tracking-[0.1em] ml-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                4.9
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_4px_rgba(0,0,0,0.5)]" />
-              <span className="text-white/90 text-[10px] sm:text-xs font-light tracking-[0.08em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                <span className="font-medium text-white">12,500+</span>{" "}
-                Pelanggan Puas
-              </span>
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `url(${img})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -349,15 +237,15 @@ function FeatureBadge({
   subtext: string;
 }) {
   return (
-    <div className="group flex items-center gap-3 px-5 sm:px-6 py-4 sm:py-5 hover:bg-white/5 transition-colors duration-300">
-      <div className="flex-shrink-0 text-white/60 group-hover:text-white/90 transition-colors duration-300">
+    <div className="group flex items-center justify-center sm:justify-start gap-3 sm:gap-4 px-4 sm:px-6 py-4 sm:py-5 hover:bg-white/5 transition-colors duration-300">
+      <div className="flex-shrink-0 text-white/60 group-hover:text-white transition-colors duration-300">
         {icon}
       </div>
-      <div>
-        <div className="font-medium text-white text-[11px] tracking-[0.18em] uppercase leading-tight">
+      <div className="text-center sm:text-left">
+        <div className="font-semibold text-white text-[10px] sm:text-[11px] tracking-[0.15em] sm:tracking-[0.18em] uppercase leading-tight">
           {label}
         </div>
-        <div className="text-white/45 text-[10px] mt-0.5 tracking-[0.12em] font-light">
+        <div className="text-white/50 text-[9px] sm:text-[10px] mt-0.5 tracking-[0.1em] sm:tracking-[0.12em] font-light">
           {subtext}
         </div>
       </div>

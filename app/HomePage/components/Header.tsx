@@ -124,6 +124,18 @@ export default function Header({
 
     const fetchCategories = async () => {
       try {
+        const cached = sessionStorage.getItem("ravelle_categories");
+        if (cached) {
+          const { data, ts } = JSON.parse(cached);
+          if (Date.now() - ts < 60 * 60 * 1000) {
+            // Cache for 1 hour since categories rarely change
+            setCategories(data);
+            return;
+          }
+        }
+      } catch {}
+
+      try {
         const res = await api.get("/products", { params: { limit: 100 } });
         if (res.data.status === "success") {
           const items = res.data.data.data || res.data.data;
@@ -143,7 +155,15 @@ export default function Header({
               catMap.set(normalized, display);
             }
           });
-          setCategories(Array.from(catMap.values()));
+          const fetchedCategories = Array.from(catMap.values());
+          setCategories(fetchedCategories);
+
+          try {
+            sessionStorage.setItem(
+              "ravelle_categories",
+              JSON.stringify({ data: fetchedCategories, ts: Date.now() }),
+            );
+          } catch {}
         }
       } catch {}
     };

@@ -25,6 +25,19 @@ export default function NewProducts() {
   );
 
   useEffect(() => {
+    // Try to restore from cache first
+    try {
+      const cached = sessionStorage.getItem("ravelle_new_products");
+      if (cached) {
+        const { data, ts } = JSON.parse(cached);
+        if (Date.now() - ts < 5 * 60 * 1000) {
+          setProducts(data);
+          setIsLoading(false);
+          return; // Cache is fresh, skip API call
+        }
+      }
+    } catch {}
+
     const fetchNewProducts = async () => {
       try {
         const res = await api.get("/products", {
@@ -54,6 +67,12 @@ export default function NewProducts() {
             };
           });
           setProducts(mapped);
+          try {
+            sessionStorage.setItem(
+              "ravelle_new_products",
+              JSON.stringify({ data: mapped, ts: Date.now() }),
+            );
+          } catch {}
         }
       } catch (error) {
         console.error("Failed to fetch new products", error);
@@ -236,9 +255,12 @@ function ProductCard({
   onAddToCart: (p: Product) => void;
 }) {
   return (
-    <div className="min-w-[160px] sm:min-w-[200px] md:min-w-0 snap-start group">
-      {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden mb-3 sm:mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-4 sm:p-5 flex items-center justify-center">
+    <div className="min-w-[140px] sm:min-w-[180px] md:min-w-0 snap-start group">
+      {/* Image Container — clickable to product detail */}
+      <Link
+        href={`/product/${product.id}`}
+        className="block relative aspect-square overflow-hidden mb-3 sm:mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-3 sm:p-5 flex items-center justify-center"
+      >
         {/* Badge */}
         <div className="absolute top-3 left-3 z-10">
           <span
@@ -264,6 +286,7 @@ function ProductCard({
         <button
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             onAddToCart(product);
           }}
           className="absolute bottom-4 left-4 right-4 bg-white py-3 font-medium text-neutral-900 text-[11px] tracking-[0.2em] uppercase translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 hover:bg-neutral-100"
@@ -271,7 +294,7 @@ function ProductCard({
           <ShoppingBag className="w-3.5 h-3.5" />
           Tambah ke Keranjang
         </button>
-      </div>
+      </Link>
 
       {/* Product Info */}
       <div>
@@ -280,10 +303,12 @@ function ProductCard({
           {product.category}
         </p>
 
-        {/* Product Title */}
-        <h3 className="font-semibold text-base sm:text-lg md:text-xl text-neutral-900 mb-1.5 sm:mb-2 line-clamp-1 group-hover:text-neutral-600 transition-colors leading-tight">
-          {product.title}
-        </h3>
+        {/* Product Title — clickable to product detail */}
+        <Link href={`/product/${product.id}`}>
+          <h3 className="font-semibold text-sm sm:text-base md:text-lg text-neutral-900 mb-1.5 sm:mb-2 line-clamp-1 group-hover:text-neutral-600 transition-colors leading-tight cursor-pointer">
+            {product.title}
+          </h3>
+        </Link>
 
         {/* Price & Rating */}
         <div className="flex items-center justify-between">

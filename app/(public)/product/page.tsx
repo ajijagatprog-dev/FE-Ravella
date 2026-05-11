@@ -52,6 +52,19 @@ function ProductPageContent() {
   const initialCategory = searchParams.get("category");
 
   useEffect(() => {
+    // Try to restore from cache first
+    try {
+      const cached = sessionStorage.getItem("ravelle_all_products");
+      if (cached) {
+        const { data, ts } = JSON.parse(cached);
+        if (Date.now() - ts < 5 * 60 * 1000) {
+          setProducts(data);
+          setIsLoading(false);
+          return;
+        }
+      }
+    } catch {}
+
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
@@ -92,10 +105,17 @@ function ProductPageContent() {
             };
           });
           setProducts(mapped);
+          try {
+            sessionStorage.setItem(
+              "ravelle_all_products",
+              JSON.stringify({ data: mapped, ts: Date.now() }),
+            );
+          } catch {}
         }
       } catch (err) {
         console.error("Failed to fetch public products", err);
-        setProducts([]);
+        // Don't empty the array if it fails, maybe there's existing data or let it fail gracefully
+        // setProducts([]); // removed so it doesn't empty the screen completely if a temporary error occurs
       } finally {
         setIsLoading(false);
       }
@@ -338,7 +358,9 @@ function ProductPageContent() {
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight break-words drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]"
             >
               Find Your Perfect <br />
-              <span className="font-normal text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">Product</span>
+              <span className="font-normal text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">
+                Product
+              </span>
             </motion.h1>
 
             <motion.div
@@ -586,9 +608,10 @@ function ProductPageContent() {
                       : ""
                   }`}
                 >
-                  {/* Image Container */}
-                  <div
-                    className={`relative overflow-hidden bg-[#F9F9F9] group-hover:bg-[#F3F3F3] transition-colors duration-500 flex items-center justify-center p-4 sm:p-8 ${viewMode === "grid" ? "aspect-square" : "w-full md:w-[300px] flex-shrink-0 aspect-square"}`}
+                  {/* Image Container — clickable to product detail */}
+                  <Link
+                    href={`/product/${product.id}`}
+                    className={`block relative overflow-hidden bg-[#F9F9F9] group-hover:bg-[#F3F3F3] transition-colors duration-500 flex items-center justify-center p-4 sm:p-8 ${viewMode === "grid" ? "aspect-square" : "w-full md:w-[300px] flex-shrink-0 aspect-square"}`}
                   >
                     <motion.img
                       initial={false}
@@ -626,14 +649,22 @@ function ProductPageContent() {
                     {/* Action Buttons Floating */}
                     <div className="absolute top-4 right-4 flex flex-col gap-2 z-10 translate-x-0 sm:translate-x-4 opacity-100 sm:opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
                       <button
-                        onClick={() => openQuickView(product)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          openQuickView(product);
+                        }}
                         className="w-10 h-10 bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center text-neutral-400 hover:bg-neutral-900 hover:text-white transition-all duration-300"
                         title="Quick View"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => toggleFavorite(product.id)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleFavorite(product.id);
+                        }}
                         className={`w-10 h-10 bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center transition-all duration-300 ${favorites.includes(product.id) ? "text-red-500 bg-red-50" : "text-neutral-400 hover:bg-neutral-900 hover:text-white"}`}
                         title="Add to Wishlist"
                       >
@@ -646,7 +677,11 @@ function ProductPageContent() {
                     {/* Quick Add at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.16, 1, 0.3, 1]">
                       <button
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
                         disabled={!product.inStock}
                         className="w-full py-4 bg-neutral-900 text-white text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-colors flex items-center justify-center gap-3 disabled:bg-neutral-300 disabled:cursor-not-allowed"
                       >
@@ -654,7 +689,7 @@ function ProductPageContent() {
                         {product.inStock ? "Add to Cart" : "Out of Stock"}
                       </button>
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Info Area */}
                   <div
