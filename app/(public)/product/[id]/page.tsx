@@ -35,6 +35,20 @@ export default function ProductDetail() {
     const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
     useEffect(() => {
+        // Try to load from cache first
+        try {
+            const cached = sessionStorage.getItem(`ravelle_product_${productId}`);
+            if (cached) {
+                const { data, related, ts } = JSON.parse(cached);
+                if (Date.now() - ts < 5 * 60 * 1000) {
+                    setProduct(data);
+                    setRelatedProducts(related);
+                    setIsLoading(false);
+                    return;
+                }
+            }
+        } catch {}
+
         const fetchProductDetail = async () => {
             try {
                 setIsLoading(true);
@@ -42,7 +56,7 @@ export default function ProductDetail() {
                 if (res.data.status === 'success') {
                     const item = res.data.data;
                     const activePromo = item.active_promotion;
-                    setProduct({
+                    const mappedProduct = {
                         id: item.id,
                         name: item.name,
                         description: item.description || "Deskripsi produk",
@@ -63,31 +77,47 @@ export default function ProductDetail() {
                         badge: item.badge || (item.is_featured ? "Best Seller" : ""),
                         media: (item.media || []).filter((m: any) => !m.variant_id),
                         variants: item.variants || [],
-                    });
+                    };
+
+                    setProduct(mappedProduct);
 
                     // Fetch related products from same category
-                    const relRes = await api.get('/products', { params: { limit: 10, category: item.category || undefined } });
-                    if (relRes.data.status === 'success') {
-                        const relMapped = relRes.data.data.data
-                            .filter((r: any) => r.id !== item.id) // Exclude current product
-                            .slice(0, 4) // Show only 4
-                            .map((r: any) => ({
-                                id: r.id,
-                                name: r.name,
-                                rating: r.calculated_rating || 0,
-                                reviews: r.total_reviews_count || 0,
-                                originalPrice: r.price,
-                                price: r.promoted_price || r.price,
-                                discount: r.active_promotion ? (r.active_promotion.discount_type === 'percent' ? r.active_promotion.discount_value : Math.round((r.price - r.promoted_price) / r.price * 100)) : (r.discount || 0),
-                                active_promotion: r.active_promotion,
-                                badge: r.badge || (r.is_featured ? "Best Seller" : ""),
-                                image: r.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
-                            }));
-                        setRelatedProducts(relMapped);
+                    let relMapped: any[] = [];
+                    try {
+                        const relRes = await api.get('/products', { params: { limit: 10, category: item.category || undefined } });
+                        if (relRes.data.status === 'success') {
+                            relMapped = relRes.data.data.data
+                                .filter((r: any) => r.id !== item.id) // Exclude current product
+                                .slice(0, 4) // Show only 4
+                                .map((r: any) => ({
+                                    id: r.id,
+                                    name: r.name,
+                                    rating: r.calculated_rating || 0,
+                                    reviews: r.total_reviews_count || 0,
+                                    originalPrice: r.price,
+                                    price: r.promoted_price || r.price,
+                                    discount: r.active_promotion ? (r.active_promotion.discount_type === 'percent' ? r.active_promotion.discount_value : Math.round((r.price - r.promoted_price) / r.price * 100)) : (r.discount || 0),
+                                    active_promotion: r.active_promotion,
+                                    badge: r.badge || (r.is_featured ? "Best Seller" : ""),
+                                    image: r.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+                                }));
+                            setRelatedProducts(relMapped);
+                        }
+                    } catch (e) {
+                        console.error("Failed to fetch related products", e);
                     }
+
+                    // Save to cache
+                    try {
+                        sessionStorage.setItem(`ravelle_product_${productId}`, JSON.stringify({
+                            data: mappedProduct,
+                            related: relMapped,
+                            ts: Date.now()
+                        }));
+                    } catch {}
                 }
             } catch (e) {
-                console.log(e);
+                console.error("Failed to fetch product detail", e);
             } finally {
                 setIsLoading(false);
             }
