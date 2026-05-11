@@ -18,6 +18,7 @@ import {
   Handshake,
 } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import Header from "../../HomePage/components/Header";
 import Footer from "../../HomePage/components/Footer";
 import BestSellers from "../../HomePage/components/BestSellers";
@@ -41,28 +42,37 @@ export default function Company() {
           }}
         />
 
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/90 via-neutral-900/40 to-transparent pointer-events-none" />
+
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24">
-          <div className="max-w-2xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="max-w-2xl"
+          >
             {/* Eyebrow */}
-            <div className="inline-flex items-center gap-2.5 mb-5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
-              <div className="w-1.5 h-1.5 bg-white/80" />
-              <span className="text-white/90 font-medium text-[11px] uppercase tracking-[0.25em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            <div className="inline-flex items-center gap-2.5 mb-5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg rounded-full">
+              <div className="w-1.5 h-1.5 bg-white/80 rounded-full" />
+              <span className="text-white/90 font-medium text-[11px] uppercase tracking-[0.25em]">
                 About Us
               </span>
             </div>
 
             {/* Heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">
-              Ravelle <span className="font-normal text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">Indonesia</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+              Ravelle{" "}
+              <span className="font-light text-white/90">Indonesia</span>
             </h1>
 
-            <div className="w-10 h-[2px] bg-white/80 mb-5 shadow-[0_2px_4px_rgba(0,0,0,0.6)]" />
+            <div className="w-10 h-[2px] bg-white/80 mb-5" />
 
-            <p className="text-white/75 text-sm sm:text-base font-light leading-relaxed max-w-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            <p className="text-white/90 text-sm sm:text-base font-light leading-relaxed max-w-lg">
               Providing premium quality kitchen appliances with modern and
               innovative designs to make your cooking activities easier.
             </p>
-          </div>
+          </motion.div>
         </div>
       </section>
 

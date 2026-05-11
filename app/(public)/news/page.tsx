@@ -146,42 +146,35 @@ export default function News() {
           }}
         />
 
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/90 via-neutral-900/40 to-transparent pointer-events-none" />
+
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24 xl:px-40">
-          <div className="max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
-            >
-              <div className="w-1.5 h-1.5 bg-white/80" />
-              <span className="text-white/90 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="max-w-2xl"
+          >
+            <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg rounded-full">
+              <div className="w-1.5 h-1.5 bg-white/80 rounded-full" />
+              <span className="text-white/90 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em]">
                 Eksplorasi Kuliner
               </span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-5 leading-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]"
-            >
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-5 leading-tight">
               Inspirasi Rasa <br />
-              <span className="font-normal text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]">
-                Dan Gaya
-              </span>
-            </motion.h1>
+              <span className="font-light text-white/90">Dan Gaya</span>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.8 }}
-              className="text-white/60 text-sm sm:text-lg font-light leading-relaxed max-w-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-            >
+            <div className="w-10 h-[2px] bg-white/80 mb-5" />
+
+            <p className="text-white/90 text-sm sm:text-lg font-light leading-relaxed max-w-lg">
               Temukan tips eksklusif, tutorial mendalam, dan tren gaya hidup
               terkini dari para ahli Ravella.
-            </motion.p>
-          </div>
+            </p>
+          </motion.div>
         </div>
 
         {/* Scroll indicator */}

@@ -188,64 +188,52 @@ export default function SalePage() {
           }}
         />
 
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/90 via-neutral-900/40 to-transparent pointer-events-none" />
+
         <div className="relative z-10 h-full flex items-center px-6 md:px-16 lg:px-24 xl:px-40">
-          <div className="max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-amber-500/10 backdrop-blur-md border border-amber-500/20 shadow-lg"
-            >
-              <div className="w-1.5 h-1.5 bg-amber-500" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="max-w-3xl"
+          >
+            <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 bg-amber-500/10 backdrop-blur-md border border-amber-500/20 shadow-lg rounded-full">
+              <div className="w-1.5 h-1.5 bg-amber-500 rounded-full" />
               <span className="text-amber-500 font-bold text-[10px] sm:text-xs uppercase tracking-[0.4em]">
                 Limited Time Offers
               </span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]"
-            >
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]">
               Pesta Diskon <br />
               <span className="font-semibold italic text-amber-500">Harga</span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.8 }}
-              className="text-white/60 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-10"
-            >
+            <p className="text-white/90 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-10">
               Bawa pulang produk premium Ravella dengan harga yang lebih
               bersahabat. Kualitas terbaik, desain abadi, kini hadir khusus
               untuk Anda.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1 }}
-              className="flex items-center gap-8"
-            >
+            <div className="flex items-center gap-8">
               <div className="flex flex-col">
                 <span className="text-white font-bold text-2xl">
                   {products.length}+
                 </span>
-                <span className="text-white/40 text-[10px] uppercase tracking-wider">
+                <span className="text-white/60 text-[10px] uppercase tracking-wider">
                   On Sale
                 </span>
               </div>
-              <div className="w-[1px] h-10 bg-white/10" />
+              <div className="w-[1px] h-10 bg-white/20" />
               <div className="flex flex-col">
                 <span className="text-white font-bold text-2xl">Up to 70%</span>
-                <span className="text-white/40 text-[10px] uppercase tracking-wider">
+                <span className="text-white/60 text-[10px] uppercase tracking-wider">
                   Discount
                 </span>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
