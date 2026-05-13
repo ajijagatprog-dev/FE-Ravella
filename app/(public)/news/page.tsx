@@ -41,6 +41,7 @@ export default function News() {
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [articles, setArticles] = useState<PublicArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(8);
 
   const [newsBanner] = useBanners("news", [
     "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=80",
@@ -87,6 +88,10 @@ export default function News() {
   useEffect(() => {
     fetchArticles();
   }, []);
+
+  useEffect(() => {
+    setVisibleCount(8);
+  }, [activeCategory, searchQuery]);
 
   const categories = useMemo(
     () => [
@@ -306,7 +311,7 @@ export default function News() {
               animate="show"
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"
             >
-              {filteredArticles.map((article) => (
+              {filteredArticles.slice(0, visibleCount).map((article) => (
                 <motion.div
                   key={article.id}
                   variants={{
@@ -373,12 +378,17 @@ export default function News() {
         </section>
 
         {/* Load More */}
-        {!isLoading && filteredArticles.length > 6 && (
+        {!isLoading && visibleCount < filteredArticles.length && (
           <div className="mt-24 text-center">
-            <button className="group relative px-12 py-5 border border-neutral-200 text-neutral-900 text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden transition-all hover:border-neutral-900">
-              <span className="relative z-10">Discover More Stories</span>
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 8)}
+              className="group relative px-12 py-5 border border-neutral-200 text-neutral-900 text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden transition-all hover:border-neutral-900"
+            >
+              <span className="relative z-10 group-hover:text-white transition-colors duration-500">
+                Discover More Stories
+              </span>
               <div className="absolute inset-0 bg-neutral-900 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-              <span className="relative z-10 group-hover:text-white ml-2">
+              <span className="relative z-10 group-hover:text-white ml-2 transition-colors duration-500">
                 ↓
               </span>
             </button>
