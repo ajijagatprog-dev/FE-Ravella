@@ -43,6 +43,8 @@ const CATEGORY_ICONS: Record<string, string> = {
   default: "◈",
   homeliving: "🏠",
   "home living": "🏠",
+  homekitchen: "🍳",
+  "home kitchen": "🍳",
   knifeset: "🔪",
   "knife set": "🔪",
   ezyseries: "⚡",
@@ -124,7 +126,7 @@ export default function Header({
 
     const fetchCategories = async () => {
       try {
-        const cached = sessionStorage.getItem("ravelle_categories");
+        const cached = sessionStorage.getItem("ravelle_categories_v4");
         if (cached) {
           const { data, ts } = JSON.parse(cached);
           if (Date.now() - ts < 60 * 60 * 1000) {
@@ -145,22 +147,24 @@ export default function Header({
             let normalized = c.toLowerCase().replace(/\s+/g, "");
             if (normalized === "homeliving") {
               catMap.set("homeliving", "Home Living");
-            } else if (!catMap.has(normalized)) {
-              const display = c
-                .split(" ")
-                .map(
-                  (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(),
-                )
-                .join(" ");
-              catMap.set(normalized, display);
+            } else if (
+              normalized.includes("kitchen") ||
+              normalized.includes("appliance") ||
+              normalized.includes("knife") ||
+              normalized.includes("cook") ||
+              normalized === "homekitchen"
+            ) {
+              catMap.set("homekitchen", "Home Kitchen");
             }
           });
-          const fetchedCategories = Array.from(catMap.values());
+
+          // Use hardcoded curated categories as requested by the user
+          const fetchedCategories = ["Home Living", "Home Kitchen"];
           setCategories(fetchedCategories);
 
           try {
             sessionStorage.setItem(
-              "ravelle_categories",
+              "ravelle_categories_v4",
               JSON.stringify({ data: fetchedCategories, ts: Date.now() }),
             );
           } catch {}

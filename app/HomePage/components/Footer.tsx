@@ -33,10 +33,18 @@ export default function Footer() {
     {
       name: "Instagram",
       icon: Instagram,
-      href: "https://instagram.com/ravelle",
+      href: "https://www.instagram.com/ravelle.official/",
     },
-    { name: "Facebook", icon: Facebook, href: "https://facebook.com/ravelle" },
-    { name: "YouTube", icon: Youtube, href: "https://youtube.com/ravelle" },
+    {
+      name: "Facebook",
+      icon: Facebook,
+      href: "https://web.facebook.com/Ravelle.id/",
+    },
+    {
+      name: "YouTube",
+      icon: Youtube,
+      href: "https://www.youtube.com/@RavelleOfficial/",
+    },
   ];
 
   return (
