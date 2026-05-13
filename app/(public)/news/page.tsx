@@ -385,7 +385,7 @@ export default function News() {
               className="group relative px-12 py-5 border border-neutral-200 text-neutral-900 text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden transition-all hover:border-neutral-900"
             >
               <span className="relative z-10 group-hover:text-white transition-colors duration-500">
-                Discover More Stories
+                Load More
               </span>
               <div className="absolute inset-0 bg-neutral-900 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               <span className="relative z-10 group-hover:text-white ml-2 transition-colors duration-500">
@@ -395,7 +395,6 @@ export default function News() {
           </div>
         )}
       </div>
-
       <Footer />
     </div>
   );

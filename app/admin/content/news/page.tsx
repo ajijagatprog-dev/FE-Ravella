@@ -88,7 +88,7 @@ export default function NewsContentPage() {
 
     const fetchArticles = async () => {
         try {
-            const res = await api.get('/news?limit=100');
+            const res = await api.get('/news?limit=10000');
             if (res.data.status === 'success') {
                 const mapped = res.data.data.data.map((item: any) => ({
                     id: item.id,
