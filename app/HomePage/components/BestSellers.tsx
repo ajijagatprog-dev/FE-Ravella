@@ -282,7 +282,7 @@ function ProductCard({
   onAddToCart: (p: Product) => void;
 }) {
   return (
-    <div className="min-w-[140px] sm:min-w-[180px] md:min-w-0 snap-start group">
+    <div className="w-[160px] sm:w-[200px] md:w-auto md:min-w-0 flex-none snap-start group">
       {/* Image Container — clickable to product detail */}
       <Link
         href={`/product/${product.id}`}
