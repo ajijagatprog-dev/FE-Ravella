@@ -4,7 +4,6 @@ import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 
-
 export default function Newsletter() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,17 +25,23 @@ export default function Newsletter() {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const res = await api.get('/news?limit=3&status=published');
-        if (res.data.status === 'success') {
+        const res = await api.get("/news?limit=3&status=published");
+        if (res.data.status === "success") {
           const mapped = res.data.data.data.map((item: any) => ({
             id: item.id,
             title: item.title,
             slug: item.slug,
-            image: item.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
+            image:
+              item.image ||
+              "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
             category: item.category,
             date: item.published_at
-              ? new Date(item.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
-              : '-',
+              ? new Date(item.published_at).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })
+              : "-",
           }));
           setArticles(mapped);
         }
@@ -48,23 +53,15 @@ export default function Newsletter() {
   }, []);
 
   return (
-    <section
-      className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20 md:py-24 bg-white"
-      
-    >
-      <div className="max-w-[1600px] mx-auto bg-neutral-900 overflow-hidden">
+    <section className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20 md:py-24 bg-white">
+      <div className="max-w-[1600px] mx-auto bg-[#352309] overflow-hidden">
         <div className="relative p-6 sm:p-10 md:p-16 lg:p-20">
-
           {/* ── Header ── */}
           <div className="text-center mb-12 sm:mb-16">
-
             {/* Eyebrow */}
             <div className="inline-flex items-center gap-2.5 mb-5">
               <div className="w-5 h-[1px] bg-white/30" />
-              <span
-                className="text-white/50 font-medium text-[11px] uppercase tracking-[0.25em]"
-                
-              >
+              <span className="text-white/50 font-medium text-[11px] uppercase tracking-[0.25em]">
                 Ravelle Insight
               </span>
               <div className="w-5 h-[1px] bg-white/30" />
@@ -73,7 +70,7 @@ export default function Newsletter() {
             {/* Title — Cormorant Garamond */}
             <h2
               className="text-4xl sm:text-5xl md:text-6xl font-light text-white mb-4 sm:mb-6 leading-[1.05]"
-              style={{  letterSpacing: "-0.01em" }}
+              style={{ letterSpacing: "-0.01em" }}
             >
               Insight &amp;{" "}
               <em
@@ -90,12 +87,10 @@ export default function Newsletter() {
             </div>
 
             {/* Description */}
-            <p
-              className="text-white/60 text-sm sm:text-base font-light max-w-2xl mx-auto leading-relaxed"
-              
-            >
-              Dapatkan tips, tutorial, dan insight terbaru seputar peralatan dapur Ravelle.
-              Dari cara penggunaan hingga perawatan agar alat dapur lebih awet.
+            <p className="text-white/60 text-sm sm:text-base font-light max-w-2xl mx-auto leading-relaxed">
+              Dapatkan tips, tutorial, dan insight terbaru seputar peralatan
+              dapur Ravelle. Dari cara penggunaan hingga perawatan agar alat
+              dapur lebih awet.
             </p>
           </div>
 
@@ -117,10 +112,7 @@ export default function Newsletter() {
 
                   {/* Category badge — rectangular, Jost */}
                   <div className="absolute top-3 left-3">
-                    <span
-                      className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] font-medium tracking-[0.15em] uppercase"
-                      
-                    >
+                    <span className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] font-medium tracking-[0.15em] uppercase">
                       {item.category}
                     </span>
                   </div>
@@ -128,15 +120,12 @@ export default function Newsletter() {
 
                 {/* Content */}
                 <div className="p-4 sm:p-5">
-                  <p
-                    className="text-[10px] text-white/40 mb-2 tracking-[0.15em] uppercase font-medium"
-                    
-                  >
+                  <p className="text-[10px] text-white/40 mb-2 tracking-[0.15em] uppercase font-medium">
                     {item.date}
                   </p>
                   <h3
                     className="text-base sm:text-lg font-light text-white leading-snug group-hover:text-white/70 transition-colors line-clamp-2"
-                    style={{  fontSize: "clamp(1rem, 2vw, 1.25rem)" }}
+                    style={{ fontSize: "clamp(1rem, 2vw, 1.25rem)" }}
                   >
                     {item.title}
                   </h3>
@@ -158,13 +147,11 @@ export default function Newsletter() {
             <a
               href="/news"
               className="inline-flex items-center gap-3 px-8 py-3.5 border border-white/30 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 text-[11px] tracking-[0.22em] uppercase font-medium"
-              
             >
               Lihat Semua Artikel &amp; Tips Dapur
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
-
         </div>
       </div>
     </section>

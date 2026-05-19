@@ -5,7 +5,6 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
 
-
 /* ─── Tier interface (matches backend) ───────────────────────────────────── */
 interface Tier {
   name: string;
@@ -209,7 +208,6 @@ export default function LoyaltyShowcase() {
     <section
       ref={sectionRef}
       className="relative px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-20 sm:py-24 md:py-32 bg-neutral-50 overflow-hidden"
-      
       id="loyalty-program"
     >
       {/* ── Subtle background decoration ── */}
@@ -228,10 +226,7 @@ export default function LoyaltyShowcase() {
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2.5 mb-5">
             <div className="w-6 h-[1px] bg-amber-400" />
-            <span
-              className="text-amber-600 font-medium text-[11px] uppercase tracking-[0.28em]"
-              
-            >
+            <span className="text-amber-600 font-medium text-[11px] uppercase tracking-[0.28em]">
               Member Exclusive
             </span>
             <div className="w-6 h-[1px] bg-amber-400" />
@@ -240,7 +235,7 @@ export default function LoyaltyShowcase() {
           {/* Heading */}
           <h2
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] text-neutral-900 mb-4"
-            style={{  letterSpacing: "-0.01em" }}
+            style={{ letterSpacing: "-0.01em" }}
           >
             Loyalty{" "}
             <em
@@ -257,10 +252,7 @@ export default function LoyaltyShowcase() {
           </div>
 
           {/* Description */}
-          <p
-            className="text-neutral-500 text-sm sm:text-base font-light max-w-2xl mx-auto leading-relaxed tracking-wide"
-            
-          >
+          <p className="text-neutral-500 text-sm sm:text-base font-light max-w-2xl mx-auto leading-relaxed tracking-wide">
             Nikmati benefit eksklusif sebagai member Ravelle. Semakin banyak
             Anda belanja, semakin besar keuntungan yang didapat — mulai dari
             gratis ongkir hingga akses VIP.
@@ -287,16 +279,12 @@ export default function LoyaltyShowcase() {
         >
           <Link
             href="/auth/register"
-            className="group inline-flex items-center gap-3 px-10 py-4 bg-neutral-900 text-white hover:bg-black transition-all duration-300 text-[11px] tracking-[0.22em] uppercase font-medium"
-            
+            className="group inline-flex items-center gap-3 px-10 py-4 bg-black text-white hover:bg-[#4a3210] transition-all duration-300 text-[11px] tracking-[0.22em] uppercase font-medium"
           >
             <span>Daftar &amp; Mulai Kumpul Poin</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
           </Link>
-          <p
-            className="mt-4 text-xs text-neutral-400 font-light tracking-wide"
-            
-          >
+          <p className="mt-4 text-xs text-neutral-400 font-light tracking-wide">
             Gratis pendaftaran • Otomatis terdaftar sebagai member Basic
           </p>
         </div>
@@ -342,10 +330,7 @@ function TierCard({
       {/* ── Popular badge (Gold only) ── */}
       {isGold && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-          <span
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-md shadow-amber-200/50"
-            
-          >
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-md shadow-amber-200/50">
             ★ Paling Populer
           </span>
         </div>
@@ -362,23 +347,16 @@ function TierCard({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h3
-                className="text-xl sm:text-2xl font-semibold text-neutral-900"
-                
-              >
+              <h3 className="text-xl sm:text-2xl font-semibold text-neutral-900">
                 {tier.name}
               </h3>
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide ${p.labelBg} ${p.labelText}`}
-                
               >
                 {tier.label || p.tagline}
               </span>
             </div>
-            <p
-              className="text-xs text-neutral-500 mt-1 font-light tracking-wide"
-              
-            >
+            <p className="text-xs text-neutral-500 mt-1 font-light tracking-wide">
               {tier.max
                 ? `${formatCurrency(tier.min)} – ${formatCurrency(tier.max)}`
                 : `${formatCurrency(tier.min)}+`}
@@ -409,10 +387,7 @@ function TierCard({
 
       {/* ── Perks ── */}
       <div className="px-6 sm:px-7 py-5 flex-1">
-        <p
-          className="text-[10px] font-semibold text-neutral-400 uppercase tracking-[0.2em] mb-4"
-          
-        >
+        <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-[0.2em] mb-4">
           Keuntungan Member
         </p>
         <ul className="space-y-2.5">
@@ -423,7 +398,6 @@ function TierCard({
                 inView ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
               }`}
               style={{
-                
                 transitionDelay: `${600 + index * 150 + pi * 80}ms`,
               }}
             >
@@ -437,24 +411,15 @@ function TierCard({
       {/* ── Footer — Aspirational CTA ── */}
       <div className="px-6 sm:px-7 pb-6 sm:pb-7">
         {isPlatinum ? (
-          <div
-            className="w-full py-3 text-center text-[10px] font-medium tracking-[0.18em] uppercase rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-200/50"
-            
-          >
+          <div className="w-full py-3 text-center text-[10px] font-medium tracking-[0.18em] uppercase rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-200/50">
             Tier Tertinggi
           </div>
         ) : isGold ? (
-          <div
-            className="w-full py-3 text-center text-[10px] font-medium tracking-[0.18em] uppercase rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-md shadow-amber-200/40"
-            
-          >
+          <div className="w-full py-3 text-center text-[10px] font-medium tracking-[0.18em] uppercase rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-white shadow-md shadow-amber-200/40">
             Upgrade dari Basic
           </div>
         ) : (
-          <div
-            className="w-full py-3 text-center text-[10px] font-medium tracking-[0.18em] uppercase rounded-xl border border-neutral-200 text-neutral-500"
-            
-          >
+          <div className="w-full py-3 text-center text-[10px] font-medium tracking-[0.18em] uppercase rounded-xl border border-neutral-200 text-neutral-500">
             Mulai dari sini
           </div>
         )}
