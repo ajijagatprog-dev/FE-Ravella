@@ -1,9 +1,15 @@
 "use client";
 
-import { ArrowRight, Home, Utensils, Package, Sofa, Laptop } from "lucide-react";
+import {
+  ArrowRight,
+  Home,
+  Utensils,
+  Package,
+  Sofa,
+  Laptop,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-
 
 export default function CategoryGrid() {
   const router = useRouter();
@@ -14,7 +20,8 @@ export default function CategoryGrid() {
       title: "Home & Kitchen Appliance",
       subtitle: "Peralatan Rumah & Dapur",
       icon: Home,
-      image: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+      image:
+        "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
       count: "150+ Produk",
     },
     {
@@ -22,7 +29,8 @@ export default function CategoryGrid() {
       title: "Knife Set",
       subtitle: "Pisau & Alat Potong",
       icon: Utensils,
-      image: "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=800&q=80",
+      image:
+        "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=800&q=80",
       count: "80+ Produk",
     },
     {
@@ -30,7 +38,8 @@ export default function CategoryGrid() {
       title: "Ezy Series",
       subtitle: "Koleksi Premium",
       icon: Package,
-      image: "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&q=80",
+      image:
+        "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&q=80",
       count: "120+ Produk",
     },
     {
@@ -38,7 +47,8 @@ export default function CategoryGrid() {
       title: "Home Living",
       subtitle: "Dekorasi & Furniture",
       icon: Sofa,
-      image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&q=80",
+      image:
+        "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&q=80",
       count: "200+ Produk",
     },
     {
@@ -46,7 +56,8 @@ export default function CategoryGrid() {
       title: "Kitchen Tools",
       subtitle: "Alat Masak Modern",
       icon: Laptop,
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
+      image:
+        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
       count: "95+ Produk",
     },
   ];
@@ -56,28 +67,20 @@ export default function CategoryGrid() {
   };
 
   return (
-    <section
-      className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20 md:py-24 bg-white relative overflow-hidden"
-      
-    >
-      <motion.div 
+    <section className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-10 sm:py-16 md:py-24 bg-white relative overflow-hidden">
+      <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-[1600px] mx-auto relative z-10"
       >
-
         {/* ── Header ── */}
-        <div className="text-center mb-12 sm:mb-16 md:mb-20">
-
+        <div className="text-center mb-8 sm:mb-12 md:mb-20">
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2.5 mb-4">
             <div className="w-5 h-[1px] bg-neutral-400" />
-            <span
-              className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]"
-              
-            >
+            <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.25em]">
               Kategori Produk
             </span>
             <div className="w-5 h-[1px] bg-neutral-400" />
@@ -85,13 +88,13 @@ export default function CategoryGrid() {
 
           {/* Heading — Cormorant Garamond */}
           <h2
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] text-neutral-900 mb-4"
-            style={{  letterSpacing: "-0.01em" }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light leading-[1.05] text-neutral-900 mb-4"
+            style={{ letterSpacing: "-0.01em" }}
           >
             Shop by{" "}
             <em
               className="font-semibold not-italic"
-              style={{  fontStyle: "italic" }}
+              style={{ fontStyle: "italic" }}
             >
               Category
             </em>
@@ -102,16 +105,14 @@ export default function CategoryGrid() {
             <div className="w-10 h-[1px] bg-neutral-300" />
           </div>
 
-          <p
-            className="text-neutral-500 text-sm sm:text-base font-light max-w-xl mx-auto leading-relaxed tracking-wide"
-            
-          >
-            Temukan produk berkualitas dalam kategori yang telah kami kurasi khusus untuk Anda
+          <p className="text-neutral-500 text-sm sm:text-base font-light max-w-xl mx-auto leading-relaxed tracking-wide">
+            Temukan produk berkualitas dalam kategori yang telah kami kurasi
+            khusus untuk Anda
           </p>
         </div>
 
         {/* ── Grid ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {categories.map((cat, i) => (
             <CategoryCard
               key={i}
@@ -124,10 +125,7 @@ export default function CategoryGrid() {
 
         {/* ── View All CTA ── */}
         <div className="text-center mt-12 sm:mt-16">
-          <button
-            className="group inline-flex items-center gap-3 px-10 py-4 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-[11px] tracking-[0.2em] uppercase font-medium"
-            
-          >
+          <button className="group inline-flex items-center gap-3 px-10 py-4 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-[11px] tracking-[0.2em] uppercase font-medium">
             <span>Lihat Semua Kategori</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
@@ -137,13 +135,21 @@ export default function CategoryGrid() {
   );
 }
 
-function CategoryCard({ category, index, onClick }: { category: any; index: number; onClick: () => void }) {
+function CategoryCard({
+  category,
+  index,
+  onClick,
+}: {
+  category: any;
+  index: number;
+  onClick: () => void;
+}) {
   const Icon = category.icon;
 
   return (
     <div
       onClick={onClick}
-      className={`group relative h-[280px] sm:h-[320px] md:h-[380px] lg:h-[420px] overflow-hidden cursor-pointer
+      className={`group relative h-[180px] sm:h-[280px] md:h-[380px] lg:h-[420px] overflow-hidden cursor-pointer rounded-lg sm:rounded-none
         shadow-sm hover:shadow-xl transition-all duration-700 ease-out
         hover:-translate-y-1 ${index === 1 ? "lg:mt-8" : index === 3 ? "lg:mt-4" : ""}`}
     >
@@ -161,11 +167,12 @@ function CategoryCard({ category, index, onClick }: { category: any; index: numb
 
       {/* Top Badge */}
       <div className="absolute top-4 sm:top-5 left-4 sm:left-5 z-10">
-        <div
-          className="flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm"
-          
-        >
-          {Icon ? <Icon className="w-3.5 h-3.5 text-neutral-700" /> : <div className="w-3.5 h-3.5" />}
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm">
+          {Icon ? (
+            <Icon className="w-3.5 h-3.5 text-neutral-700" />
+          ) : (
+            <div className="w-3.5 h-3.5" />
+          )}
           <span className="text-[10px] font-medium text-neutral-800 tracking-[0.12em] uppercase">
             {category.count}
           </span>
@@ -173,31 +180,24 @@ function CategoryCard({ category, index, onClick }: { category: any; index: numb
       </div>
 
       {/* Content */}
-      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 md:p-8">
-
+      <div className="absolute inset-x-0 bottom-0 p-3 sm:p-6 md:p-8">
         {/* Subtitle — appears on hover */}
-        <p
-          className="text-white/70 text-[10px] sm:text-[11px] font-light mb-1.5 uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500"
-          
-        >
+        <p className="text-white/70 text-[10px] sm:text-[11px] font-light mb-1.5 uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500">
           {category.subtitle}
         </p>
 
         {/* Title — Cormorant Garamond */}
         <h3
-          className="text-white text-2xl sm:text-3xl md:text-4xl font-light leading-tight mb-4 drop-shadow-lg transition-all duration-700 group-hover:-translate-y-1"
-          style={{  letterSpacing: "0" }}
+          className="text-white text-base sm:text-2xl md:text-4xl font-light leading-tight mb-2 sm:mb-4 drop-shadow-lg transition-all duration-700 group-hover:-translate-y-1"
+          style={{ letterSpacing: "0" }}
         >
           {category.title}
         </h3>
 
         {/* Jelajahi Button — appears on hover */}
-        <button
-          className="inline-flex items-center gap-2.5 bg-white text-neutral-900 px-6 py-2.5 text-[10px] tracking-[0.2em] uppercase font-medium opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out hover:bg-neutral-100"
-          
-        >
+        <button className="inline-flex items-center gap-1.5 sm:gap-2.5 bg-white/95 backdrop-blur-sm text-neutral-900 px-3 sm:px-6 py-1.5 sm:py-2.5 text-[8px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase font-medium opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out hover:bg-white">
           Jelajahi
-          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform" />
         </button>
 
         {/* Bottom line — thin, white, slides in on hover */}
