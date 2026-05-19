@@ -205,12 +205,12 @@ export default function SalePage() {
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-light text-white mb-6 leading-[1.1]">
+            <h1 className="text-3xl sm:text-6xl md:text-7xl font-light text-white mb-4 sm:mb-6 leading-[1.1]">
               Pesta Diskon <br />
               <span className="font-semibold italic text-amber-500">Harga</span>
             </h1>
 
-            <p className="text-white/90 text-sm sm:text-lg font-light leading-relaxed max-w-lg mb-10">
+            <p className="text-white/90 text-xs sm:text-lg font-light leading-relaxed max-w-lg mb-8 sm:mb-10">
               Bawa pulang produk premium Ravella dengan harga yang lebih
               bersahabat. Kualitas terbaik, desain abadi, kini hadir khusus
               untuk Anda.
@@ -248,7 +248,7 @@ export default function SalePage() {
                 Penawaran Terbatas
               </span>
             </div>
-            <h2 className="text-4xl sm:text-5xl font-light text-neutral-900">
+            <h2 className="text-3xl sm:text-5xl font-light text-neutral-900">
               Kejutan Mewah,{" "}
               <span className="italic font-medium">Harga Ramah</span>
             </h2>
@@ -308,7 +308,7 @@ export default function SalePage() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-16"
+            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-10 sm:gap-y-16"
           >
             {products.map((product) => (
               <motion.div
@@ -320,7 +320,7 @@ export default function SalePage() {
                 className="group relative flex flex-col"
               >
                 {/* Image Container */}
-                <div className="relative aspect-[4/5] bg-neutral-50 overflow-hidden flex items-center justify-center p-8 group-hover:bg-neutral-100 transition-colors duration-500">
+                <div className="relative aspect-[4/5] bg-neutral-50 overflow-hidden flex items-center justify-center p-4 sm:p-8 group-hover:bg-neutral-100 transition-colors duration-500">
                   <motion.img
                     whileHover={{ scale: 1.08 }}
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -333,13 +333,14 @@ export default function SalePage() {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
 
                   {/* Badges */}
-                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-                    <span className="px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-black tracking-[0.2em] uppercase shadow-xl">
+                  <div className="absolute top-3 sm:top-4 left-3 sm:left-4 flex flex-col gap-1.5 sm:gap-2 z-10">
+                    <span className="px-2 sm:px-3 py-1 sm:py-1.5 bg-neutral-900 text-white text-[8px] sm:text-[9px] font-black tracking-[0.2em] uppercase shadow-xl">
                       -{product.discount}%
                     </span>
                     {product.active_promotion?.type === "flash_sale" && (
-                      <span className="px-3 py-1.5 bg-amber-500 text-white text-[9px] font-black tracking-[0.2em] uppercase flex items-center gap-1.5 shadow-xl">
-                        <Flame className="w-3 h-3 fill-white" /> Sale
+                      <span className="px-2 sm:px-3 py-1 sm:py-1.5 bg-amber-500 text-white text-[8px] sm:text-[9px] font-black tracking-[0.2em] uppercase flex items-center gap-1 sm:gap-1.5 shadow-xl">
+                        <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-white" />{" "}
+                        Sale
                       </span>
                     )}
                   </div>
@@ -359,7 +360,7 @@ export default function SalePage() {
                   <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.16, 1, 0.3, 1]">
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="w-full py-4 bg-neutral-900 text-white text-[10px] tracking-[0.3em] uppercase font-bold hover:bg-black transition-colors flex items-center justify-center gap-3"
+                      className="w-full py-2.5 sm:py-4 bg-neutral-900 text-white text-[8px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] uppercase font-bold hover:bg-black transition-colors flex items-center justify-center gap-2 sm:gap-3"
                     >
                       <ShoppingCart className="w-4 h-4" /> Add to Cart
                     </button>
@@ -386,17 +387,17 @@ export default function SalePage() {
                   </div>
 
                   <Link href={`/product/${product.id}`} className="block mb-4">
-                    <h3 className="text-xl sm:text-2xl font-medium text-neutral-900 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight">
+                    <h3 className="text-lg sm:text-2xl font-medium text-neutral-900 line-clamp-2 hover:text-neutral-500 transition-colors leading-tight">
                       {product.name}
                     </h3>
                   </Link>
 
                   <div className="mt-auto flex flex-col gap-1">
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-lg font-bold text-neutral-900">
+                    <div className="flex items-baseline gap-2 sm:gap-3">
+                      <span className="text-sm sm:text-lg font-bold text-neutral-900">
                         {formatPrice(product.price)}
                       </span>
-                      <span className="text-xs text-neutral-400 line-through font-light">
+                      <span className="text-[10px] sm:text-xs text-neutral-400 line-through font-light">
                         {formatPrice(product.originalPrice)}
                       </span>
                     </div>
@@ -406,10 +407,10 @@ export default function SalePage() {
                   </div>
 
                   {/* View Details Button (User Requested) */}
-                  <div className="mt-6">
+                  <div className="mt-4 sm:mt-6">
                     <Link
                       href={`/product/${product.id}`}
-                      className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-neutral-900 hover:text-neutral-500 transition-colors group/link"
+                      className="inline-flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-neutral-900 hover:text-neutral-500 transition-colors group/link"
                     >
                       View Details
                       <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />

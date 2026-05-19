@@ -61,7 +61,7 @@ export default function Company() {
             </div>
 
             {/* Heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 leading-tight">
               Ravelle{" "}
               <span className="font-light text-white/90">Indonesia</span>
             </h1>
@@ -90,11 +90,10 @@ export default function Company() {
               />
             </div>
 
-            {/* Content */}
-            <div className="bg-[#fcfcfc] border border-neutral-100 p-8 sm:p-12 md:p-16 lg:p-20 space-y-16">
+            <div className="bg-[#fcfcfc] border border-neutral-100 p-6 sm:p-12 md:p-16 lg:p-20 space-y-12 sm:space-y-16">
               {/* Improve the Living Quality */}
               <div className="space-y-6">
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-neutral-900 leading-tight">
+                <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light text-neutral-900 leading-tight">
                   Improve the <br />
                   <span className="font-normal text-neutral-900">
                     Living Quality
@@ -131,7 +130,7 @@ export default function Company() {
 
               {/* Ravelle Product */}
               <div className="space-y-6">
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-neutral-900 leading-tight">
+                <h2 className="text-2xl sm:text-4xl lg:text-5xl font-normal text-neutral-900 leading-tight">
                   Ravelle Product
                 </h2>
 
@@ -179,7 +178,7 @@ export default function Company() {
             <div className="pt-6">
               <a
                 href="/product"
-                className="inline-block px-10 py-3.5 bg-black text-white text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-800 transition-colors"
+                className="inline-block px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-[9px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] uppercase font-medium hover:bg-neutral-800 transition-colors"
               >
                 Product
               </a>
@@ -205,7 +204,7 @@ export default function Company() {
                   <div className="w-5 h-[1px] bg-white/30" />
                 </div>
                 <h2
-                  className="text-4xl sm:text-5xl font-light text-white mb-3"
+                  className="text-3xl sm:text-5xl font-light text-white mb-3"
                   style={{ letterSpacing: "-0.01em" }}
                 >
                   Proud{" "}
