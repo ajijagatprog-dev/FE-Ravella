@@ -53,11 +53,11 @@ export default function Newsletter() {
   }, []);
 
   return (
-    <section className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20 md:py-24 bg-white">
+    <section className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-10 sm:py-16 md:py-24 bg-white">
       <div className="max-w-[1600px] mx-auto bg-[#352309] overflow-hidden">
-        <div className="relative p-6 sm:p-10 md:p-16 lg:p-20">
+        <div className="relative p-4 sm:p-8 md:p-16 lg:p-20">
           {/* ── Header ── */}
-          <div className="text-center mb-12 sm:mb-16">
+          <div className="text-center mb-8 sm:mb-12">
             {/* Eyebrow */}
             <div className="inline-flex items-center gap-2.5 mb-5">
               <div className="w-5 h-[1px] bg-white/30" />
@@ -69,7 +69,7 @@ export default function Newsletter() {
 
             {/* Title — Cormorant Garamond */}
             <h2
-              className="text-4xl sm:text-5xl md:text-6xl font-light text-white mb-4 sm:mb-6 leading-[1.05]"
+              className="text-2xl sm:text-4xl md:text-5xl font-light text-white mb-3 sm:mb-6 leading-[1.05]"
               style={{ letterSpacing: "-0.01em" }}
             >
               Insight &amp;{" "}
@@ -95,7 +95,7 @@ export default function Newsletter() {
           </div>
 
           {/* ── Articles Grid ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-12">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 mb-8 sm:mb-12">
             {articles.map((item, i) => (
               <a
                 key={i}
@@ -103,7 +103,7 @@ export default function Newsletter() {
                 className="group relative overflow-hidden bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
               >
                 {/* Image */}
-                <div className="relative h-40 sm:h-48 overflow-hidden">
+                <div className="relative h-28 sm:h-48 overflow-hidden">
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                     style={{ backgroundImage: `url(${item.image})` }}
@@ -119,12 +119,12 @@ export default function Newsletter() {
                 </div>
 
                 {/* Content */}
-                <div className="p-4 sm:p-5">
-                  <p className="text-[10px] text-white/40 mb-2 tracking-[0.15em] uppercase font-medium">
+                <div className="p-3 sm:p-5">
+                  <p className="text-[8px] sm:text-[10px] text-white/40 mb-1.5 sm:mb-2 tracking-[0.15em] uppercase font-medium">
                     {item.date}
                   </p>
                   <h3
-                    className="text-base sm:text-lg font-light text-white leading-snug group-hover:text-white/70 transition-colors line-clamp-2"
+                    className="text-xs sm:text-lg font-light text-white leading-snug group-hover:text-white/70 transition-colors line-clamp-2"
                     style={{ fontSize: "clamp(1rem, 2vw, 1.25rem)" }}
                   >
                     {item.title}
@@ -146,10 +146,10 @@ export default function Newsletter() {
           <div className="text-center">
             <a
               href="/news"
-              className="inline-flex items-center gap-3 px-8 py-3.5 border border-white/30 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 text-[11px] tracking-[0.22em] uppercase font-medium"
+              className="inline-flex items-center gap-2 sm:gap-3 px-5 sm:px-8 py-2.5 sm:py-3.5 border border-white/30 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 text-[9px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.22em] uppercase font-medium"
             >
               Lihat Semua Artikel &amp; Tips Dapur
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
         </div>

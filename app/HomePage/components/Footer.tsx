@@ -48,28 +48,28 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#EEEEEE] px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16 sm:py-20">
+    <footer className="bg-[#EEEEEE] px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-10 sm:py-20">
       <div className="max-w-[1600px] mx-auto">
         {/* ── Main Grid ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 mb-12 sm:mb-16">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-10 sm:gap-10 lg:gap-12 mb-10 sm:mb-16">
           {/* Brand */}
-          <div className="lg:col-span-4">
-            <div className="mb-6">
+          <div className="col-span-2 lg:col-span-4">
+            <div className="mb-5 sm:mb-6">
               <img
                 src="/lg-ravella-gold.png"
                 alt="Ravelle Logo"
-                className="h-8 w-auto mb-5"
+                className="h-6 sm:h-8 w-auto mb-4 sm:mb-5"
               />
             </div>
 
-            <p className="text-sm text-neutral-600 leading-relaxed mb-7 max-w-sm font-light">
+            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-6 sm:mb-7 max-w-sm font-light">
               Menyediakan peralatan dapur berkualitas premium dengan desain
               modern dan inovatif sejak 2018. Kepercayaan Anda adalah prioritas
               kami.
             </p>
 
             {/* Contact */}
-            <div className="space-y-3.5 mb-7">
+            <div className="space-y-3 mb-6 sm:mb-7">
               <a
                 href="tel:+628123456789"
                 className="flex items-center gap-3 text-sm text-neutral-600 hover:text-neutral-900 transition-colors group"
@@ -120,7 +120,7 @@ export default function Footer() {
 
             {/* Social */}
             <div>
-              <h5 className="font-medium text-neutral-800 mb-4 text-[11px] uppercase tracking-[0.22em]">
+              <h5 className="font-bold text-neutral-800 mb-3 sm:mb-4 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.22em]">
                 Ikuti Kami
               </h5>
               <div className="flex flex-wrap gap-2.5">
@@ -145,16 +145,16 @@ export default function Footer() {
           </div>
 
           {/* Company Links */}
-          <div className="lg:col-span-2">
-            <h4 className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]">
+          <div className="col-span-1 lg:col-span-2">
+            <h4 className="font-bold text-neutral-800 mb-4 sm:mb-6 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.22em]">
               Company
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5 sm:space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
+                    className="text-xs sm:text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
                   >
                     {link.name}
                   </Link>
@@ -164,16 +164,16 @@ export default function Footer() {
           </div>
 
           {/* Customer Links */}
-          <div className="lg:col-span-3">
-            <h4 className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]">
+          <div className="col-span-1 lg:col-span-3">
+            <h4 className="font-bold text-neutral-800 mb-4 sm:mb-6 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.22em]">
               Customer
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5 sm:space-y-3">
               {customerLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
+                    className="text-xs sm:text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
                   >
                     {link.name}
                   </Link>
@@ -183,16 +183,16 @@ export default function Footer() {
           </div>
 
           {/* Product Links */}
-          <div className="lg:col-span-3">
-            <h4 className="font-bold text-neutral-800 mb-6 text-[11px] uppercase tracking-[0.22em]">
+          <div className="col-span-2 sm:col-span-2 lg:col-span-3">
+            <h4 className="font-bold text-neutral-800 mb-4 sm:mb-6 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.22em]">
               Products
             </h4>
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-2 sm:grid-cols-1 gap-y-2.5 sm:gap-y-0 sm:space-y-3 gap-x-4">
               {productLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
+                    className="text-xs sm:text-sm font-light text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide"
                   >
                     {link.name}
                   </Link>

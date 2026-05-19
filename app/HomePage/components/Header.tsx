@@ -417,12 +417,12 @@ export default function Header({
               <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/55 to-black/40" />
             </>
           )}
-          <div className="relative max-w-[1320px] mx-auto px-6 md:px-12 py-10">
+          <div className="relative max-w-[1320px] mx-auto px-6 md:px-12 py-6">
             <div className="flex flex-col xl:flex-row gap-8 xl:gap-12">
               {/* ── LEFT: Categories ── */}
               <div className="flex-1 min-w-0">
                 {/* Section header */}
-                <div className="flex items-center gap-3 mb-7">
+                <div className="flex items-center gap-3 mb-4">
                   <div>
                     <p
                       className={`text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 ${dropdownBanners[2] ? "text-white/50" : "text-neutral-400"}`}
@@ -447,13 +447,13 @@ export default function Header({
                       <Link
                         key={cat}
                         href={`/search?q=${encodeURIComponent(cat)}`}
-                        className={`cat-card cat-card-stagger rounded-xl p-5 block ${dropdownBanners[2] ? "!bg-white/10 backdrop-blur-md border border-white/10 hover:!bg-white/20" : ""}`}
+                        className={`cat-card cat-card-stagger rounded-xl p-4 block ${dropdownBanners[2] ? "!bg-white/10 backdrop-blur-md border border-white/10 hover:!bg-white/20" : ""}`}
                         style={{ transitionDelay: `${0.05 + i * 0.04}s` }}
                         onMouseEnter={() => setHoveredCat(cat)}
                         onMouseLeave={() => setHoveredCat(null)}
                       >
                         <div className="relative z-10">
-                          <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-start justify-between mb-2">
                             <span className="cat-icon text-2xl leading-none">
                               {getCategoryIcon(cat)}
                             </span>
@@ -492,7 +492,7 @@ export default function Header({
 
                 {/* Stats row */}
                 <div
-                  className={`mt-8 pt-6 flex flex-wrap items-center gap-6 xl:gap-8 ${dropdownBanners[2] ? "border-t border-white/10" : "border-t border-neutral-100"}`}
+                  className={`mt-5 pt-4 flex flex-wrap items-center gap-6 xl:gap-8 ${dropdownBanners[2] ? "border-t border-white/10" : "border-t border-neutral-100"}`}
                 >
                   {[
                     { value: "500+", label: "Produk" },
@@ -533,7 +533,7 @@ export default function Header({
                 {/* Main featured */}
                 <Link
                   href="/product"
-                  className="featured-card block aspect-[3/4] w-full flex-1 relative shadow-sm hover:shadow-xl transition-shadow duration-500 group/feat rounded-xl overflow-hidden"
+                  className="featured-card block aspect-[4/5] w-full flex-1 relative shadow-sm hover:shadow-xl transition-shadow duration-500 group/feat rounded-xl overflow-hidden"
                 >
                   <img
                     src={

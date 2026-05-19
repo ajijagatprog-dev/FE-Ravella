@@ -183,10 +183,10 @@ export default function NewProducts() {
           {/* CTA — ghost style, consistent with HeroSection secondary button */}
           <Link
             href="/product"
-            className="group flex items-center gap-2.5 px-7 py-3 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-[11px] tracking-[0.2em] uppercase font-medium"
+            className="group flex items-center gap-2 px-4 sm:px-7 py-2 sm:py-3 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-[9px] sm:text-[11px] tracking-[0.15em] sm:tracking-[0.2em] uppercase font-medium"
           >
             <span>Lihat Semua</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
