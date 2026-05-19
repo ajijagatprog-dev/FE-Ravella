@@ -960,7 +960,7 @@ function ProductPageContent() {
       </AnimatePresence>
 
       {/* ── FEATURES STRIP ── */}
-      <section className="bg-neutral-900 py-12 sm:py-14">
+      <section className="bg-[#352309] py-12 sm:py-14">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
             {[
@@ -985,7 +985,7 @@ function ProductPageContent() {
               return (
                 <div
                   key={i}
-                  className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-neutral-900 hover:bg-neutral-800 transition-colors group"
+                  className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-[#352309] hover:bg-[#4a3210] transition-colors group"
                 >
                   <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0" />
                   <div>
