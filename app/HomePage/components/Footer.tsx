@@ -10,8 +10,8 @@ import Link from "next/link";
 
 export default function Footer() {
   const companyLinks = [
-    { name: "About", href: "/about" },
-    { name: "FAQ", href: "/faq" },
+    { name: "About", href: "/company" },
+    { name: "FAQ", href: "/contact" },
   ];
 
   const customerLinks = [

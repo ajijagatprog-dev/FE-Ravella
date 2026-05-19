@@ -90,7 +90,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative w-full overflow-hidden bg-neutral-900">
+    <section className="relative w-full overflow-hidden bg-[#352309]">
       {/* ── HERO IMAGE & CONTENT — full width ── */}
       <div className="relative">
         <div className="relative h-[380px] sm:h-[440px] w-full">
@@ -198,7 +198,7 @@ function HeroBackground({
   images: string[];
 }) {
   return (
-    <div className="absolute inset-0 bg-neutral-900">
+    <div className="absolute inset-0 bg-[#352309]">
       {images.map((img, i) => {
         const link = HERO_DATA[i]?.link || "/products";
         return (
