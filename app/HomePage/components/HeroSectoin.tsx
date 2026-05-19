@@ -93,7 +93,7 @@ export default function HeroSection() {
     <section className="relative w-full overflow-hidden bg-[#352309]">
       {/* ── HERO IMAGE & CONTENT — full width ── */}
       <div className="relative">
-        <div className="relative w-full min-h-[220px] md:h-[440px] overflow-hidden">
+        <div className="relative w-full md:h-[440px] overflow-hidden">
           <HeroBackground active={active} images={HERO_IMAGES} />
 
           {/* Nav Arrows */}
