@@ -207,7 +207,7 @@ export default function LoyaltyShowcase() {
   return (
     <section
       ref={sectionRef}
-      className="relative px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-20 sm:py-24 md:py-32 bg-neutral-50 overflow-hidden"
+      className="relative px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-12 sm:py-20 md:py-32 bg-neutral-50 overflow-hidden"
       id="loyalty-program"
     >
       {/* ── Subtle background decoration ── */}
@@ -219,7 +219,7 @@ export default function LoyaltyShowcase() {
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* ── Header ── */}
         <div
-          className={`text-center mb-14 sm:mb-16 md:mb-20 transition-all duration-1000 ${
+          className={`text-center mb-8 sm:mb-14 md:mb-20 transition-all duration-1000 ${
             inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
@@ -234,7 +234,7 @@ export default function LoyaltyShowcase() {
 
           {/* Heading */}
           <h2
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] text-neutral-900 mb-4"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light leading-[1.05] text-neutral-900 mb-4"
             style={{ letterSpacing: "-0.01em" }}
           >
             Loyalty{" "}
@@ -260,7 +260,7 @@ export default function LoyaltyShowcase() {
         </div>
 
         {/* ── Tier Cards Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 mb-14 sm:mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-8 mb-10 sm:mb-14">
           {tiers.map((tier, i) => (
             <TierCard
               key={`${tier.name}-${i}`}
@@ -279,10 +279,10 @@ export default function LoyaltyShowcase() {
         >
           <Link
             href="/auth/register"
-            className="group inline-flex items-center gap-3 px-10 py-4 bg-black text-white hover:bg-[#4a3210] transition-all duration-300 text-[11px] tracking-[0.22em] uppercase font-medium"
+            className="group inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 bg-black text-white hover:bg-[#4a3210] transition-all duration-300 text-[9px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.22em] uppercase font-medium"
           >
             <span>Daftar &amp; Mulai Kumpul Poin</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
           </Link>
           <p className="mt-4 text-xs text-neutral-400 font-light tracking-wide">
             Gratis pendaftaran • Otomatis terdaftar sebagai member Basic
@@ -337,17 +337,17 @@ function TierCard({
       )}
 
       {/* ── Header ── */}
-      <div className="px-6 sm:px-7 pt-7 sm:pt-8 pb-5">
+      <div className="px-4 sm:px-7 pt-5 sm:pt-8 pb-4 sm:pb-5">
         <div className="flex items-start gap-3.5">
           {/* Icon */}
           <div
-            className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg}`}
+            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg}`}
           >
             <TierIcon name={tier.name} className={p.iconColor} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h3 className="text-xl sm:text-2xl font-semibold text-neutral-900">
+              <h3 className="text-lg sm:text-2xl font-semibold text-neutral-900">
                 {tier.name}
               </h3>
               <span
@@ -383,18 +383,18 @@ function TierCard({
       </div>
 
       {/* ── Divider ── */}
-      <div className="mx-6 sm:mx-7 h-[1px] bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
+      <div className="mx-4 sm:mx-7 h-[1px] bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
 
       {/* ── Perks ── */}
-      <div className="px-6 sm:px-7 py-5 flex-1">
-        <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-[0.2em] mb-4">
+      <div className="px-4 sm:px-7 py-4 sm:py-5 flex-1">
+        <p className="text-[9px] sm:text-[10px] font-semibold text-neutral-400 uppercase tracking-[0.2em] mb-3 sm:mb-4">
           Keuntungan Member
         </p>
         <ul className="space-y-2.5">
           {(tier.perks ?? []).map((perk, pi) => (
             <li
               key={perk}
-              className={`flex items-start gap-3 text-sm text-neutral-700 font-light transition-all duration-500 ${
+              className={`flex items-start gap-2.5 sm:gap-3 text-xs sm:text-sm text-neutral-700 font-light transition-all duration-500 ${
                 inView ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
               }`}
               style={{
@@ -409,7 +409,7 @@ function TierCard({
       </div>
 
       {/* ── Footer — Aspirational CTA ── */}
-      <div className="px-6 sm:px-7 pb-6 sm:pb-7">
+      <div className="px-4 sm:px-7 pb-4 sm:pb-7">
         {isPlatinum ? (
           <div className="w-full py-3 text-center text-[10px] font-medium tracking-[0.18em] uppercase rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-200/50">
             Tier Tertinggi

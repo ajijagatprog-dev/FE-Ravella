@@ -354,7 +354,7 @@ function ProductPageContent() {
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight break-words">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 leading-tight break-words">
               Find Your Perfect <br />
               <span className="font-light text-white/90">Product</span>
             </h1>
@@ -404,14 +404,14 @@ function ProductPageContent() {
           viewport={{ once: true }}
           className="flex justify-center mb-16"
         >
-          <div className="flex items-center gap-4 w-full max-w-2xl px-8 py-5 rounded-full border border-neutral-200 bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] focus-within:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.15)] focus-within:border-neutral-900 transition-all duration-500">
-            <Search className="w-5 h-5 text-neutral-400 flex-shrink-0" />
+          <div className="flex items-center gap-3 sm:gap-4 w-full max-w-2xl px-5 sm:px-8 py-3.5 sm:py-5 rounded-full border border-neutral-200 bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] focus-within:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.15)] focus-within:border-neutral-900 transition-all duration-500">
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400 flex-shrink-0" />
             <input
               type="text"
               placeholder="Cari produk, koleksi, atau inspirasi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent text-base text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
+              className="flex-1 bg-transparent text-sm sm:text-base text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
             />
             {searchQuery && (
               <motion.button
@@ -450,7 +450,7 @@ function ProductPageContent() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                     onClick={() => setActiveCategory(cat.name)}
-                    className={`group flex items-center gap-3 px-6 py-3.5 text-[10px] tracking-[0.2em] uppercase font-bold transition-all relative overflow-hidden border ${
+                    className={`group flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3.5 text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase font-bold transition-all relative overflow-hidden border ${
                       activeCategory === cat.name
                         ? "text-white border-neutral-900"
                         : "text-neutral-500 bg-neutral-50 border-neutral-100 hover:bg-neutral-100 hover:border-neutral-200"
@@ -518,7 +518,7 @@ function ProductPageContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none pl-4 pr-9 py-2 border border-neutral-200 text-[11px] tracking-[0.12em] uppercase text-neutral-700 hover:border-neutral-400 focus:outline-none cursor-pointer bg-white"
+                className="appearance-none pl-3 sm:pl-4 pr-8 sm:pr-9 py-1.5 sm:py-2 border border-neutral-200 text-[10px] sm:text-[11px] tracking-[0.12em] uppercase text-neutral-700 hover:border-neutral-400 focus:outline-none cursor-pointer bg-white"
               >
                 <option value="featured">Featured</option>
                 <option value="newest">Newest</option>
@@ -960,7 +960,7 @@ function ProductPageContent() {
       </AnimatePresence>
 
       {/* ── FEATURES STRIP ── */}
-      <section className="bg-neutral-900 py-12 sm:py-14">
+      <section className="bg-[#352309] py-12 sm:py-14">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
             {[
@@ -985,7 +985,7 @@ function ProductPageContent() {
               return (
                 <div
                   key={i}
-                  className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-neutral-900 hover:bg-neutral-800 transition-colors group"
+                  className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-[#352309] hover:bg-[#4a3210] transition-colors group"
                 >
                   <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0" />
                   <div>

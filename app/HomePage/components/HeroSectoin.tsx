@@ -93,7 +93,7 @@ export default function HeroSection() {
     <section className="relative w-full overflow-hidden bg-[#352309]">
       {/* ── HERO IMAGE & CONTENT — full width ── */}
       <div className="relative">
-        <div className="relative h-[380px] sm:h-[440px] w-full">
+        <div className="relative w-full md:h-[440px] overflow-hidden">
           <HeroBackground active={active} images={HERO_IMAGES} />
 
           {/* Nav Arrows */}
@@ -118,8 +118,8 @@ export default function HeroSection() {
       <div className="max-w-[1600px] mx-auto">
         <div className="relative px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 border-t border-white/10">
           {/* Tabs & Progress */}
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-5 lg:gap-6 py-5 lg:py-6">
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-4 w-full lg:w-auto">
+          <div className="flex items-center justify-between gap-2 lg:gap-6 py-2 lg:py-5">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-1 sm:gap-4 w-full lg:w-auto">
               {HERO_IMAGES.map((_, i) => (
                 <button
                   key={i}
@@ -127,7 +127,7 @@ export default function HeroSection() {
                     setActive(i);
                     setProgress(0);
                   }}
-                  className="relative group px-3 py-2 sm:px-4 sm:py-2.5 transition-all duration-300"
+                  className="relative group px-1.5 py-1 sm:px-4 sm:py-2.5 transition-all duration-300"
                   aria-label={`Go to slide ${i + 1}`}
                 >
                   <span
@@ -151,7 +151,7 @@ export default function HeroSection() {
               ))}
             </div>
 
-            <div className="w-full lg:w-64 flex items-center gap-4 px-2 sm:px-4 lg:px-0">
+            <div className="hidden lg:flex w-64 items-center gap-4 lg:px-0">
               <div className="flex-1 h-[2px] bg-white/10 overflow-hidden rounded-full">
                 <div
                   className="h-full bg-white transition-all duration-100 ease-linear rounded-full"
@@ -166,7 +166,7 @@ export default function HeroSection() {
           </div>
 
           {/* Feature Badges */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10 border-t border-white/10 mb-6 sm:mb-8 lg:mb-10">
+          <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 mb-2 sm:mb-6 lg:mb-8">
             <FeatureBadge
               icon={<Truck className="w-4 h-4 sm:w-5 sm:h-5" />}
               label="Gratis Ongkir"
@@ -198,26 +198,24 @@ function HeroBackground({
   images: string[];
 }) {
   return (
-    <div className="absolute inset-0 bg-[#352309]">
+    <div className="relative w-full md:absolute md:inset-0 bg-[#352309]">
       {images.map((img, i) => {
         const link = HERO_DATA[i]?.link || "/products";
+        const isActive = active === i;
         return (
           <Link
             href={link}
             key={i}
-            className={`absolute inset-0 block transition-opacity duration-[1400ms] ease-in-out ${
-              active === i
-                ? "opacity-100 z-10"
-                : "opacity-0 z-0 pointer-events-none"
+            className={`block transition-opacity duration-[1400ms] ease-in-out ${
+              isActive
+                ? "relative md:absolute md:inset-0 opacity-100 z-10"
+                : "absolute inset-0 opacity-0 z-0 pointer-events-none"
             }`}
           >
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `url(${img})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
+            <img
+              src={img}
+              alt={HERO_DATA[i]?.title || `Banner ${i + 1}`}
+              className="w-full h-auto md:h-full md:object-cover md:object-center"
             />
           </Link>
         );
@@ -237,7 +235,7 @@ function FeatureBadge({
   subtext: string;
 }) {
   return (
-    <div className="group flex items-center justify-center sm:justify-start gap-3 sm:gap-4 px-4 sm:px-6 py-4 sm:py-5 hover:bg-white/5 transition-colors duration-300">
+    <div className="group flex items-center justify-center sm:justify-start gap-2 sm:gap-4 px-2 sm:px-6 py-2.5 sm:py-5 hover:bg-white/5 transition-colors duration-300">
       <div className="flex-shrink-0 text-white/60 group-hover:text-white transition-colors duration-300">
         {icon}
       </div>

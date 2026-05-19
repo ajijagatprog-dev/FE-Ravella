@@ -119,7 +119,7 @@ export default function ContactPage() {
   ];
 
   const inputClass =
-    "w-full px-4 py-3.5 bg-white border border-neutral-200 focus:border-neutral-800 focus:outline-none transition-colors text-neutral-900 placeholder:text-neutral-400 text-sm font-light";
+    "w-full px-4 py-3 sm:py-3.5 bg-white border border-neutral-200 focus:border-neutral-800 focus:outline-none transition-colors text-neutral-900 placeholder:text-neutral-400 text-xs sm:text-sm font-light";
 
   return (
     <div className="min-h-screen bg-white">
@@ -151,7 +151,7 @@ export default function ContactPage() {
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 leading-tight">
               Contact <span className="font-light text-white/90">Ravelle</span>
             </h1>
 
@@ -176,7 +176,7 @@ export default function ContactPage() {
                 <a
                   key={idx}
                   href={item.href || "#"}
-                  className="group bg-white p-6 sm:p-8 hover:bg-neutral-50 transition-colors duration-300"
+                  className="group bg-white p-5 sm:p-8 hover:bg-neutral-50 transition-colors duration-300"
                 >
                   <div className="w-10 h-10 flex items-center justify-center border border-neutral-200 mb-5 group-hover:bg-neutral-900 group-hover:border-neutral-900 transition-all duration-300">
                     <Icon className="w-4 h-4 text-neutral-600 group-hover:text-white transition-colors" />
@@ -210,7 +210,7 @@ export default function ContactPage() {
                   </span>
                 </div>
                 <h2
-                  className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3 leading-[1.05]"
+                  className="text-3xl sm:text-5xl font-light text-neutral-900 mb-3 leading-[1.05]"
                   style={{ letterSpacing: "-0.01em" }}
                 >
                   Let's{" "}
@@ -444,7 +444,7 @@ export default function ContactPage() {
               <div className="w-5 h-[1px] bg-neutral-400" />
             </div>
             <h2
-              className="text-4xl sm:text-5xl font-light text-neutral-900 mb-3"
+              className="text-3xl sm:text-5xl font-light text-neutral-900 mb-3"
               style={{ letterSpacing: "-0.01em" }}
             >
               Common{" "}

@@ -168,7 +168,7 @@ export default function News() {
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-5 leading-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-5 leading-tight">
               Inspirasi Rasa <br />
               <span className="font-light text-white/90">Dan Gaya</span>
             </h1>
@@ -201,15 +201,15 @@ export default function News() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-4 w-full max-w-2xl px-8 py-5 rounded-full border border-neutral-200 bg-white shadow-xl focus-within:border-neutral-900 transition-all duration-500"
+              className="flex items-center gap-3 sm:gap-4 w-full max-w-2xl px-5 sm:px-8 py-3.5 sm:py-5 rounded-full border border-neutral-200 bg-white shadow-xl focus-within:border-neutral-900 transition-all duration-500"
             >
-              <Search className="w-5 h-5 text-neutral-400 flex-shrink-0" />
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400 flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Cari artikel, tips, atau resep..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent text-base text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
+                className="flex-1 bg-transparent text-sm sm:text-base text-neutral-700 placeholder:text-neutral-400 outline-none font-light"
               />
               {searchQuery && (
                 <button
@@ -230,7 +230,7 @@ export default function News() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
                 onClick={() => setActiveCategory(cat.name)}
-                className={`relative px-6 py-3 text-[10px] tracking-[0.2em] uppercase font-black transition-all border ${
+                className={`relative px-4 sm:px-6 py-2 sm:py-3 text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase font-black transition-all border ${
                   activeCategory === cat.name
                     ? "text-white border-neutral-900"
                     : "text-neutral-500 bg-neutral-50 border-neutral-100 hover:bg-neutral-100 hover:border-neutral-200"
@@ -261,13 +261,13 @@ export default function News() {
           <div className="flex items-center justify-between mb-12 border-b border-neutral-100 pb-8">
             <div className="flex items-center gap-4">
               <TrendingUp className="w-5 h-5 text-neutral-900" />
-              <h2 className="text-3xl font-light text-neutral-900">
+              <h2 className="text-xl sm:text-3xl font-light text-neutral-900">
                 {activeCategory === "Semua"
                   ? "Latest Articles"
                   : activeCategory}
               </h2>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400">
+            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-neutral-400">
               {filteredArticles.length} Stories
             </span>
           </div>
@@ -352,7 +352,7 @@ export default function News() {
                     </div>
 
                     <Link href={`/news/${article.id}`}>
-                      <h3 className="text-2xl font-medium text-neutral-900 mb-4 line-clamp-2 hover:text-neutral-500 transition-colors leading-snug">
+                      <h3 className="text-lg sm:text-2xl font-medium text-neutral-900 mb-2 sm:mb-4 line-clamp-2 hover:text-neutral-500 transition-colors leading-snug">
                         {article.title}
                       </h3>
                     </Link>
@@ -382,7 +382,7 @@ export default function News() {
           <div className="mt-24 text-center">
             <button
               onClick={() => setVisibleCount((prev) => prev + 8)}
-              className="group relative px-12 py-5 border border-neutral-200 text-neutral-900 text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden transition-all hover:border-neutral-900"
+              className="group relative px-8 sm:px-12 py-4 sm:py-5 border border-neutral-200 text-neutral-900 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] overflow-hidden transition-all hover:border-neutral-900"
             >
               <span className="relative z-10 group-hover:text-white transition-colors duration-500">
                 Load More
