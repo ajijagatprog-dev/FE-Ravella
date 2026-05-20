@@ -99,17 +99,17 @@ export default function HeroSection() {
           {/* Nav Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center border border-white/25 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 group"
+            className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-20 w-7 h-7 md:w-11 md:h-11 flex items-center justify-center border border-white/25 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 group"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center border border-white/25 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 group"
+            className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-20 w-7 h-7 md:w-11 md:h-11 flex items-center justify-center border border-white/25 text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 group"
             aria-label="Next slide"
           >
-            <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
       </div>
@@ -118,7 +118,7 @@ export default function HeroSection() {
       <div className="max-w-[1600px] mx-auto">
         <div className="relative px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 border-t border-white/10">
           {/* Tabs & Progress */}
-          <div className="flex items-center justify-between gap-2 lg:gap-6 py-2 lg:py-5">
+          <div className="flex items-center justify-between gap-1 lg:gap-6 py-1 lg:py-5">
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-1 sm:gap-4 w-full lg:w-auto">
               {HERO_IMAGES.map((_, i) => (
                 <button
@@ -166,7 +166,7 @@ export default function HeroSection() {
           </div>
 
           {/* Feature Badges */}
-          <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 mb-2 sm:mb-6 lg:mb-8">
+          <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 mb-0 sm:mb-6 lg:mb-8">
             <FeatureBadge
               icon={<Truck className="w-4 h-4 sm:w-5 sm:h-5" />}
               label="Gratis Ongkir"
@@ -235,7 +235,7 @@ function FeatureBadge({
   subtext: string;
 }) {
   return (
-    <div className="group flex items-center justify-center sm:justify-start gap-2 sm:gap-4 px-2 sm:px-6 py-2.5 sm:py-5 hover:bg-white/5 transition-colors duration-300">
+    <div className="group flex items-center justify-center sm:justify-start gap-1.5 sm:gap-4 px-1 sm:px-6 py-1.5 sm:py-5 hover:bg-white/5 transition-colors duration-300">
       <div className="flex-shrink-0 text-white/60 group-hover:text-white transition-colors duration-300">
         {icon}
       </div>
