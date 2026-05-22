@@ -101,7 +101,10 @@ export default function WelcomePopup() {
           </button>
 
           {/* Top banner */}
-          <div className="bg-stone-900 px-8 pt-10 pb-8 text-center relative overflow-hidden">
+          <div
+            className="px-8 pt-10 pb-8 text-center relative overflow-hidden"
+            style={{ backgroundColor: "#352309" }}
+          >
             {/* Decorative circles */}
             <div className="absolute -top-10 -left-10 w-32 h-32 bg-white/5 rounded-full" />
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -137,8 +140,9 @@ export default function WelcomePopup() {
                 className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${
                   copied
                     ? "bg-green-600 text-white"
-                    : "bg-stone-900 text-white hover:bg-black"
+                    : "text-white hover:opacity-90"
                 }`}
+                style={!copied ? { backgroundColor: "#352309" } : undefined}
               >
                 {copied ? (
                   <>
@@ -157,7 +161,8 @@ export default function WelcomePopup() {
               <Link
                 href="/product"
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 w-full bg-stone-900 text-white py-3.5 text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-black transition-colors"
+                className="flex items-center justify-center gap-2 w-full text-white py-3.5 text-[11px] font-bold uppercase tracking-[0.2em] hover:opacity-90 transition-colors"
+                style={{ backgroundColor: "#352309" }}
               >
                 <ShoppingBag className="w-4 h-4" />
                 Belanja Sekarang
