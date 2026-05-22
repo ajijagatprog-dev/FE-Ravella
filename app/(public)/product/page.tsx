@@ -404,7 +404,7 @@ function ProductPageContent() {
           viewport={{ once: true }}
           className="flex justify-center mb-16"
         >
-          <div className="flex items-center gap-3 sm:gap-4 w-full max-w-2xl px-5 sm:px-8 py-3.5 sm:py-5 rounded-full border border-neutral-200 bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] focus-within:shadow-[0_15px_40px_-15px_rgba(0,0,0,0.15)] focus-within:border-neutral-900 transition-all duration-500">
+          <div className="flex items-center gap-3 w-full max-w-xl px-5 py-2.5 sm:py-3.5 rounded-full border border-neutral-200 bg-white shadow-sm hover:shadow-md focus-within:shadow-md focus-within:border-neutral-400 transition-all duration-300">
             <Search className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400 flex-shrink-0" />
             <input
               type="text"
