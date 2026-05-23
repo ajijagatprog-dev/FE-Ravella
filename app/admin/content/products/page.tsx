@@ -34,7 +34,7 @@ const CATEGORIES = [
     { value: "keyboard", label: "keyboard" },
 ];
 
-const BADGES = ["Best Seller", "Premium", "Popular", "New"];
+const BADGES = ["Best Seller", "Best", "Hot Sales", "Premium", "Popular", "New"];
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
@@ -130,6 +130,22 @@ export default function ProductContentPage() {
     const showToast = (msg: string) => {
         setToast({ message: msg, visible: true });
         setTimeout(() => setToast({ message: "", visible: false }), 2500);
+    };
+
+    const clearProductCache = () => {
+        try {
+            sessionStorage.removeItem("ravelle_new_products");
+            sessionStorage.removeItem("ravelle_best_sellers");
+            sessionStorage.removeItem("ravelle_sale_products");
+            sessionStorage.removeItem("ravelle_all_products");
+            Object.keys(sessionStorage).forEach((key) => {
+                if (key.startsWith("ravelle_product_")) {
+                    sessionStorage.removeItem(key);
+                }
+            });
+        } catch (e) {
+            console.error("Failed to clear sessionStorage cache", e);
+        }
     };
 
     const fetchProducts = async () => {
@@ -446,6 +462,7 @@ export default function ProductContentPage() {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                clearProductCache();
                 showToast("Produk berhasil ditambahkan!");
             } else {
                 formData.append('_method', 'PUT');
@@ -455,6 +472,7 @@ export default function ProductContentPage() {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                clearProductCache();
                 showToast("Produk berhasil diperbarui!");
             }
 
@@ -487,6 +505,7 @@ export default function ProductContentPage() {
 
         try {
             await api.delete(`/products/${deleteTarget.id}`);
+            clearProductCache();
             showToast("Produk berhasil dihapus!");
             setDeleteTarget(null);
             fetchProducts();
@@ -672,9 +691,11 @@ export default function ProductContentPage() {
                                         </td>
                                         <td className="px-4 py-4">
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${p.badge === "Best Seller" ? "bg-amber-100 text-amber-700" :
-                                                p.badge === "Premium" ? "bg-purple-100 text-purple-700" :
-                                                    p.badge === "Popular" ? "bg-blue-100 text-blue-700" :
-                                                        "bg-blue-100 text-blue-700"
+                                                p.badge === "Best" ? "bg-emerald-100 text-emerald-700" :
+                                                    p.badge === "Hot Sales" ? "bg-rose-100 text-rose-700" :
+                                                        p.badge === "Premium" ? "bg-purple-100 text-purple-700" :
+                                                            p.badge === "Popular" ? "bg-blue-100 text-blue-700" :
+                                                                "bg-blue-100 text-blue-700"
                                                 }`}>
                                                 {p.badge}
                                             </span>

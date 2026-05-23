@@ -273,6 +273,8 @@ export default function ProductDetail() {
 
     const badgeStyle: Record<string, string> = {
         "Best Seller": "bg-neutral-900 text-white",
+        Best: "bg-[#352309] text-white",
+        "Hot Sales": "bg-red-600 text-white",
         Premium: "bg-neutral-700 text-white",
         Popular: "bg-neutral-100 text-neutral-700 border border-neutral-200",
         New: "bg-white text-neutral-900 border border-neutral-200",
