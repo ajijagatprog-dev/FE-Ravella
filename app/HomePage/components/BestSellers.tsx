@@ -74,7 +74,7 @@ export default function BestSellers() {
                 image:
                   item.image ||
                   "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-                badge: "Best Seller",
+                badge: item.badge || "Best Seller",
                 rating: item.rating ? parseFloat(item.rating) : 0,
               };
             });
@@ -260,10 +260,13 @@ export default function BestSellers() {
 /* ── BADGE COLORS ── */
 const badgeStyle: Record<string, string> = {
   "Best Seller": "bg-neutral-900 text-white",
+  Best: "bg-[#352309] text-white",
+  "Hot Sales": "bg-red-600 text-white",
   New: "bg-white text-neutral-900 border border-neutral-200",
   Hot: "bg-neutral-700 text-white",
   Sale: "bg-neutral-100 text-neutral-700 border border-neutral-200",
-  Premium: "bg-white text-neutral-900 border border-neutral-200",
+  Premium: "bg-neutral-800 text-white",
+  Popular: "bg-neutral-600 text-white",
 };
 
 function ProductCard({

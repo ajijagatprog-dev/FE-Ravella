@@ -234,9 +234,13 @@ export default function NewProducts() {
 /* ── BADGE COLORS ── */
 const badgeStyle: Record<string, string> = {
   "Best Seller": "bg-neutral-900 text-white",
+  Best: "bg-[#352309] text-white",
+  "Hot Sales": "bg-red-600 text-white",
   New: "bg-white text-neutral-900 border border-neutral-200",
   Hot: "bg-neutral-700 text-white",
   Sale: "bg-neutral-100 text-neutral-700 border border-neutral-200",
+  Premium: "bg-neutral-800 text-white",
+  Popular: "bg-neutral-600 text-white",
 };
 
 function ProductCard({
