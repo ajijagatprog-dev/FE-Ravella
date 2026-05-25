@@ -30,11 +30,15 @@ function Avatar({ name = "", tier }: { name: string; tier: string }) {
     .slice(0, 2)
     .toUpperCase();
   const color =
-    tier === "PLATINUM" ? "bg-blue-100 text-blue-700" :
-      tier === "GOLD" ? "bg-amber-100 text-amber-700" :
-        "bg-slate-100 text-slate-600";
+    tier === "PLATINUM"
+      ? "bg-blue-100 text-blue-700"
+      : tier === "GOLD"
+        ? "bg-amber-100 text-amber-700"
+        : "bg-slate-100 text-slate-600";
   return (
-    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${color}`}>
+    <div
+      className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${color}`}
+    >
       {initials || "??"}
     </div>
   );
@@ -57,24 +61,25 @@ export default function CustomerLoyaltyTable() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/admin/loyalty')
-      .then(res => {
-        if (res.data.status === 'success') {
+    api
+      .get("/admin/loyalty")
+      .then((res) => {
+        if (res.data.status === "success") {
           setCustomers(res.data.data.customers);
         }
       })
-      .catch(err => console.error("Failed to load loyalty data", err))
+      .catch((err) => console.error("Failed to load loyalty data", err))
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = customers.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.email.toLowerCase().includes(search.toLowerCase())
+  const filtered = customers.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.email.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-4">
-
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -89,10 +94,16 @@ export default function CustomerLoyaltyTable() {
         <div className="relative">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z"
+            />
           </svg>
           <input
             type="text"
@@ -138,7 +149,10 @@ export default function CustomerLoyaltyTable() {
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-3 py-10 text-center text-slate-400 text-sm">
+                <td
+                  colSpan={5}
+                  className="px-3 py-10 text-center text-slate-400 text-sm"
+                >
                   No customers found
                 </td>
               </tr>
@@ -147,22 +161,33 @@ export default function CustomerLoyaltyTable() {
                 const cfg = TIER_CONFIG[customer.tier] ?? TIER_CONFIG["BASIC"];
 
                 return (
-                  <tr key={customer.id} className="hover:bg-slate-50/70 transition-colors">
+                  <tr
+                    key={customer.id}
+                    className="hover:bg-slate-50/70 transition-colors"
+                  >
                     {/* Customer */}
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2.5">
                         <Avatar name={customer.name} tier={customer.tier} />
                         <div>
-                          <span className="font-medium text-gray-900">{customer.name}</span>
-                          <p className="text-xs text-slate-400">{customer.email}</p>
+                          <span className="font-medium text-gray-900">
+                            {customer.name}
+                          </span>
+                          <p className="text-xs text-slate-400">
+                            {customer.email}
+                          </p>
                         </div>
                       </div>
                     </td>
 
                     {/* Tier */}
                     <td className="px-3 py-3">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${cfg.pill}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${cfg.pill}`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`}
+                        />
                         {customer.tier}
                       </span>
                     </td>
@@ -171,20 +196,30 @@ export default function CustomerLoyaltyTable() {
                     <td className="px-3 py-3">
                       <span className="font-semibold text-gray-900 tabular-nums">
                         {Number(customer.points || 0).toLocaleString()}
-                        <span className="text-xs font-normal text-slate-400 ml-1">pts</span>
+                        <span className="text-xs font-normal text-slate-400 ml-1">
+                          pts
+                        </span>
                       </span>
                     </td>
 
                     {/* Total Spent */}
                     <td className="px-3 py-3">
                       <span className="text-sm font-medium text-gray-800">
-                        Rp {Number(customer.total_spent || 0).toLocaleString('id-ID')}
+                        {new Intl.NumberFormat("id-ID", {
+                          style: "currency",
+                          currency: "IDR",
+                          minimumFractionDigits: 0,
+                        }).format(
+                          Math.round(Number(customer.total_spent || 0)),
+                        )}
                       </span>
                     </td>
 
                     {/* Orders */}
                     <td className="px-3 py-3">
-                      <span className="text-sm text-gray-700">{customer.total_orders}</span>
+                      <span className="text-sm text-gray-700">
+                        {customer.total_orders}
+                      </span>
                     </td>
                   </tr>
                 );
@@ -193,7 +228,6 @@ export default function CustomerLoyaltyTable() {
           </tbody>
         </table>
       </div>
-
     </div>
   );
 }
