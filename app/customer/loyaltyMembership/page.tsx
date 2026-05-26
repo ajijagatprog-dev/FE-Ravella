@@ -9,7 +9,7 @@ import PointHistoryTab, {
 } from "./components/PointHistoryTab";
 import HowToEarnTab from "./components/HowToEarnTab";
 import { cn } from "@/lib/utils";
-import { Loader2, CheckCircle2, XCircle, Copy, X } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Copy, X, Gift, Star } from "lucide-react";
 import api from "@/lib/axios";
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
@@ -34,6 +34,29 @@ interface RedeemResult {
   voucher_description: string;
   points_spent: number;
   remaining_points: number;
+}
+
+export interface ClaimableReward {
+  id: string;
+  label: string;
+  type: "bonus_points" | "voucher_code";
+  tier_name: string;
+  points?: number;
+  voucher_id?: number;
+  voucher_label?: string;
+  one_time: boolean;
+  is_claimed: boolean;
+  claimed_value?: string;
+  claimed_at?: string;
+}
+
+interface ClaimResult {
+  type: "bonus_points" | "voucher_code";
+  points_awarded?: number;
+  new_balance?: number;
+  voucher_code?: string;
+  description?: string;
+  value?: string;
 }
 
 // ── Toast Component ───────────────────────────────────────────────────────────
@@ -134,6 +157,13 @@ export default function LoyaltyMembershipPage() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [rewardsLoading, setRewardsLoading] = useState(false);
 
+  // Claimable tier rewards state
+  const [claimable, setClaimable] = useState<ClaimableReward[]>([]);
+  const [claimedHistory, setClaimedHistory] = useState<ClaimableReward[]>([]);
+  const [claimableLoading, setClaimableLoading] = useState(false);
+  const [claimingId, setClaimingId] = useState<string | null>(null);
+  const [claimSuccess, setClaimSuccess] = useState<ClaimResult | null>(null);
+
   // Redeem state
   const [redeemingId, setRedeemingId] = useState<string | null>(null);
   const [redeemSuccess, setRedeemSuccess] = useState<RedeemResult | null>(null);
@@ -168,10 +198,50 @@ export default function LoyaltyMembershipPage() {
       .finally(() => setRewardsLoading(false));
   }, []);
 
+  // Fetch claimable rewards
+  const fetchClaimable = useCallback(() => {
+    setClaimableLoading(true);
+    api
+      .get("/customer/loyalty/claimable")
+      .then((res) => {
+        if (res.data.status === "success") {
+          setClaimable(res.data.data?.claimable ?? []);
+          setClaimedHistory(res.data.data?.claimed ?? []);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setClaimableLoading(false));
+  }, []);
+
   useEffect(() => {
     fetchLoyaltyData();
     fetchRewards();
-  }, [fetchLoyaltyData, fetchRewards]);
+    fetchClaimable();
+  }, [fetchLoyaltyData, fetchRewards, fetchClaimable]);
+
+  // Handle claim tier reward
+  const handleClaim = async (reward: ClaimableReward) => {
+    setClaimingId(reward.id);
+    setRedeemError(null);
+    setClaimSuccess(null);
+    try {
+      const res = await api.post("/customer/loyalty/claim", { reward_id: reward.id });
+      if (res.data.status === "success") {
+        setClaimSuccess(res.data.data);
+        fetchLoyaltyData();
+        fetchRewards();
+        fetchClaimable();
+        setTimeout(() => setClaimSuccess(null), 6000);
+      }
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const msg = error?.response?.data?.message ?? "Gagal klaim reward. Coba lagi.";
+      setRedeemError(msg);
+      setTimeout(() => setRedeemError(null), 5000);
+    } finally {
+      setClaimingId(null);
+    }
+  };
 
   // Handle redeem
   const handleRedeem = async (reward: Reward) => {
@@ -259,13 +329,18 @@ export default function LoyaltyMembershipPage() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                "flex-1 text-sm font-medium py-3.5 transition-all duration-150",
+                "flex-1 text-sm font-medium py-3.5 transition-all duration-150 relative",
                 activeTab === tab
                   ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50/40"
                   : "text-stone-500 hover:text-stone-700 hover:bg-stone-50",
               )}
             >
               {tab}
+              {tab === "Available Rewards" && claimable.length > 0 && (
+                <span className="absolute top-2 right-2 inline-flex items-center justify-center w-4 h-4 text-[10px] font-black text-white bg-red-500 rounded-full">
+                  {claimable.length}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -279,6 +354,11 @@ export default function LoyaltyMembershipPage() {
               loading={rewardsLoading}
               onRedeem={handleRedeem}
               redeemingId={redeemingId}
+              claimable={claimable}
+              claimedHistory={claimedHistory}
+              claimableLoading={claimableLoading}
+              onClaim={handleClaim}
+              claimingId={claimingId}
             />
           )}
           {activeTab === "Point History Log" && (
@@ -289,6 +369,42 @@ export default function LoyaltyMembershipPage() {
       </div>
 
       {/* ── Toast Notifications ── */}
+      {claimSuccess && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4">
+          <div className="bg-white border border-emerald-200 shadow-2xl rounded-2xl p-5">
+            <div className="flex items-start gap-3 mb-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-bold text-stone-800 mb-1">Reward Berhasil Diklaim! 🎉</p>
+                {claimSuccess.type === "bonus_points" ? (
+                  <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">
+                    <Star size={16} className="text-amber-500" />
+                    <p className="text-sm font-black text-amber-700">+{claimSuccess.points_awarded?.toLocaleString()} poin ditambahkan!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-xs text-stone-500">{claimSuccess.description} — {claimSuccess.value}</p>
+                    <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2">
+                      <Gift size={14} className="text-emerald-600" />
+                      <span className="text-sm font-black tracking-widest text-emerald-700">{claimSuccess.voucher_code}</span>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(claimSuccess.voucher_code ?? "")}
+                        className="ml-auto text-[10px] font-bold text-emerald-600 bg-white border border-emerald-200 px-2 py-1 rounded-lg hover:bg-emerald-50"
+                      >
+                        Salin
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-stone-400">Voucher berlaku 90 hari. Gunakan saat checkout.</p>
+                  </div>
+                )}
+              </div>
+              <button onClick={() => setClaimSuccess(null)} className="p-1 rounded-lg hover:bg-stone-100 text-stone-400">
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {redeemSuccess && (
         <VoucherSuccessToast
           result={redeemSuccess}

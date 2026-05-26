@@ -1,14 +1,29 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Download, Search, TrendingUp, TrendingDown, ShoppingBag, Truck, X } from "lucide-react";
+import {
+  Download,
+  Search,
+  TrendingUp,
+  TrendingDown,
+  ShoppingBag,
+  Truck,
+  X,
+} from "lucide-react";
 import { OrderTable, Order } from "./components/OrderTable";
 
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 import { downloadFile } from "@/lib/download";
 
-type TabStatus = "all" | "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+type TabStatus =
+  | "all"
+  | "PENDING"
+  | "PAID"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
 
 interface TrackingModalState {
   isOpen: boolean;
@@ -56,11 +71,17 @@ export default function OrderPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<OrderStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
-  const fetchStats = async () => {
+  const fetchStats = async (from: string = "", to: string = "") => {
+    setStatsLoading(true);
     try {
-      const res = await api.get('/admin/orders/stats');
-      if (res.data.status === 'success') {
+      const params: Record<string, string> = {};
+      if (from) params.date_from = from;
+      if (to) params.date_to = to;
+      const res = await api.get("/admin/orders/stats", { params });
+      if (res.data.status === "success") {
         setStats(res.data.data);
       }
     } catch (error) {
@@ -73,25 +94,38 @@ export default function OrderPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await api.get('/admin/orders');
-        if (res.data.status === 'success') {
+        const res = await api.get("/admin/orders");
+        if (res.data.status === "success") {
           const formatted: Order[] = res.data.data.map((o: any) => {
-            const products = o.items ? o.items.map((item: any) => `${item.quantity}x ${item.product?.name || 'Unknown'}`).join(", ") : "-";
+            const products = o.items
+              ? o.items
+                  .map(
+                    (item: any) =>
+                      `${item.quantity}x ${item.product?.name || "Unknown"}`,
+                  )
+                  .join(", ")
+              : "-";
             return {
               id: o.order_number,
               customer: {
-                name: o.user?.name || 'Guest',
-                initials: (o.user?.name || 'G').substring(0, 2).toUpperCase(),
-                avatarColor: "#8B5CF6"
+                name: o.user?.name || "Guest",
+                initials: (o.user?.name || "G").substring(0, 2).toUpperCase(),
+                avatarColor: "#8B5CF6",
               },
               products: products,
-              paymentMethod: o.payment_channel || o.payment_method || '-',
+              paymentMethod: o.payment_channel || o.payment_method || "-",
               date: new Date(o.created_at).toLocaleDateString("id-ID", {
-                year: "numeric", month: "short", day: "numeric"
+                year: "numeric",
+                month: "short",
+                day: "numeric",
               }),
               status: o.status,
-              total: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(o.total_amount),
-              rawOrder: o
+              total: new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0,
+              }).format(o.total_amount),
+              rawOrder: o,
             };
           });
           setOrders(formatted);
@@ -106,13 +140,21 @@ export default function OrderPage() {
     fetchStats();
   }, []);
 
+  // Refetch stats whenever date range changes
+  useEffect(() => {
+    fetchStats(dateFrom, dateTo);
+  }, [dateFrom, dateTo]);
+
   const filtered = useMemo(() => {
     let result = orders;
-    if (activeTab !== "all") result = result.filter((o) => o.status === activeTab);
+    if (activeTab !== "all")
+      result = result.filter((o) => o.status === activeTab);
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
-        (o) => o.id.toLowerCase().includes(q) || o.customer.name.toLowerCase().includes(q)
+        (o) =>
+          o.id.toLowerCase().includes(q) ||
+          o.customer.name.toLowerCase().includes(q),
       );
     }
     return result;
@@ -121,7 +163,9 @@ export default function OrderPage() {
   const paginated = filtered.slice((page - 1) * LIMIT, page * LIMIT);
 
   const tabCount = (key: TabStatus) =>
-    key === "all" ? orders.length : orders.filter((o) => o.status === key).length;
+    key === "all"
+      ? orders.length
+      : orders.filter((o) => o.status === key).length;
 
   const handleTabChange = (key: TabStatus) => {
     setActiveTab(key);
@@ -137,13 +181,23 @@ export default function OrderPage() {
     isOpen: false,
     orderNumber: "",
     courier: "J&T",
-    trackingNumber: ""
+    trackingNumber: "",
   });
 
-  const handleUpdateStatus = async (orderNumber: string, status: string, courier?: string, trackingNumber?: string) => {
+  const handleUpdateStatus = async (
+    orderNumber: string,
+    status: string,
+    courier?: string,
+    trackingNumber?: string,
+  ) => {
     if (status === "SHIPPED" && !courier && !trackingNumber) {
-        setTrackingModal({ isOpen: true, orderNumber, courier: "J&T", trackingNumber: "" });
-        return;
+      setTrackingModal({
+        isOpen: true,
+        orderNumber,
+        courier: "J&T",
+        trackingNumber: "",
+      });
+      return;
     }
 
     try {
@@ -152,16 +206,22 @@ export default function OrderPage() {
       if (trackingNumber) payload.tracking_number = trackingNumber;
 
       const res = await api.put(`/admin/orders/${orderNumber}/status`, payload);
-      if (res.data.status === 'success') {
+      if (res.data.status === "success") {
         const orderData = res.data.data;
-        setOrders(prev => prev.map(o => o.id === orderNumber ? { 
-            ...o, 
-            status: orderData.status as any,
-            rawOrder: orderData
-        } : o));
-        fetchStats();
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === orderNumber
+              ? {
+                  ...o,
+                  status: orderData.status as any,
+                  rawOrder: orderData,
+                }
+              : o,
+          ),
+        );
+        fetchStats(dateFrom, dateTo);
         toast.success("Order status updated successfully!");
-        setTrackingModal(prev => ({ ...prev, isOpen: false }));
+        setTrackingModal((prev) => ({ ...prev, isOpen: false }));
       }
     } catch (error: any) {
       console.error("Failed to update status", error);
@@ -173,7 +233,9 @@ export default function OrderPage() {
     <div className="flex flex-col gap-6 p-4 sm:p-6">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-gray-400">
-        <span className="hover:text-gray-600 cursor-pointer transition-colors">Home</span>
+        <span className="hover:text-gray-600 cursor-pointer transition-colors">
+          Home
+        </span>
         <span>/</span>
         <span className="font-medium text-gray-700">Orders</span>
       </nav>
@@ -181,7 +243,9 @@ export default function OrderPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">Order Management</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+            Order Management
+          </h1>
           <p className="mt-1 text-xs md:text-sm text-gray-500">
             Manage and track all customer orders from here.
           </p>
@@ -189,8 +253,14 @@ export default function OrderPage() {
         <button
           onClick={async () => {
             try {
-              const filename = activeTab === 'all' ? 'all_orders_report.xlsx' : `${activeTab.toLowerCase()}_orders_report.xlsx`;
-              await downloadFile(`/admin/export/orders?status=${activeTab}`, filename);
+              const filename =
+                activeTab === "all"
+                  ? "all_orders_report.xlsx"
+                  : `${activeTab.toLowerCase()}_orders_report.xlsx`;
+              await downloadFile(
+                `/admin/export/orders?status=${activeTab}`,
+                filename,
+              );
               toast.success("Orders exported successfully");
             } catch (error) {
               toast.error("Failed to export orders");
@@ -203,70 +273,158 @@ export default function OrderPage() {
         </button>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {/* Total Pendapatan */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Total Pendapatan
-            </p>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
-              <ShoppingBag size={15} className="text-blue-500" />
+      {/* Date Filter + Summary Cards */}
+      <div className="flex flex-col gap-3">
+        {/* Calendar Date Range Filter */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 shrink-0">
+            Filter Tanggal
+          </span>
+          <div className="flex flex-1 flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-gray-500 shrink-0">Dari</label>
+              <input
+                type="date"
+                value={dateFrom}
+                max={dateTo || undefined}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-          </div>
-          {statsLoading ? (
-            <div className="mt-3 h-8 w-36 animate-pulse rounded-lg bg-gray-200" />
-          ) : (
-            <p className="mt-3 text-2xl font-bold text-gray-900">
-              {formatCurrency(stats?.total_revenue ?? 0)}
-            </p>
-          )}
-          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.revenue_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
-            {(stats?.revenue_trend ?? 0) >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-            {(stats?.revenue_trend ?? 0) >= 0 ? "+" : ""}{stats?.revenue_trend ?? 0}% vs last month
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-gray-500 shrink-0">Sampai</label>
+              <input
+                type="date"
+                value={dateTo}
+                min={dateFrom || undefined}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            {(dateFrom || dateTo) && (
+              <button
+                onClick={() => {
+                  setDateFrom("");
+                  setDateTo("");
+                }}
+                className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+              >
+                <X size={12} />
+                Reset
+              </button>
+            )}
+            {dateFrom && dateTo && (
+              <span className="text-[11px] text-blue-500 font-medium">
+                Menampilkan data{" "}
+                {new Date(dateFrom).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}{" "}
+                –{" "}
+                {new Date(dateTo).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Pesanan Aktif */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Pesanan Aktif
-            </p>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
-              <ShoppingBag size={15} className="text-emerald-500" />
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {/* Total Pendapatan */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Total Pendapatan
+              </p>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
+                <ShoppingBag size={15} className="text-blue-500" />
+              </div>
+            </div>
+            {statsLoading ? (
+              <div className="mt-3 h-8 w-36 animate-pulse rounded-lg bg-gray-200" />
+            ) : (
+              <p className="mt-3 text-2xl font-bold text-gray-900">
+                {formatCurrency(stats?.total_revenue ?? 0)}
+              </p>
+            )}
+            <div
+              className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.revenue_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}
+            >
+              {(stats?.revenue_trend ?? 0) >= 0 ? (
+                <TrendingUp size={12} />
+              ) : (
+                <TrendingDown size={12} />
+              )}
+              {(stats?.revenue_trend ?? 0) >= 0 ? "+" : ""}
+              {stats?.revenue_trend ?? 0}%{" "}
+              {(stats as any)?.trend_label ?? "vs bulan lalu"}
             </div>
           </div>
-          {statsLoading ? (
-            <div className="mt-3 h-8 w-16 animate-pulse rounded-lg bg-gray-200" />
-          ) : (
-            <p className="mt-3 text-2xl font-bold text-gray-900">{stats?.active_orders ?? 0}</p>
-          )}
-          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.active_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
-            {(stats?.active_trend ?? 0) >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-            {(stats?.active_trend ?? 0) >= 0 ? "+" : ""}{stats?.active_trend ?? 0}% from yesterday
-          </div>
-        </div>
 
-        {/* Pengiriman Tertunda */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Pengiriman Tertunda
-            </p>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
-              <Truck size={15} className="text-red-400" />
+          {/* Pesanan Aktif */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Pesanan Aktif
+              </p>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
+                <ShoppingBag size={15} className="text-emerald-500" />
+              </div>
+            </div>
+            {statsLoading ? (
+              <div className="mt-3 h-8 w-16 animate-pulse rounded-lg bg-gray-200" />
+            ) : (
+              <p className="mt-3 text-2xl font-bold text-gray-900">
+                {stats?.active_orders ?? 0}
+              </p>
+            )}
+            <div
+              className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.active_trend ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}
+            >
+              {(stats?.active_trend ?? 0) >= 0 ? (
+                <TrendingUp size={12} />
+              ) : (
+                <TrendingDown size={12} />
+              )}
+              {(stats?.active_trend ?? 0) >= 0 ? "+" : ""}
+              {stats?.active_trend ?? 0}%{" "}
+              {(stats as any)?.trend_label ?? "vs periode sebelumnya"}
             </div>
           </div>
-          {statsLoading ? (
-            <div className="mt-3 h-8 w-12 animate-pulse rounded-lg bg-gray-200" />
-          ) : (
-            <p className="mt-3 text-2xl font-bold text-gray-900">{stats?.pending_shipments ?? 0}</p>
-          )}
-          <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.pending_trend ?? 0) <= 0 ? "text-emerald-600" : "text-red-500"}`}>
-            {(stats?.pending_trend ?? 0) <= 0 ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
-            {(stats?.pending_trend ?? 0) >= 0 ? "+" : ""}{stats?.pending_trend ?? 0}% since last week
+
+          {/* Pengiriman Tertunda */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                {dateFrom && dateTo ? "Belum Dikirim" : "Pengiriman Tertunda"}
+              </p>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
+                <Truck size={15} className="text-red-400" />
+              </div>
+            </div>
+            {statsLoading ? (
+              <div className="mt-3 h-8 w-12 animate-pulse rounded-lg bg-gray-200" />
+            ) : (
+              <p className="mt-3 text-2xl font-bold text-gray-900">
+                {stats?.pending_shipments ?? 0}
+              </p>
+            )}
+            <div
+              className={`mt-2 flex items-center gap-1 text-xs font-medium ${(stats?.pending_trend ?? 0) <= 0 ? "text-emerald-600" : "text-red-500"}`}
+            >
+              {(stats?.pending_trend ?? 0) <= 0 ? (
+                <TrendingDown size={12} />
+              ) : (
+                <TrendingUp size={12} />
+              )}
+              {(stats?.pending_trend ?? 0) >= 0 ? "+" : ""}
+              {stats?.pending_trend ?? 0}%{" "}
+              {(stats as any)?.trend_label ?? "vs periode sebelumnya"}
+            </div>
           </div>
         </div>
       </div>
@@ -281,17 +439,19 @@ export default function OrderPage() {
               <button
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
-                className={`relative flex shrink-0 items-center gap-1.5 px-4 pb-3 text-sm font-medium transition-colors ${activeTab === tab.key
-                  ? "text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-500"
-                  : "text-gray-500 hover:text-gray-700"
-                  }`}
+                className={`relative flex shrink-0 items-center gap-1.5 px-4 pb-3 text-sm font-medium transition-colors ${
+                  activeTab === tab.key
+                    ? "text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-500"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
               >
                 {tab.label}
                 <span
-                  className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold ${activeTab === tab.key
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 text-gray-500"
-                    }`}
+                  className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold ${
+                    activeTab === tab.key
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-gray-500"
+                  }`}
                 >
                   {tabCount(tab.key)}
                 </span>
@@ -332,64 +492,96 @@ export default function OrderPage() {
       {/* Tracking Modal */}
       {trackingModal.isOpen && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between p-5 border-b border-gray-100">
-                    <h3 className="font-semibold text-gray-900">Input Resi Pengiriman</h3>
-                    <button 
-                        onClick={() => setTrackingModal(prev => ({ ...prev, isOpen: false }))}
-                        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                        <X size={18} />
-                    </button>
-                </div>
-                <div className="p-5 flex flex-col gap-4">
-                    <p className="text-sm text-gray-500">
-                        Status pesanan <span className="font-semibold text-blue-600">#{trackingModal.orderNumber}</span> akan berubah menjadi <span className="font-semibold text-purple-600">SHIPPED</span>.
-                    </p>
-                    
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-medium text-gray-700">Kurir / Ekspedisi</label>
-                        <select 
-                            value={trackingModal.courier}
-                            onChange={e => setTrackingModal(prev => ({ ...prev, courier: e.target.value }))}
-                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                        >
-                            <option value="J&T">J&T Express</option>
-                            <option value="JNE">JNE</option>
-                            <option value="SICEPAT">Sicepat</option>
-                            <option value="ANTERAJA">AnterAja</option>
-                            <option value="GOSEND">GoSend</option>
-                            <option value="GRAB">Grab Express</option>
-                        </select>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-medium text-gray-700">Nomor Resi / AWB</label>
-                        <input 
-                            type="text"
-                            placeholder="Contoh: JP1234567890"
-                            value={trackingModal.trackingNumber}
-                            onChange={e => setTrackingModal(prev => ({ ...prev, trackingNumber: e.target.value }))}
-                            className="w-full p-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                        />
-                    </div>
-                </div>
-                <div className="p-5 border-t border-gray-100 flex gap-3 justify-end items-center bg-gray-50/50">
-                    <button 
-                        onClick={() => setTrackingModal(prev => ({ ...prev, isOpen: false }))}
-                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors"
-                    >
-                        Batal
-                    </button>
-                    <button 
-                        onClick={() => handleUpdateStatus(trackingModal.orderNumber, 'SHIPPED', trackingModal.courier, trackingModal.trackingNumber)}
-                        disabled={!trackingModal.trackingNumber.trim()}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                        Simpan & Kirim
-                    </button>
-                </div>
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-900">
+                Input Resi Pengiriman
+              </h3>
+              <button
+                onClick={() =>
+                  setTrackingModal((prev) => ({ ...prev, isOpen: false }))
+                }
+                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={18} />
+              </button>
             </div>
+            <div className="p-5 flex flex-col gap-4">
+              <p className="text-sm text-gray-500">
+                Status pesanan{" "}
+                <span className="font-semibold text-blue-600">
+                  #{trackingModal.orderNumber}
+                </span>{" "}
+                akan berubah menjadi{" "}
+                <span className="font-semibold text-purple-600">SHIPPED</span>.
+              </p>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  Kurir / Ekspedisi
+                </label>
+                <select
+                  value={trackingModal.courier}
+                  onChange={(e) =>
+                    setTrackingModal((prev) => ({
+                      ...prev,
+                      courier: e.target.value,
+                    }))
+                  }
+                  className="w-full p-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  <option value="J&T">J&T Express</option>
+                  <option value="JNE">JNE</option>
+                  <option value="SICEPAT">Sicepat</option>
+                  <option value="ANTERAJA">AnterAja</option>
+                  <option value="GOSEND">GoSend</option>
+                  <option value="GRAB">Grab Express</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  Nomor Resi / AWB
+                </label>
+                <input
+                  type="text"
+                  placeholder="Contoh: JP1234567890"
+                  value={trackingModal.trackingNumber}
+                  onChange={(e) =>
+                    setTrackingModal((prev) => ({
+                      ...prev,
+                      trackingNumber: e.target.value,
+                    }))
+                  }
+                  className="w-full p-2.5 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
+              </div>
+            </div>
+            <div className="p-5 border-t border-gray-100 flex gap-3 justify-end items-center bg-gray-50/50">
+              <button
+                onClick={() =>
+                  setTrackingModal((prev) => ({ ...prev, isOpen: false }))
+                }
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() =>
+                  handleUpdateStatus(
+                    trackingModal.orderNumber,
+                    "SHIPPED",
+                    trackingModal.courier,
+                    trackingModal.trackingNumber,
+                  )
+                }
+                disabled={!trackingModal.trackingNumber.trim()}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Simpan & Kirim
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

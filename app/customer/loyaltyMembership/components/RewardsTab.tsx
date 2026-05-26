@@ -1,7 +1,16 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Tag, Truck, Gift, Ticket, Zap, Loader2 } from "lucide-react";
+import {
+  Gift,
+  Ticket,
+  Zap,
+  Loader2,
+  Star,
+  CheckCircle2,
+  Truck,
+} from "lucide-react";
+import type { ClaimableReward } from "../page";
 
 export interface Reward {
   id: string;
@@ -58,6 +67,12 @@ interface Props {
   loading?: boolean;
   onRedeem?: (reward: Reward) => void;
   redeemingId?: string | null;
+  // Claimable tier rewards
+  claimable?: ClaimableReward[];
+  claimedHistory?: ClaimableReward[];
+  claimableLoading?: boolean;
+  onClaim?: (reward: ClaimableReward) => void;
+  claimingId?: string | null;
 }
 
 export default function RewardsTab({
@@ -66,6 +81,11 @@ export default function RewardsTab({
   loading,
   onRedeem,
   redeemingId,
+  claimable = [],
+  claimedHistory = [],
+  claimableLoading = false,
+  onClaim,
+  claimingId,
 }: Props) {
   if (loading) {
     return (
@@ -91,7 +111,107 @@ export default function RewardsTab({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* ── Section 1: Tier Claimable Rewards ── */}
+      {(claimable.length > 0 ||
+        claimedHistory.length > 0 ||
+        claimableLoading) && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Star size={15} className="text-amber-500" />
+            <h4 className="text-sm font-bold text-stone-800">
+              Tier Rewards — Siap Diklaim
+            </h4>
+            {claimable.length > 0 && (
+              <span className="text-[10px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded-full">
+                {claimable.length} baru
+              </span>
+            )}
+          </div>
+
+          {claimableLoading ? (
+            <div className="flex items-center gap-2 text-stone-400 py-2">
+              <Loader2 size={14} className="animate-spin" />
+              <span className="text-xs">Memuat...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Unclaimed */}
+              {claimable.map((cr) => {
+                const isClaiming = claimingId === cr.id;
+                return (
+                  <div
+                    key={cr.id}
+                    className="flex items-center gap-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl px-4 py-3.5"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                      {cr.type === "voucher_code" ? (
+                        <Ticket size={18} className="text-amber-600" />
+                      ) : (
+                        <Star size={18} className="text-amber-600" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-amber-900 leading-tight truncate">
+                        {cr.label}
+                      </p>
+                      <p className="text-xs text-amber-600 mt-0.5">
+                        {cr.type === "voucher_code"
+                          ? (cr.voucher_label ?? "Voucher Diskon")
+                          : `+${cr.points?.toLocaleString()} poin`}
+                        {" · "}
+                        {cr.tier_name} Tier
+                      </p>
+                    </div>
+                    <button
+                      disabled={isClaiming}
+                      onClick={() => onClaim?.(cr)}
+                      className="shrink-0 flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isClaiming ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <Gift size={12} />
+                      )}
+                      {isClaiming ? "Klaim..." : "Klaim"}
+                    </button>
+                  </div>
+                );
+              })}
+
+              {/* Already claimed */}
+              {claimedHistory.map((cr) => (
+                <div
+                  key={cr.id}
+                  className="flex items-center gap-3 bg-stone-50 border border-stone-200 rounded-xl px-4 py-3.5 opacity-70"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+                    <CheckCircle2 size={18} className="text-emerald-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-stone-600 leading-tight truncate">
+                      {cr.label}
+                    </p>
+                    <p className="text-xs text-stone-400 mt-0.5">
+                      {cr.type === "voucher_code"
+                        ? `Kode: ${cr.claimed_value}`
+                        : `+${cr.claimed_value} poin`}
+                      {cr.claimed_at && ` · ${cr.claimed_at}`}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg">
+                    ✓ Diklaim
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="border-t border-stone-100 pt-2" />
+        </div>
+      )}
+
+      {/* ── Section 2: Tukar Poin ── */}
       {/* Point balance reminder */}
       <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5">
         <Zap className="w-4 h-4 text-amber-500 shrink-0" />

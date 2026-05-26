@@ -26,11 +26,21 @@ const TAB_KEYS = [
   { key: "retail", label: "Retail Customers", roleFilter: "customer" },
 ] as const;
 
-export default function UserManagementClient() {
+interface UserManagementClientProps {
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export default function UserManagementClient({
+  dateFrom = "",
+  dateTo = "",
+}: UserManagementClientProps) {
   const searchParams = useSearchParams();
-  const initialRole = searchParams.get('role');
-  
-  const [activeTab, setActiveTab] = useState<string>(initialRole === 'b2b' ? 'b2b' : 'all');
+  const initialRole = searchParams.get("role");
+
+  const [activeTab, setActiveTab] = useState<string>(
+    initialRole === "b2b" ? "b2b" : "all",
+  );
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
@@ -47,9 +57,14 @@ export default function UserManagementClient() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const fetchStats = useCallback(async () => {
+    setStatsLoading(true);
     try {
-      const res = await api.get('/admin/users/stats');
-      if (res.data.status === 'success') {
+      const params: Record<string, string> = {};
+      if (dateFrom) params.date_from = dateFrom;
+      if (dateTo) params.date_to = dateTo;
+
+      const res = await api.get("/admin/users/stats", { params });
+      if (res.data.status === "success") {
         setStats(res.data.data);
       }
     } catch (error) {
@@ -57,20 +72,22 @@ export default function UserManagementClient() {
     } finally {
       setStatsLoading(false);
     }
-  }, []);
+  }, [dateFrom, dateTo]);
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
-      const currentTab = TAB_KEYS.find(t => t.key === activeTab);
-      const res = await api.get('/admin/users', {
-        params: {
-          page,
-          limit,
-          role: currentTab?.roleFilter || undefined,
-        }
-      });
-      if (res.data.status === 'success') {
+      const currentTab = TAB_KEYS.find((t) => t.key === activeTab);
+      const params: Record<string, any> = {
+        page,
+        limit,
+        role: currentTab?.roleFilter || undefined,
+      };
+      if (dateFrom) params.date_from = dateFrom;
+      if (dateTo) params.date_to = dateTo;
+
+      const res = await api.get("/admin/users", { params });
+      if (res.data.status === "success") {
         const fetchResponse = res.data.data;
         setUsers(fetchResponse.data || []);
         setTotalUsers(fetchResponse.total || 0);
@@ -80,7 +97,7 @@ export default function UserManagementClient() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, activeTab]);
+  }, [page, limit, activeTab, dateFrom, dateTo]);
 
   useEffect(() => {
     fetchStats();
@@ -94,8 +111,8 @@ export default function UserManagementClient() {
   const handleUserAction = async (userId: number, action: string) => {
     try {
       let payload: Record<string, string> = {};
-      if (action === 'approve') payload = { b2b_status: 'approved' };
-      else if (action === 'reject') payload = { b2b_status: 'rejected' };
+      if (action === "approve") payload = { b2b_status: "approved" };
+      else if (action === "reject") payload = { b2b_status: "rejected" };
 
       await api.put(`/admin/users/${userId}`, payload);
       // Refresh data
@@ -111,16 +128,19 @@ export default function UserManagementClient() {
   const getTabCount = (key: string): number => {
     if (!stats) return 0;
     switch (key) {
-      case "all": return stats.total_users;
-      case "b2b": return stats.b2b_partners + stats.pending_verifications;
-      case "retail": return stats.retail_customers;
-      default: return 0;
+      case "all":
+        return stats.total_users;
+      case "b2b":
+        return stats.b2b_partners + stats.pending_verifications;
+      case "retail":
+        return stats.retail_customers;
+      default:
+        return 0;
     }
   };
 
   return (
     <div className="space-y-6">
-
       {/* ── Stats Cards ── */}
       <UserManagementStats
         totalUsers={stats?.total_users ?? 0}
@@ -139,18 +159,23 @@ export default function UserManagementClient() {
         {TAB_KEYS.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => { setActiveTab(tab.key); setPage(1); }}
-            className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === tab.key
-              ? "text-blue-600"
-              : "text-slate-500 hover:text-slate-700"
-              }`}
+            onClick={() => {
+              setActiveTab(tab.key);
+              setPage(1);
+            }}
+            className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+              activeTab === tab.key
+                ? "text-blue-600"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
           >
             {tab.label}
             <span
-              className={`inline-flex items-center justify-center min-w-[22px] h-5 px-1.5 rounded-full text-xs font-bold transition-colors ${activeTab === tab.key
-                ? "bg-blue-100 text-blue-700"
-                : "bg-slate-100 text-slate-500"
-                }`}
+              className={`inline-flex items-center justify-center min-w-[22px] h-5 px-1.5 rounded-full text-xs font-bold transition-colors ${
+                activeTab === tab.key
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-slate-100 text-slate-500"
+              }`}
             >
               {getTabCount(tab.key).toLocaleString()}
             </span>
@@ -170,16 +195,25 @@ export default function UserManagementClient() {
         limit={limit}
         total={totalUsers}
         handlePageChange={(p) => setPage(p)}
-        handleLimitChange={(l) => { setLimit(l); setPage(1); }}
+        handleLimitChange={(l) => {
+          setLimit(l);
+          setPage(1);
+        }}
         onUserAction={handleUserAction}
-        onViewDetail={(userId: number) => { setSelectedUserId(userId); setIsDetailOpen(true); }}
+        onViewDetail={(userId: number) => {
+          setSelectedUserId(userId);
+          setIsDetailOpen(true);
+        }}
       />
 
       {/* User Detail Modal */}
       <UserDetailModal
         userId={selectedUserId}
         isOpen={isDetailOpen}
-        onClose={() => { setIsDetailOpen(false); setSelectedUserId(null); }}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setSelectedUserId(null);
+        }}
         onAction={(userId, action) => {
           handleUserAction(userId, action);
         }}
