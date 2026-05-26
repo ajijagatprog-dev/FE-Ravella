@@ -82,6 +82,8 @@ export function ReportingTable<T extends Record<string, unknown>>({
       setSortKey(key);
       setSortDir("asc");
     }
+    // Reset ke halaman 1 saat sorting berubah
+    if (handlePageChange) handlePageChange(1);
   };
 
   const sortedData = [...data].sort((a, b) => {
@@ -92,6 +94,9 @@ export function ReportingTable<T extends Record<string, unknown>>({
     const cmp = String(av) < String(bv) ? -1 : 1;
     return sortDir === "asc" ? cmp : -cmp;
   });
+
+  // Slice data sesuai halaman aktif (client-side pagination)
+  const pagedData = sortedData.slice((page - 1) * limit, page * limit);
 
   const startItem = total === 0 ? 0 : (page - 1) * limit + 1;
   const endItem = Math.min(page * limit, total);
@@ -164,7 +169,7 @@ export function ReportingTable<T extends Record<string, unknown>>({
                 </td>
               </tr>
             ) : (
-              sortedData.map((row, idx) => (
+              pagedData.map((row, idx) => (
                 <tr
                   key={idx}
                   className="hover:bg-gray-50 transition-colors duration-100"

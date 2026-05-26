@@ -12,6 +12,14 @@ interface Tier {
   min: number;
   max: number | null;
   perks: string[];
+  claimable_rewards?: {
+    id: string;
+    label: string;
+    type: "bonus_points" | "voucher_code";
+    points?: number;
+    voucher_id?: number;
+    one_time: boolean;
+  }[];
 }
 
 /* ─── Delete Confirm Toast ─────────────────────────────────────────────────── */
