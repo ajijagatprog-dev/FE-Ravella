@@ -3,21 +3,21 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
-    Star,
-    ArrowLeft,
-    ArrowRight,
-    ShoppingCart,
-    Heart,
-    Check,
-    Shield,
-    Zap,
-    Award,
-    TrendingUp,
-    Share2,
-    Package,
-    Play,
-    ChevronLeft,
-    ChevronRight,
+  Star,
+  ArrowLeft,
+  ArrowRight,
+  ShoppingCart,
+  Heart,
+  Check,
+  Shield,
+  Zap,
+  Award,
+  TrendingUp,
+  Share2,
+  Package,
+  Play,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Header from "../../../HomePage/components/Header";
 import Footer from "../../../HomePage/components/Footer";
@@ -26,838 +26,854 @@ import api from "@/lib/axios";
 import { useEffect, useState } from "react";
 import ProductReviewsSection from "./components/ProductReviewsSection";
 
-
 export default function ProductDetail() {
-    const { id } = useParams<{ id: string }>();
-    const productId = id; // use string id or slug
-    const [product, setProduct] = useState<any | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const { id } = useParams<{ id: string }>();
+  const productId = id; // use string id or slug
+  const [product, setProduct] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
-    useEffect(() => {
-        // Try to load from cache first
-        try {
-            const cached = sessionStorage.getItem(`ravelle_product_${productId}`);
-            if (cached) {
-                const { data, related, ts } = JSON.parse(cached);
-                if (Date.now() - ts < 5 * 60 * 1000) {
-                    setProduct(data);
-                    setRelatedProducts(related);
-                    setIsLoading(false);
-                    return;
-                }
-            }
-        } catch {}
-
-        const fetchProductDetail = async () => {
-            try {
-                setIsLoading(true);
-                const res = await api.get(`/products/${productId}`);
-                if (res.data.status === 'success') {
-                    const item = res.data.data;
-                    const activePromo = item.active_promotion;
-                    const mappedProduct = {
-                        id: item.id,
-                        name: item.name,
-                        description: item.description || "Deskripsi produk",
-                        price: item.promoted_price || item.price,
-                        originalPrice: item.price,
-                        discount: activePromo ? (activePromo.discount_type === 'percent' ? activePromo.discount_value : Math.round((item.price - item.promoted_price) / item.price * 100)) : (item.discount || 0),
-                        active_promotion: activePromo,
-                        rating: item.calculated_rating || 0,
-                        reviews: item.total_reviews_count || 0,
-                        distribution: item.rating_distribution || {},
-                        category: item.category || "appliance",
-                        image: item.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
-                        videoUrl: item.video_url || null,
-                        features: Array.isArray(item.features) ? item.features : [],
-                        specifications: typeof item.specifications === 'object' && item.specifications !== null ? item.specifications : {},
-                        inStock: item.stock > 0,
-                        stock: item.stock || 0,
-                        badge: item.badge || (item.is_featured ? "Best Seller" : ""),
-                        media: (item.media || []).filter((m: any) => !m.variant_id),
-                        variants: item.variants || [],
-                    };
-
-                    setProduct(mappedProduct);
-
-                    // Fetch related products from same category
-                    let relMapped: any[] = [];
-                    try {
-                        const relRes = await api.get('/products', { params: { limit: 10, category: item.category || undefined } });
-                        if (relRes.data.status === 'success') {
-                            relMapped = relRes.data.data.data
-                                .filter((r: any) => r.id !== item.id) // Exclude current product
-                                .slice(0, 4) // Show only 4
-                                .map((r: any) => ({
-                                    id: r.id,
-                                    name: r.name,
-                                    rating: r.calculated_rating || 0,
-                                    reviews: r.total_reviews_count || 0,
-                                    originalPrice: r.price,
-                                    price: r.promoted_price || r.price,
-                                    discount: r.active_promotion ? (r.active_promotion.discount_type === 'percent' ? r.active_promotion.discount_value : Math.round((r.price - r.promoted_price) / r.price * 100)) : (r.discount || 0),
-                                    active_promotion: r.active_promotion,
-                                    badge: r.badge || (r.is_featured ? "Best Seller" : ""),
-                                    image: r.image || "https://images.unsplash.com/photo-1558317374-067fb5f30001",
-                                }));
-                            setRelatedProducts(relMapped);
-                        }
-                    } catch (e) {
-                        console.error("Failed to fetch related products", e);
-                    }
-
-                    // Save to cache
-                    try {
-                        sessionStorage.setItem(`ravelle_product_${productId}`, JSON.stringify({
-                            data: mappedProduct,
-                            related: relMapped,
-                            ts: Date.now()
-                        }));
-                    } catch {}
-                }
-            } catch (e) {
-                console.error("Failed to fetch product detail", e);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchProductDetail();
-    }, [productId]);
-
-    const [isFavorite, setIsFavorite] = useState(false);
-    const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-    const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
-    const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
-        { visible: false, productName: "" }
-    );
-
-    // Auto-select default variant on product load
-    useEffect(() => {
-        if (product && product.variants && product.variants.length > 0) {
-            const defaultVariant = product.variants.find((v: any) => v.is_default);
-            setSelectedVariantId(defaultVariant ? defaultVariant.id : product.variants[0].id);
+  useEffect(() => {
+    // Try to load from cache first
+    try {
+      const cached = sessionStorage.getItem(`ravelle_product_${productId}`);
+      if (cached) {
+        const { data, related, ts } = JSON.parse(cached);
+        if (Date.now() - ts < 5 * 60 * 1000) {
+          setProduct(data);
+          setRelatedProducts(related);
+          setIsLoading(false);
+          return;
         }
-    }, [product]);
+      }
+    } catch {}
 
-    // Get selected variant data
-    const selectedVariant = product?.variants?.find((v: any) => v.id === selectedVariantId) || null;
+    const fetchProductDetail = async () => {
+      try {
+        setIsLoading(true);
+        const res = await api.get(`/products/${productId}`);
+        if (res.data.status === "success") {
+          const item = res.data.data;
+          const activePromo = item.active_promotion;
+          const mappedProduct = {
+            id: item.id,
+            name: item.name,
+            description: item.description || "Deskripsi produk",
+            price: item.promoted_price || item.price,
+            originalPrice: item.price,
+            discount: activePromo
+              ? activePromo.discount_type === "percent"
+                ? activePromo.discount_value
+                : Math.round(
+                    ((item.price - item.promoted_price) / item.price) * 100,
+                  )
+              : item.discount || 0,
+            active_promotion: activePromo,
+            rating: item.calculated_rating || 0,
+            reviews: item.total_reviews_count || 0,
+            distribution: item.rating_distribution || {},
+            category: item.category || "appliance",
+            image:
+              item.image ||
+              "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+            videoUrl: item.video_url || null,
+            features: Array.isArray(item.features) ? item.features : [],
+            specifications:
+              typeof item.specifications === "object" &&
+              item.specifications !== null
+                ? item.specifications
+                : {},
+            inStock: item.stock > 0,
+            stock: item.stock || 0,
+            badge: item.badge || (item.is_featured ? "Best Seller" : ""),
+            media: (item.media || []).filter((m: any) => !m.variant_id),
+            variants: item.variants || [],
+          };
 
-    // Compute active price/stock based on variant selection
-    // Apply promotion discount to variant price if applicable
-    const computeActivePrice = () => {
-        const basePrice = selectedVariant?.price ?? product?.originalPrice ?? 0;
-        const promo = product?.active_promotion;
-        if (!promo) return basePrice;
-        if (promo.discount_type === 'percent') {
-            return Math.round(basePrice - (basePrice * promo.discount_value / 100));
-        }
-        if (promo.discount_type === 'fixed') {
-            return Math.max(0, basePrice - promo.discount_value);
-        }
-        return basePrice;
-    };
-    const activePrice = computeActivePrice();
-    const activeStock = selectedVariant ? selectedVariant.stock : (product?.stock ?? 0);
-    const activeInStock = activeStock > 0;
-    // Original price (before discount) — variant-aware
-    const activeOriginalPrice = selectedVariant?.price ?? product?.originalPrice ?? 0;
+          setProduct(mappedProduct);
 
-    // Build gallery items: variant images + main videos (always shown)
-    const galleryItems = (() => {
-        if (!product) return [];
-        const items: { type: 'image' | 'video'; url: string }[] = [];
-
-        // Collect main videos and secondary images (lifestyle/specs/branding)
-        const mainVideos: { type: 'image' | 'video'; url: string }[] = [];
-        const secondaryMainImages: { type: 'image' | 'video'; url: string }[] = [];
-
-        if (product.media && product.media.length > 0) {
-            product.media.forEach((m: any) => {
-                if (m.type === 'video') {
-                    mainVideos.push({ type: 'video', url: m.url });
-                } else if (m.type === 'image' && !m.is_primary) {
-                    // Secondary images (lifestyle/spec charts/logos)
-                    secondaryMainImages.push({ type: 'image', url: m.url });
-                }
+          // Fetch related products from same category
+          let relMapped: any[] = [];
+          try {
+            const relRes = await api.get("/products", {
+              params: { limit: 10, category: item.category || undefined },
             });
-        }
-
-        // If a variant is selected, mix: Variant Media + Main Videos + Secondary Main Images
-        if (selectedVariant && selectedVariant.media && selectedVariant.media.length > 0) {
-            // First: Specific Variant Media
-            selectedVariant.media.forEach((m: any) => {
-                items.push({ type: m.type || 'image', url: m.url });
-            });
-            // Second: Demo Videos
-            items.push(...mainVideos);
-            // Third: Contextual/Lifestyle info from main media
-            items.push(...secondaryMainImages);
-            return items;
-        }
-
-        // Otherwise show all main product media (images + videos)
-        if (product.media && product.media.length > 0) {
-            product.media.forEach((m: any) => {
-                items.push({ type: m.type, url: m.url });
-            });
-        } else {
-            if (product.image) items.push({ type: 'image', url: product.image });
-            if (product.videoUrl) {
-                let embedUrl = product.videoUrl;
-                const ytMatch = product.videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+/);
-                if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
-                items.push({ type: 'video', url: embedUrl });
+            if (relRes.data.status === "success") {
+              relMapped = relRes.data.data.data
+                .filter((r: any) => r.id !== item.id) // Exclude current product
+                .slice(0, 4) // Show only 4
+                .map((r: any) => ({
+                  id: r.id,
+                  name: r.name,
+                  rating: r.calculated_rating || 0,
+                  reviews: r.total_reviews_count || 0,
+                  originalPrice: r.price,
+                  price: r.promoted_price || r.price,
+                  discount: r.active_promotion
+                    ? r.active_promotion.discount_type === "percent"
+                      ? r.active_promotion.discount_value
+                      : Math.round(
+                          ((r.price - r.promoted_price) / r.price) * 100,
+                        )
+                    : r.discount || 0,
+                  active_promotion: r.active_promotion,
+                  badge: r.badge || (r.is_featured ? "Best Seller" : ""),
+                  image:
+                    r.image ||
+                    "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+                }));
+              setRelatedProducts(relMapped);
             }
+          } catch (e) {
+            console.error("Failed to fetch related products", e);
+          }
+
+          // Save to cache
+          try {
+            sessionStorage.setItem(
+              `ravelle_product_${productId}`,
+              JSON.stringify({
+                data: mappedProduct,
+                related: relMapped,
+                ts: Date.now(),
+              }),
+            );
+          } catch {}
         }
-        return items;
-    })();
-
-    // Reset active media index when variant changes
-    useEffect(() => {
-        setActiveMediaIndex(0);
-    }, [selectedVariantId]);
-
-    const formatPrice = (price: number) =>
-        new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-        }).format(price);
-
-    const handleAddToCart = (p: Product) => {
-        try {
-            const stored = localStorage.getItem("ravelle_cart");
-            let cart: any[] = [];
-            try {
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    cart = Array.isArray(parsed) ? parsed : [];
-                }
-            } catch (e) {
-                cart = [];
-            }
-
-            const exists = cart.find((item) => item.id === p.id);
-            if (exists) {
-                cart = cart.map((item) =>
-                    item.id === p.id
-                        ? { ...item, quantity: (item.quantity || 0) + 1 }
-                        : item
-                );
-            } else {
-                cart = [
-                    ...cart,
-                    {
-                        id: p.id,
-                        name: p.name,
-                        price: p.price,
-                        originalPrice: p.originalPrice,
-                        image: p.image,
-                        badge: p.badge,
-                        discount: p.discount,
-                        category: p.category,
-                        quantity: 1,
-                        selected: true,
-                    },
-                ];
-            }
-            localStorage.setItem("ravelle_cart", JSON.stringify(cart));
-            window.dispatchEvent(new Event("ravelle_cart_updated"));
-            setToast({ visible: true, productName: p.name });
-            setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
-        } catch (error) {
-            console.error("Cart action failed:", error);
-        }
+      } catch (e) {
+        console.error("Failed to fetch product detail", e);
+      } finally {
+        setIsLoading(false);
+      }
     };
+    fetchProductDetail();
+  }, [productId]);
 
-    const badgeStyle: Record<string, string> = {
-        "Best Seller": "bg-neutral-900 text-white",
-        Best: "bg-[#352309] text-white",
-        "Hot Sales": "bg-red-600 text-white",
-        Premium: "bg-neutral-700 text-white",
-        Popular: "bg-neutral-100 text-neutral-700 border border-neutral-200",
-        New: "bg-white text-neutral-900 border border-neutral-200",
-    };
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
+    null,
+  );
+  const [toast, setToast] = useState<{ visible: boolean; productName: string }>(
+    { visible: false, productName: "" },
+  );
 
-    /* Loading state */
-    if (isLoading) {
-        return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-800 rounded-full animate-spin"></div></div>;
+  // Auto-select default variant on product load
+  useEffect(() => {
+    if (product && product.variants && product.variants.length > 0) {
+      const defaultVariant = product.variants.find((v: any) => v.is_default);
+      setSelectedVariantId(
+        defaultVariant ? defaultVariant.id : product.variants[0].id,
+      );
+    }
+  }, [product]);
+
+  // Get selected variant data
+  const selectedVariant =
+    product?.variants?.find((v: any) => v.id === selectedVariantId) || null;
+
+  // Compute active price/stock based on variant selection
+  // Apply promotion discount to variant price if applicable
+  const computeActivePrice = () => {
+    const basePrice = selectedVariant?.price ?? product?.originalPrice ?? 0;
+    const promo = product?.active_promotion;
+    if (!promo) return basePrice;
+    if (promo.discount_type === "percent") {
+      return Math.round(basePrice - (basePrice * promo.discount_value) / 100);
+    }
+    if (promo.discount_type === "fixed") {
+      return Math.max(0, basePrice - promo.discount_value);
+    }
+    return basePrice;
+  };
+  const activePrice = computeActivePrice();
+  const activeStock = selectedVariant
+    ? selectedVariant.stock
+    : (product?.stock ?? 0);
+  const activeInStock = activeStock > 0;
+  // Original price (before discount) — variant-aware
+  const activeOriginalPrice =
+    selectedVariant?.price ?? product?.originalPrice ?? 0;
+
+  // Build gallery items: variant images + main videos (always shown)
+  const galleryItems = (() => {
+    if (!product) return [];
+    const items: { type: "image" | "video"; url: string }[] = [];
+
+    // Collect main videos and secondary images (lifestyle/specs/branding)
+    const mainVideos: { type: "image" | "video"; url: string }[] = [];
+    const secondaryMainImages: { type: "image" | "video"; url: string }[] = [];
+
+    if (product.media && product.media.length > 0) {
+      product.media.forEach((m: any) => {
+        if (m.type === "video") {
+          mainVideos.push({ type: "video", url: m.url });
+        } else if (m.type === "image" && !m.is_primary) {
+          // Secondary images (lifestyle/spec charts/logos)
+          secondaryMainImages.push({ type: "image", url: m.url });
+        }
+      });
     }
 
-    /* 404 */
-    if (!product) {
-        return (
-            <div className="min-h-screen bg-white" >
-                <Header />
-                <div className="flex flex-col items-center justify-center py-32 px-6">
-                    <Package className="w-12 h-12 text-neutral-300 mb-6" />
-                    <h1
-                        className="text-5xl sm:text-6xl font-light text-neutral-900 mb-4"
-                        
-                    >
-                        Produk Tidak Ditemukan
-                    </h1>
-                    <div className="w-10 h-[1px] bg-neutral-300 mb-6" />
-                    <p
-                        className="text-neutral-500 text-sm font-light mb-10 text-center max-w-md"
-                        
-                    >
-                        Maaf, produk yang Anda cari tidak tersedia atau telah dihapus.
-                    </p>
-                    <Link
-                        href="/product"
-                        className="inline-flex items-center gap-2 px-8 py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-900 hover:text-white transition-colors"
-                        
-                    >
-                        <ArrowLeft className="w-3.5 h-3.5" />
-                        Kembali ke Produk
-                    </Link>
-                </div>
-                <Footer />
-            </div>
+    // If a variant is selected, mix: Variant Media + Main Videos + Secondary Main Images
+    if (
+      selectedVariant &&
+      selectedVariant.media &&
+      selectedVariant.media.length > 0
+    ) {
+      // First: Specific Variant Media
+      selectedVariant.media.forEach((m: any) => {
+        items.push({ type: m.type || "image", url: m.url });
+      });
+      // Second: Demo Videos
+      items.push(...mainVideos);
+      // Third: Contextual/Lifestyle info from main media
+      items.push(...secondaryMainImages);
+      return items;
+    }
+
+    // Otherwise show all main product media (images + videos)
+    if (product.media && product.media.length > 0) {
+      product.media.forEach((m: any) => {
+        items.push({ type: m.type, url: m.url });
+      });
+    } else {
+      if (product.image) items.push({ type: "image", url: product.image });
+      if (product.videoUrl) {
+        let embedUrl = product.videoUrl;
+        const ytMatch = product.videoUrl.match(
+          /(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+/,
         );
+        if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+        items.push({ type: "video", url: embedUrl });
+      }
     }
+    return items;
+  })();
 
+  // Reset active media index when variant changes
+  useEffect(() => {
+    setActiveMediaIndex(0);
+  }, [selectedVariantId]);
+
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
+
+  const handleAddToCart = (p: Product) => {
+    try {
+      const stored = localStorage.getItem("ravelle_cart");
+      let cart: any[] = [];
+      try {
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          cart = Array.isArray(parsed) ? parsed : [];
+        }
+      } catch (e) {
+        cart = [];
+      }
+
+      const exists = cart.find((item) => item.id === p.id);
+      if (exists) {
+        cart = cart.map((item) =>
+          item.id === p.id
+            ? { ...item, quantity: (item.quantity || 0) + 1 }
+            : item,
+        );
+      } else {
+        cart = [
+          ...cart,
+          {
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            originalPrice: p.originalPrice,
+            image: p.image,
+            badge: p.badge,
+            discount: p.discount,
+            category: p.category,
+            quantity: 1,
+            selected: true,
+          },
+        ];
+      }
+      localStorage.setItem("ravelle_cart", JSON.stringify(cart));
+      window.dispatchEvent(new Event("ravelle_cart_updated"));
+      setToast({ visible: true, productName: p.name });
+      setTimeout(() => setToast({ visible: false, productName: "" }), 2500);
+    } catch (error) {
+      console.error("Cart action failed:", error);
+    }
+  };
+
+  const badgeStyle: Record<string, string> = {
+    "Best Seller": "bg-neutral-900 text-white",
+    Best: "bg-[#352309] text-white",
+    "Hot Sales": "bg-red-600 text-white",
+    Premium: "bg-neutral-700 text-white",
+    Popular: "bg-neutral-100 text-neutral-700 border border-neutral-200",
+    New: "bg-white text-neutral-900 border border-neutral-200",
+  };
+
+  /* Loading state */
+  if (isLoading) {
     return (
-        <div className="min-h-screen bg-white" >
-            <Header />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
-            {/* Toast */}
-            <div
-                className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${toast.visible
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 -translate-y-4 pointer-events-none"
+  /* 404 */
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <div className="flex flex-col items-center justify-center py-32 px-6">
+          <Package className="w-12 h-12 text-neutral-300 mb-6" />
+          <h1 className="text-5xl sm:text-6xl font-light text-neutral-900 mb-4">
+            Produk Tidak Ditemukan
+          </h1>
+          <div className="w-10 h-[1px] bg-neutral-300 mb-6" />
+          <p className="text-neutral-500 text-sm font-light mb-10 text-center max-w-md">
+            Maaf, produk yang Anda cari tidak tersedia atau telah dihapus.
+          </p>
+          <Link
+            href="/product"
+            className="inline-flex items-center gap-2 px-8 py-3 border border-neutral-800 text-neutral-900 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-900 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Kembali ke Produk
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      <Header />
+
+      {/* Toast */}
+      <div
+        className={`fixed top-6 right-6 z-[100] transition-all duration-500 ${
+          toast.visible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-4 pointer-events-none"
+        }`}
+      >
+        <div className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm">
+          <ShoppingCart className="w-4 h-4 text-neutral-600 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-neutral-900 text-sm">
+              Ditambahkan ke Keranjang
+            </p>
+            <p className="text-xs text-neutral-400 truncate mt-0.5">
+              {toast.productName}
+            </p>
+          </div>
+          <Check className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+        </div>
+      </div>
+
+      {/* ── BREADCRUMB ── */}
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 pt-6">
+        <Link
+          href="/product"
+          className="inline-flex items-center gap-2 text-neutral-400 text-[11px] tracking-[0.15em] uppercase font-medium hover:text-neutral-900 transition-colors group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+          Kembali ke Produk
+        </Link>
+      </div>
+
+      {/* ── PRODUCT DETAIL ── */}
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 py-8 sm:py-12">
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-14">
+          {/* Gallery */}
+          <div>
+            {/* Main Display */}
+            <div className="relative aspect-square bg-neutral-50 overflow-hidden">
+              {galleryItems.length > 0 &&
+              galleryItems[activeMediaIndex]?.type === "video" ? (
+                (() => {
+                  const videoUrl = galleryItems[activeMediaIndex].url;
+                  // Check if it's a YouTube embed or uploaded video file
+                  const isYouTube =
+                    videoUrl.includes("youtube.com") ||
+                    videoUrl.includes("youtu.be");
+                  let embedUrl = videoUrl;
+                  if (isYouTube) {
+                    const ytMatch = videoUrl.match(
+                      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/,
+                    );
+                    if (ytMatch)
+                      embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+                  }
+                  return isYouTube ? (
+                    <iframe
+                      src={embedUrl}
+                      title={`Video ${product.name}`}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <div className="w-full h-full relative bg-neutral-100">
+                      <video
+                        src={videoUrl}
+                        controls
+                        muted
+                        playsInline
+                        preload="metadata"
+                        className="w-full h-full object-contain"
+                        onLoadedData={(e) => {
+                          const vid = e.target as HTMLVideoElement;
+                          vid.currentTime = 1;
+                        }}
+                      />
+                    </div>
+                  );
+                })()
+              ) : (
+                <img
+                  src={galleryItems[activeMediaIndex]?.url || product.image}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              )}
+              {/* Badges */}
+              <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
+                {product.badge && (
+                  <span className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-bold border border-neutral-200 shadow-sm">
+                    {product.badge}
+                  </span>
+                )}
+                {product.active_promotion?.type === "flash_sale" && (
+                  <span className="px-2.5 py-1 bg-amber-500 text-white text-[10px] tracking-[0.12em] uppercase font-bold shadow-sm flex items-center gap-1">
+                    <Zap className="w-3 h-3 fill-white" /> Flash Sale
+                  </span>
+                )}
+                {product.discount > 0 && (
+                  <span className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase font-medium">
+                    -{Math.round(product.discount)}%
+                  </span>
+                )}
+              </div>
+              {/* Navigation Arrows */}
+              {galleryItems.length > 1 && (
+                <>
+                  <button
+                    onClick={() =>
+                      setActiveMediaIndex((i) =>
+                        i > 0 ? i - 1 : galleryItems.length - 1,
+                      )
+                    }
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-neutral-700" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setActiveMediaIndex((i) =>
+                        i < galleryItems.length - 1 ? i + 1 : 0,
+                      )
+                    }
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10"
+                  >
+                    <ChevronRight className="w-4 h-4 text-neutral-700" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnail Strip */}
+            {galleryItems.length > 1 && (
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                {galleryItems.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveMediaIndex(idx)}
+                    className={`relative flex-shrink-0 w-16 h-16 overflow-hidden border-2 transition-all ${
+                      idx === activeMediaIndex
+                        ? "border-neutral-900"
+                        : "border-neutral-200 hover:border-neutral-400"
                     }`}
+                  >
+                    {item.type === "image" ? (
+                      <img
+                        src={item.url}
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-neutral-100 relative">
+                        <video
+                          src={item.url}
+                          muted
+                          playsInline
+                          preload="metadata"
+                          className="w-full h-full object-cover"
+                          onLoadedData={(e) => {
+                            const vid = e.target as HTMLVideoElement;
+                            vid.currentTime = 1;
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <Play className="w-4 h-4 text-white drop-shadow-lg fill-white/80" />
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Details */}
+          <div className="flex flex-col">
+            {/* Badge */}
+            <span
+              className={`inline-block self-start px-3 py-1 text-[10px] tracking-[0.15em] uppercase font-medium mb-4 ${
+                badgeStyle[product.badge] || badgeStyle["Popular"]
+              }`}
             >
-                <div
-                    className="flex items-center gap-3 bg-white border border-neutral-200 shadow-xl px-5 py-4 min-w-[280px] max-w-sm"
-                    
-                >
-                    <ShoppingCart className="w-4 h-4 text-neutral-600 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                        <p className="font-medium text-neutral-900 text-sm">
-                            Ditambahkan ke Keranjang
-                        </p>
-                        <p className="text-xs text-neutral-400 truncate mt-0.5">
-                            {toast.productName}
-                        </p>
-                    </div>
-                    <Check className="w-4 h-4 text-neutral-500 flex-shrink-0" />
-                </div>
+              {product.badge}
+            </span>
+
+            {/* Rating */}
+            <div className="flex items-center gap-1.5 mb-3">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-4 h-4 ${
+                    i < Math.floor(product.rating)
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-neutral-200"
+                  }`}
+                />
+              ))}
+              <span className="text-xs text-neutral-500 ml-1">
+                {product.rating} ({product.reviews} reviews)
+              </span>
             </div>
 
-            {/* ── BREADCRUMB ── */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 pt-6">
-                <Link
-                    href="/product"
-                    className="inline-flex items-center gap-2 text-neutral-400 text-[11px] tracking-[0.15em] uppercase font-medium hover:text-neutral-900 transition-colors group"
-                    
-                >
-                    <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-                    Kembali ke Produk
-                </Link>
+            {/* Name */}
+            <h1 className="text-3xl sm:text-4xl font-light text-neutral-900 mb-3 leading-tight">
+              {product.name}
+            </h1>
+
+            <div className="w-8 h-[1px] bg-neutral-200 mb-5" />
+
+            {/* Description */}
+            <p className="text-neutral-500 text-sm font-light leading-relaxed mb-6 whitespace-pre-line">
+              {product.description}
+            </p>
+
+            {/* Price */}
+            <div className="border border-neutral-100 bg-neutral-50 p-5 mb-6">
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl sm:text-3xl font-medium text-neutral-900">
+                  {formatPrice(activePrice)}
+                </span>
+                {activeOriginalPrice > activePrice && (
+                  <span className="text-sm text-neutral-400 line-through">
+                    {formatPrice(activeOriginalPrice)}
+                  </span>
+                )}
+              </div>
+              {activeOriginalPrice > activePrice && (
+                <p className="text-[11px] text-neutral-500 mt-1.5 tracking-wide">
+                  Hemat {formatPrice(activeOriginalPrice - activePrice)}
+                </p>
+              )}
             </div>
 
-            {/* ── PRODUCT DETAIL ── */}
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 py-8 sm:py-12">
-                <div className="grid md:grid-cols-2 gap-8 lg:gap-14">
-                    {/* Gallery */}
-                    <div>
-                        {/* Main Display */}
-                        <div className="relative aspect-square bg-neutral-50 overflow-hidden">
-                            {galleryItems.length > 0 && galleryItems[activeMediaIndex]?.type === 'video' ? (
-                                (() => {
-                                    const videoUrl = galleryItems[activeMediaIndex].url;
-                                    // Check if it's a YouTube embed or uploaded video file
-                                    const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
-                                    let embedUrl = videoUrl;
-                                    if (isYouTube) {
-                                        const ytMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-                                        if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
-                                    }
-                                    return isYouTube ? (
-                                        <iframe
-                                            src={embedUrl}
-                                            title={`Video ${product.name}`}
-                                            className="w-full h-full"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full relative bg-neutral-100">
-                                            <video
-                                                src={videoUrl}
-                                                controls
-                                                muted
-                                                playsInline
-                                                preload="metadata"
-                                                className="w-full h-full object-contain"
-                                                onLoadedData={(e) => {
-                                                    const vid = e.target as HTMLVideoElement;
-                                                    vid.currentTime = 1;
-                                                }}
-                                            />
-                                        </div>
-                                    );
-                                })()
-                            ) : (
-                                <img
-                                    src={galleryItems[activeMediaIndex]?.url || product.image}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            )}
-                            {/* Badges */}
-                            <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
-                                {product.badge && (
-                                    <span
-                                        className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] tracking-[0.12em] uppercase font-bold border border-neutral-200 shadow-sm"
-                                        
-                                    >
-                                        {product.badge}
-                                    </span>
-                                )}
-                                {product.active_promotion?.type === 'flash_sale' && (
-                                    <span
-                                        className="px-2.5 py-1 bg-amber-500 text-white text-[10px] tracking-[0.12em] uppercase font-bold shadow-sm flex items-center gap-1"
-                                        
-                                    >
-                                        <Zap className="w-3 h-3 fill-white" /> Flash Sale
-                                    </span>
-                                )}
-                                {product.discount > 0 && (
-                                    <span
-                                        className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] tracking-[0.12em] uppercase font-medium"
-                                        
-                                    >
-                                        -{Math.round(product.discount)}%
-                                    </span>
-                                )}
-                            </div>
-                            {/* Navigation Arrows */}
-                            {galleryItems.length > 1 && (
-                                <>
-                                    <button
-                                        onClick={() => setActiveMediaIndex(i => i > 0 ? i - 1 : galleryItems.length - 1)}
-                                        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10"
-                                    >
-                                        <ChevronLeft className="w-4 h-4 text-neutral-700" />
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveMediaIndex(i => i < galleryItems.length - 1 ? i + 1 : 0)}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10"
-                                    >
-                                        <ChevronRight className="w-4 h-4 text-neutral-700" />
-                                    </button>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Thumbnail Strip */}
-                        {galleryItems.length > 1 && (
-                            <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-                                {galleryItems.map((item, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setActiveMediaIndex(idx)}
-                                        className={`relative flex-shrink-0 w-16 h-16 overflow-hidden border-2 transition-all ${
-                                            idx === activeMediaIndex
-                                                ? 'border-neutral-900'
-                                                : 'border-neutral-200 hover:border-neutral-400'
-                                        }`}
-                                    >
-                                        {item.type === 'image' ? (
-                                            <img src={item.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="w-full h-full bg-neutral-100 relative">
-                                                <video
-                                                    src={item.url}
-                                                    muted
-                                                    playsInline
-                                                    preload="metadata"
-                                                    className="w-full h-full object-cover"
-                                                    onLoadedData={(e) => {
-                                                        const vid = e.target as HTMLVideoElement;
-                                                        vid.currentTime = 1;
-                                                    }}
-                                                />
-                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                                    <Play className="w-4 h-4 text-white drop-shadow-lg fill-white/80" />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
+            {/* ── Variant Selector ── */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="mb-6">
+                <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3">
+                  {product.variants[0]?.variant_type || "Varian"}
+                  {selectedVariant && (
+                    <span className="text-neutral-900 font-semibold ml-2 normal-case tracking-normal text-xs">
+                      — {selectedVariant.variant_value}
+                    </span>
+                  )}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.variants.map((v: any) => {
+                    const variantThumb = v.media?.[0]?.url;
+                    const isSelected = selectedVariantId === v.id;
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => setSelectedVariantId(v.id)}
+                        className={`relative flex items-center gap-2.5 px-3 py-2 border-2 transition-all ${
+                          isSelected
+                            ? "border-neutral-900 bg-neutral-50"
+                            : "border-neutral-200 hover:border-neutral-400 bg-white"
+                        }`}
+                      >
+                        {variantThumb && (
+                          <img
+                            src={variantThumb}
+                            alt={v.variant_value}
+                            className="w-8 h-8 object-cover rounded-sm"
+                          />
                         )}
-                    </div>
-
-                    {/* Details */}
-                    <div className="flex flex-col">
-                        {/* Badge */}
                         <span
-                            className={`inline-block self-start px-3 py-1 text-[10px] tracking-[0.15em] uppercase font-medium mb-4 ${badgeStyle[product.badge] || badgeStyle["Popular"]
-                                }`}
-                            
+                          className={`text-xs font-medium ${
+                            isSelected ? "text-neutral-900" : "text-neutral-500"
+                          }`}
                         >
-                            {product.badge}
+                          {v.variant_value}
                         </span>
-
-                        {/* Rating */}
-                        <div className="flex items-center gap-1.5 mb-3">
-                            {[...Array(5)].map((_, i) => (
-                                <Star
-                                    key={i}
-                                    className={`w-4 h-4 ${i < Math.floor(product.rating)
-                                        ? "fill-yellow-400 text-yellow-400"
-                                        : "text-neutral-200"
-                                        }`}
-                                />
-                            ))}
-                            <span
-                                className="text-xs text-neutral-500 ml-1"
-                                
-                            >
-                                {product.rating} ({product.reviews} reviews)
-                            </span>
-                        </div>
-
-                        {/* Name */}
-                        <h1
-                            className="text-3xl sm:text-4xl font-light text-neutral-900 mb-3 leading-tight"
-                            
-                        >
-                            {product.name}
-                        </h1>
-
-                        <div className="w-8 h-[1px] bg-neutral-200 mb-5" />
-
-                        {/* Description */}
-                        <p
-                            className="text-neutral-500 text-sm font-light leading-relaxed mb-6 whitespace-pre-line"
-                            
-                        >
-                            {product.description}
-                        </p>
-
-                        {/* Price */}
-                        <div className="border border-neutral-100 bg-neutral-50 p-5 mb-6">
-                            <div className="flex items-baseline gap-3">
-                                <span
-                                    className="text-2xl sm:text-3xl font-medium text-neutral-900"
-                                    
-                                >
-                                    {formatPrice(activePrice)}
-                                </span>
-                                {activeOriginalPrice > activePrice && (
-                                    <span
-                                        className="text-sm text-neutral-400 line-through"
-                                        
-                                    >
-                                        {formatPrice(activeOriginalPrice)}
-                                    </span>
-                                )}
-                            </div>
-                            {activeOriginalPrice > activePrice && (
-                                <p
-                                    className="text-[11px] text-neutral-500 mt-1.5 tracking-wide"
-                                    
-                                >
-                                    Hemat {formatPrice(activeOriginalPrice - activePrice)}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* ── Variant Selector ── */}
-                        {product.variants && product.variants.length > 0 && (
-                            <div className="mb-6">
-                                <p
-                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
-                                    
-                                >
-                                    {product.variants[0]?.variant_type || 'Varian'}
-                                    {selectedVariant && (
-                                        <span className="text-neutral-900 font-semibold ml-2 normal-case tracking-normal text-xs">
-                                            — {selectedVariant.variant_value}
-                                        </span>
-                                    )}
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                    {product.variants.map((v: any) => {
-                                        const variantThumb = v.media?.[0]?.url;
-                                        const isSelected = selectedVariantId === v.id;
-                                        return (
-                                            <button
-                                                key={v.id}
-                                                onClick={() => setSelectedVariantId(v.id)}
-                                                className={`relative flex items-center gap-2.5 px-3 py-2 border-2 transition-all ${
-                                                    isSelected
-                                                        ? 'border-neutral-900 bg-neutral-50'
-                                                        : 'border-neutral-200 hover:border-neutral-400 bg-white'
-                                                }`}
-                                                
-                                            >
-                                                {variantThumb && (
-                                                    <img
-                                                        src={variantThumb}
-                                                        alt={v.variant_value}
-                                                        className="w-8 h-8 object-cover rounded-sm"
-                                                    />
-                                                )}
-                                                <span className={`text-xs font-medium ${
-                                                    isSelected ? 'text-neutral-900' : 'text-neutral-500'
-                                                }`}>
-                                                    {v.variant_value}
-                                                </span>
-                                                {v.stock <= 0 && (
-                                                    <span className="text-[9px] text-red-400 font-medium">Habis</span>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
+                        {v.stock <= 0 && (
+                          <span className="text-[9px] text-red-400 font-medium">
+                            Habis
+                          </span>
                         )}
-
-                        {/* Features */}
-                        {product.features && product.features.length > 0 && (
-                            <div className="mb-8 p-6 bg-neutral-50 border border-neutral-100 rounded-lg">
-                                <p
-                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-900 font-bold mb-4"
-                                    
-                                >
-                                    Fitur Utama
-                                </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {product.features.map((f: string, i: number) => (
-                                        <div
-                                            key={i}
-                                            className="flex items-start gap-2.5 text-neutral-600 text-[12px] font-light leading-tight"
-                                            
-                                        >
-                                            <div className="w-4 h-4 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
-                                                <Check className="w-2.5 h-2.5 text-white" />
-                                            </div>
-                                            {f}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Specifications */}
-                        {product.specifications && Object.keys(product.specifications).length > 0 && (
-                            <div className="mb-8">
-                                <p
-                                    className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3"
-                                    
-                                >
-                                    Spesifikasi
-                                </p>
-                                <div className="grid grid-cols-1 gap-2">
-                                    {Object.entries(product.specifications).map(([k, v]) => (
-                                        <div
-                                            key={k}
-                                            className="flex justify-between py-2.5 px-4 bg-white border border-neutral-100 text-sm"
-                                            
-                                        >
-                                            <span className="text-neutral-400 font-light">{k}</span>
-                                            <span className="text-neutral-900 font-medium">{v as string}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Actions */}
-                        <div className="flex gap-2 mt-auto">
-                            <button
-                                onClick={() => setIsFavorite(!isFavorite)}
-                                className={`w-12 h-12 flex items-center justify-center border transition-all ${isFavorite
-                                    ? "bg-neutral-900 border-neutral-900 text-white"
-                                    : "border-neutral-200 text-neutral-500 hover:border-neutral-800"
-                                    }`}
-                            >
-                                <Heart
-                                    className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`}
-                                />
-                            </button>
-                            <button
-                                onClick={() => navigator.share?.({ title: product.name, url: window.location.href }).catch(() => { })}
-                                className="w-12 h-12 flex items-center justify-center border border-neutral-200 text-neutral-500 hover:border-neutral-800 transition-all"
-                            >
-                                <Share2 className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => handleAddToCart(product)}
-                                className="flex-1 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-black transition-colors flex items-center justify-center gap-2"
-                                
-                            >
-                                <ShoppingCart className="w-4 h-4" />
-                                Add to Cart
-                            </button>
-                        </div>
-
-                        {/* Stock */}
-                        <div className="mt-3 flex items-center gap-2">
-                            <div
-                                className={`w-1.5 h-1.5 rounded-full ${activeInStock ? "bg-green-500" : "bg-red-400"
-                                    }`}
-                            />
-                            <span
-                                className="text-[11px] text-neutral-400 tracking-wide"
-                                
-                            >
-                                {activeInStock ? `Stok Tersedia (${activeStock})` : "Stok Habis"}
-                            </span>
-                        </div>
-                    </div>
+                      </button>
+                    );
+                  })}
                 </div>
-            </div>
-
-            {/* ── REVIEWS SECTION ── */}
-            <ProductReviewsSection 
-                productId={productId}
-                calculatedRating={product.rating}
-                totalReviews={product.reviews}
-                distribution={product.distribution || {}}
-            />
-
-            {/* ── RELATED PRODUCTS ── */}
-            {relatedProducts.length > 0 && (
-                <section className="bg-neutral-50 py-14 sm:py-20">
-                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
-                        <div className="inline-flex items-center gap-2.5 mb-8">
-                            <div className="w-4 h-[1px] bg-neutral-400" />
-                            <span
-                                className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.22em]"
-                                
-                            >
-                                Produk Terkait
-                            </span>
-                            <div className="w-4 h-[1px] bg-neutral-400" />
-                        </div>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                            {relatedProducts.map((related) => (
-                                <Link
-                                    key={related.id}
-                                    href={`/product/${related.id}`}
-                                    className="group flex flex-col bg-white border border-neutral-100 hover:border-neutral-200 hover:shadow-xl transition-all duration-500 overflow-hidden"
-                                >
-                                    {/* Image */}
-                                    <div className="relative aspect-square overflow-hidden bg-[#F9F9F9] group-hover:bg-[#F3F3F3] flex items-center justify-center p-4 sm:p-6 transition-colors duration-500 flex-shrink-0">
-                                        <img
-                                            src={related.image}
-                                            alt={related.name}
-                                            className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-105"
-                                        />
-                                        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-                                            {related.isNew && (
-                                                <span className="px-2 py-1 bg-white text-neutral-900 text-[8px] font-black tracking-[0.15em] uppercase border border-neutral-200 shadow-sm">
-                                                    New
-                                                </span>
-                                            )}
-                                            {related.discount > 0 && (
-                                                <span className="px-2 py-1 bg-neutral-900 text-white text-[8px] font-black tracking-[0.15em] uppercase shadow-sm">
-                                                    -{related.discount}%
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Info */}
-                                    <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex items-center gap-1.5 mb-2.5">
-                                                <div className="flex items-center gap-0.5">
-                                                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                                    <span className="text-[10px] font-bold text-neutral-800">
-                                                        {related.rating > 0 ? related.rating.toFixed(1) : "0.0"}
-                                                    </span>
-                                                </div>
-                                                <span className="text-[10px] text-neutral-400">
-                                                    ({related.reviews})
-                                                </span>
-                                            </div>
-                                            <h3 className="text-xs sm:text-sm font-medium text-neutral-900 mb-3 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-tight min-h-[2.5rem]">
-                                                {related.name}
-                                            </h3>
-                                        </div>
-                                        <div className="flex items-baseline gap-2 mt-auto">
-                                            <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                                                {formatPrice(related.price)}
-                                            </span>
-                                            {related.originalPrice > related.price && (
-                                                <span className="text-[10px] text-neutral-400 line-through font-light">
-                                                    {formatPrice(related.originalPrice)}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
+              </div>
             )}
 
-            {/* ── FEATURES STRIP ── */}
-            <section className="bg-[#352309] py-12 sm:py-14">
-                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
-                        {[
-                            {
-                                icon: Shield,
-                                title: "Official Warranty",
-                                desc: "1 Year Warranty",
-                            },
-                            {
-                                icon: Zap,
-                                title: "Fast Delivery",
-                                desc: "Same Day Delivery",
-                            },
-                            {
-                                icon: Award,
-                                title: "Premium Quality",
-                                desc: "Certified Products",
-                            },
-                            {
-                                icon: TrendingUp,
-                                title: "Best Price",
-                                desc: "Guaranteed Lowest",
-                            },
-                        ].map((f, i) => {
-                            const Icon = f.icon;
-                            return (
-                                <div
-                                    key={i}
-                                    className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-[#352309] hover:bg-[#4a3210] transition-colors group"
-                                >
-                                    <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0" />
-                                    <div>
-                                        <p
-                                            className="text-[11px] tracking-[0.18em] uppercase text-white font-medium mb-0.5"
-                                            
-                                        >
-                                            {f.title}
-                                        </p>
-                                        <p
-                                            className="text-[11px] text-white/40 font-light tracking-wide"
-                                            
-                                        >
-                                            {f.desc}
-                                        </p>
-                                    </div>
-                                </div>
-                            );
-                        })}
+            {/* Features */}
+            {product.features && product.features.length > 0 && (
+              <div className="mb-8 p-6 bg-neutral-50 border border-neutral-100 rounded-lg">
+                <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-900 font-bold mb-4">
+                  Fitur Utama
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {product.features.map((f: string, i: number) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2.5 text-neutral-600 text-[12px] font-light leading-tight"
+                    >
+                      <div className="w-4 h-4 rounded-full bg-neutral-900 flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      </div>
+                      {f}
                     </div>
+                  ))}
                 </div>
-            </section>
+              </div>
+            )}
 
-            <Footer />
+            {/* Specifications */}
+            {product.specifications &&
+              Object.keys(product.specifications).length > 0 && (
+                <div className="mb-8">
+                  <p className="text-[11px] tracking-[0.2em] uppercase text-neutral-400 font-medium mb-3">
+                    Spesifikasi
+                  </p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {Object.entries(product.specifications).map(([k, v]) => (
+                      <div
+                        key={k}
+                        className="flex justify-between py-2.5 px-4 bg-white border border-neutral-100 text-sm"
+                      >
+                        <span className="text-neutral-400 font-light">{k}</span>
+                        <span className="text-neutral-900 font-medium">
+                          {v as string}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {/* Actions */}
+            <div className="flex gap-2 mt-auto">
+              <button
+                onClick={() => setIsFavorite(!isFavorite)}
+                className={`w-12 h-12 flex items-center justify-center border transition-all ${
+                  isFavorite
+                    ? "bg-neutral-900 border-neutral-900 text-white"
+                    : "border-neutral-200 text-neutral-500 hover:border-neutral-800"
+                }`}
+              >
+                <Heart
+                  className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`}
+                />
+              </button>
+              <button
+                onClick={() =>
+                  navigator
+                    .share?.({ title: product.name, url: window.location.href })
+                    .catch(() => {})
+                }
+                className="w-12 h-12 flex items-center justify-center border border-neutral-200 text-neutral-500 hover:border-neutral-800 transition-all"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleAddToCart(product)}
+                className="flex-1 py-3 bg-neutral-900 text-white text-[11px] tracking-[0.22em] uppercase font-medium hover:bg-black transition-colors flex items-center justify-center gap-2"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Add to Cart
+              </button>
+            </div>
+
+            {/* Stock */}
+            <div className="mt-3 flex items-center gap-2">
+              <div
+                className={`w-1.5 h-1.5 rounded-full ${
+                  activeInStock ? "bg-green-500" : "bg-red-400"
+                }`}
+              />
+              <span className="text-[11px] text-neutral-400 tracking-wide">
+                {activeInStock
+                  ? `Stok Tersedia (${activeStock})`
+                  : "Stok Habis"}
+              </span>
+            </div>
+          </div>
         </div>
-    );
+      </div>
+
+      {/* ── REVIEWS SECTION ── */}
+      <ProductReviewsSection
+        productId={productId}
+        calculatedRating={product.rating}
+        totalReviews={product.reviews}
+        distribution={product.distribution || {}}
+      />
+
+      {/* ── RELATED PRODUCTS ── */}
+      {relatedProducts.length > 0 && (
+        <section className="bg-neutral-50 py-14 sm:py-20">
+          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
+            <div className="inline-flex items-center gap-2.5 mb-8">
+              <div className="w-4 h-[1px] bg-neutral-400" />
+              <span className="text-neutral-500 font-medium text-[11px] uppercase tracking-[0.22em]">
+                Produk Terkait
+              </span>
+              <div className="w-4 h-[1px] bg-neutral-400" />
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {relatedProducts.map((related) => (
+                <Link
+                  key={related.id}
+                  href={`/product/${related.id}`}
+                  className="group flex flex-col bg-white border border-neutral-100 hover:border-neutral-200 hover:shadow-xl transition-all duration-500 overflow-hidden"
+                >
+                  {/* Image */}
+                  <div className="relative aspect-square overflow-hidden bg-[#F9F9F9] group-hover:bg-[#F3F3F3] flex items-center justify-center p-4 sm:p-6 transition-colors duration-500 flex-shrink-0">
+                    <img
+                      src={related.image}
+                      alt={related.name}
+                      className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                      {related.isNew && (
+                        <span className="px-2 py-1 bg-white text-neutral-900 text-[8px] font-black tracking-[0.15em] uppercase border border-neutral-200 shadow-sm">
+                          New
+                        </span>
+                      )}
+                      {related.discount > 0 && (
+                        <span className="px-2 py-1 bg-neutral-900 text-white text-[8px] font-black tracking-[0.15em] uppercase shadow-sm">
+                          -{related.discount}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-2.5">
+                        <div className="flex items-center gap-0.5">
+                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                          <span className="text-[10px] font-bold text-neutral-800">
+                            {related.rating > 0
+                              ? related.rating.toFixed(1)
+                              : "0.0"}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-neutral-400">
+                          ({related.reviews})
+                        </span>
+                      </div>
+                      <h3 className="text-xs sm:text-sm font-medium text-neutral-900 mb-3 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-tight min-h-[2.5rem]">
+                        {related.name}
+                      </h3>
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-auto">
+                      <span className="text-xs sm:text-sm font-bold text-neutral-900">
+                        {formatPrice(related.price)}
+                      </span>
+                      {related.originalPrice > related.price && (
+                        <span className="text-[10px] text-neutral-400 line-through font-light">
+                          {formatPrice(related.originalPrice)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── FEATURES STRIP ── */}
+      <section className="bg-[#352309] py-12 sm:py-14">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
+            {[
+              {
+                icon: Shield,
+                title: "Official Warranty",
+                desc: "1 Year Warranty",
+              },
+              {
+                icon: Zap,
+                title: "Fast Delivery",
+                desc: "Same Day Delivery",
+              },
+              {
+                icon: Award,
+                title: "Premium Quality",
+                desc: "Certified Products",
+              },
+              {
+                icon: TrendingUp,
+                title: "Best Price",
+                desc: "Guaranteed Lowest",
+              },
+            ].map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-[#352309] hover:bg-[#4a3210] transition-colors group"
+                >
+                  <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0" />
+                  <div>
+                    <p className="text-[11px] tracking-[0.18em] uppercase text-white font-medium mb-0.5">
+                      {f.title}
+                    </p>
+                    <p className="text-[11px] text-white/40 font-light tracking-wide">
+                      {f.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
 }

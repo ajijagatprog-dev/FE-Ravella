@@ -10,6 +10,7 @@ import {
   Package,
   AlertTriangle,
   Loader2,
+  X,
 } from "lucide-react";
 import StatCard from "./components/Statcard";
 import RecentOrders from "./components/RecentOrders";
@@ -65,11 +66,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [trafficData, setTrafficData] = useState<any[]>([]);
   const [loadingTraffic, setLoadingTraffic] = useState(true);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
-  useEffect(() => {
-    // Fetch Main Dashboard
+  const fetchDashboard = (from: string = "", to: string = "") => {
+    setLoading(true);
+    const params: Record<string, string> = {};
+    if (from) params.date_from = from;
+    if (to) params.date_to = to;
+
     api
-      .get("/admin/dashboard")
+      .get("/admin/dashboard", { params })
       .then((res) => {
         if (res.data.status === "success") {
           setData(res.data.data);
@@ -77,8 +84,14 @@ export default function DashboardPage() {
       })
       .catch((err) => console.error("Failed to load dashboard", err))
       .finally(() => setLoading(false));
+  };
 
-    // Fetch Traffic
+  useEffect(() => {
+    fetchDashboard(dateFrom, dateTo);
+  }, [dateFrom, dateTo]);
+
+  useEffect(() => {
+    // Fetch Traffic (once on mount)
     api
       .get("/admin/reports/traffic", { params: { period: "last_30" } })
       .then((res) => {
@@ -98,10 +111,17 @@ export default function DashboardPage() {
       maximumFractionDigits: 0,
     }).format(val);
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="flex flex-col gap-6 p-4 sm:p-6">
-        <div className="flex items-center justify-center py-20 gap-2 text-slate-400">
+        <nav className="flex items-center gap-1.5 text-sm text-gray-400">
+          <span className="hover:text-gray-600 cursor-pointer transition-colors">
+            Admin
+          </span>
+          <ChevronRight size={13} />
+          <span className="font-medium text-blue-600">Dashboard Overview</span>
+        </nav>
+        <div className="flex items-center justify-center py-32 gap-2 text-slate-400">
           <Loader2 size={20} className="animate-spin" />
           <span>Loading dashboard...</span>
         </div>
@@ -126,9 +146,19 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="flex flex-col gap-6 p-4 sm:p-6">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 relative">
+      {/* Loading Overlay for Background Reloads */}
+      {loading && (
+        <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-50 flex items-center justify-center rounded-2xl">
+          <div className="bg-white/80 px-4 py-2.5 rounded-xl border border-gray-100 shadow-md flex items-center gap-2 text-sm text-gray-500 font-medium">
+            <Loader2 size={16} className="animate-spin text-blue-600" />
+            Memperbarui data...
+          </div>
+        </div>
+      )}
+
       {/* ── Breadcrumb ── */}
-      <nav className="flex items-center gap-1.5 text-sm text-gray-400">
+      <nav className="nav-breadcrumb flex items-center gap-1.5 text-sm text-gray-400">
         <span className="hover:text-gray-600 cursor-pointer transition-colors">
           Admin
         </span>
@@ -155,8 +185,16 @@ export default function DashboardPage() {
           <button
             onClick={async () => {
               try {
+                let exportUrl = "/admin/export/orders";
+                const params = new URLSearchParams();
+                if (dateFrom) params.append("date_from", dateFrom);
+                if (dateTo) params.append("date_to", dateTo);
+                const queryString = params.toString();
+                if (queryString) {
+                  exportUrl += `?${queryString}`;
+                }
                 await downloadFile(
-                  "/admin/export/orders",
+                  exportUrl,
                   "dashboard_report.xlsx",
                 );
                 toast.success("Report exported successfully");
@@ -169,6 +207,63 @@ export default function DashboardPage() {
             <Download size={14} />
             Export Report
           </button>
+        </div>
+      </div>
+
+      {/* ── Date Filter ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+        <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 shrink-0">
+          Filter Tanggal
+        </span>
+        <div className="flex flex-1 flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500 shrink-0">Dari</label>
+            <input
+              type="date"
+              value={dateFrom}
+              max={dateTo || undefined}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500 shrink-0">Sampai</label>
+            <input
+              type="date"
+              value={dateTo}
+              min={dateFrom || undefined}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {(dateFrom || dateTo) && (
+            <button
+              onClick={() => {
+                setDateFrom("");
+                setDateTo("");
+              }}
+              className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+            >
+              <X size={12} />
+              Reset
+            </button>
+          )}
+          {dateFrom && dateTo && (
+            <span className="text-[11px] text-blue-500 font-medium">
+              Menampilkan data{" "}
+              {new Date(dateFrom).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}{" "}
+              –{" "}
+              {new Date(dateTo).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          )}
         </div>
       </div>
 
