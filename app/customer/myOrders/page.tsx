@@ -96,6 +96,7 @@ export default function MyOrdersPage() {
                         price: parseFloat(i.price),
                         image: i.product?.image || null,
                         hasReview: i.has_review || false,
+                        review: i.review || null,
                     })),
                     shippingAddress: {
                         fullName: addressData.recipient_name || "",
@@ -144,6 +145,7 @@ export default function MyOrdersPage() {
                 price: parseFloat(i.price),
                 image: i.product?.image || null,
                 hasReview: i.has_review || false,
+                review: i.review || null,
             })),
             shippingAddress: {
                 fullName: addressData.recipient_name || "",
