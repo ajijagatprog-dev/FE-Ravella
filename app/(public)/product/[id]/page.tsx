@@ -739,34 +739,28 @@ export default function ProductDetail() {
                             <div className="w-4 h-[1px] bg-neutral-400" />
                         </div>
 
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                             {relatedProducts.map((related) => (
                                 <Link
                                     key={related.id}
                                     href={`/product/${related.id}`}
-                                    className="group bg-white border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all duration-300 overflow-hidden block"
+                                    className="group flex flex-col bg-white border border-neutral-100 hover:border-neutral-200 hover:shadow-xl transition-all duration-500 overflow-hidden"
                                 >
                                     {/* Image */}
-                                    <div className="relative aspect-[3/4] overflow-hidden bg-neutral-50">
+                                    <div className="relative aspect-square overflow-hidden bg-[#F9F9F9] group-hover:bg-[#F3F3F3] flex items-center justify-center p-4 sm:p-6 transition-colors duration-500 flex-shrink-0">
                                         <img
                                             src={related.image}
                                             alt={related.name}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                            className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-105"
                                         />
-                                        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                                        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
                                             {related.isNew && (
-                                                <span
-                                                    className="px-2.5 py-1 bg-white text-neutral-900 text-[10px] font-medium tracking-[0.12em] uppercase border border-neutral-200"
-                                                    
-                                                >
+                                                <span className="px-2 py-1 bg-white text-neutral-900 text-[8px] font-black tracking-[0.15em] uppercase border border-neutral-200 shadow-sm">
                                                     New
                                                 </span>
                                             )}
                                             {related.discount > 0 && (
-                                                <span
-                                                    className="px-2.5 py-1 bg-neutral-900 text-white text-[10px] font-medium tracking-[0.12em] uppercase"
-                                                    
-                                                >
+                                                <span className="px-2 py-1 bg-neutral-900 text-white text-[8px] font-black tracking-[0.15em] uppercase shadow-sm">
                                                     -{related.discount}%
                                                 </span>
                                             )}
@@ -774,40 +768,29 @@ export default function ProductDetail() {
                                     </div>
 
                                     {/* Info */}
-                                    <div className="p-4 sm:p-5">
-                                        <div className="flex items-center gap-1.5 mb-2">
-                                            <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                                            <span
-                                                className="text-xs font-medium text-neutral-800"
-                                                
-                                            >
-                                                {related.rating}
-                                            </span>
-                                            <span
-                                                className="text-[11px] text-neutral-400"
-                                                
-                                            >
-                                                ({related.reviews})
-                                            </span>
+                                    <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <div className="flex items-center gap-1.5 mb-2.5">
+                                                <div className="flex items-center gap-0.5">
+                                                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                                    <span className="text-[10px] font-bold text-neutral-800">
+                                                        {related.rating > 0 ? related.rating.toFixed(1) : "0.0"}
+                                                    </span>
+                                                </div>
+                                                <span className="text-[10px] text-neutral-400">
+                                                    ({related.reviews})
+                                                </span>
+                                            </div>
+                                            <h3 className="text-xs sm:text-sm font-medium text-neutral-900 mb-3 line-clamp-2 group-hover:text-neutral-500 transition-colors leading-tight min-h-[2.5rem]">
+                                                {related.name}
+                                            </h3>
                                         </div>
-                                        <h3
-                                            className="text-lg font-light text-neutral-900 mb-2 line-clamp-2 group-hover:text-neutral-600 transition-colors leading-snug"
-                                            
-                                        >
-                                            {related.name}
-                                        </h3>
-                                        <div className="flex items-baseline gap-2">
-                                            <span
-                                                className="text-base font-medium text-neutral-900"
-                                                
-                                            >
+                                        <div className="flex items-baseline gap-2 mt-auto">
+                                            <span className="text-xs sm:text-sm font-bold text-neutral-900">
                                                 {formatPrice(related.price)}
                                             </span>
                                             {related.originalPrice > related.price && (
-                                                <span
-                                                    className="text-xs text-neutral-400 line-through"
-                                                    
-                                                >
+                                                <span className="text-[10px] text-neutral-400 line-through font-light">
                                                     {formatPrice(related.originalPrice)}
                                                 </span>
                                             )}
@@ -821,7 +804,7 @@ export default function ProductDetail() {
             )}
 
             {/* ── FEATURES STRIP ── */}
-            <section className="bg-neutral-900 py-12 sm:py-14">
+            <section className="bg-[#352309] py-12 sm:py-14">
                 <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
                         {[
@@ -850,7 +833,7 @@ export default function ProductDetail() {
                             return (
                                 <div
                                     key={i}
-                                    className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-neutral-900 hover:bg-neutral-800 transition-colors group"
+                                    className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-[#352309] hover:bg-[#4a3210] transition-colors group"
                                 >
                                     <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0" />
                                     <div>

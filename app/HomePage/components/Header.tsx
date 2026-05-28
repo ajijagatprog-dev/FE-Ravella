@@ -446,7 +446,13 @@ export default function Header({
                     categories.map((cat, i) => (
                       <Link
                         key={cat}
-                        href={`/search?q=${encodeURIComponent(cat)}`}
+                        href={
+                          cat.toLowerCase().includes("kitchen")
+                            ? `/product?category=${encodeURIComponent("Home & Kitchen Appliance")}`
+                            : cat.toLowerCase().includes("living")
+                              ? `/product?category=${encodeURIComponent("home living")}`
+                              : `/product?category=${encodeURIComponent(cat)}`
+                        }
                         className={`cat-card cat-card-stagger rounded-xl p-4 block ${dropdownBanners[2] ? "!bg-white/10 backdrop-blur-md border border-white/10 hover:!bg-white/20" : ""}`}
                         style={{ transitionDelay: `${0.05 + i * 0.04}s` }}
                         onMouseEnter={() => setHoveredCat(cat)}
@@ -617,14 +623,15 @@ export default function Header({
 
         {/* ── Search Overlay ── */}
         <div
-          className={`absolute inset-0 z-[60] bg-white search-overlay-enter ${
+          className={`absolute inset-x-0 top-0 z-[60] bg-white/95 backdrop-blur-3xl shadow-[0_30px_70px_-10px_rgba(0,0,0,0.15)] border-b border-neutral-150 transition-all duration-300 origin-top ${
             searchOpen
               ? "opacity-100 translate-y-0"
-              : "opacity-0 -translate-y-full pointer-events-none"
+              : "opacity-0 -translate-y-4 pointer-events-none"
           }`}
         >
-          <div className="mx-auto max-w-[1320px] h-full px-6 md:px-12 flex items-center">
-            <div className="flex-1 flex items-center gap-5">
+          <div className="mx-auto max-w-[1320px] px-6 md:px-12 py-8">
+            {/* Input Row */}
+            <div className="flex items-center gap-4 border-b border-neutral-150 pb-5">
               <Search className="w-5 h-5 text-neutral-400 flex-shrink-0" />
               <input
                 type="text"
@@ -637,21 +644,133 @@ export default function Header({
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && searchQuery.trim()) {
                     router.push(
-                      `/search?q=${encodeURIComponent(searchQuery.trim())}`,
+                      `/product?q=${encodeURIComponent(searchQuery.trim())}`,
                     );
                     setSearchOpen(false);
                   }
                   if (e.key === "Escape") setSearchOpen(false);
                 }}
                 autoFocus={searchOpen}
-                className="flex-1 text-xl md:text-2xl font-light bg-transparent outline-none text-neutral-900 placeholder:text-neutral-300"
+                className="flex-1 text-lg sm:text-xl font-medium bg-transparent outline-none text-neutral-900 placeholder:text-neutral-300"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    onSearch("");
+                  }}
+                  className="p-1 rounded-full hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
               <button
                 onClick={() => setSearchOpen(false)}
-                className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-neutral-200 hover:border-black rounded-lg text-xs font-semibold uppercase tracking-wider text-neutral-500 hover:text-black transition-all"
               >
-                <X className="w-5 h-5 text-neutral-700" />
+                Tutup <X className="w-3.5 h-3.5" />
               </button>
+            </div>
+
+            {/* Quick Suggestions & Categories Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6 animate-in fade-in slide-in-from-top-4 duration-300">
+              {/* Popular Searches */}
+              <div>
+                <p className="text-[10px] font-extrabold tracking-[0.2em] uppercase text-neutral-400 mb-3">
+                  Pencarian Terpopuler
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "Slow Juicer",
+                    "Air Purifier",
+                    "Kompor Induksi",
+                    "Knife Set",
+                    "Ezy Series",
+                  ].map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => {
+                        setSearchQuery(item);
+                        let productUrl = `/product?q=${encodeURIComponent(item)}`;
+                        if (item.toLowerCase().includes("ezy")) {
+                          productUrl = `/product?category=${encodeURIComponent("ezy series")}`;
+                        } else if (item.toLowerCase().includes("knife")) {
+                          productUrl = `/product?category=${encodeURIComponent("Knife set")}`;
+                        }
+                        router.push(productUrl);
+                        setSearchOpen(false);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-neutral-50 hover:bg-blue-50 hover:text-blue-600 border border-neutral-100 text-xs font-medium text-neutral-600 transition-all active:scale-95"
+                    >
+                      🔥 {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Categories Shortcut */}
+              <div>
+                <p className="text-[10px] font-extrabold tracking-[0.2em] uppercase text-neutral-400 mb-3">
+                  Kategori Unggulan
+                </p>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setSearchQuery(cat);
+                        const productUrl = cat.toLowerCase().includes("kitchen")
+                          ? `/product?category=${encodeURIComponent("Home & Kitchen Appliance")}`
+                          : cat.toLowerCase().includes("living")
+                            ? `/product?category=${encodeURIComponent("home living")}`
+                            : `/product?category=${encodeURIComponent(cat)}`;
+                        router.push(productUrl);
+                        setSearchOpen(false);
+                      }}
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl border border-neutral-100 hover:border-blue-200 bg-neutral-50/50 hover:bg-blue-50/20 text-left transition-all active:scale-[0.98] group"
+                    >
+                      <span className="text-xl bg-white shadow-sm border border-neutral-100 p-1 rounded-lg">
+                        {getCategoryIcon(cat)}
+                      </span>
+                      <span className="text-xs font-bold text-neutral-700 group-hover:text-blue-600 transition-colors">
+                        {cat}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Curated Products Spotlight */}
+              <div>
+                <p className="text-[10px] font-extrabold tracking-[0.2em] uppercase text-neutral-400 mb-3">
+                  Rekomendasi Koleksi
+                </p>
+                <div className="flex flex-col gap-2.5">
+                  <button
+                    onClick={() => {
+                      router.push("/product");
+                      setSearchOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-2 rounded-xl hover:bg-neutral-50 border border-transparent hover:border-neutral-150 transition-all text-left group"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      <img
+                        src="https://images.unsplash.com/photo-1558317374-067fb5f30001?w=100&q=80"
+                        alt="Best Seller"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-300"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-neutral-800 group-hover:text-blue-600 transition-colors">
+                        Koleksi Best Seller
+                      </p>
+                      <p className="text-[10px] text-neutral-400 font-medium">
+                        Lihat perlengkapan terlaris kami
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -692,24 +811,32 @@ export default function Header({
             </div>
 
             {/* Search */}
-            <div className="px-7 py-4 border-b border-neutral-100">
-              <div className="flex items-center gap-2 px-3 py-2.5 border border-neutral-200 rounded-sm">
-                <Search className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+            <div className="px-6 py-4 border-b border-neutral-100">
+              <div className="flex items-center gap-3 px-4 py-3 bg-neutral-50 border border-neutral-200/80 rounded-2xl focus-within:ring-4 focus-within:ring-blue-100/50 focus-within:border-blue-400 focus-within:bg-white transition-all shadow-inner">
+                <Search className="w-4.5 h-4.5 text-neutral-400 flex-shrink-0" />
                 <input
                   type="text"
-                  placeholder="Cari produk..."
+                  placeholder="Cari produk, kategori..."
                   value={mobileSearchQuery}
                   onChange={(e) => setMobileSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && mobileSearchQuery.trim()) {
                       router.push(
-                        `/search?q=${encodeURIComponent(mobileSearchQuery.trim())}`,
+                        `/product?q=${encodeURIComponent(mobileSearchQuery.trim())}`,
                       );
                       setMobileOpen(false);
                     }
                   }}
-                  className="flex-1 text-sm bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
+                  className="flex-1 text-sm bg-transparent outline-none text-neutral-800 placeholder:text-neutral-400 font-medium"
                 />
+                {mobileSearchQuery && (
+                  <button
+                    onClick={() => setMobileSearchQuery("")}
+                    className="p-1 rounded-full hover:bg-neutral-200 text-neutral-400 hover:text-neutral-600 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
 

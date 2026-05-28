@@ -15,7 +15,7 @@ export default function Footer() {
   ];
 
   const customerLinks = [
-    { name: "Customer Care", href: "/customer-care" },
+    { name: "Customer Care", href: "/contact" },
     { name: "Service Center", href: "/service-center" },
   ];
 

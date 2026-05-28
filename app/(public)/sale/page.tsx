@@ -424,9 +424,9 @@ export default function SalePage() {
       </section>
 
       {/* ── FEATURES STRIP ── */}
-      <section className="bg-neutral-50 py-16 border-y border-neutral-100">
+      <section className="bg-[#352309] py-12 sm:py-14">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
             {[
               {
                 icon: Shield,
@@ -444,21 +444,25 @@ export default function SalePage() {
                 desc: "Price Match Guarantee",
               },
               { icon: Zap, title: "Fast Shipping", desc: "Same Day Dispatch" },
-            ].map((item, idx) => (
-              <div key={idx} className="flex gap-5">
-                <div className="w-12 h-12 bg-white flex items-center justify-center border border-neutral-100 shadow-sm flex-shrink-0">
-                  <item.icon className="w-5 h-5 text-neutral-900" />
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={idx}
+                  className="flex items-center gap-4 px-5 sm:px-6 py-6 bg-[#352309] hover:bg-[#4a3210] transition-colors group"
+                >
+                  <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0" />
+                  <div>
+                    <h4 className="text-white text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+                      {item.title}
+                    </h4>
+                    <p className="text-white/60 text-[9px] font-medium tracking-wide">
+                      {item.desc}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] mb-1 text-neutral-900">
-                    {item.title}
-                  </h4>
-                  <p className="text-[11px] text-neutral-600 font-medium">
-                    {item.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
