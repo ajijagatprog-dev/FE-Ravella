@@ -37,6 +37,7 @@ export interface OrderItem {
     rating: number;
     comment: string;
     images?: string[];
+    is_editable?: boolean;
   } | null;
 }
 
@@ -275,14 +276,19 @@ export default function OrderDetailModal({ order, onClose }: Props) {
                                 <Star size={10} className="fill-emerald-600" />
                                 Sudah Diulas
                               </div>
-                              {item.review && (
-                                <button
-                                  onClick={() => setReviewProduct(item)}
-                                  className="flex items-center gap-1.5 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 hover:underline transition-all"
-                                >
-                                  ✎ Edit Ulasan
-                                </button>
-                              )}
+                              {item.review &&
+                                (item.review.is_editable !== false ? (
+                                  <button
+                                    onClick={() => setReviewProduct(item)}
+                                    className="flex items-center gap-1.5 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 hover:underline transition-all"
+                                  >
+                                    ✎ Edit Ulasan
+                                  </button>
+                                ) : (
+                                  <span className="text-[10px] font-semibold text-stone-400 bg-stone-50 px-2 py-1 rounded-md border border-stone-200">
+                                    Batas edit habis
+                                  </span>
+                                ))}
                             </div>
                           ) : (
                             <button

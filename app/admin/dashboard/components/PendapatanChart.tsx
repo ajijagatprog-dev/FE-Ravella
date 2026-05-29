@@ -30,9 +30,12 @@ interface PendapatanChartProps {
 const CHART_H = 220;
 
 function formatRp(val: number): string {
-  if (val >= 1000000) return `Rp ${(val / 1000000).toFixed(1)}jt`;
-  if (val >= 1000) return `Rp ${Math.round(val / 1000)}k`;
-  return `Rp ${val.toLocaleString("id-ID")}`;
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(val);
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -68,7 +71,9 @@ export default function PendapatanChart({
       {/* ── Header ── */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h3 className="text-base font-bold text-gray-900">Trafik Penjualan</h3>
+          <h3 className="text-base font-bold text-gray-900">
+            Trafik Penjualan
+          </h3>
           <p className="text-xs text-gray-500 mt-0.5">
             Total Ringkasan Penjualan {range === "week" ? "7 hari" : "30 hari"}
           </p>
@@ -111,7 +116,9 @@ export default function PendapatanChart({
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 11, fill: "#9CA3AF" }}
-              tickFormatter={(val) => (val >= 1000000 ? `${val / 1000000}jt` : val)}
+              tickFormatter={(val) =>
+                val >= 1000000 ? `${val / 1000000}jt` : val
+              }
             />
             <Tooltip content={<CustomTooltip />} />
             <Area

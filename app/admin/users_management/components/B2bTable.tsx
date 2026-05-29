@@ -84,9 +84,26 @@ function Avatar({ name, isB2B }: { name: string; isB2B: boolean }) {
 }
 
 // ─── Action Buttons ───────────────────────────────────────────────────────────
-function ActionButtons({ row, onAction, onViewDetail }: { row: any; onAction?: (userId: number, action: string) => void; onViewDetail?: (userId: number) => void }) {
+function ActionButtons({ row, onAction, onViewDetail, onDeleteRequest }: { row: any; onAction?: (userId: number, action: string) => void; onViewDetail?: (userId: number) => void; onDeleteRequest?: (userId: number, name: string) => void }) {
   const status = row.status?.toLowerCase();
   const type = row.type?.toUpperCase();
+
+  const handleDelete = () => {
+    onDeleteRequest?.(row.id, row.name ?? row.company ?? "User");
+  };
+
+  const deleteBtn = (
+    <button
+      onClick={handleDelete}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 active:scale-95 transition-all shadow-sm shrink-0"
+      title="Hapus User"
+    >
+      <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+      Hapus
+    </button>
+  );
 
   if (type === "B2B PARTNER" || type === "B2B") {
     if (status === "active") {
@@ -104,6 +121,7 @@ function ActionButtons({ row, onAction, onViewDetail }: { row: any; onAction?: (
           >
             Details
           </button>
+          {deleteBtn}
         </div>
       );
     }
@@ -122,6 +140,7 @@ function ActionButtons({ row, onAction, onViewDetail }: { row: any; onAction?: (
           >
             Reject
           </button>
+          {deleteBtn}
         </div>
       );
     }
@@ -133,6 +152,7 @@ function ActionButtons({ row, onAction, onViewDetail }: { row: any; onAction?: (
         >
           Re-activate
         </button>
+        {deleteBtn}
       </div>
     );
   }
@@ -153,6 +173,7 @@ function ActionButtons({ row, onAction, onViewDetail }: { row: any; onAction?: (
       >
         Details
       </button>
+      {deleteBtn}
     </div>
   );
 }
@@ -266,6 +287,8 @@ export default function B2bTable({
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const [deleteTargetName, setDeleteTargetName] = useState<string>("");
 
   // Filter locally (or remove if server-side)
   const filtered = data.filter((row) => {
@@ -416,7 +439,15 @@ export default function B2bTable({
                     {/* Actions */}
                     <td className="px-4 py-3.5">
                       <div className="flex justify-end">
-                        <ActionButtons row={row} onAction={onUserAction} onViewDetail={onViewDetail} />
+                        <ActionButtons 
+                          row={row} 
+                          onAction={onUserAction} 
+                          onViewDetail={onViewDetail} 
+                          onDeleteRequest={(id, name) => {
+                            setConfirmDeleteId(id);
+                            setDeleteTargetName(name);
+                          }}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -472,7 +503,15 @@ export default function B2bTable({
                   )}
                 </div>
 
-                <ActionButtons row={row} onAction={onUserAction} onViewDetail={onViewDetail} />
+                <ActionButtons 
+                  row={row} 
+                  onAction={onUserAction} 
+                  onViewDetail={onViewDetail} 
+                  onDeleteRequest={(id, name) => {
+                    setConfirmDeleteId(id);
+                    setDeleteTargetName(name);
+                  }}
+                />
               </div>
             );
           })
@@ -481,6 +520,50 @@ export default function B2bTable({
 
       {/* ── Pagination ── */}
       <Pagination page={page} total={total} limit={limit} handlePageChange={handlePageChange} />
+
+      {/* ── Custom Deletion Confirmation Modal ── */}
+      {confirmDeleteId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-4 text-red-600">
+              <div className="p-3 bg-red-100 rounded-2xl">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-slate-900 tracking-tight">Konfirmasi Hapus</h3>
+                <p className="text-xs text-slate-400 font-medium">Tindakan ini permanen & tidak dapat dibatalkan</p>
+              </div>
+            </div>
+            
+            <p className="text-sm text-slate-600 mt-4 leading-relaxed font-medium">
+              Apakah Anda yakin ingin menghapus user <strong className="text-slate-800 font-extrabold">{deleteTargetName}</strong> beserta seluruh riwayat transaksi, ulasan, dan data terkait dari sistem?
+            </p>
+            
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                onClick={() => { setConfirmDeleteId(null); setDeleteTargetName(""); }}
+                className="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  if (confirmDeleteId !== null) {
+                    onUserAction?.(confirmDeleteId, 'delete');
+                    setConfirmDeleteId(null);
+                    setDeleteTargetName("");
+                  }
+                }}
+                className="px-5 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-100 active:scale-95 transition-all"
+              >
+                Ya, Hapus Data
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

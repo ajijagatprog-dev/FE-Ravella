@@ -169,13 +169,13 @@ export default function WelcomePopup() {
               </Link>
               <button
                 onClick={handleClose}
-                className="w-full text-stone-400 text-xs hover:text-stone-600 transition-colors py-2"
+                className="w-full text-gray-500 text-xs hover:text-stone-600 transition-colors py-2"
               >
                 Nanti saja
               </button>
             </div>
 
-            <p className="text-stone-300 text-[10px] mt-4">
+            <p className="text-gray-500 text-[10px] mt-4">
               * Syarat & ketentuan berlaku. Kode tidak bisa digabung dengan
               promo lain.
             </p>

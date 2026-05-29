@@ -66,7 +66,7 @@ export default function VoucherTokoPage() {
   const fetchVouchers = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/admin/vouchers");
+      const res = await api.get("/admin/vouchers?type=toko");
       if (res.data.status === "success") setVouchers(res.data.data);
     } catch (e) {
       console.error(e);

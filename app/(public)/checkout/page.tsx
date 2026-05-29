@@ -203,7 +203,13 @@ export default function CheckoutPage() {
                 if (av && sub > 0) {
                     try {
                         setVoucherCode(av);
-                        const r = await api.get(`/vouchers/validate?code=${av}&subtotal=${sub}`);
+                        const r = await api.get('/vouchers/validate', {
+                            params: {
+                                code: av,
+                                subtotal: sub,
+                                items: JSON.stringify(parsedCart.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })))
+                            }
+                        });
                         if (r.data.status === 'success') setVoucherResult(r.data.data);
                     } catch { localStorage.removeItem("ravelle_active_voucher"); }
                 }
@@ -264,7 +270,13 @@ export default function CheckoutPage() {
         if (!voucherCode.trim()) return;
         setApplyingVoucher(true); setVoucherError(''); setVoucherResult(null);
         try {
-            const r = await api.get('/vouchers/validate', { params: { code: voucherCode.trim(), subtotal } });
+            const r = await api.get('/vouchers/validate', {
+                params: {
+                    code: voucherCode.trim(),
+                    subtotal,
+                    items: JSON.stringify(cart.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })))
+                }
+            });
             if (r.data.status === 'success') setVoucherResult(r.data.data);
         } catch (e: any) {
             setVoucherError(e?.response?.data?.message || 'Kode voucher tidak valid.');
