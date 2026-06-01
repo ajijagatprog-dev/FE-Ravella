@@ -120,7 +120,13 @@ export default function CartClient() {
     setCouponResult(null);
     try {
       // NOTE: Here we must use 'api' from our axiot instance
-      const res = await api.get(`/vouchers/validate?code=${couponCode.toUpperCase()}&subtotal=${subtotal}`);
+      const res = await api.get('/vouchers/validate', {
+        params: {
+          code: couponCode.toUpperCase(),
+          subtotal,
+          items: JSON.stringify(selectedItems.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })))
+        }
+      });
       if (res.data.status === 'success') {
         setCouponResult(res.data.data);
       }

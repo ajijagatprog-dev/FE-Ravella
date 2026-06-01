@@ -27,6 +27,9 @@ interface Review {
   status: "pending" | "approved" | "rejected";
   admin_reply: string | null;
   created_at: string;
+  edit_rating?: number | null;
+  edit_comment?: string | null;
+  edit_status?: "none" | "pending";
   product: {
     name: string;
     image: string;
@@ -74,8 +77,9 @@ export default function ReviewManagementPage() {
       setActionLoading(id);
       const res = await api.put(`/admin/reviews/${id}/status`, { status });
       if (res.data.status === "success") {
+        const updatedReview = res.data.data;
         setReviews((prev) =>
-          prev.map((r) => (r.id === id ? { ...r, status } : r)),
+          prev.map((r) => (r.id === id ? { ...r, ...updatedReview } : r)),
         );
       }
     } catch (err) {
@@ -234,30 +238,89 @@ export default function ReviewManagementPage() {
 
                 {/* Center: Review Content */}
                 <div className="flex-1 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <Star
-                          key={s}
-                          size={14}
-                          className={cn(
-                            s <= review.rating
-                              ? "fill-amber-400 text-amber-400"
-                              : "text-gray-200",
-                          )}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-[11px] font-medium text-gray-400">
-                      {new Date(review.created_at).toLocaleString()}
-                    </span>
-                  </div>
+                  {review.edit_status === "pending" ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2 w-fit">
+                        <span className="animate-pulse w-2 h-2 rounded-full bg-amber-500" />
+                        Pengajuan Perubahan Ulasan (Pending Moderasi)
+                      </div>
 
-                  <div className="p-4 bg-gray-50 rounded-2xl">
-                    <p className="text-sm text-gray-700 leading-relaxed italic">
-                      "{review.comment}"
-                    </p>
-                  </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Versi Lama */}
+                        <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-2 opacity-60">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            Versi Saat Ini (Aktif di Web)
+                          </p>
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <Star
+                                key={s}
+                                size={12}
+                                className={cn(
+                                  s <= review.rating
+                                    ? "fill-gray-400 text-gray-400 animate-none"
+                                    : "text-gray-200",
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-xs text-gray-600 italic">
+                            "{review.comment}"
+                          </p>
+                        </div>
+
+                        {/* Versi Baru */}
+                        <div className="p-4 bg-amber-50/30 border border-amber-200 rounded-2xl space-y-2">
+                          <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
+                            Versi Baru (Menunggu Persetujuan)
+                          </p>
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <Star
+                                key={s}
+                                size={12}
+                                className={cn(
+                                  s <= (review.edit_rating ?? 5)
+                                    ? "fill-amber-400 text-amber-400"
+                                    : "text-gray-200",
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-xs text-stone-800 font-semibold italic">
+                            "{review.edit_comment}"
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star
+                              key={s}
+                              size={14}
+                              className={cn(
+                                s <= review.rating
+                                  ? "fill-amber-400 text-amber-400"
+                                  : "text-gray-200",
+                              )}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-[11px] font-medium text-gray-400">
+                          {new Date(review.created_at).toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div className="p-4 bg-gray-50 rounded-2xl">
+                        <p className="text-sm text-gray-700 leading-relaxed italic">
+                          "{review.comment}"
+                        </p>
+                      </div>
+                    </>
+                  )}
 
                   {review.admin_reply ? (
                     <div className="ml-6 flex items-start gap-3 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
@@ -306,8 +369,13 @@ export default function ReviewManagementPage() {
 
                 {/* Right: Actions */}
                 <div className="lg:w-48 flex flex-col gap-2 justify-center pl-6 lg:border-l border-gray-50">
-                  <div className="mb-2">
+                  <div className="mb-2 flex flex-col gap-1">
                     <StatusBadge status={review.status} />
+                    {review.edit_status === "pending" && (
+                      <span className="text-[9px] font-black px-2 py-0.5 rounded-full border bg-amber-50 text-amber-600 border-amber-300 uppercase tracking-widest text-center animate-pulse">
+                        EDIT PENDING
+                      </span>
+                    )}
                   </div>
 
                   {review.status === "pending" && (
@@ -331,6 +399,31 @@ export default function ReviewManagementPage() {
                       >
                         <XCircle size={14} />
                         Reject
+                      </button>
+                    </>
+                  )}
+
+                  {review.edit_status === "pending" && (
+                    <>
+                      <button
+                        onClick={() => handleAction(review.id, "approved")}
+                        disabled={actionLoading === review.id}
+                        className="w-full py-2.5 bg-amber-500 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-amber-600 transition-colors shadow-lg shadow-amber-100 flex items-center justify-center gap-2"
+                      >
+                        {actionLoading === review.id ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <CheckCircle size={14} />
+                        )}
+                        Setujui Edit
+                      </button>
+                      <button
+                        onClick={() => handleAction(review.id, "rejected")}
+                        disabled={actionLoading === review.id}
+                        className="w-full py-2.5 bg-white text-rose-600 border border-rose-100 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <XCircle size={14} />
+                        Tolak Edit
                       </button>
                     </>
                   )}

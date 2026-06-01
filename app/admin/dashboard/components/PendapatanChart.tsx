@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Coins, BarChart3, TrendingUp } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -30,9 +30,12 @@ interface PendapatanChartProps {
 const CHART_H = 220;
 
 function formatRp(val: number): string {
-  if (val >= 1000000) return `Rp ${(val / 1000000).toFixed(1)}jt`;
-  if (val >= 1000) return `Rp ${Math.round(val / 1000)}k`;
-  return `Rp ${val.toLocaleString("id-ID")}`;
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(val);
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -68,7 +71,9 @@ export default function PendapatanChart({
       {/* ── Header ── */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h3 className="text-base font-bold text-gray-900">Trafik Penjualan</h3>
+          <h3 className="text-base font-bold text-gray-900">
+            Trafik Penjualan
+          </h3>
           <p className="text-xs text-gray-500 mt-0.5">
             Total Ringkasan Penjualan {range === "week" ? "7 hari" : "30 hari"}
           </p>
@@ -111,7 +116,9 @@ export default function PendapatanChart({
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 11, fill: "#9CA3AF" }}
-              tickFormatter={(val) => (val >= 1000000 ? `${val / 1000000}jt` : val)}
+              tickFormatter={(val) =>
+                val >= 1000000 ? `${val / 1000000}jt` : val
+              }
             />
             <Tooltip content={<CustomTooltip />} />
             <Area
@@ -134,21 +141,24 @@ export default function PendapatanChart({
       <div className="grid grid-cols-3 gap-3">
         {[
           {
-            emoji: "💰",
+            icon: <Coins className="w-4 h-4 text-emerald-500" />,
+            iconBg: "bg-emerald-50",
             label: "TOTAL",
             value: formatRp(summary.total),
             sub: "periode ini",
             subColor: "text-emerald-600",
           },
           {
-            emoji: "📊",
+            icon: <BarChart3 className="w-4 h-4 text-blue-500" />,
+            iconBg: "bg-blue-50",
             label: "RATA-RATA",
             value: formatRp(summary.avg_daily),
             sub: "per hari",
             subColor: "text-gray-400",
           },
           {
-            emoji: "🏆",
+            icon: <TrendingUp className="w-4 h-4 text-amber-500" />,
+            iconBg: "bg-amber-50",
             label: "TERTINGGI",
             value: formatRp(summary.peak.value),
             sub: summary.peak.label,
@@ -157,14 +167,18 @@ export default function PendapatanChart({
         ].map((s) => (
           <div
             key={s.label}
-            className="flex flex-col gap-1 p-3 rounded-xl bg-gray-50 border border-gray-100 hover:border-blue-100 hover:bg-blue-50/30 transition-colors"
+            className="flex flex-col gap-2 p-3.5 rounded-xl bg-gray-50 border border-gray-100 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-200 group"
           >
-            <span className="text-base">{s.emoji}</span>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-              {s.label}
-            </p>
-            <p className="text-sm font-bold text-gray-900">{s.value}</p>
-            <p className={`text-[10px] font-medium ${s.subColor}`}>{s.sub}</p>
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${s.iconBg} transition-transform duration-300 group-hover:scale-110`}>
+              {s.icon}
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                {s.label}
+              </p>
+              <p className="text-sm font-bold text-gray-900 leading-none">{s.value}</p>
+              <p className={`text-[10px] font-medium leading-none ${s.subColor}`}>{s.sub}</p>
+            </div>
           </div>
         ))}
       </div>

@@ -6,6 +6,7 @@ import B2bTable from "./B2bTable";
 import UserManagementStats from "./UserManagementStats";
 import UserDetailModal from "./UserDetailModal";
 import api from "@/lib/axios";
+import toast from "react-hot-toast";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface UserStats {
@@ -110,17 +111,24 @@ export default function UserManagementClient({
   // Action handler for B2B verify/reject, etc.
   const handleUserAction = async (userId: number, action: string) => {
     try {
-      let payload: Record<string, string> = {};
-      if (action === "approve") payload = { b2b_status: "approved" };
-      else if (action === "reject") payload = { b2b_status: "rejected" };
+      if (action === "delete") {
+        await api.delete(`/admin/users/${userId}`);
+        toast.success("User berhasil dihapus beserta seluruh data terkait.");
+      } else {
+        let payload: Record<string, string> = {};
+        if (action === "approve") payload = { b2b_status: "approved" };
+        else if (action === "reject") payload = { b2b_status: "rejected" };
 
-      await api.put(`/admin/users/${userId}`, payload);
+        await api.put(`/admin/users/${userId}`, payload);
+        toast.success("Status user berhasil diperbarui.");
+      }
       // Refresh data
       fetchUsers();
       fetchStats();
-    } catch (error) {
-      console.error("Failed to update user", error);
-      alert("Failed to update user. Please try again.");
+    } catch (error: any) {
+      console.error("Failed to action user", error);
+      const msg = error?.response?.data?.message || "Gagal memproses tindakan user. Silakan coba lagi.";
+      toast.error(msg);
     }
   };
 

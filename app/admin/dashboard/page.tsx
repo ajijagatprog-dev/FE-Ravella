@@ -10,6 +10,7 @@ import {
   Package,
   AlertTriangle,
   Loader2,
+  X,
 } from "lucide-react";
 import StatCard from "./components/Statcard";
 import RecentOrders from "./components/RecentOrders";
@@ -65,11 +66,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [trafficData, setTrafficData] = useState<any[]>([]);
   const [loadingTraffic, setLoadingTraffic] = useState(true);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
-  useEffect(() => {
-    // Fetch Main Dashboard
+  const fetchDashboard = (from: string = "", to: string = "") => {
+    setLoading(true);
+    const params: Record<string, string> = {};
+    if (from) params.date_from = from;
+    if (to) params.date_to = to;
+
     api
-      .get("/admin/dashboard")
+      .get("/admin/dashboard", { params })
       .then((res) => {
         if (res.data.status === "success") {
           setData(res.data.data);
@@ -77,10 +84,17 @@ export default function DashboardPage() {
       })
       .catch((err) => console.error("Failed to load dashboard", err))
       .finally(() => setLoading(false));
+  };
 
-    // Fetch Traffic
+  const fetchTraffic = (from: string = "", to: string = "") => {
+    setLoadingTraffic(true);
+    const params: Record<string, string> = {};
+    if (from) params.date_from = from;
+    if (to) params.date_to = to;
+    if (!from && !to) params.period = "last_30";
+
     api
-      .get("/admin/reports/traffic", { params: { period: "last_30" } })
+      .get("/admin/reports/traffic", { params })
       .then((res) => {
         if (res.data.status === "success") {
           setTrafficData(res.data.data.traffic || []);
@@ -88,7 +102,12 @@ export default function DashboardPage() {
       })
       .catch((err) => console.error("Failed to load traffic data", err))
       .finally(() => setLoadingTraffic(false));
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchDashboard(dateFrom, dateTo);
+    fetchTraffic(dateFrom, dateTo);
+  }, [dateFrom, dateTo]);
 
   const formatRp = (val: number) =>
     new Intl.NumberFormat("id-ID", {
@@ -98,10 +117,17 @@ export default function DashboardPage() {
       maximumFractionDigits: 0,
     }).format(val);
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="flex flex-col gap-6 p-4 sm:p-6">
-        <div className="flex items-center justify-center py-20 gap-2 text-slate-400">
+        <nav className="flex items-center gap-1.5 text-sm text-gray-400">
+          <span className="hover:text-gray-600 cursor-pointer transition-colors">
+            Admin
+          </span>
+          <ChevronRight size={13} />
+          <span className="font-medium text-blue-600">Dashboard Overview</span>
+        </nav>
+        <div className="flex items-center justify-center py-32 gap-2 text-slate-400">
           <Loader2 size={20} className="animate-spin" />
           <span>Loading dashboard...</span>
         </div>
@@ -126,9 +152,19 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="flex flex-col gap-6 p-4 sm:p-6">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 relative">
+      {/* Loading Overlay for Background Reloads */}
+      {loading && (
+        <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-50 flex items-center justify-center rounded-2xl">
+          <div className="bg-white/80 px-4 py-2.5 rounded-xl border border-gray-100 shadow-md flex items-center gap-2 text-sm text-gray-500 font-medium">
+            <Loader2 size={16} className="animate-spin text-blue-600" />
+            Memperbarui data...
+          </div>
+        </div>
+      )}
+
       {/* ── Breadcrumb ── */}
-      <nav className="flex items-center gap-1.5 text-sm text-gray-400">
+      <nav className="nav-breadcrumb flex items-center gap-1.5 text-sm text-gray-400">
         <span className="hover:text-gray-600 cursor-pointer transition-colors">
           Admin
         </span>
@@ -155,10 +191,15 @@ export default function DashboardPage() {
           <button
             onClick={async () => {
               try {
-                await downloadFile(
-                  "/admin/export/orders",
-                  "dashboard_report.xlsx",
-                );
+                let exportUrl = "/admin/export/orders";
+                const params = new URLSearchParams();
+                if (dateFrom) params.append("date_from", dateFrom);
+                if (dateTo) params.append("date_to", dateTo);
+                const queryString = params.toString();
+                if (queryString) {
+                  exportUrl += `?${queryString}`;
+                }
+                await downloadFile(exportUrl, "dashboard_report.xlsx");
                 toast.success("Report exported successfully");
               } catch (error) {
                 toast.error("Failed to export report");
@@ -169,6 +210,63 @@ export default function DashboardPage() {
             <Download size={14} />
             Export Report
           </button>
+        </div>
+      </div>
+
+      {/* ── Date Filter ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+        <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 shrink-0">
+          Filter Tanggal
+        </span>
+        <div className="flex flex-1 flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500 shrink-0">Dari</label>
+            <input
+              type="date"
+              value={dateFrom}
+              max={dateTo || undefined}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500 shrink-0">Sampai</label>
+            <input
+              type="date"
+              value={dateTo}
+              min={dateFrom || undefined}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {(dateFrom || dateTo) && (
+            <button
+              onClick={() => {
+                setDateFrom("");
+                setDateTo("");
+              }}
+              className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+            >
+              <X size={12} />
+              Reset
+            </button>
+          )}
+          {dateFrom && dateTo && (
+            <span className="text-[11px] text-blue-500 font-medium">
+              Menampilkan data{" "}
+              {new Date(dateFrom).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}{" "}
+              –{" "}
+              {new Date(dateTo).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          )}
         </div>
       </div>
 
@@ -251,29 +349,64 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Traffic Chart Row ── */}
-      {!loadingTraffic && trafficData.length > 0 && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-gray-800">
-                Top 10 Laman Teraktif (Traffic)
-              </h2>
-              <p className="mt-0.5 text-xs text-gray-500">
-                Visualisasi 10 halaman organik paling sering diakses (semua
-                waktu)
-              </p>
-            </div>
-            <div className="mt-2 sm:mt-0 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[11px] font-semibold flex items-center gap-1.5 w-fit">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Live Data
-            </div>
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm relative min-h-[380px]">
+        {/* Loading Overlay inside the Traffic Card */}
+        {loadingTraffic && (
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-2 rounded-2xl">
+            <Loader2 size={24} className="animate-spin text-emerald-600" />
+            <span className="text-xs text-gray-500 font-medium">
+              Memuat data traffic...
+            </span>
           </div>
+        )}
+
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-gray-800">
+              Top 10 Laman Teraktif (Traffic)
+            </h2>
+            <p className="mt-0.5 text-xs text-gray-500">
+              {dateFrom || dateTo
+                ? `Visualisasi 10 halaman organik paling sering diakses periode ${
+                    dateFrom
+                      ? new Date(dateFrom).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "awal"
+                  } – ${
+                    dateTo
+                      ? new Date(dateTo).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "sekarang"
+                  }`
+                : "Visualisasi 10 halaman organik paling sering diakses (30 hari terakhir)"}
+            </p>
+          </div>
+          <div className="mt-2 sm:mt-0 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[11px] font-semibold flex items-center gap-1.5 w-fit">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            {loadingTraffic ? "Sinkronisasi..." : "Live Data"}
+          </div>
+        </div>
+
+        {!loadingTraffic && trafficData.length === 0 ? (
+          <div className="h-[300px] flex items-center justify-center text-gray-400 text-xs">
+            Tidak ada data traffic untuk periode ini atau Google Analytics belum
+            terkonfigurasi.
+          </div>
+        ) : (
           <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={trafficData.slice(0, 10).map((d: any) => ({
                   name: d.human_readable_path || d.page_path,
                   views: parseInt(d.views || 0, 10),
+                  users: parseInt(d.active_users || 0, 10),
+                  sessions: parseInt(d.sessions || 0, 10),
                 }))}
                 margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
               >
@@ -303,22 +436,36 @@ export default function DashboardPage() {
                   tickLine={false}
                 />
                 <RechartsTooltip
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "none",
-                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                    padding: "8px 12px",
-                  }}
-                  labelStyle={{
-                    fontWeight: 600,
-                    color: "#374151",
-                    fontSize: "11px",
-                    marginBottom: "4px",
-                  }}
-                  itemStyle={{
-                    fontSize: "12px",
-                    color: "#10B981",
-                    fontWeight: 600,
+                  content={({ active, payload, label }: any) => {
+                    if (active && payload && payload.length) {
+                      const item = payload[0].payload;
+                      return (
+                        <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-lg text-xs flex flex-col gap-1">
+                          <p className="font-bold text-gray-800 border-b border-gray-50 pb-1 mb-1">
+                            {label}
+                          </p>
+                          <p className="text-emerald-600 font-semibold flex items-center justify-between gap-4">
+                            <span>Tayangan:</span>
+                            <span className="font-bold">
+                              {item.views.toLocaleString("id-ID")}
+                            </span>
+                          </p>
+                          <p className="text-blue-500 font-semibold flex items-center justify-between gap-4">
+                            <span>Pengguna Aktif:</span>
+                            <span className="font-bold">
+                              {item.users.toLocaleString("id-ID")}
+                            </span>
+                          </p>
+                          <p className="text-amber-500 font-semibold flex items-center justify-between gap-4">
+                            <span>Sesi:</span>
+                            <span className="font-bold">
+                              {item.sessions.toLocaleString("id-ID")}
+                            </span>
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
                   }}
                 />
                 <Area
@@ -334,8 +481,8 @@ export default function DashboardPage() {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
