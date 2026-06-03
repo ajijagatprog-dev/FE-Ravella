@@ -25,12 +25,21 @@ export default function NewProducts() {
   );
 
   useEffect(() => {
+    // Check if cache is still valid (not invalidated by admin updates)
+    const isCacheValid = (cacheTs: number) => {
+      try {
+        const version = localStorage.getItem("ravelle_cache_version");
+        if (version && parseInt(version) > cacheTs) return false;
+      } catch {}
+      return Date.now() - cacheTs < 5 * 60 * 1000;
+    };
+
     // Try to restore from cache first
     try {
-      const cached = sessionStorage.getItem("ravelle_new_products");
+      const cached = localStorage.getItem("ravelle_new_products");
       if (cached) {
         const { data, ts } = JSON.parse(cached);
-        if (Date.now() - ts < 5 * 60 * 1000) {
+        if (isCacheValid(ts)) {
           setProducts(data);
           setIsLoading(false);
           return; // Cache is fresh, skip API call
@@ -62,13 +71,13 @@ export default function NewProducts() {
               image:
                 item.image ||
                 "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-              badge: item.badge || (item.is_featured ? "Best Seller" : "New"),
+              badge: item.badge || "New",
               rating: item.rating ? parseFloat(item.rating) : 0,
             };
           });
           setProducts(mapped);
           try {
-            sessionStorage.setItem(
+            localStorage.setItem(
               "ravelle_new_products",
               JSON.stringify({ data: mapped, ts: Date.now() }),
             );

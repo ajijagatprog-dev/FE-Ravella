@@ -52,12 +52,21 @@ function ProductPageContent() {
   const initialCategory = searchParams.get("category");
 
   useEffect(() => {
+    // Check if cache is still valid (not invalidated by admin updates)
+    const isCacheValid = (cacheTs: number) => {
+      try {
+        const version = localStorage.getItem("ravelle_cache_version");
+        if (version && parseInt(version) > cacheTs) return false;
+      } catch {}
+      return Date.now() - cacheTs < 5 * 60 * 1000;
+    };
+
     // Try to restore from cache first
     try {
-      const cached = sessionStorage.getItem("ravelle_all_products");
+      const cached = localStorage.getItem("ravelle_all_products");
       if (cached) {
         const { data, ts } = JSON.parse(cached);
-        if (Date.now() - ts < 5 * 60 * 1000) {
+        if (isCacheValid(ts)) {
           setProducts(data);
           setIsLoading(false);
           return;
@@ -100,13 +109,13 @@ function ProductPageContent() {
                   ? item.specifications
                   : {},
               inStock: item.stock > 0,
-              badge: item.badge || (item.is_featured ? "Best Seller" : ""),
+              badge: item.badge || "",
               _variants: item.variants || [],
             };
           });
           setProducts(mapped);
           try {
-            sessionStorage.setItem(
+            localStorage.setItem(
               "ravelle_all_products",
               JSON.stringify({ data: mapped, ts: Date.now() }),
             );
@@ -123,7 +132,8 @@ function ProductPageContent() {
     fetchProducts();
   }, []);
 
-  const initialSearch = searchParams.get("q") || searchParams.get("search") || "";
+  const initialSearch =
+    searchParams.get("q") || searchParams.get("search") || "";
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [activeCategory, setActiveCategory] = useState("ALL PRODUCTS");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -257,7 +267,7 @@ function ProductPageContent() {
       filtered = filtered.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          (p.category && p.category.toLowerCase().includes(q))
+          (p.category && p.category.toLowerCase().includes(q)),
       );
     }
     filtered = filtered.filter(
