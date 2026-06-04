@@ -268,9 +268,9 @@ function ProductCard({
         className="block relative aspect-square overflow-hidden mb-3 sm:mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-3 sm:p-5 flex items-center justify-center"
       >
         {/* Badge */}
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
           <span
-            className={`inline-block px-3 py-1 text-[10px] font-medium tracking-[0.15em] uppercase shadow-sm ${
+            className={`inline-block px-1.5 py-0.5 sm:px-3 sm:py-1 text-[8px] sm:text-[10px] font-semibold tracking-[0] sm:tracking-[0.15em] uppercase shadow-sm ${
               badgeStyle[product.badge] ?? "bg-neutral-900 text-white"
             }`}
           >

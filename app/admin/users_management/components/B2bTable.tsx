@@ -50,13 +50,15 @@ function StatusBadge({ status }: { status: string }) {
 
 // ─── Type Badge ───────────────────────────────────────────────────────────────
 function TypeBadge({ type }: { type: string }) {
-  const isB2B = type?.toUpperCase() === "B2B PARTNER" || type?.toUpperCase() === "B2B";
+  const isB2B =
+    type?.toUpperCase() === "B2B PARTNER" || type?.toUpperCase() === "B2B";
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide ${isB2B
-        ? "bg-blue-100 text-blue-700 ring-1 ring-blue-200"
-        : "bg-violet-100 text-violet-700 ring-1 ring-violet-200"
-        }`}
+      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide ${
+        isB2B
+          ? "bg-blue-100 text-blue-700 ring-1 ring-blue-200"
+          : "bg-violet-100 text-violet-700 ring-1 ring-violet-200"
+      }`}
     >
       {isB2B ? "B2B Partner" : "Retail"}
     </span>
@@ -73,10 +75,9 @@ function Avatar({ name, isB2B }: { name: string; isB2B: boolean }) {
     .toUpperCase();
   return (
     <div
-      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${isB2B
-        ? "bg-blue-100 text-blue-700"
-        : "bg-violet-100 text-violet-700"
-        }`}
+      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
+        isB2B ? "bg-blue-100 text-blue-700" : "bg-violet-100 text-violet-700"
+      }`}
     >
       {initials}
     </div>
@@ -84,7 +85,17 @@ function Avatar({ name, isB2B }: { name: string; isB2B: boolean }) {
 }
 
 // ─── Action Buttons ───────────────────────────────────────────────────────────
-function ActionButtons({ row, onAction, onViewDetail, onDeleteRequest }: { row: any; onAction?: (userId: number, action: string) => void; onViewDetail?: (userId: number) => void; onDeleteRequest?: (userId: number, name: string) => void }) {
+function ActionButtons({
+  row,
+  onAction,
+  onViewDetail,
+  onDeleteRequest,
+}: {
+  row: any;
+  onAction?: (userId: number, action: string) => void;
+  onViewDetail?: (userId: number) => void;
+  onDeleteRequest?: (userId: number, name: string) => void;
+}) {
   const status = row.status?.toLowerCase();
   const type = row.type?.toUpperCase();
 
@@ -98,8 +109,18 @@ function ActionButtons({ row, onAction, onViewDetail, onDeleteRequest }: { row: 
       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 active:scale-95 transition-all shadow-sm shrink-0"
       title="Hapus User"
     >
-      <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      <svg
+        className="w-3.5 h-3.5 text-red-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        />
       </svg>
       Hapus
     </button>
@@ -110,8 +131,18 @@ function ActionButtons({ row, onAction, onViewDetail, onDeleteRequest }: { row: 
       return (
         <div className="flex gap-2">
           <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
             </svg>
             Transactions
           </button>
@@ -129,13 +160,13 @@ function ActionButtons({ row, onAction, onViewDetail, onDeleteRequest }: { row: 
       return (
         <div className="flex gap-2">
           <button
-            onClick={() => onAction?.(row.id, 'approve')}
+            onClick={() => onAction?.(row.id, "approve")}
             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
           >
             Verify Now
           </button>
           <button
-            onClick={() => onAction?.(row.id, 'reject')}
+            onClick={() => onAction?.(row.id, "reject")}
             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
           >
             Reject
@@ -147,7 +178,7 @@ function ActionButtons({ row, onAction, onViewDetail, onDeleteRequest }: { row: 
     return (
       <div className="flex gap-2">
         <button
-          onClick={() => onAction?.(row.id, 'approve')}
+          onClick={() => onAction?.(row.id, "approve")}
           className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
         >
           Re-activate
@@ -161,9 +192,24 @@ function ActionButtons({ row, onAction, onViewDetail, onDeleteRequest }: { row: 
   return (
     <div className="flex gap-2">
       <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors">
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        <svg
+          className="w-3.5 h-3.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+          />
         </svg>
         View Activity
       </button>
@@ -184,7 +230,10 @@ function SkeletonRow() {
     <tr className="border-b border-slate-100">
       {[1, 2, 3, 4, 5].map((i) => (
         <td key={i} className="px-4 py-4">
-          <div className="h-4 bg-slate-200 rounded animate-pulse" style={{ width: `${60 + i * 8}%` }} />
+          <div
+            className="h-4 bg-slate-200 rounded animate-pulse"
+            style={{ width: `${60 + i * 8}%` }}
+          />
         </td>
       ))}
     </tr>
@@ -214,7 +263,11 @@ function Pagination({
     } else {
       pages.push(1);
       if (page > 3) pages.push("...");
-      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
+      for (
+        let i = Math.max(2, page - 1);
+        i <= Math.min(totalPages - 1, page + 1);
+        i++
+      ) {
         pages.push(i);
       }
       if (page < totalPages - 2) pages.push("...");
@@ -226,8 +279,15 @@ function Pagination({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-slate-100">
       <span className="text-xs text-slate-500">
-        Showing <span className="font-medium text-slate-700">{start}–{end}</span> of{" "}
-        <span className="font-medium text-slate-700">{total.toLocaleString()}</span> users
+        Showing{" "}
+        <span className="font-medium text-slate-700">
+          {start}–{end}
+        </span>{" "}
+        of{" "}
+        <span className="font-medium text-slate-700">
+          {total.toLocaleString()}
+        </span>{" "}
+        users
       </span>
       <div className="flex items-center gap-1">
         <button
@@ -235,35 +295,59 @@ function Pagination({
           onClick={() => handlePageChange(page - 1)}
           className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         {getPages().map((p, i) =>
           p === "..." ? (
-            <span key={`dot-${i}`} className="w-8 h-8 flex items-center justify-center text-slate-400 text-sm">
+            <span
+              key={`dot-${i}`}
+              className="w-8 h-8 flex items-center justify-center text-slate-400 text-sm"
+            >
               …
             </span>
           ) : (
             <button
               key={p}
               onClick={() => handlePageChange(p as number)}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${page === p
-                ? "bg-blue-600 text-white shadow-sm"
-                : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                }`}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                page === p
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
             >
               {p}
             </button>
-          )
+          ),
         )}
         <button
           disabled={page === totalPages}
           onClick={() => handlePageChange(page + 1)}
           className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </button>
       </div>
@@ -303,8 +387,7 @@ export default function B2bTable({
       typeFilter === "all" ||
       row.type?.toLowerCase().replace(" ", "") === typeFilter;
     const matchStatus =
-      statusFilter === "all" ||
-      row.status?.toLowerCase() === statusFilter;
+      statusFilter === "all" || row.status?.toLowerCase() === statusFilter;
     return matchSearch && matchType && matchStatus;
   });
 
@@ -320,7 +403,12 @@ export default function B2bTable({
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z"
+            />
           </svg>
           <input
             type="text"
@@ -360,7 +448,9 @@ export default function B2bTable({
             className="pl-3 pr-8 py-2 text-sm rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
           >
             {[10, 25, 50].map((n) => (
-              <option key={n} value={n}>{n} / page</option>
+              <option key={n} value={n}>
+                {n} / page
+              </option>
             ))}
           </select>
         </div>
@@ -371,25 +461,49 @@ export default function B2bTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">User / Business</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Transaction</th>
-              <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                User / Business
+              </th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Type
+              </th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Last Transaction
+              </th>
+              <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {isLoading ? (
-              Array.from({ length: limit }).map((_, i) => <SkeletonRow key={i} />)
+              Array.from({ length: limit }).map((_, i) => (
+                <SkeletonRow key={i} />
+              ))
             ) : filtered.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-16 text-center">
                   <div className="flex flex-col items-center gap-2 text-slate-400">
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg
+                      className="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
                     </svg>
                     <p className="font-medium text-slate-500">No users found</p>
-                    <p className="text-xs">Try adjusting your search or filters</p>
+                    <p className="text-xs">
+                      Try adjusting your search or filters
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -404,9 +518,14 @@ export default function B2bTable({
                     {/* User / Business */}
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-3">
-                        <Avatar name={row.name ?? row.company ?? "?"} isB2B={isB2B} />
+                        <Avatar
+                          name={row.name ?? row.company ?? "?"}
+                          isB2B={isB2B}
+                        />
                         <div className="min-w-0">
-                          <p className="font-semibold text-slate-800 truncate">{row.name ?? row.company}</p>
+                          <p className="font-semibold text-slate-800 truncate">
+                            {row.name ?? row.company}
+                          </p>
                           <p className="text-xs text-slate-400 truncate">
                             {row.email ?? row.taxId ?? row.npwp}
                           </p>
@@ -428,21 +547,27 @@ export default function B2bTable({
                     <td className="px-4 py-3.5">
                       {row.lastTransaction ? (
                         <div>
-                          <p className="font-semibold text-slate-700">{row.lastTransaction.amount}</p>
-                          <p className="text-xs text-slate-400">{row.lastTransaction.date}</p>
+                          <p className="font-semibold text-slate-700">
+                            {row.lastTransaction.amount}
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            {row.lastTransaction.date}
+                          </p>
                         </div>
                       ) : (
-                        <span className="text-xs italic text-slate-400">No transactions yet</span>
+                        <span className="text-xs italic text-slate-400">
+                          No transactions yet
+                        </span>
                       )}
                     </td>
 
                     {/* Actions */}
                     <td className="px-4 py-3.5">
                       <div className="flex justify-end">
-                        <ActionButtons 
-                          row={row} 
-                          onAction={onUserAction} 
-                          onViewDetail={onViewDetail} 
+                        <ActionButtons
+                          row={row}
+                          onAction={onUserAction}
+                          onViewDetail={onViewDetail}
                           onDeleteRequest={(id, name) => {
                             setConfirmDeleteId(id);
                             setDeleteTargetName(name);
@@ -474,7 +599,9 @@ export default function B2bTable({
             </div>
           ))
         ) : filtered.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-sm">No users found</div>
+          <div className="p-12 text-center text-slate-400 text-sm">
+            No users found
+          </div>
         ) : (
           filtered.map((row, idx) => {
             const isB2B = row.type?.toUpperCase().includes("B2B");
@@ -482,10 +609,17 @@ export default function B2bTable({
               <div key={row.id ?? idx} className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3 min-w-0">
-                    <Avatar name={row.name ?? row.company ?? "?"} isB2B={isB2B} />
+                    <Avatar
+                      name={row.name ?? row.company ?? "?"}
+                      isB2B={isB2B}
+                    />
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-800 truncate">{row.name ?? row.company}</p>
-                      <p className="text-xs text-slate-400 truncate">{row.email ?? row.taxId ?? row.npwp}</p>
+                      <p className="font-semibold text-slate-800 truncate">
+                        {row.name ?? row.company}
+                      </p>
+                      <p className="text-xs text-slate-400 truncate">
+                        {row.email ?? row.taxId ?? row.npwp}
+                      </p>
                     </div>
                   </div>
                   <StatusBadge status={row.status} />
@@ -495,18 +629,24 @@ export default function B2bTable({
                   <TypeBadge type={row.type} />
                   {row.lastTransaction ? (
                     <div className="text-right">
-                      <p className="font-semibold text-slate-700 text-xs">{row.lastTransaction.amount}</p>
-                      <p className="text-xs text-slate-400">{row.lastTransaction.date}</p>
+                      <p className="font-semibold text-slate-700 text-xs">
+                        {row.lastTransaction.amount}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {row.lastTransaction.date}
+                      </p>
                     </div>
                   ) : (
-                    <span className="text-xs italic text-slate-400">No transactions yet</span>
+                    <span className="text-xs italic text-slate-400">
+                      No transactions yet
+                    </span>
                   )}
                 </div>
 
-                <ActionButtons 
-                  row={row} 
-                  onAction={onUserAction} 
-                  onViewDetail={onViewDetail} 
+                <ActionButtons
+                  row={row}
+                  onAction={onUserAction}
+                  onViewDetail={onViewDetail}
                   onDeleteRequest={(id, name) => {
                     setConfirmDeleteId(id);
                     setDeleteTargetName(name);
@@ -519,7 +659,12 @@ export default function B2bTable({
       </div>
 
       {/* ── Pagination ── */}
-      <Pagination page={page} total={total} limit={limit} handlePageChange={handlePageChange} />
+      <Pagination
+        page={page}
+        total={total}
+        limit={limit}
+        handlePageChange={handlePageChange}
+      />
 
       {/* ── Custom Deletion Confirmation Modal ── */}
       {confirmDeleteId !== null && (
@@ -527,23 +672,45 @@ export default function B2bTable({
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-4 text-red-600">
               <div className="p-3 bg-red-100 rounded-2xl">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-black text-slate-900 tracking-tight">Konfirmasi Hapus</h3>
-                <p className="text-xs text-slate-400 font-medium">Tindakan ini permanen & tidak dapat dibatalkan</p>
+                <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                  Konfirmasi Hapus
+                </h3>
+                <p className="text-xs text-slate-400 font-medium">
+                  Tindakan ini permanen & tidak dapat dibatalkan
+                </p>
               </div>
             </div>
-            
+
             <p className="text-sm text-slate-600 mt-4 leading-relaxed font-medium">
-              Apakah Anda yakin ingin menghapus user <strong className="text-slate-800 font-extrabold">{deleteTargetName}</strong> beserta seluruh riwayat transaksi, ulasan, dan data terkait dari sistem?
+              Apakah Anda yakin ingin menghapus user{" "}
+              <strong className="text-slate-800 font-extrabold">
+                {deleteTargetName}
+              </strong>{" "}
+              beserta seluruh riwayat transaksi, ulasan, dan data terkait dari
+              sistem?
             </p>
-            
+
             <div className="flex items-center justify-end gap-3 mt-6">
               <button
-                onClick={() => { setConfirmDeleteId(null); setDeleteTargetName(""); }}
+                onClick={() => {
+                  setConfirmDeleteId(null);
+                  setDeleteTargetName("");
+                }}
                 className="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all"
               >
                 Batal
@@ -551,7 +718,7 @@ export default function B2bTable({
               <button
                 onClick={() => {
                   if (confirmDeleteId !== null) {
-                    onUserAction?.(confirmDeleteId, 'delete');
+                    onUserAction?.(confirmDeleteId, "delete");
                     setConfirmDeleteId(null);
                     setDeleteTargetName("");
                   }
