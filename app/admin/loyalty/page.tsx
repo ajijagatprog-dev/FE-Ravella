@@ -4,6 +4,7 @@ import { useState } from "react";
 import GlobalPointSettings from "./components/GlobalPointSettings";
 import MembershipTiers from "./components/MembershipTiers";
 import CustomerLoyaltyTable from "./components/CustomerLoyaltyTable";
+import LoyaltyVouchers from "./components/LoyaltyVouchers";
 import {
   Lock,
   Unlock,
@@ -321,6 +322,9 @@ function SyncResultModal({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function LoyaltyPage() {
+  const [activeTab, setActiveTab] = useState<"settings" | "vouchers">(
+    "settings",
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [showSyncConfirm, setShowSyncConfirm] = useState(false);
@@ -349,7 +353,7 @@ export default function LoyaltyPage() {
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8">
       {/* ── Page Header ── */}
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-5 mb-8">
+      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-5 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
@@ -361,40 +365,42 @@ export default function LoyaltyPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap justify-end">
-            {/* Sync Button */}
-            <button
-              onClick={() => setShowSyncConfirm(true)}
-              disabled={syncing}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm border shrink-0 bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {syncing ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <RefreshCw size={16} />
-              )}
-              <span>{syncing ? "Syncing..." : "Sync Poin"}</span>
-            </button>
+          {activeTab === "settings" && (
+            <div className="flex items-center gap-3 flex-wrap justify-end">
+              {/* Sync Button */}
+              <button
+                onClick={() => setShowSyncConfirm(true)}
+                disabled={syncing}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm border shrink-0 bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {syncing ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <RefreshCw size={16} />
+                )}
+                <span>{syncing ? "Syncing..." : "Sync Poin"}</span>
+              </button>
 
-            {/* Edit Mode Button */}
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className={`
-                inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm border shrink-0
-                ${
-                  isEditing
-                    ? "bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                }
-              `}
-            >
-              {isEditing ? <Unlock size={16} /> : <Lock size={16} />}
-              <span className="hidden xs:inline">
-                {isEditing ? "Exit Edit Mode" : "Edit Loyalty System"}
-              </span>
-              <span className="xs:hidden">{isEditing ? "Exit" : "Edit"}</span>
-            </button>
-          </div>
+              {/* Edit Mode Button */}
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className={`
+                  inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm border shrink-0
+                  ${
+                    isEditing
+                      ? "bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100"
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  }
+                `}
+              >
+                {isEditing ? <Unlock size={16} /> : <Lock size={16} />}
+                <span className="hidden xs:inline">
+                  {isEditing ? "Exit Edit Mode" : "Edit Loyalty System"}
+                </span>
+                <span className="xs:hidden">{isEditing ? "Exit" : "Edit"}</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ── Error Banner ── */}
@@ -412,14 +418,46 @@ export default function LoyaltyPage() {
         )}
       </div>
 
+      {/* ── Tabs Navigation ── */}
+      <div className="px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="flex border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab("settings")}
+            className={`py-3 px-6 font-semibold text-sm border-b-2 transition-all duration-200 ${
+              activeTab === "settings"
+                ? "border-stone-900 text-stone-900"
+                : "border-transparent text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            Sistem &amp; Tier Membership
+          </button>
+          <button
+            onClick={() => setActiveTab("vouchers")}
+            className={`py-3 px-6 font-semibold text-sm border-b-2 transition-all duration-200 ${
+              activeTab === "vouchers"
+                ? "border-stone-900 text-stone-900"
+                : "border-transparent text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            Hadiah Voucher Loyalty
+          </button>
+        </div>
+      </div>
+
       {/* ── Main Content Area ── */}
       <div className="px-4 sm:px-6 lg:px-8 space-y-8 pb-10">
-        <GlobalPointSettings
-          isEditing={isEditing}
-          setIsEditing={setIsEditing}
-        />
-        <MembershipTiers isEditing={isEditing} />
-        <CustomerLoyaltyTable />
+        {activeTab === "settings" ? (
+          <>
+            <GlobalPointSettings
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+            />
+            <MembershipTiers isEditing={isEditing} />
+            <CustomerLoyaltyTable />
+          </>
+        ) : (
+          <LoyaltyVouchers />
+        )}
       </div>
 
       {/* ── Sync Confirm Modal ── */}

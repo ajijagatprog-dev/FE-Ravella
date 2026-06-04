@@ -44,6 +44,7 @@ export default function CheckoutPage() {
     const [voucherError, setVoucherError] = useState('');
     const [applyingVoucher, setApplyingVoucher] = useState(false);
     const [availableVouchers, setAvailableVouchers] = useState<any[]>([]);
+    const [loyaltyData, setLoyaltyData] = useState<any>(null);
 
     // ── RajaOngkir: Shipping State ────────────────────────────────
     const [selectedCourier, setSelectedCourier] = useState("jnt");
@@ -176,6 +177,15 @@ export default function CheckoutPage() {
                 await fetchAddresses();
 
                 try {
+                    const lRes = await api.get('/customer/loyalty');
+                    if (lRes.data.status === 'success') {
+                        setLoyaltyData(lRes.data.data);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch loyalty data:", e);
+                }
+
+                try {
                     let recRes = await api.get('/products', { params: { on_sale: true, limit: 12 } });
                     if (recRes.data.status !== 'success' || !recRes.data.data?.data?.length) {
                         recRes = await api.get('/products', { params: { limit: 12 } });
@@ -259,9 +269,32 @@ export default function CheckoutPage() {
     }
 
     const subtotal      = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+
+    // ── Loyalty Tier Free Shipping Perk Check ─────────────────────
+    let isFreeShippingEligible = false;
+    let freeShippingTierName = "";
+    if (loyaltyData && loyaltyData.benefits) {
+        for (const perk of loyaltyData.benefits) {
+            const perkLower = perk.label.toLowerCase();
+            if (perkLower.includes('free ongkir') || perkLower.includes('gratis ongkir')) {
+                const matches = perk.label.match(/rp\s*([\d\.]+)/i);
+                let minSpend = 0;
+                if (matches && matches[1]) {
+                    minSpend = parseFloat(matches[1].replace(/\./g, ''));
+                }
+                if (subtotal >= minSpend) {
+                    isFreeShippingEligible = true;
+                    freeShippingTierName = loyaltyData.tier;
+                }
+                break;
+            }
+        }
+    }
+
     const discountAmt   = voucherResult?.discount_amount || 0;
     const shippingFee   = selectedShipping?.cost ?? null;
-    const grandTotal    = Math.max(0, subtotal - discountAmt + (shippingFee ?? 0));
+    const appliedShippingFee = (shippingFee !== null && isFreeShippingEligible) ? 0 : shippingFee;
+    const grandTotal    = Math.max(0, subtotal - discountAmt + (appliedShippingFee ?? 0));
 
     const fmt = (p: number) =>
         new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(p);
@@ -293,7 +326,7 @@ export default function CheckoutPage() {
                 payment_method:      paymentMethod,
                 courier:             selectedCourier,
                 courier_service:     selectedShipping?.service,
-                shipping_cost:       shippingFee,
+                shipping_cost:       appliedShippingFee,
                 items: cart.map(i => ({ product_id: i.id, quantity: i.quantity, price: i.price })),
                 utm_source: sessionStorage.getItem("ravella_utm_source"),
                 utm_medium: sessionStorage.getItem("ravella_utm_medium"),
@@ -756,10 +789,19 @@ export default function CheckoutPage() {
                             )}
                             <div className="flex justify-between text-stone-600">
                                 <span>Ongkos Kirim</span>
-                                <span className="font-medium text-stone-800">
+                                <span className="font-medium text-stone-800 text-right">
                                     {loadingShipping ? <Loader2 className="w-3 h-3 animate-spin inline" />
-                                        : shippingFee !== null ? (shippingFee === 0 ? 'Gratis' : fmt(shippingFee))
-                                            : <span className="text-stone-400 text-xs italic">Pilih layanan</span>}
+                                        : shippingFee !== null ? (
+                                            isFreeShippingEligible ? (
+                                                <div>
+                                                    <span className="line-through text-stone-400 mr-2">{fmt(shippingFee)}</span>
+                                                    <span className="text-green-600 font-semibold">Gratis</span>
+                                                    <div className="text-[10px] text-green-500 font-light mt-0.5">Tier {freeShippingTierName} Benefit</div>
+                                                </div>
+                                            ) : (
+                                                shippingFee === 0 ? 'Gratis' : fmt(shippingFee)
+                                            )
+                                        ) : <span className="text-stone-400 text-xs italic">Pilih layanan</span>}
                                 </span>
                             </div>
                             {selectedShipping && (
