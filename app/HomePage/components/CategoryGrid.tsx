@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   ArrowRight,
   Home,
@@ -7,12 +8,14 @@ import {
   Package,
   Sofa,
   Laptop,
+  Loader2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 export default function CategoryGrid() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const categories = [
     {
@@ -125,9 +128,25 @@ export default function CategoryGrid() {
 
         {/* ── View All CTA ── */}
         <div className="text-center mt-12 sm:mt-16">
-          <button className="group inline-flex items-center gap-3 px-10 py-4 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-[11px] tracking-[0.2em] uppercase font-medium">
-            <span>Lihat Semua Kategori</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <button
+            disabled={loading}
+            onClick={() => {
+              setLoading(true);
+              router.push("/product");
+            }}
+            className="group inline-flex items-center gap-3 px-10 py-4 border border-neutral-800 text-neutral-900 hover:bg-neutral-900 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 text-[11px] tracking-[0.2em] uppercase font-medium"
+          >
+            {loading ? (
+              <>
+                <span>Memuat...</span>
+                <Loader2 className="w-4 h-4 animate-spin" />
+              </>
+            ) : (
+              <>
+                <span>Lihat Semua Kategori</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
           </button>
         </div>
       </motion.div>
