@@ -19,6 +19,7 @@ import {
   Check,
   Filter,
   Sparkles,
+  Loader2,
 } from "lucide-react";
 import { useState, useMemo, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,6 +48,7 @@ export default function ProductPage() {
 function ProductPageContent() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [displayLimit, setDisplayLimit] = useState(8);
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category");
@@ -806,26 +808,38 @@ function ProductPageContent() {
             className="mt-24 text-center flex justify-center"
           >
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setDisplayLimit((prev) => prev + 8)}
-              className="group relative px-16 py-5 bg-white text-neutral-900 text-[10px] tracking-[0.3em] uppercase font-bold border border-neutral-200 overflow-hidden transition-all duration-500 hover:border-neutral-900 shadow-sm hover:shadow-xl flex items-center gap-3"
+              whileHover={!loadingMore ? { scale: 1.02 } : {}}
+              whileTap={!loadingMore ? { scale: 0.98 } : {}}
+              disabled={loadingMore}
+              onClick={() => {
+                setLoadingMore(true);
+                setTimeout(() => {
+                  setDisplayLimit((prev) => prev + 8);
+                  setLoadingMore(false);
+                }, 600);
+              }}
+              className="group relative px-16 py-5 bg-white text-neutral-900 text-[10px] tracking-[0.3em] uppercase font-bold border border-neutral-200 overflow-hidden transition-all duration-500 hover:border-neutral-900 shadow-sm hover:shadow-xl flex items-center gap-3 disabled:cursor-not-allowed disabled:opacity-80"
             >
-              <span className="relative z-10 group-hover:text-white transition-colors duration-500">
-                Load More
-              </span>
-              <motion.div className="absolute inset-0 bg-neutral-900 -z-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-              <motion.span
-                animate={{ y: [0, 5, 0] }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 1.5,
-                  ease: "easeInOut",
-                }}
-                className="relative z-10 group-hover:text-white transition-colors duration-500"
-              >
-                ↓
-              </motion.span>
+              {loadingMore ? (
+                <>
+                  <Loader2 className="relative z-10 w-4 h-4 animate-spin text-neutral-600" />
+                  <span className="relative z-10 text-neutral-600">Memuat...</span>
+                </>
+              ) : (
+                <>
+                  <span className="relative z-10 group-hover:text-white transition-colors duration-500">
+                    Load More
+                  </span>
+                  <motion.div className="absolute inset-0 bg-neutral-900 -z-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                  <motion.span
+                    animate={{ y: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                    className="relative z-10 group-hover:text-white transition-colors duration-500"
+                  >
+                    ↓
+                  </motion.span>
+                </>
+              )}
             </motion.button>
           </motion.div>
         )}
