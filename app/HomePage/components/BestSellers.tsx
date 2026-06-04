@@ -30,69 +30,90 @@ export default function BestSellers() {
     { visible: false, productName: "" },
   );
 
-  useEffect(() => {
-    // Try to restore from cache first
-    try {
-      const cached = sessionStorage.getItem("ravelle_best_sellers");
-      if (cached) {
-        const { data, ts } = JSON.parse(cached);
-        if (Date.now() - ts < 5 * 60 * 1000) {
-          setProducts(data);
-          setIsLoading(false);
-          return;
-        }
-      }
-    } catch {}
-
-    const fetchBestSellers = async () => {
+  const fetchBestSellers = async (forceRefresh = false) => {
+    // Check if cache is still valid (not invalidated by admin updates)
+    const isCacheValid = (cacheTs: number) => {
       try {
-        const res = await api.get("/products", {
-          params: { limit: 100 },
-        });
-        if (res.data.status === "success") {
-          const allProducts = res.data.data.data;
-          const bestSellers = allProducts
-            .filter(
-              (item: any) =>
-                item.badge === "Best Seller" ||
-                item.is_featured === 1 ||
-                item.is_featured === true,
-            )
-            .slice(0, 4)
-            .map((item: any) => {
-              const displayPrice = item.promoted_price || item.price;
-              return {
-                id: item.id,
-                title: item.name,
-                category: item.category || "Peralatan Masak",
-                price: new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                  minimumFractionDigits: 0,
-                }).format(displayPrice),
-                rawPrice: displayPrice,
-                image:
-                  item.image ||
-                  "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
-                badge: item.badge || "Best Seller",
-                rating: item.rating ? parseFloat(item.rating) : 0,
-              };
-            });
-          setProducts(bestSellers);
-          try {
-            sessionStorage.setItem(
-              "ravelle_best_sellers",
-              JSON.stringify({ data: bestSellers, ts: Date.now() }),
-            );
-          } catch {}
+        const version = localStorage.getItem("ravelle_cache_version");
+        if (version && parseInt(version) > cacheTs) return false;
+      } catch {}
+      return Date.now() - cacheTs < 5 * 60 * 1000;
+    };
+
+    if (!forceRefresh) {
+      // Try to restore from cache first
+      try {
+        const cached = localStorage.getItem("ravelle_best_sellers");
+        if (cached) {
+          const { data, ts } = JSON.parse(cached);
+          if (isCacheValid(ts)) {
+            setProducts(data);
+            setIsLoading(false);
+            return;
+          }
         }
-      } catch (error) {
-        console.error("Failed to fetch best sellers", error);
-      } finally {
-        setIsLoading(false);
+      } catch {}
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await api.get("/products", {
+        params: { limit: 100 },
+      });
+      if (res.data.status === "success") {
+        const allProducts = res.data.data.data;
+        const bestSellers = allProducts
+          .filter((item: any) => item.badge === "Best Seller")
+          .slice(0, 4)
+          .map((item: any) => {
+            const displayPrice = item.promoted_price || item.price;
+            return {
+              id: item.id,
+              title: item.name,
+              category: item.category || "Peralatan Masak",
+              price: new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0,
+              }).format(displayPrice),
+              rawPrice: displayPrice,
+              image:
+                item.image ||
+                "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&q=80",
+              badge: item.badge || "Best Seller",
+              rating: item.rating ? parseFloat(item.rating) : 0,
+            };
+          });
+        setProducts(bestSellers);
+        try {
+          localStorage.setItem(
+            "ravelle_best_sellers",
+            JSON.stringify({ data: bestSellers, ts: Date.now() }),
+          );
+        } catch {}
+      }
+    } catch (error) {
+      console.error("Failed to fetch best sellers", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Initial fetch
+    fetchBestSellers();
+
+    // Listen for cache invalidation from admin (another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "ravelle_cache_version") {
+        // Admin updated products — clear local cache and re-fetch
+        localStorage.removeItem("ravelle_best_sellers");
+        fetchBestSellers(true);
       }
     };
-    fetchBestSellers();
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   const handleAddToCart = (p: Product) => {
@@ -285,9 +306,9 @@ function ProductCard({
         className="block relative aspect-square overflow-hidden mb-3 sm:mb-4 bg-neutral-50 rounded-xl border border-neutral-100 p-3 sm:p-5 flex items-center justify-center"
       >
         {/* Badge */}
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
           <span
-            className={`inline-block px-3 py-1 text-[10px] font-medium tracking-[0.15em] uppercase shadow-sm ${
+            className={`inline-block px-1.5 py-0.5 sm:px-3 sm:py-1 text-[8px] sm:text-[10px] font-semibold tracking-[0] sm:tracking-[0.15em] uppercase shadow-sm ${
               badgeStyle[product.badge] ?? "bg-neutral-900 text-white"
             }`}
           >

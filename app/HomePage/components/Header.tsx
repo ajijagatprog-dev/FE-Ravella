@@ -98,7 +98,9 @@ export default function Header({
   const dropdownBanners = useBanners("product-dropdown", [
     "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&q=80",
     "",
-    "",
+    "/Product/Ravelle-Cooking-BG.png",
+    "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&q=80",
+    "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&q=80",
   ]);
 
   useEffect(() => {
@@ -443,45 +445,71 @@ export default function Header({
                 {/* Category grid */}
                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
                   {categories.length > 0 ? (
-                    categories.map((cat, i) => (
-                      <Link
-                        key={cat}
-                        href={
-                          cat.toLowerCase().includes("kitchen")
-                            ? `/product?category=${encodeURIComponent("Home & Kitchen Appliance")}`
-                            : cat.toLowerCase().includes("living")
-                              ? `/product?category=${encodeURIComponent("home living")}`
-                              : `/product?category=${encodeURIComponent(cat)}`
-                        }
-                        className={`cat-card cat-card-stagger rounded-xl p-4 block ${dropdownBanners[2] ? "!bg-white/10 backdrop-blur-md border border-white/10 hover:!bg-white/20" : ""}`}
-                        style={{ transitionDelay: `${0.05 + i * 0.04}s` }}
-                        onMouseEnter={() => setHoveredCat(cat)}
-                        onMouseLeave={() => setHoveredCat(null)}
-                      >
-                        <div className="relative z-10">
-                          <div className="flex items-start justify-between mb-2">
-                            <span className="cat-icon text-2xl leading-none">
-                              {getCategoryIcon(cat)}
-                            </span>
-                            <span
-                              className={`cat-arrow text-sm font-light ${dropdownBanners[2] ? "text-white/40" : "text-neutral-300"}`}
+                    categories.map((cat, i) => {
+                      const isLiving = cat.toLowerCase().includes("living");
+                      const isKitchen = cat.toLowerCase().includes("kitchen");
+                      const cardBanner = isLiving
+                        ? dropdownBanners[3]
+                        : isKitchen
+                          ? dropdownBanners[4]
+                          : null;
+
+                      return (
+                        <Link
+                          key={cat}
+                          href={
+                            cat.toLowerCase().includes("kitchen")
+                              ? `/product?category=${encodeURIComponent("Home & Kitchen Appliance")}`
+                              : cat.toLowerCase().includes("living")
+                                ? `/product?category=${encodeURIComponent("home living")}`
+                                : `/product?category=${encodeURIComponent(cat)}`
+                          }
+                          className={`cat-card cat-card-stagger rounded-xl p-4 block relative overflow-hidden transition-all duration-300 ${
+                            cardBanner
+                              ? "border border-white/10 hover:scale-[1.02] shadow-sm hover:shadow-md"
+                              : dropdownBanners[2]
+                                ? "!bg-white/10 backdrop-blur-md border border-white/10 hover:!bg-white/20"
+                                : "border border-neutral-100 hover:bg-neutral-50"
+                          }`}
+                          style={{ transitionDelay: `${0.05 + i * 0.04}s` }}
+                          onMouseEnter={() => setHoveredCat(cat)}
+                          onMouseLeave={() => setHoveredCat(null)}
+                        >
+                          {cardBanner && (
+                            <>
+                              <img
+                                src={cardBanner}
+                                alt={cat}
+                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                              />
+                              <div className="absolute inset-0 bg-black/45 hover:bg-black/35 transition-colors duration-300" />
+                            </>
+                          )}
+                          <div className="relative z-10">
+                            <div className="flex items-start justify-between mb-2">
+                              <span className="cat-icon text-2xl leading-none">
+                                {getCategoryIcon(cat)}
+                              </span>
+                              <span
+                                className={`cat-arrow text-sm font-light ${cardBanner || dropdownBanners[2] ? "text-white/80" : "text-neutral-300"}`}
+                              >
+                                →
+                              </span>
+                            </div>
+                            <h4
+                              className={`cat-label text-[13px] font-bold tracking-wide capitalize leading-tight mb-1 ${cardBanner || dropdownBanners[2] ? "text-white" : "text-neutral-800"}`}
                             >
-                              →
-                            </span>
+                              {cat}
+                            </h4>
+                            <p
+                              className={`cat-eksplor text-[9.5px] uppercase tracking-[0.22em] font-semibold flex items-center gap-1 ${cardBanner || dropdownBanners[2] ? "text-white/85" : "text-neutral-400"}`}
+                            >
+                              Eksplor
+                            </p>
                           </div>
-                          <h4
-                            className={`cat-label text-[13px] font-bold tracking-wide capitalize leading-tight mb-1 ${dropdownBanners[2] ? "text-white" : "text-neutral-800"}`}
-                          >
-                            {cat}
-                          </h4>
-                          <p
-                            className={`cat-eksplor text-[9.5px] uppercase tracking-[0.22em] font-semibold flex items-center gap-1 ${dropdownBanners[2] ? "text-white/50" : "text-neutral-400"}`}
-                          >
-                            Eksplor
-                          </p>
-                        </div>
-                      </Link>
-                    ))
+                        </Link>
+                      );
+                    })
                   ) : (
                     <div className="col-span-full flex items-center py-10">
                       <Loader2

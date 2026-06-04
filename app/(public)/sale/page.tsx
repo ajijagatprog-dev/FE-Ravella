@@ -45,11 +45,20 @@ export default function SalePage() {
     }).format(p);
 
   useEffect(() => {
+    // Check if cache is still valid (not invalidated by admin updates)
+    const isCacheValid = (cacheTs: number) => {
+      try {
+        const version = localStorage.getItem("ravelle_cache_version");
+        if (version && parseInt(version) > cacheTs) return false;
+      } catch {}
+      return Date.now() - cacheTs < 5 * 60 * 1000;
+    };
+
     try {
-      const cached = sessionStorage.getItem("ravelle_sale_products");
+      const cached = localStorage.getItem("ravelle_sale_products");
       if (cached) {
         const { data, ts } = JSON.parse(cached);
-        if (Date.now() - ts < 5 * 60 * 1000) {
+        if (isCacheValid(ts)) {
           setProducts(data);
           setLoading(false);
           return;
@@ -98,7 +107,7 @@ export default function SalePage() {
             .filter((p: any) => p !== null);
           setProducts(saleProducts);
           try {
-            sessionStorage.setItem(
+            localStorage.setItem(
               "ravelle_sale_products",
               JSON.stringify({ data: saleProducts, ts: Date.now() }),
             );

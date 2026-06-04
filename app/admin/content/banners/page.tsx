@@ -54,13 +54,21 @@ const PAGE_CONFIGS: PageConfig[] = [
     key: "product-dropdown",
     label: "Product — Dropdown Menu",
     description:
-      "Banner di mega-menu dropdown navigasi Product (Featured Card, Mini Promo, Background)",
-    slots: 3,
-    slotLabels: ["Featured Card", "Mini Promo", "Background"],
+      "Banner di mega-menu dropdown navigasi Product (Featured Card, Mini Promo, Background, Home Living, Home Kitchen)",
+    slots: 5,
+    slotLabels: [
+      "Featured Card",
+      "Mini Promo",
+      "Background",
+      "Home Living Banner",
+      "Home Kitchen Banner",
+    ],
     defaultImages: [
       "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&q=80",
       "",
-      "",
+      "/Product/Ravelle-Cooking-BG.png",
+      "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&q=80",
+      "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&q=80",
     ],
   },
   {

@@ -34,12 +34,21 @@ export default function ProductDetail() {
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
   useEffect(() => {
+    // Check if cache is still valid (not invalidated by admin updates)
+    const isCacheValid = (cacheTs: number) => {
+      try {
+        const version = localStorage.getItem("ravelle_cache_version");
+        if (version && parseInt(version) > cacheTs) return false;
+      } catch {}
+      return Date.now() - cacheTs < 5 * 60 * 1000;
+    };
+
     // Try to load from cache first
     try {
-      const cached = sessionStorage.getItem(`ravelle_product_${productId}`);
+      const cached = localStorage.getItem(`ravelle_product_${productId}`);
       if (cached) {
         const { data, related, ts } = JSON.parse(cached);
-        if (Date.now() - ts < 5 * 60 * 1000) {
+        if (isCacheValid(ts)) {
           setProduct(data);
           setRelatedProducts(related);
           setIsLoading(false);
@@ -85,7 +94,7 @@ export default function ProductDetail() {
                 : {},
             inStock: item.stock > 0,
             stock: item.stock || 0,
-            badge: item.badge || (item.is_featured ? "Best Seller" : ""),
+            badge: item.badge || "",
             media: (item.media || []).filter((m: any) => !m.variant_id),
             variants: item.variants || [],
           };
@@ -117,7 +126,7 @@ export default function ProductDetail() {
                         )
                     : r.discount || 0,
                   active_promotion: r.active_promotion,
-                  badge: r.badge || (r.is_featured ? "Best Seller" : ""),
+                  badge: r.badge || "",
                   image:
                     r.image ||
                     "https://images.unsplash.com/photo-1558317374-067fb5f30001",
@@ -130,7 +139,7 @@ export default function ProductDetail() {
 
           // Save to cache
           try {
-            sessionStorage.setItem(
+            localStorage.setItem(
               `ravelle_product_${productId}`,
               JSON.stringify({
                 data: mappedProduct,

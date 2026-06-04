@@ -62,7 +62,7 @@ interface MediaItem {
 }
 
 interface VariantItem {
-  id?: number; // existing variant from DB
+  id?: number;
   variant_type: string;
   variant_value: string;
   price: number | "";
@@ -121,6 +121,7 @@ export default function ProductContentPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("all");
+  const [filterBadge, setFilterBadge] = useState("all");
   const [page, setPage] = useState(1);
   const PER_PAGE = 6;
 
@@ -154,8 +155,22 @@ export default function ProductContentPage() {
 
   const clearProductCache = () => {
     try {
-      sessionStorage.removeItem("ravelle_new_products");
+      // Clear localStorage caches (shared across all tabs — triggers storage event on public pages)
+      localStorage.removeItem("ravelle_best_sellers");
+      localStorage.removeItem("ravelle_new_products");
+      localStorage.removeItem("ravelle_sale_products");
+      localStorage.removeItem("ravelle_all_products");
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("ravelle_product_")) {
+          localStorage.removeItem(key);
+        }
+      });
+      // Set version timestamp — public pages listen for this via storage event and auto-refresh
+      localStorage.setItem("ravelle_cache_version", Date.now().toString());
+
+      // Also clear sessionStorage for backward compatibility
       sessionStorage.removeItem("ravelle_best_sellers");
+      sessionStorage.removeItem("ravelle_new_products");
       sessionStorage.removeItem("ravelle_sale_products");
       sessionStorage.removeItem("ravelle_all_products");
       Object.keys(sessionStorage).forEach((key) => {
@@ -164,7 +179,7 @@ export default function ProductContentPage() {
         }
       });
     } catch (e) {
-      console.error("Failed to clear sessionStorage cache", e);
+      console.error("Failed to clear product cache", e);
     }
   };
 
@@ -232,15 +247,16 @@ export default function ProductContentPage() {
     if (search)
       r = r.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
     if (filterCat !== "all") r = r.filter((p) => p.category === filterCat);
+    if (filterBadge !== "all") r = r.filter((p) => p.badge === filterBadge);
     return r;
-  }, [products, search, filterCat]);
+  }, [products, search, filterCat, filterBadge]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   useEffect(() => {
     setPage(1);
-  }, [search, filterCat]);
+  }, [search, filterCat, filterBadge]);
 
   // ── CRUD ──────────────────────────────────────────────────────────────────
   const openAdd = () => {
@@ -714,6 +730,20 @@ export default function ProductContentPage() {
               {CATEGORIES.map((c) => (
                 <option key={c.value} value={c.value}>
                   {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="relative flex-1 sm:flex-none">
+            <select
+              value={filterBadge}
+              onChange={(e) => setFilterBadge(e.target.value)}
+              className="w-full appearance-none bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 px-5 py-3 pr-10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 cursor-pointer transition-all"
+            >
+              <option value="all">Semua Badge</option>
+              {BADGES.map((b) => (
+                <option key={b} value={b}>
+                  {b}
                 </option>
               ))}
             </select>
